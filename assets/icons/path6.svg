@@ -1,0 +1,34 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (slightly wider oval) -->
+    <ellipse cx="250" cy="295" rx="115" ry="120" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+	<!-- Spiky hair additions -->
+	<path d="M 195 195 L 200 140 L 175 195 Z" fill="#1A1A1A" />
+    <path d="M 210 185 L 218 130 L 195 190 Z" fill="#1A1A1A" />
+    <path d="M 225 175 L 234 142 L 242 180 Z" fill="#1A1A1A" />
+    <path d="M 265 172 L 273 135 L 275 175 Z" fill="#1A1A1A" />
+    <path d="M 283 178 L 295 135 L 293 178 Z" fill="#1A1A1A" />
+    <path d="M 305 180 L 323 140 L 315 195 Z" fill="#1A1A1A" />
+	
+    <!-- Hair - Short spiky style -->
+    <path d="M 261 190
+           C 210 185, 165 205, 145 250
+           C 220 185, 230 170, 256 180
+           C 352 225, 360 225, 367 275
+           L 362 255
+           C 337 210, 307 180, 246 195 Z" fill="#1A1A1A" />
+
+    <!-- Left eye (almond shaped) -->
+    <ellipse cx="205" cy="270" rx="14" ry="12" fill="#1A1A1A" />
+
+    <!-- Right eye (almond shaped) -->
+    <ellipse cx="297" cy="270" rx="14" ry="12" fill="#1A1A1A" />
+
+    <!-- Nose (triangular) -->
+    <path d="M 251 312 L 240 332 L 265 332 Z" fill="#1A1A1A" />
+
+    <!-- Mouth (closed smile) -->
+    <path d="M 210 360 Q 256 375, 297 360" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+</svg>

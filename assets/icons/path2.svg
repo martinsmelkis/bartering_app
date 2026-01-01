@@ -1,0 +1,53 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (heart-shaped with pointed chin) -->
+    <path d="M 260 385
+           C 230 385, 195 375, 180 355
+           C 165 335, 155 310, 160 280
+           C 150 250, 155 220, 160 195
+           C 160 170, 180 155, 210 150
+           C 220 147, 243 148, 250 150
+           C 252 148, 272 147, 287 150
+           C 330 148, 350 165, 350 193
+           C 350 217, 362 245, 348 275
+           C 348 310, 347 335, 334 355
+           C 317 375, 292 385, 246 385 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - Bob cut with bangs -->
+    <path d="M 256 140
+           C 210 140, 170 160, 148 190
+           L 148 215
+           C 148 200, 155 192, 170 185
+           C 185 173, 200 175, 220 177
+           C 232 170, 244 173, 256 173
+           C 268 168, 280 175, 292 177
+           C 312 170, 327 178, 342 185
+           C 357 187, 364 205, 364 220
+           L 364 185
+           C 342 155, 302 145, 256 145 Z" fill="#1A1A1A" />
+
+    <!-- Bangs -->
+    <path d="M 170 180 Q 180 175, 190 205" fill="none" stroke="#1A1A1A" stroke-width="8"
+        stroke-linecap="round" />
+    <path d="M 200 173 Q 210 168, 220 198" fill="none" stroke="#1A1A1A" stroke-width="8"
+        stroke-linecap="round" />
+    <path d="M 232 170 Q 244 165, 256 193" fill="none" stroke="#1A1A1A" stroke-width="8"
+        stroke-linecap="round" />
+    <path d="M 268 170 Q 280 165, 292 198" fill="none" stroke="#1A1A1A" stroke-width="8"
+        stroke-linecap="round" />
+    <path d="M 302 173 Q 312 168, 322 205" fill="none" stroke="#1A1A1A" stroke-width="8"
+        stroke-linecap="round" />
+
+    <!-- Left eye (doe-eyed, larger) -->
+    <circle cx="215" cy="245" r="10" fill="#1A1A1A" />
+
+    <!-- Right eye (doe-eyed, larger) -->
+    <circle cx="297" cy="245" r="10" fill="#1A1A1A" />
+
+    <!-- Nose (petite) -->
+    <circle cx="256" cy="292" r="5" fill="#1A1A1A" />
+
+    <!-- Mouth (small smile) -->
+    <path d="M 225 330 Q 256 340, 287 330" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+</svg>

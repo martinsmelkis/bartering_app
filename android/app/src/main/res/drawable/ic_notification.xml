@@ -1,0 +1,36 @@
+<!-- Notification icon based on ic_launcher.svg -->
+<!-- Converted to white/transparent for Android notification compatibility -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    
+    <!-- Diamond shape filled white -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 256,95 L 97,254 L 256,413 L 415,254 Z"/>
+    
+    <!-- Zigzag fold line to show detail -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#00000000"
+        android:strokeWidth="12"
+        android:strokeLineJoin="miter"
+        android:strokeLineCap="round"
+        android:pathData="M 256,95 L 207,201 L 305,307 L 256,413"/>
+    
+    <!-- Optional: Add subtle inner shadow effect with semi-transparent path -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 256,95 L 207,201 L 305,307 L 256,413 L 415,254 Z"/>
+        
+    <!-- Outer border for definition -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="8"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M 256,95 L 415,254 L 256,413 L 97,254 Z"/>
+</vector>

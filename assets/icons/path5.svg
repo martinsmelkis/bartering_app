@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (slightly square jaw) -->
+    <path d="M 256 400
+           C 180 400, 145 360, 145 330
+           L 145 230
+           C 145 190, 190 155, 256 165
+           C 322 145, 367 190, 367 240
+           L 367 330
+           C 347 390, 292 400, 256 400 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair - Pompadour/quiff style -->
+    <path d="M 256 160
+           C 190 140, 150 165, 140 210
+           L 140 235
+           C 145 200, 160 185, 185 178
+           C 200 165, 220 155, 240 158
+           Q 248 140, 256 125
+           Q 264 140, 272 158
+           C 292 155, 312 165, 327 178
+           C 352 185, 367 200, 372 235
+           L 372 210
+           C 362 165, 322 140, 256 140 Z" fill="#1A1A1A" />
+
+    <!-- Pompadour volume -->
+    <ellipse cx="256" cy="145" rx="45" ry="30" fill="#1A1A1A" />
+
+    <!-- Left eye (doe-eyed, larger) -->
+    <circle cx="215" cy="260" r="14" fill="#1A1A1A" />
+
+    <!-- Right eye (doe-eyed, larger) -->
+    <circle cx="297" cy="260" r="14" fill="#1A1A1A" />
+
+    <!-- Nose (defined bridge) -->
+    <path d="M 256 290 L 256 320 M 248 320 Q 256 325, 264 320" fill="none" stroke="#1A1A1A"
+        stroke-width="7" stroke-linecap="round" />
+
+    <!-- Mouth (wide grin) -->
+    <path d="M 217 350 Q 256 370, 292 350" fill="none" stroke="#1A1A1A" stroke-width="9"
+        stroke-linecap="round" />
+</svg>

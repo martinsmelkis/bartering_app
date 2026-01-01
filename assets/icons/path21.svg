@@ -1,0 +1,47 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (round, darker skin tone) -->
+    <circle cx="256" cy="295" r="110" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="11" />
+
+    <!-- Hair - Cornrows/braids going back -->
+    <ellipse cx="180" cy="200" rx="8" ry="60" fill="#2C1810" />
+    <ellipse cx="200" cy="195" rx="8" ry="62" fill="#2C1810" />
+    <ellipse cx="220" cy="190" rx="8" ry="64" fill="#2C1810" />
+    <ellipse cx="240" cy="188" rx="8" ry="65" fill="#2C1810" />
+    <ellipse cx="256" cy="186" rx="8" ry="66" fill="#2C1810" />
+    <ellipse cx="272" cy="188" rx="8" ry="65" fill="#2C1810" />
+    <ellipse cx="292" cy="190" rx="8" ry="64" fill="#2C1810" />
+    <ellipse cx="312" cy="195" rx="8" ry="62" fill="#2C1810" />
+    <ellipse cx="332" cy="200" rx="8" ry="60" fill="#2C1810" />
+
+    <!-- Hair base -->
+    <path d="M 155 230
+           C 155 195, 170 175, 195 165
+           C 215 155, 235 150, 256 150
+           C 277 150, 297 155, 317 165
+           C 342 175, 357 195, 357 230
+           L 357 250
+           L 155 250 Z" fill="#2C1810" />
+
+    <!-- Left eye (wide, expressive) -->
+    <ellipse cx="215" cy="287" rx="12" ry="12" fill="#FFFFFF" />
+    <circle cx="214" cy="287" r="10" fill="#3B2414" />
+    <circle cx="216" cy="284" r="4" fill="#FFFFFF" />
+
+    <!-- Right eye (wide, expressive) -->
+    <ellipse cx="297" cy="287" rx="12" ry="12" fill="#FFFFFF" />
+    <circle cx="296" cy="287" r="10" fill="#3B2414" />
+    <circle cx="297" cy="284" r="4" fill="#FFFFFF" />
+
+    <!-- Nose (broad) -->
+    <ellipse cx="256" cy="325" rx="8" ry="7" fill="#3B2414" />
+
+    <!-- Mouth (big warm smile) -->
+    <path d="M 220 360 Q 256 380, 300 355 Q 251 370, 215 360 Z" fill="#8B4513" stroke="#1A1A1A"
+        stroke-width="3" />
+    <path d="M 220 360 Q 256 370, 287 360" fill="none" stroke="#FFFFFF" stroke-width="4" />
+
+    <!-- Earrings -->
+    <circle cx="150" cy="295" r="8" fill="#FFD700" stroke="#1A1A1A" stroke-width="2" />
+    <circle cx="362" cy="295" r="8" fill="#FFD700" stroke="#1A1A1A" stroke-width="2" />
+</svg>

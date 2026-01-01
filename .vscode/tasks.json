@@ -1,0 +1,141 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup Flavor: Dev",
+      "type": "shell",
+      "command": "dart scripts/flavor_dependencies.dart dev && flutter pub get",
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Setup Flavor: Staging",
+      "type": "shell",
+      "command": "dart scripts/flavor_dependencies.dart staging && flutter pub get",
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Setup Flavor: Prod",
+      "type": "shell",
+      "command": "dart scripts/flavor_dependencies.dart prod && flutter pub get",
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Check Flavor: Dev",
+      "type": "shell",
+      "command": "dart scripts/check_flavor.dart dev",
+      "problemMatcher": [],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Check Flavor: Staging",
+      "type": "shell",
+      "command": "dart scripts/check_flavor.dart staging",
+      "problemMatcher": [],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Check Flavor: Prod",
+      "type": "shell",
+      "command": "dart scripts/check_flavor.dart prod",
+      "problemMatcher": [],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Restore Original pubspec.yaml",
+      "type": "shell",
+      "command": "dart scripts/restore_pubspec.dart && flutter pub get",
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Test Flavor System",
+      "type": "shell",
+      "command": "dart scripts/test_flavor_dependencies.dart",
+      "problemMatcher": [],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Build: Dev APK",
+      "type": "shell",
+      "command": "dart scripts/flavor_dependencies.dart dev && flutter pub get && flutter build apk --flavor dev && dart scripts/restore_pubspec.dart",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Build: Prod APK",
+      "type": "shell",
+      "command": "dart scripts/flavor_dependencies.dart prod && flutter pub get && flutter build apk --flavor prod && dart scripts/restore_pubspec.dart",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}

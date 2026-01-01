@@ -1,0 +1,51 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (olive/tan skin tone) -->
+    <ellipse cx="256" cy="295" rx="105" ry="115" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair top/crown (moved 10% lower) -->
+    <path d="M 136 232
+          C 136 182, 180 145, 256 145
+          C 332 145, 376 182, 376 232
+          L 376 272
+          C 376 272, 365 252, 345 242
+          C 325 232, 295 227, 256 227
+          C 217 227, 187 232, 167 242
+          C 147 252, 136 272, 136 272
+          Z" fill="#1A1A1A" />
+    
+    <!-- Hair sides (5% closer to face) -->
+    <path d="M 154 240 Q 149 280, 154 330" fill="none" stroke="#1A1A1A" stroke-width="35" stroke-linecap="butt" />
+    <path d="M 358 240 Q 363 280, 358 330" fill="none" stroke="#1A1A1A" stroke-width="35" stroke-linecap="butt" />
+
+    <!-- Left eye (large, expressive with liner) -->
+    <ellipse cx="220" cy="280" rx="11" ry="11" fill="#FFFFFF" />
+    <circle cx="220" cy="282" r="9" fill="#2C1810" />
+    <circle cx="222" cy="279" r="3" fill="#FFFFFF" />
+
+    <!-- Eye liner -->
+    <path d="M 205 273 Q 220 270, 235 273" fill="none" stroke="#1A1A1A" stroke-width="3"
+        stroke-linecap="round" />
+
+    <!-- Right eye (large, expressive with liner) -->
+    <ellipse cx="292" cy="280" rx="11" ry="11" fill="#FFFFFF" />
+    <circle cx="292" cy="282" r="9" fill="#2C1810" />
+    <circle cx="294" cy="279" r="3" fill="#FFFFFF" />
+
+    <!-- Eye liner -->
+    <path d="M 277 273 Q 292 270, 307 273" fill="none" stroke="#1A1A1A" stroke-width="3"
+        stroke-linecap="round" />
+
+    <!-- Eyebrows -->
+    <path d="M 200 265 Q 220 260, 238 265" fill="none" stroke="#2C1810" stroke-width="5"
+        stroke-linecap="round" />
+    <path d="M 274 265 Q 292 260, 312 265" fill="none" stroke="#2C1810" stroke-width="5"
+        stroke-linecap="round" />
+
+    <!-- Nose -->
+    <circle cx="256" cy="315" r="6" fill="#a66d36" />
+
+    <!-- Mouth (gentle smile) -->
+    <path d="M 230 350 Q 256 362, 282 350" fill="none" stroke="#8B4513" stroke-width="6"
+        stroke-linecap="round" />
+</svg>

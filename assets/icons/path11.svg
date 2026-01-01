@@ -1,0 +1,60 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (round and soft) -->
+    <circle cx="256" cy="290" r="108" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - High bun with hair accessories -->
+    <path d="M 256 165
+           C 205 165, 165 185, 150 225
+           L 150 245
+           C 150 230, 155 215, 170 205
+           C 185 195, 205 190, 225 192
+           C 238 185, 247 183, 256 185
+           C 265 183, 274 185, 287 192
+           C 307 190, 327 195, 342 205
+           C 357 215, 362 230, 362 245
+           L 362 225
+           C 347 185, 307 165, 256 165 Z" fill="#1A1A1A" />
+
+    <!-- High bun -->
+    <ellipse cx="256" cy="155" rx="35" ry="38" fill="#1A1A1A" />
+    <ellipse cx="256" cy="150" rx="30" ry="25" fill="#1A1A1A" />
+
+    <!-- Hair accessory - bow -->
+    <path d="M 220 155 Q 215 150, 220 145 Q 225 140, 230 145 L 235 150 L 230 155 Z" fill="#FF69B4"
+        stroke="#1A1A1A" stroke-width="2" />
+    <path d="M 292 155 Q 297 150, 292 145 Q 287 140, 282 145 L 277 150 L 282 155 Z" fill="#FF69B4"
+        stroke="#1A1A1A" stroke-width="2" />
+    <circle cx="256" cy="152" r="6" fill="#FF69B4" stroke="#1A1A1A" stroke-width="2" />
+
+    <!-- Soft bangs -->
+    <path d="M 190 205 Q 200 195, 210 210" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+    <path d="M 220 198 Q 230 190, 240 205" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+    <path d="M 272 205 Q 282 190, 292 198" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+    <path d="M 302 210 Q 312 195, 322 205" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+
+    <!-- Left eye (large, doe-eyed) -->
+    <circle cx="222" cy="280" r="11" fill="#1A1A1A" />
+    <circle cx="225" cy="277" r="3.5" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Right eye (large, doe-eyed) -->
+    <circle cx="290" cy="280" r="11" fill="#1A1A1A" />
+    <circle cx="293" cy="277" r="3.5" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Eyelashes -->
+    <path d="M 215 277 Q 210 273, 213 270" fill="none" stroke="#1A1A1A" stroke-width="2" />
+    <path d="M 229 277 Q 234 273, 231 270" fill="none" stroke="#1A1A1A" stroke-width="2" />
+    <path d="M 283 277 Q 278 273, 281 270" fill="none" stroke="#1A1A1A" stroke-width="2" />
+    <path d="M 297 277 Q 302 273, 299 270" fill="none" stroke="#1A1A1A" stroke-width="2" />
+
+    <!-- Nose (petite button) -->
+    <circle cx="256" cy="308" r="5" fill="#1A1A1A" />
+
+    <!-- Mouth (small, sweet smile) -->
+    <path d="M 232 340 Q 256 350, 280 340" fill="none" stroke="#1A1A1A" stroke-width="5"
+        stroke-linecap="round" />
+</svg>

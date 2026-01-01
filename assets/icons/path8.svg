@@ -1,0 +1,53 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (heart-shaped) -->
+    <path d="M 256 385
+           C 225 385, 190 375, 175 350
+           C 160 325, 150 295, 155 265
+           C 150 240, 155 215, 160 195
+           C 165 170, 185 155, 215 150
+           C 230 147, 245 148, 256 150
+           C 267 148, 282 147, 297 150
+           C 327 155, 347 170, 352 195
+           C 357 215, 362 240, 357 265
+           C 362 295, 352 325, 337 350
+           C 322 375, 287 385, 256 385 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - Braided crown/updo -->
+    <path d="M 256 145
+           C 205 145, 165 165, 148 200
+           L 148 225
+           C 148 210, 155 195, 175 185
+           C 195 175, 220 175, 245 178
+           Q 250 165, 256 155
+           Q 262 165, 267 178
+           C 292 175, 317 175, 337 185
+           C 357 195, 364 210, 364 225
+           L 364 200
+           C 347 165, 307 145, 256 145 Z" fill="#1A1A1A" />
+
+    <!-- Braided crown pattern -->
+    <path d="M 170 190 Q 180 185, 190 190 Q 200 185, 210 190" fill="none" stroke="#1A1A1A"
+        stroke-width="5" />
+    <path d="M 220 183 Q 230 178, 240 183 Q 250 178, 256 180" fill="none" stroke="#1A1A1A"
+        stroke-width="5" />
+    <path d="M 266 180 Q 272 178, 282 183 Q 292 178, 302 183" fill="none" stroke="#1A1A1A"
+        stroke-width="5" />
+    <path d="M 312 190 Q 322 185, 332 190 Q 342 185, 352 190" fill="none" stroke="#1A1A1A"
+        stroke-width="5" />
+
+    <!-- Left eye (doe-eyed) -->
+    <circle cx="215" cy="250" r="12" fill="#1A1A1A" />
+    <circle cx="219" cy="247" r="3" fill="#FFFFFF" opacity="0.8" />
+
+    <!-- Right eye (doe-eyed) -->
+    <circle cx="297" cy="250" r="12" fill="#1A1A1A" />
+    <circle cx="301" cy="247" r="3" fill="#FFFFFF" opacity="0.8" />
+
+    <!-- Nose (delicate) -->
+    <circle cx="256" cy="295" r="6" fill="#1A1A1A" />
+
+    <!-- Mouth (gentle curve) -->
+    <path d="M 228 335 Q 256 345, 284 335" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+</svg>

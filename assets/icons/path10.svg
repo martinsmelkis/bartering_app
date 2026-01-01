@@ -1,0 +1,48 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (slightly angular with soft features) -->
+    <ellipse cx="256" cy="292" rx="112" ry="120" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair - Messy/tousled medium length -->
+    <path d="M 260 170
+           C 200 170, 160 190, 145 225
+           L 150 220
+           C 150 245, 152 230, 170 220
+           C 185 210, 205 205, 225 208
+           C 238 200, 247 198, 256 200
+           C 265 198, 274 200, 287 208
+           C 307 205, 327 210, 342 220
+           C 360 230, 367 245, 367 260
+           L 367 235
+           C 352 190, 312 170, 260 170 Z" fill="#1A1A1A" />
+
+    <!-- Messy strands -->
+    <path d="M 165 215 Q 175 205, 185 225" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 195 208 Q 205 198, 215 218" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 238 208 Q 247 195, 256 210" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 274 198 Q 283 190, 292 210" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 307 210 Q 317 200, 327 223" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 337 218 Q 347 203, 357 233" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+
+    <!-- Left eye (casual) -->
+    <ellipse cx="217" cy="275" rx="12" ry="11" fill="#1A1A1A" />
+    <circle cx="221" cy="272" r="4" fill="#FFFFFF" />
+
+    <!-- Right eye (casual) -->
+    <ellipse cx="295" cy="275" rx="12" ry="11" fill="#1A1A1A" />
+    <circle cx="299" cy="272" r="4" fill="#FFFFFF" />
+
+    <!-- Nose (medium) -->
+    <path d="M 256 305 L 254 322 M 248 322 Q 256 327, 264 322" fill="none" stroke="#1A1A1A"
+        stroke-width="6" stroke-linecap="round" />
+
+    <!-- Mouth (easy-going smile) -->
+    <path d="M 225 355 Q 256 368, 287 355" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+</svg>

@@ -1,0 +1,50 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (square jaw, masculine) -->
+    <path d="M 256 405
+           C 185 405, 148 365, 148 335
+           L 148 235
+           C 148 195, 193 160, 256 160
+           C 319 160, 364 195, 364 235
+           L 364 335
+           C 364 365, 327 405, 256 405 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair - Buzz cut/military style -->
+    <path d="M 256 155
+           C 200 155, 160 175, 145 220
+           L 145 240
+           C 145 225, 150 210, 165 200
+           C 180 190, 200 185, 225 185
+           C 235 182, 245 180, 256 180
+           C 267 180, 277 182, 287 185
+           C 312 185, 332 190, 347 200
+           C 362 210, 367 225, 367 240
+           L 367 220
+           C 352 175, 312 155, 256 155 Z" fill="#1A1A1A" />
+
+    <!-- Short hair texture -->
+    <path d="M 170 195 L 172 200 M 185 190 L 187 195 M 200 187 L 202 192" fill="none" stroke="#1A1A1A" stroke-width="2" />
+    <path d="M 312 187 L 310 192 M 327 190 L 325 195 M 342 195 L 340 200" fill="none" stroke="#1A1A1A" stroke-width="2" />
+
+    <!-- Left eye (narrow, focused) -->
+    <circle cx="213" cy="270" r="11" fill="#1A1A1A" />
+    <circle cx="216" cy="267" r="3" fill="#FFFFFF" opacity="0.7" />
+
+    <!-- Right eye (narrow, focused) -->
+    <circle cx="299" cy="270" r="11" fill="#1A1A1A" />
+    <circle cx="302" cy="267" r="3" fill="#FFFFFF" opacity="0.7" />
+
+    <!-- Strong eyebrows -->
+    <path d="M 195 252 Q 213 245, 230 251" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 282 252 Q 299 245, 317 251" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+
+    <!-- Nose (defined) -->
+    <path d="M 256 295 L 256 325 M 248 325 Q 256 330, 264 325" fill="none" stroke="#1A1A1A"
+        stroke-width="7" stroke-linecap="round" />
+
+	<path d="M 220 360 Q 256 367, 292 360" fill="none" stroke="#1A1A1A" stroke-width="5"
+        stroke-linecap="round" />
+		
+</svg>

@@ -1,0 +1,29 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  
+  <!-- Left section (darker orange) -->
+  <path d="M 256 95 L 97 254 L 256 413 L 305 307 L 207 201 Z" 
+        fill="#ff9c75" 
+        stroke="none"/>
+  
+  <!-- Right section (lighter orange) -->
+  <path d="M 256 95 L 207 201 L 305 307 L 256 413 L 415 254 Z" 
+        fill="#faa94c" 
+        stroke="none"/>
+  
+  <!-- Outer border -->
+  <path d="M 256 95 L 415 254 L 256 413 L 97 254 Z" 
+        fill="none" 
+        stroke="#ffefd3" 
+        stroke-width="10" 
+        stroke-linejoin="round"
+        stroke-linecap="round"/>
+  
+  <!-- Zigzag fold line with correct angles -->
+  <!-- From top center at 230° to 1/3 height, then 330° to 2/3 height, then to bottom -->
+  <path d="M 256 95 L 207 201 L 305 307 L 256 413" 
+        fill="none" 
+        stroke="#ffefd3" 
+        stroke-width="8" 
+        stroke-linejoin="miter"
+        stroke-linecap="round"/>
+</svg>

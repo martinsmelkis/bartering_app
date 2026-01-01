@@ -1,0 +1,69 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (light/rosy skin, freckled) -->
+    <ellipse cx="256" cy="290" rx="108" ry="118" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - Curly/wavy red hair (ginger) -->
+    <circle cx="195" cy="185" r="28" fill="#D2691E" />
+    <circle cx="220" cy="170" r="30" fill="#D2691E" />
+    <circle cx="245" cy="162" r="28" fill="#D2691E" />
+    <circle cx="256" cy="157" r="32" fill="#D2691E" />
+    <circle cx="267" cy="162" r="28" fill="#D2691E" />
+    <circle cx="292" cy="170" r="30" fill="#D2691E" />
+    <circle cx="317" cy="185" r="28" fill="#D2691E" />
+    <circle cx="175" cy="210" r="25" fill="#D2691E" />
+    <circle cx="337" cy="210" r="25" fill="#D2691E" />
+
+    <!-- Hair volume/curls on sides -->
+    <circle cx="160" cy="240" r="22" fill="#D2691E" />
+    <circle cx="352" cy="240" r="22" fill="#D2691E" />
+    <circle cx="150" cy="270" r="18" fill="#D2691E" />
+    <circle cx="362" cy="270" r="18" fill="#D2691E" />
+
+    <!-- Cover gaps -->
+    <path d="M 145 260
+           C 145 215, 160 180, 195 165
+           C 215 155, 235 152, 256 152
+           C 277 152, 297 155, 317 165
+           C 352 180, 367 215, 367 260
+           L 367 275
+           L 145 275 Z" fill="#D2691E" />
+
+    <!-- Left eye (green, bright) -->
+    <ellipse cx="218" cy="278" rx="13" ry="11" fill="#FFFFFF" />
+    <circle cx="218" cy="280" r="9" fill="#2E8B57" />
+    <circle cx="220" cy="277" r="3" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Right eye (green, bright) -->
+    <ellipse cx="294" cy="278" rx="13" ry="11" fill="#FFFFFF" />
+    <circle cx="294" cy="280" r="9" fill="#2E8B57" />
+    <circle cx="296" cy="277" r="3" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Freckles (lots of them!) -->
+    <circle cx="200" cy="270" r="2.5" fill="#CD853F" opacity="0.7" />
+    <circle cx="210" cy="275" r="2" fill="#CD853F" opacity="0.7" />
+    <circle cx="218" cy="265" r="2.5" fill="#CD853F" opacity="0.7" />
+    <circle cx="228" cy="272" r="2" fill="#CD853F" opacity="0.7" />
+    <circle cx="235" cy="310" r="2.5" fill="#CD853F" opacity="0.7" />
+    <circle cx="245" cy="315" r="2" fill="#CD853F" opacity="0.7" />
+    <circle cx="256" cy="308" r="2.5" fill="#CD853F" opacity="0.7" />
+    <circle cx="267" cy="315" r="2" fill="#CD853F" opacity="0.7" />
+    <circle cx="277" cy="310" r="2.5" fill="#CD853F" opacity="0.7" />
+    <circle cx="284" cy="272" r="2" fill="#CD853F" opacity="0.7" />
+    <circle cx="294" cy="265" r="2.5" fill="#CD853F" opacity="0.7" />
+    <circle cx="302" cy="275" r="2" fill="#CD853F" opacity="0.7" />
+    <circle cx="312" cy="270" r="2.5" fill="#CD853F" opacity="0.7" />
+
+    <!-- Eyebrows (lighter, ginger) -->
+    <path d="M 198 265 Q 218 260, 236 265" fill="none" stroke="#A0522D" stroke-width="4"
+        stroke-linecap="round" />
+    <path d="M 276 265 Q 294 260, 314 265" fill="none" stroke="#A0522D" stroke-width="4"
+        stroke-linecap="round" />
+
+    <!-- Nose (small, upturned) -->
+    <circle cx="256" cy="312" r="5" fill="#1A1A1A" />
+
+    <!-- Mouth (cheerful smile) -->
+    <path d="M 225 345 Q 256 360, 287 345" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+</svg>

@@ -1,0 +1,40 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (round and friendly) -->
+    <circle cx="256" cy="285" r="118" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair - Man bun with undercut -->
+    <path d="M 256 155
+           C 195 155, 155 180, 145 230
+           L 145 255
+           C 145 240, 150 225, 165 215
+           C 180 205, 200 200, 220 202
+           C 235 195, 245 193, 256 195
+           C 267 193, 277 195, 292 202
+           C 312 200, 332 205, 347 215
+           C 362 225, 367 240, 367 255
+           L 367 230
+           C 357 180, 317 155, 256 155 Z" fill="#1A1A1A" />
+
+    <!-- Man bun on top -->
+    <circle cx="256" cy="160" r="28" fill="#1A1A1A" />
+    <path d="M 235 155 Q 256 145, 277 155" fill="none" stroke="#1A1A1A" stroke-width="6" />
+
+    <!-- Left eye (friendly) -->
+    <circle cx="218" cy="275" r="12" fill="#1A1A1A" />
+    <circle cx="222" cy="271" r="3.5" fill="#FFFFFF" opacity="0.8" />
+
+    <!-- Right eye (friendly) -->
+    <circle cx="294" cy="275" r="12" fill="#1A1A1A" />
+    <circle cx="298" cy="271" r="3.5" fill="#FFFFFF" opacity="0.8" />
+
+    <!-- Nose (simple) -->
+    <circle cx="256" cy="308" r="6" fill="#1A1A1A" />
+
+    <!-- Facial hair - small goatee -->
+    <ellipse cx="256" cy="365" rx="12" ry="8" fill="#1A1A1A" />
+
+    <!-- Mouth (relaxed smile) -->
+    <path d="M 225 340 Q 256 352, 287 340" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+</svg>

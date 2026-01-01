@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  
+  
+  <!-- Face (head circle with skin tone) -->
+  <circle cx="256" cy="280" r="118" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair/Head top (green semicircle) -->
+    <path d="M 256 140
+           C 180 140, 140 180, 140 240
+           L 140 260
+           C 140 260, 140 220, 180 200
+           C 180 200, 200 180, 256 180
+           C 312 180, 332 200, 332 200
+           C 372 220, 372 260, 372 260
+           L 372 240
+           C 372 180, 332 140, 256 140 Z" fill="#1A1A1A" />
+
+    <!-- Left eye -->
+    <circle cx="210" cy="255" r="10" fill="#1A1A1A" />
+
+    <!-- Right eye -->
+    <circle cx="302" cy="255" r="10" fill="#1A1A1A" />
+	
+	<!-- Left eye (wide, expressive) -->
+    <ellipse cx="210" cy="262" rx="12" ry="12" fill="#FFFFFF" />
+    <circle cx="210" cy="262" r="10" fill="#3B2414" />
+    <circle cx="212" cy="259" r="4" fill="#FFFFFF" />
+
+    <!-- Right eye (wide, expressive) -->
+    <ellipse cx="301" cy="262" rx="12" ry="12" fill="#FFFFFF" />
+    <circle cx="300" cy="262" r="10" fill="#3B2414" />
+    <circle cx="301" cy="259" r="4" fill="#FFFFFF" />
+
+    <!-- Nose -->
+    <circle cx="256" cy="307" r="6.5" fill="#1A1A1A" />
+
+    <!-- Mouth (smile) -->
+    <path d="M 220 343 Q 256 360, 292 343" fill="none" stroke="#1A1A1A"
+        stroke-width="8" 
+        stroke-linecap="round"/>
+</svg>

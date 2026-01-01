@@ -1,0 +1,39 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (oval with defined jawline) -->
+    <ellipse cx="256" cy="295" rx="110" ry="125" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair - Dreadlocks style -->
+    <ellipse cx="180" cy="200" rx="18" ry="45" fill="#1A1A1A" />
+    <ellipse cx="210" cy="185" rx="18" ry="50" fill="#1A1A1A" />
+    <ellipse cx="240" cy="175" rx="18" ry="52" fill="#1A1A1A" />
+    <ellipse cx="256" cy="170" rx="18" ry="55" fill="#1A1A1A" />
+    <ellipse cx="272" cy="175" rx="18" ry="52" fill="#1A1A1A" />
+    <ellipse cx="302" cy="185" rx="18" ry="50" fill="#1A1A1A" />
+    <ellipse cx="332" cy="200" rx="18" ry="45" fill="#1A1A1A" />
+
+    <!-- Hair base to cover gaps -->
+    <path d="M 150 220
+           C 150 190, 165 170, 190 160
+           C 210 150, 235 145, 256 145
+           C 277 145, 302 150, 322 160
+           C 347 170, 362 190, 362 220
+           L 362 240
+           L 150 240 Z" fill="#1A1A1A" />
+
+    <!-- Left eye (expressive) -->
+    <circle cx="215" cy="285" r="13" fill="#1A1A1A" />
+    <circle cx="219" cy="282" r="4" fill="#FFFFFF" opacity="0.8" />
+
+    <!-- Right eye (expressive) -->
+    <circle cx="297" cy="285" r="13" fill="#1A1A1A" />
+    <circle cx="301" cy="282" r="4" fill="#FFFFFF" opacity="0.8" />
+
+    <!-- Nose (wider) -->
+    <path d="M 246 320 L 244 335 L 268 335 L 266 320" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+
+    <!-- Mouth (friendly smile) -->
+    <path d="M 220 365 Q 256 380, 292 365" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+</svg>

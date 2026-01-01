@@ -1,0 +1,39 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (rounder, slightly smaller) -->
+    <circle cx="256" cy="285" r="110" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair - Long wavy side part -->
+    <path d="M 256 155
+           C 190 155, 145 185, 145 235
+           L 145 255
+           C 145 245, 150 230, 165 220
+           Q 180 210, 190 215
+           Q 195 205, 205 200
+           Q 220 195, 235 200
+           Q 245 195, 256 195
+           Q 297 208, 307 215
+           Q 317 222, 327 232
+           Q 337 242, 347 255
+           L 347 235
+           C 347 185, 322 155, 256 155 Z" fill="#1A1A1A" />
+
+    <!-- Hair waves -->
+    <path d="M 155 240 Q 165 235, 175 240 Q 185 245, 190 240" fill="none" stroke="#1A1A1A"
+        stroke-width="3" />
+
+    <!-- Left eye (round with highlight) -->
+    <circle cx="220" cy="270" r="11" fill="#1A1A1A" />
+    <circle cx="224" cy="267" r="3" fill="#FFFFFF" opacity="0.8" />
+
+    <!-- Right eye (round with highlight) -->
+    <circle cx="292" cy="270" r="11" fill="#1A1A1A" />
+    <circle cx="296" cy="267" r="3" fill="#FFFFFF" opacity="0.8" />
+
+    <!-- Nose (small button) -->
+    <circle cx="256" cy="300" r="6" fill="#1A1A1A" />
+
+    <!-- Mouth (gentle smile) -->
+    <path d="M 225 335 Q 256 348, 287 335" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+</svg>

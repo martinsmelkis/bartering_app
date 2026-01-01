@@ -1,0 +1,65 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (heart-shaped, delicate) -->
+    <path d="M 256 385
+           C 228 385, 195 375, 180 352
+           C 165 330, 155 305, 158 275
+           C 152 248, 157 223, 162 200
+           C 167 175, 187 160, 215 155
+           C 228 152, 242 153, 256 155
+           C 270 153, 284 152, 297 155
+           C 325 160, 345 175, 350 200
+           C 355 223, 360 248, 354 275
+           C 357 305, 347 330, 332 352
+           C 317 375, 284 385, 256 385 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - Pixie cut with side-swept bangs -->
+    <path d="M 256 150
+           C 208 150, 168 168, 150 205
+           L 150 230
+           C 150 215, 155 200, 172 190
+           C 188 180, 210 178, 235 182
+           C 242 175, 249 173, 256 173
+           C 263 173, 270 175, 277 182
+           C 302 178, 324 180, 340 190
+           C 357 200, 362 215, 362 230
+           L 362 205
+           C 344 168, 304 150, 256 150 Z" fill="#1A1A1A" />
+
+    <!-- Side-swept bangs -->
+    <path d="M 170 185 Q 185 175, 200 210" fill="none" stroke="#1A1A1A" stroke-width="8"
+        stroke-linecap="round" />
+    <path d="M 195 178 Q 210 175, 225 208" fill="none" stroke="#1A1A1A" stroke-width="8"
+        stroke-linecap="round" />
+    <path d="M 220 173 Q 235 168, 250 205" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 248 170 Q 258 168, 268 200" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+
+    <!-- Short layered sides -->
+    <path d="M 155 220 Q 148 240, 150 255" fill="none" stroke="#1A1A1A" stroke-width="18"
+        stroke-linecap="round" />
+    <path d="M 357 220 Q 364 240, 362 255" fill="none" stroke="#1A1A1A" stroke-width="18"
+        stroke-linecap="round" />
+
+    <!-- Left eye (expressive almond) -->
+    <ellipse cx="218" cy="260" rx="11" ry="9" fill="#1A1A1A" />
+    <circle cx="221" cy="258" r="3" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Right eye (expressive almond) -->
+    <ellipse cx="294" cy="260" rx="11" ry="9" fill="#1A1A1A" />
+    <circle cx="297" cy="258" r="3" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Eyelashes (more prominent) -->
+    <path d="M 210 257 Q 205 252, 208 249" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 226 257 Q 231 252, 228 249" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 286 257 Q 281 252, 284 249" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 302 257 Q 307 252, 304 249" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+
+    <!-- Nose (delicate) -->
+    <circle cx="256" cy="295" r="5" fill="#1A1A1A" />
+
+    <!-- Mouth (soft, feminine smile) -->
+    <path d="M 228 335 Q 256 347, 284 335" fill="none" stroke="#1A1A1A" stroke-width="5"
+        stroke-linecap="round" />
+</svg>

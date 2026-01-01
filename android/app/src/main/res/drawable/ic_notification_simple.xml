@@ -1,0 +1,22 @@
+<!-- Simplified notification icon - better for very small sizes -->
+<!-- Based on ic_launcher.svg diamond shape -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    
+    <!-- Solid white diamond -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 256,95 L 415,254 L 256,413 L 97,254 Z"/>
+    
+    <!-- Zigzag fold line for brand recognition -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#40000000"
+        android:strokeWidth="16"
+        android:strokeLineJoin="miter"
+        android:strokeLineCap="round"
+        android:pathData="M 256,95 L 207,201 L 305,307 L 256,413"/>
+</vector>

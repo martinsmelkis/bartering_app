@@ -1,0 +1,55 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (angular, strong) -->
+    <path d="M 256 400
+           C 188 400, 150 365, 150 330
+           L 150 240
+           C 150 200, 195 165, 256 165
+           C 317 165, 362 200, 362 240
+           L 362 330
+           C 362 365, 324 400, 256 400 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair - Slicked back/undercut -->
+    <path d="M 256 160
+           C 205 160, 165 178, 148 218
+           L 148 238
+           C 148 223, 153 208, 168 198
+           C 183 188, 203 183, 228 183
+           Q 242 178, 256 178
+           Q 270 178, 284 183
+           C 309 183, 329 188, 344 198
+           C 359 208, 364 223, 364 238
+           L 364 218
+           C 347 178, 307 160, 256 160 Z" fill="#1A1A1A" />
+
+    <!-- Slicked back lines -->
+    <path d="M 185 190 Q 220 185, 256 183" fill="none" stroke="#1A1A1A" stroke-width="4" />
+    <path d="M 256 183 Q 292 185, 327 190" fill="none" stroke="#1A1A1A" stroke-width="4" />
+
+    <!-- Left eye (intense) -->
+    <circle cx="215" cy="268" r="12" fill="#1A1A1A" />
+    <circle cx="218" cy="265" r="3" fill="#FFFFFF" opacity="0.7" />
+
+    <!-- Right eye (intense) -->
+    <circle cx="297" cy="268" r="12" fill="#1A1A1A" />
+    <circle cx="300" cy="265" r="3" fill="#FFFFFF" opacity="0.7" />
+
+    <!-- Bold eyebrows -->
+    <path d="M 198 253 Q 215 248, 232 252" fill="none" stroke="#1A1A1A" stroke-width="8"
+        stroke-linecap="round" />
+    <path d="M 280 252 Q 297 248, 314 253" fill="none" stroke="#1A1A1A" stroke-width="8"
+        stroke-linecap="round" />
+
+    <!-- Nose (strong bridge) -->
+    <path d="M 256 290 L 256 322 M 246 322 Q 256 328, 266 322" fill="none" stroke="#1A1A1A"
+        stroke-width="8" stroke-linecap="round" />
+
+    <!-- Full beard -->
+    <path d="M 195 355 Q 205 355, 256 345 Q 307 355, 317 355" fill="#1A1A1A" />
+	
+	<path d="M 230 360 Q 256 365, 282 360" fill="none" stroke="#1A1A1A" stroke-width="3"
+        stroke-linecap="round" />
+		
+    <ellipse cx="256" cy="380" rx="8" ry="8" fill="#1A1A1A" />
+
+</svg>

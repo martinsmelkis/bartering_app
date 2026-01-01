@@ -1,0 +1,40 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (tall oval) -->
+    <ellipse cx="256" cy="290" rx="115" ry="125" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair - Curly afro style -->
+    <circle cx="200" cy="180" r="35" fill="#1A1A1A" />
+    <circle cx="230" cy="165" r="32" fill="#1A1A1A" />
+    <circle cx="256" cy="155" r="35" fill="#1A1A1A" />
+    <circle cx="282" cy="165" r="32" fill="#1A1A1A" />
+    <circle cx="312" cy="180" r="35" fill="#1A1A1A" />
+    <circle cx="175" cy="210" r="30" fill="#1A1A1A" />
+    <circle cx="337" cy="210" r="30" fill="#1A1A1A" />
+    <circle cx="160" cy="245" r="25" fill="#1A1A1A" />
+    <circle cx="352" cy="245" r="25" fill="#1A1A1A" />
+
+    <!-- Cover gaps in hair -->
+    <path d="M 155 240
+           C 155 200, 165 180, 200 165
+           C 220 155, 240 150, 256 150
+           C 272 150, 292 155, 312 165
+           C 347 180, 357 200, 357 240
+           L 357 260
+           L 155 260 Z" fill="#1A1A1A" />
+
+    <!-- Left eye (wide) -->
+    <ellipse cx="215" cy="280" rx="16" ry="10" fill="#1A1A1A" />
+
+    <!-- Right eye (wide) -->
+    <ellipse cx="297" cy="280" rx="16" ry="10" fill="#1A1A1A" />
+
+    <!-- Nose (wider bridge) -->
+    <path d="M 248 310 L 245 330 L 267 330 L 264 310" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+
+    <!-- Mouth (big smile with open) -->
+    <path d="M 210 365 Q 256 385, 302 365 Q 256 375, 210 365 Z" fill="#1A1A1A" stroke="#1A1A1A"
+        stroke-width="7" />
+    <path d="M 210 365 Q 256 375, 302 365" fill="none" stroke="#FFFFFF" stroke-width="3" />
+</svg>

@@ -1,0 +1,39 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (pale/light skin tone, rounder) -->
+    <ellipse cx="256" cy="310" rx="110" ry="122" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - Undercut with red/orange dyed top (moved 20% lower) -->
+    <path d="M 256 174
+          C 200 174, 160 194, 145 234
+          L 145 269
+          C 145 269, 150 249, 165 239
+          C 180 229, 200 224, 220 227
+          C 235 219, 245 217, 256 217
+          C 267 217, 277 219, 292 227
+          C 312 224, 332 229, 347 239
+          C 362 249, 367 269, 367 269
+          L 367 234
+          C 352 194, 312 174, 256 174 Z" fill="#1A1A1A" />
+
+    <!-- Glasses (round thick black frames) -->
+    <circle cx="210" cy="297" r="25" fill="none" stroke="#1A1A1A" stroke-width="6" />
+    <circle cx="302" cy="297" r="25" fill="none" stroke="#1A1A1A" stroke-width="6" />
+    <path d="M 235 297 L 277 297" fill="none" stroke="#1A1A1A" stroke-width="6" />
+
+    <!-- Eyes behind glasses -->
+    <circle cx="210" cy="296" r="8" fill="#4169E1" />
+    <circle cx="302" cy="296" r="8" fill="#4169E1" />
+    <circle cx="212" cy="294" r="3" fill="#FFFFFF" opacity="0.8" />
+    <circle cx="304" cy="294" r="3" fill="#FFFFFF" opacity="0.8" />
+
+    <!-- Nose ring (septum piercing) -->
+    <path d="M 248 340 Q 256 347, 264 340" fill="none" stroke="#C0C0C0" stroke-width="4" />
+
+    <!-- Nose -->
+    <path d="M 256 330 L 256 348" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Mouth (slight smirk) -->
+    <path d="M 233 373 Q 248 378, 277 373" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+</svg>

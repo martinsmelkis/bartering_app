@@ -1,0 +1,61 @@
+# Flutter/Dart build artifacts
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Platform-specific directories (not needed for web)
+android/
+ios/
+linux/
+macos/
+windows/
+test/
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README.md
+LICENSE
+CHANGELOG.md
+docs/
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Test coverage
+coverage/
+
+# Misc
+*.swp
+*.swo
+*~
+.firebase/
+.firebaserc
+firebase.json

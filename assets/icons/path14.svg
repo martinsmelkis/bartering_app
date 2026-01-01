@@ -1,0 +1,75 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (soft heart shape) -->
+    <path d="M 256 390
+           C 226 390, 192 380, 177 355
+           C 162 332, 153 308, 156 278
+           C 150 250, 155 225, 160 202
+           C 165 177, 185 162, 213 157
+           C 228 154, 242 155, 256 157
+           C 270 155, 284 154, 299 157
+           C 327 162, 347 177, 352 202
+           C 357 225, 362 250, 356 278
+           C 359 308, 350 332, 335 355
+           C 320 380, 286 390, 256 390 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - Space buns (double buns) -->
+    <path d="M 256 152
+           C 207 152, 167 170, 152 210
+           L 152 232
+           C 152 217, 157 202, 172 192
+           C 187 182, 207 177, 227 180
+           C 240 172, 248 170, 256 170
+           C 264 170, 272 172, 285 180
+           C 305 177, 325 182, 340 192
+           C 355 202, 360 217, 360 232
+           L 360 210
+           C 345 170, 305 152, 256 152 Z" fill="#1A1A1A" />
+
+    <!-- Left bun -->
+    <circle cx="190" cy="180" r="30" fill="#1A1A1A" />
+    <circle cx="190" cy="175" r="24" fill="#1A1A1A" />
+    <path d="M 170 175 Q 190 165, 210 175" fill="none" stroke="#1A1A1A" stroke-width="5" />
+
+    <!-- Right bun -->
+    <circle cx="322" cy="180" r="30" fill="#1A1A1A" />
+    <circle cx="322" cy="175" r="24" fill="#1A1A1A" />
+    <path d="M 302 175 Q 322 165, 342 175" fill="none" stroke="#1A1A1A" stroke-width="5" />
+
+    <!-- Cute bangs -->
+    <path d="M 195 195 Q 205 188, 215 200" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 225 193 Q 235 186, 245 198" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 267 198 Q 277 186, 287 193" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+    <path d="M 297 200 Q 307 188, 317 195" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+
+    <!-- Left eye (large, anime-style) -->
+    <circle cx="218" cy="265" r="12" fill="#1A1A1A" />
+    <circle cx="222" cy="262" r="4" fill="#FFFFFF" opacity="0.95" />
+    <circle cx="218" cy="267" r="1.5" fill="#FFFFFF" opacity="0.7" />
+
+    <!-- Right eye (large, anime-style) -->
+    <circle cx="294" cy="265" r="12" fill="#1A1A1A" />
+    <circle cx="298" cy="262" r="4" fill="#FFFFFF" opacity="0.95" />
+    <circle cx="294" cy="267" r="1.5" fill="#FFFFFF" opacity="0.7" />
+
+    <!-- Eyelashes (more prominent) -->
+    <path d="M 210 262 Q 204 258, 207 254" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 226 262 Q 232 258, 229 254" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 286 262 Q 280 258, 283 254" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 302 262 Q 308 258, 305 254" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+
+    <!-- Rosy cheeks -->
+    <ellipse cx="195" cy="290" rx="18" ry="12" fill="#FFB6C1" opacity="0.5" />
+    <ellipse cx="317" cy="290" rx="18" ry="12" fill="#FFB6C1" opacity="0.5" />
+
+    <!-- Nose (tiny) -->
+    <circle cx="256" cy="300" r="4" fill="#1A1A1A" />
+
+    <!-- Mouth (cute smile) -->
+    <path d="M 230 335 Q 256 348, 282 335" fill="none" stroke="#1A1A1A" stroke-width="5"
+        stroke-linecap="round" />
+</svg>

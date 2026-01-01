@@ -1,0 +1,67 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (heart-shaped, feminine) -->
+    <path d="M 256 388
+           C 224 388, 190 378, 175 353
+           C 160 330, 151 306, 154 276
+           C 149 248, 154 223, 159 200
+           C 164 175, 184 160, 212 155
+           C 227 152, 241 153, 256 155
+           C 271 153, 285 152, 300 155
+           C 328 160, 348 175, 353 200
+           C 358 223, 363 248, 358 276
+           C 361 306, 352 330, 337 353
+           C 322 378, 288 388, 256 388 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - High ponytail with volume -->
+    <path d="M 256 155
+           C 204 155, 164 163, 160 205
+           L 160 227
+           C 160 212, 155 197, 173 187
+           C 190 177, 213 173, 238 177
+           Q 247 168, 256 165
+           Q 265 168, 274 177
+           C 299 173, 322 177, 339 187
+           C 357 197, 362 212, 362 227
+           L 362 205
+           C 348 163, 308 155, 256 155 Z" fill="#1A1A1A" />
+
+    <!-- Ponytail on top -->
+    <ellipse cx="256" cy="155" rx="35" ry="45" fill="#1A1A1A" />
+    <ellipse cx="256" cy="145" rx="28" ry="45" fill="#1A1A1A" />
+
+    <!-- Ponytail tie -->
+    <ellipse cx="256" cy="155" rx="18" ry="8" fill="#1A1A1A" />
+
+    <!-- Hair strands around face -->
+    <path d="M 165 190 Q 166 220, 165 240" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+    <path d="M 347 190 Q 345 220, 347 240" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+		
+	<path d="M 176 185 Q 178 220, 176 240" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+    <path d="M 337 185 Q 335 220, 337 240" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+
+    <!-- Left eye (bright) -->
+    <circle cx="217" cy="258" r="12" fill="#1A1A1A" />
+    <circle cx="221" cy="255" r="4" fill="#FFFFFF" opacity="0.95" />
+
+    <!-- Right eye (bright) -->
+    <circle cx="295" cy="258" r="12" fill="#1A1A1A" />
+    <circle cx="299" cy="255" r="4" fill="#FFFFFF" opacity="0.95" />
+
+    <!-- Eyelashes (prominent) -->
+    <path d="M 209 254 Q 203 250, 206 246" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 225 254 Q 231 250, 228 246" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 287 254 Q 281 250, 284 246" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 303 254 Q 309 250, 306 246" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+
+    <!-- Nose (delicate) -->
+    <circle cx="256" cy="295" r="5" fill="#1A1A1A" />
+
+    <!-- Mouth (cheerful smile) -->
+    <path d="M 227 335 Q 256 350, 285 335" fill="none" stroke="#1A1A1A" stroke-width="6"
+        stroke-linecap="round" />
+</svg>

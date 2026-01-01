@@ -1,0 +1,45 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (medium brown skin tone, strong features, 5% narrower) -->
+    <path d="M 256 410
+          C 211 410, 178 395, 164 370
+          C 150 345, 145 315, 145 285
+          L 145 245
+          C 145 205, 182 170, 256 170
+          C 330 170, 367 205, 367 245
+          L 367 285
+          C 367 315, 362 345, 348 370
+          C 334 395, 301 410, 256 410 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Thick eyebrows -->
+    <path d="M 190 260 Q 215 253, 235 260" fill="none" stroke="#2C1810" stroke-width="6"
+        stroke-linecap="round" />
+    <path d="M 277 260 Q 297 253, 322 260" fill="none" stroke="#2C1810" stroke-width="6"
+        stroke-linecap="round" />
+
+    <!-- Left eye (intense) -->
+    <ellipse cx="211" cy="280" rx="10" ry="12" fill="#FFFFFF" />
+    <circle cx="210" cy="280" r="9" fill="#2C1810" />
+    <circle cx="212" cy="277" r="3" fill="#FFFFFF" />
+
+    <!-- Right eye (intense) -->
+    <ellipse cx="297" cy="280" rx="10" ry="12" fill="#FFFFFF" />
+    <circle cx="296" cy="280" r="9" fill="#2C1810" />
+    <circle cx="298" cy="277" r="3" fill="#FFFFFF" />
+
+    <!-- Nose (broad, prominent) -->
+    <path d="M 256 300 L 254 330 M 242 330 Q 256 337, 270 330" fill="none" stroke="#1A1A1A"
+        stroke-width="8" stroke-linecap="round" />
+
+    <!-- Mustache -->
+    <path d="M 210 350 Q 230 358, 256 350 Q 282 358, 302 350" fill="#2C1810" />
+    <path d="M 210 350 Q 230 345, 256 350 Q 282 345, 302 350" fill="none" stroke="#1A1A1A"
+        stroke-width="3" />
+
+    <!-- Goatee -->
+    <ellipse cx="256" cy="385" rx="12" ry="12" fill="#2C1810" />
+
+    <!-- Mouth (confident) -->
+    <path d="M 220 360 Q 256 370, 292 360" fill="none" stroke="#1A1A1A" stroke-width="7"
+        stroke-linecap="round" />
+</svg>
