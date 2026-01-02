@@ -208,6 +208,18 @@
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable
 
+# ==================== RESOURCES ====================
+# Keep notification icons (referenced by string name from Flutter)
+-keep class **.R$drawable {
+    public static final int ic_notification;
+    public static final int ic_notification_simple;
+}
+
+# Prevent resource shrinking from removing notification icons
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
 # ==================== ADDITIONAL SECURITY ====================
 # Remove debug info
 -keepattributes !LocalVariableTable,!LocalVariableTypeTable

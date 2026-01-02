@@ -6,7 +6,7 @@ part 'point_of_interest.g.dart';
 @JsonSerializable() // Add this annotation
 class PointOfInterest {
   final UserProfileData profile;
-  final double distanceKm;
+  final double? distanceKm;
   double? matchRelevancyScore;
 
   PointOfInterest({
