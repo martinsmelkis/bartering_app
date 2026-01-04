@@ -1,7 +1,10 @@
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/data/local/app_database.dart';
+import 'package:barter_app/models/reviews/review_eligibility.dart';
 import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
+import 'package:barter_app/screens/review_screen/review_screen.dart';
+import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
@@ -202,6 +205,10 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
       Conversation conversation) async {
     final l10n = AppLocalizations.of(context)!;
 
+    // First, check if user can review the other party
+    final canShowReview = true;
+    //await _checkReviewEligibility(conversation); // TODO use
+
     return showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -213,6 +220,17 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(l10n.cancel),
             ),
+            if (canShowReview)
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                  _showReviewScreen(conversation);
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.blue,
+                ),
+                child: const Text('Review'),
+              ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(
@@ -224,6 +242,102 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
         );
       },
     );
+  }
+
+  Future<bool> _checkReviewEligibility(Conversation conversation) async {
+    try {
+      // Get the other participant's ID
+      final participants = await _chatRepository.getConversationParticipants(
+        conversation.conversationId,
+        excludeUserId: _currentUserId,
+      );
+
+      if (participants.isEmpty) {
+        return false;
+      }
+
+      final otherUserId = participants.first;
+      final apiClient = getIt<ApiClient>();
+
+      // Check eligibility via API
+      final eligibility = await apiClient.checkReviewEligibility(_currentUserId!, otherUserId);
+
+      // Store eligibility for later use
+      _lastCheckedEligibility = eligibility;
+      _lastCheckedConversation = conversation;
+
+      return eligibility.eligible;
+    } catch (e) {
+      print('Error checking review eligibility: $e');
+      return false;
+    }
+  }
+
+  ReviewEligibilityResponse? _lastCheckedEligibility;
+  Conversation? _lastCheckedConversation;
+
+  Future<void> _showReviewScreen(Conversation conversation) async {
+    if (_lastCheckedEligibility == null || _lastCheckedConversation?.conversationId != conversation.conversationId) {
+      // Eligibility not cached, check again
+      final canReview = true;
+      //await _checkReviewEligibility(conversation); //TODO use
+      if (!canReview/* || _lastCheckedEligibility == null*/) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Unable to review this user at this time')),
+          );
+        }
+        return;
+      }
+    }
+
+    // Get the other participant's ID
+    final participants = await _chatRepository.getConversationParticipants(
+      conversation.conversationId,
+      excludeUserId: _currentUserId,
+    );
+
+    if (participants.isEmpty) return;
+
+    final otherUserId = participants.first;
+
+    if (mounted) {
+      final reviewed = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => ReviewScreen(
+            otherUserId: otherUserId,
+            otherUserName: "",//_lastCheckedEligibility!.otherUserName, TODO adjust
+            eligibility: ReviewEligibilityResponse(eligible: true, transactionId: conversation.conversationId,
+              otherUserName: "", otherUserAvatarUrl: "", reason: "")//) //_lastCheckedEligibility!,
+          ),
+        ),
+      );
+
+      // If review was submitted, optionally delete/archive conversation
+      if (reviewed == true && mounted) {
+        final shouldDelete = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Archive Conversation?'),
+            content: const Text('Would you like to archive this conversation now?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Keep'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Archive'),
+              ),
+            ],
+          ),
+        );
+
+        if (shouldDelete == true) {
+          _deleteConversation(conversation);
+        }
+      }
+    }
   }
 
   Future<void> _deleteConversation(Conversation conversation) async {

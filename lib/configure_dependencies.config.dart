@@ -69,9 +69,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i33.UserRepository>(),
       ),
     );
-    gh.singleton<_i1006.ChatRepository>(
-      () => _i1006.ChatRepository(gh<_i397.AppDatabase>()),
-    );
     gh.factory<_i646.InitializeCubit>(
       () => _i646.InitializeCubit(
         gh<_i33.UserRepository>(),
@@ -81,6 +78,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i159.LocationPickerCubit>(
       () => _i159.LocationPickerCubit(
         gh<_i205.ApiClient>(),
+        gh<_i33.UserRepository>(),
+      ),
+    );
+    gh.singleton<_i1006.ChatRepository>(
+      () => _i1006.ChatRepository(
+        gh<_i397.AppDatabase>(),
         gh<_i33.UserRepository>(),
       ),
     );

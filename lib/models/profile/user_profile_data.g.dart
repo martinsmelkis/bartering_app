@@ -10,8 +10,8 @@ UserProfileData _$UserProfileDataFromJson(Map<String, dynamic> json) =>
     UserProfileData(
       userId: json['userId'] as String,
       name: json['name'] as String,
-      longitude: (json['longitude'] as num).toDouble(),
-      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      latitude: (json['latitude'] as num?)?.toDouble(),
       attributes: (json['attributes'] as List<dynamic>?)
           ?.map(
             (e) => UserAttributeEntryData.fromJson(e as Map<String, dynamic>),

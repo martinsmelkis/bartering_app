@@ -1,11 +1,13 @@
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
+import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
 import 'package:barter_app/screens/map_screen/widgets/drawer_main.dart';
 import 'package:barter_app/screens/map_screen/widgets/main_navigation.dart';
 import 'package:barter_app/screens/map_screen/widgets/poi_details_bottom_sheet.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_in_map.dart';
 import 'package:barter_app/screens/map_screen/widgets/zoom_buttons.dart';
+import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart';
 import 'package:barter_app/services/firebase_service.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
@@ -101,6 +103,13 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _mapController.addObserver(this);
     _loadUserProfile();
     
+    // Load match history to update badge count
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<NotificationsCubit>().loadMatchHistory();
+      }
+    });
+    
     // Handle any pending notification that opened the app when it was terminated
     // Add a delay to ensure the route is fully settled before attempting navigation
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -163,7 +172,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       final firstPoi = widget.initialPois!.first;
       _mapController.setZoom(zoomLevel: 15.0);
       _mapController.moveTo(
-        GeoPoint(latitude: firstPoi.profile.latitude, longitude: firstPoi.profile.longitude),
+        GeoPoint(latitude: firstPoi.profile.latitude ?? 0.0,
+            longitude: firstPoi.profile.longitude ?? 0.0),
       );
       
       _processPois(widget.initialPois!);
@@ -266,8 +276,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
               print('@@@@@@@@@@@ Adding POI marker: ${poi.profile.userId}');
               final newMarker = await _createPoiMarker(poi, l10n);
-              final position = GeoPoint(latitude: poi.profile.latitude,
-                  longitude: poi.profile.longitude);
+              final position = GeoPoint(latitude: poi.profile.latitude ?? 0.0,
+                  longitude: poi.profile.longitude ?? 0.0);
               await _mapController.addMarker(
                 position,
                 markerIcon: newMarker,
@@ -295,7 +305,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
           final poiMarker = await _createPoiMarker(poi, l10n);
           final position = GeoPoint(
-              latitude: poi.profile.latitude, longitude: poi.profile.longitude);
+              latitude: poi.profile.latitude ?? 0.0,
+              longitude: poi.profile.longitude ?? 0.0);
           await _mapController.addMarker(
             position,
             markerIcon: poiMarker,
@@ -326,7 +337,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           if (!_isRenderOperationValid(currentOperation)) return;
           final svg = await _createPoiMarker(poi, l10n);
           final position = GeoPoint(
-              latitude: poi.profile.latitude, longitude: poi.profile.longitude);
+              latitude: poi.profile.latitude ?? 0.0,
+              longitude: poi.profile.longitude ?? 0.0);
           await _mapController.addMarker(
             position,
             markerIcon: svg,
@@ -389,7 +401,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
       final svg = await _createPoiMarker(poi, l10n);
       final position = GeoPoint(
-          latitude: poi.profile.latitude, longitude: poi.profile.longitude);
+          latitude: poi.profile.latitude ?? 0.0, longitude: poi.profile.longitude ?? 0.0);
       await _mapController.addMarker(
         position,
         markerIcon: svg,
@@ -595,12 +607,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             checkItem(subCluster, subCluster.centroid);
           } else {
             for (var poi in subCluster.pois) {
-              checkItem(poi, GeoPoint(latitude: poi.profile.latitude, longitude: poi.profile.longitude));
+              checkItem(poi, GeoPoint(latitude: poi.profile.latitude ?? 0.0,
+                  longitude: poi.profile.longitude ?? 0.0));
             }
           }
         }
         for (var poi in mainCluster.individualPoisWithinExpandedCluster) {
-          checkItem(poi, GeoPoint(latitude: poi.profile.latitude, longitude: poi.profile.longitude));
+          checkItem(poi, GeoPoint(latitude: poi.profile.latitude ?? 0.0,
+              longitude: poi.profile.longitude ?? 0.0));
         }
       }
     }
@@ -609,12 +623,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         checkItem(looseSubCluster, looseSubCluster.centroid);
       } else {
         for (var poi in looseSubCluster.pois) {
-          checkItem(poi, GeoPoint(latitude: poi.profile.latitude, longitude: poi.profile.longitude));
+          checkItem(poi, GeoPoint(latitude: poi.profile.latitude ?? 0.0,
+              longitude: poi.profile.longitude ?? 0.0));
         }
       }
     }
     for (var poi in mapOperationsCubit.individualPois) {
-      checkItem(poi, GeoPoint(latitude: poi.profile.latitude, longitude: poi.profile.longitude));
+      checkItem(poi, GeoPoint(latitude: poi.profile.latitude ?? 0.0,
+          longitude: poi.profile.longitude ?? 0.0));
     }
     for (var poi in widget.initialPois ?? List.empty()) {
       checkItem(poi, GeoPoint(latitude: poi.profile.latitude, longitude: poi.profile.longitude));
@@ -724,26 +740,67 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                           top: kIsWeb ? 26 : topPadding ?? 26.0,
                           right: 12,
                           child: PointerInterceptor(
-                            child: FloatingActionButton(
-                              onPressed: () {
-                                final chatCubit = context.read<ChatPanelCubit>();
+                            child: BlocBuilder<ChatsBadgeCubit, ChatsBadgeState>(
+                              builder: (context, badgeState) {
+                                return Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    FloatingActionButton(
+                                      onPressed: () {
+                                        final chatCubit = context.read<ChatPanelCubit>();
 
-                                if (context.canShowSideBySide) {
-                                  // Large screen: Open as side panel
-                                  chatCubit.openChatsList();
-                                } else {
-                                  // Small screen: Navigate to full screen
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => const ChatsListScreen(),
+                                        if (context.canShowSideBySide) {
+                                          // Large screen: Open as side panel
+                                          chatCubit.openChatsList();
+                                        } else {
+                                          // Small screen: Navigate to full screen
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (_) => const ChatsListScreen(),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      heroTag: "ChatsFab",
+                                      mini: true,
+                                      backgroundColor: AppColors.background,
+                                      child: const Icon(Icons.chat_bubble_outline),
                                     ),
-                                  );
-                                }
+                                    if (badgeState.unreadCount > 0)
+                                      Positioned(
+                                        top: -4,
+                                        right: -4,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: AppColors.background,
+                                              width: 2,
+                                            ),
+                                          ),
+                                          constraints: const BoxConstraints(
+                                            minWidth: 20,
+                                            minHeight: 20,
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              badgeState.unreadCount > 99
+                                                  ? '99+'
+                                                  : badgeState.unreadCount.toString(),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                );
                               },
-                              heroTag: "ChatsFab",
-                              mini: true,
-                              backgroundColor: AppColors.background,
-                              child: const Icon(Icons.chat_bubble_outline),
                             ),
                           ),
                         ),
@@ -859,8 +916,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         final markerWidget = snapshot.data!.iconWidget!;
 
         return GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(
+          onTap: () async {
+            await Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) =>
                     UserProfileScreen(
@@ -871,6 +928,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
               ),
             );
+            // Reload match history when user returns
+            if (mounted) {
+              context.read<NotificationsCubit>().loadMatchHistory();
+            }
           },
           child: Stack(
             children: [
@@ -892,25 +953,66 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               Positioned(
                 top: 0,
                 right: 0,
-                child: Container(
-                  width: AppDimensions.avatarEditIconSize,
-                  height: AppDimensions.avatarEditIconSize,
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.edit,
-                    size: AppDimensions.avatarEditIconInnerSize,
-                    color: AppColors.primary,
-                  ),
+                child: BlocBuilder<NotificationsCubit, NotificationsState>(
+                  builder: (context, notificationState) {
+                    final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
+                    
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: AppDimensions.avatarEditIconSize,
+                          height: AppDimensions.avatarEditIconSize,
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            size: AppDimensions.avatarEditIconInnerSize,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        if (unreadCount > 0)
+                          Positioned(
+                            top: -4,
+                            right: -4,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppColors.background,
+                                  width: 1.5,
+                                ),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 18,
+                                minHeight: 18,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],

@@ -8,8 +8,8 @@ class UserProfileData {
 
   final String userId;
   final String name;
-  final double longitude;
-  final double latitude;
+  final double? longitude;
+  final double? latitude;
   final List<UserAttributeEntryData>? attributes;
   final Map<String, double>? profileKeywordDataMap;
   final List<String>? activePostingIds;

@@ -1,10 +1,13 @@
 import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/screens/chat_screen/cubit/chat_cubit.dart';
+import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
 import 'package:barter_app/screens/map_screen/cubit/chat_panel_cubit.dart';
 import 'package:barter_app/screens/map_screen/cubit/map_operations_cubit.dart';
 import 'package:barter_app/screens/map_screen/cubit/map_screen_api_cubit.dart';
+import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/chat_notification_service.dart';
+import 'package:barter_app/services/firebase_service.dart';
 import 'package:barter_app/theme/app_theme.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -23,6 +26,7 @@ class Application extends StatefulWidget {
 
 class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   ChatNotificationService? _chatNotificationService;
+  late ChatsBadgeCubit _chatsBadgeCubit;
 
   // It is assumed that all messages contain a data field with the key 'type'
   Future<void> setupInteractedMessage() async {
@@ -107,6 +111,17 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         ),
         BlocProvider<ChatPanelCubit>(
           create: (context) => ChatPanelCubit(),
+        ),
+        BlocProvider<ChatsBadgeCubit>(
+          create: (context) {
+            _chatsBadgeCubit = ChatsBadgeCubit();
+            // Register with FirebaseService for FCM updates
+            FirebaseService().setChatsBadgeCubit(_chatsBadgeCubit);
+            return _chatsBadgeCubit;
+          },
+        ),
+        BlocProvider<NotificationsCubit>(
+          create: (context) => getIt<NotificationsCubit>()..loadMatchHistory(),
         ),
       ],
       child: ScreenUtilInit(

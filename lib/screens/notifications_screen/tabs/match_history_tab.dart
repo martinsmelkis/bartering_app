@@ -326,9 +326,7 @@ class _MatchHistoryCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     
     // Get the target user ID based on the match type
-    final targetUserId = match.targetType.toUpperCase() != 'USER'
-        ? match.targetId 
-        : match.userId; // If target is a posting, show the posting owner
+    final targetUserId = match.targetId;
     
     try {
       // Show loading indicator

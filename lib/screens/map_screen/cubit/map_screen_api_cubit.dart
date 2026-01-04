@@ -69,8 +69,8 @@ class PoiCubit extends Cubit<PoiState> {
         radiusMeters,
         weight,
       );
-      poi.forEach((poi) => {
-        print('@@@@@@@@@@@ POI loaded: ${poi.profile.userId} ${poi.matchRelevancyScore}')
+      poi.forEach((poi) {
+        print('@@@@@@@@@@@ POI loaded: ${poi.profile.userId} ${poi.matchRelevancyScore}');
       });
       emit(PoiLoaded(poi));
     } catch (e) {

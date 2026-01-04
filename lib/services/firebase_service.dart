@@ -1,7 +1,11 @@
 import 'dart:io' show Platform;
 
+import 'package:barter_app/models/chat/chat_message.dart';
+import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/router/app_router.dart';
+import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
+import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/services/local_notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -20,10 +24,20 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   } catch (e) {
     print('Firebase already initialized (this is normal): $e');
   }
-  print('Background message received: ${message.messageId}');
+  print('📱 Background message received: ${message.messageId}');
   print('Title: ${message.notification?.title}');
   print('Body: ${message.notification?.body}');
   print('Data: ${message.data}');
+  
+  // Handle chat messages in background
+  final type = message.data['type'];
+  if (type == 'new_message') {
+    print('💾 Saving chat message from background FCM...');
+    // Note: In background handler, we can't easily access dependency injection
+    // The message will be saved when the app is opened and syncs
+    // Or we could initialize dependencies here if needed
+    print('⚠️ Message will be synced when app opens or via WebSocket');
+  }
 }
 
 class FirebaseService {
@@ -40,6 +54,15 @@ class FirebaseService {
   RemoteMessage? _pendingInitialMessage;
   bool _hasHandledInitialMessage = false;
   bool _isRouterReady = false;
+  
+  // Reference to ChatsBadgeCubit for updating badge on FCM messages
+  ChatsBadgeCubit? _chatsBadgeCubit;
+  
+  /// Set the ChatsBadgeCubit instance to receive updates
+  void setChatsBadgeCubit(ChatsBadgeCubit cubit) {
+    _chatsBadgeCubit = cubit;
+    print('✅ ChatsBadgeCubit registered with FirebaseService');
+  }
 
   /// Initialize Firebase and FCM
   Future<void> initialize() async {
@@ -158,8 +181,114 @@ class FirebaseService {
     print('Body: ${message.notification?.body}');
     print('Data: ${message.data}');
 
+    final type = message.data['type'];
+    
+    // Check if this is a match notification
+    if (type == 'match' || type == 'wishlist_match') {
+      print('📱 Match notification received, reloading match history...');
+      try {
+        final notificationsCubit = getIt<NotificationsCubit>();
+        await notificationsCubit.loadMatchHistory();
+        print('✅ Match history reloaded');
+      } catch (e) {
+        print('❌ Failed to reload match history: $e');
+      }
+    }
+    
+    // Check if this is a chat message notification
+    if (type == 'new_message') {
+      print('📱 Chat message notification received via FCM');
+      
+      // Save the message to the database first
+      await _saveChatMessageFromFCM(message.data);
+      
+      // Then refresh the badge (which will read from the database)
+      if (_chatsBadgeCubit != null) {
+        try {
+          await _chatsBadgeCubit!.refresh();
+          print('✅ Chat badge refreshed after saving FCM message');
+        } catch (e) {
+          print('❌ Failed to refresh chat badge: $e');
+        }
+      } else {
+        print('⚠️ ChatsBadgeCubit not registered with FirebaseService');
+      }
+    }
+
     // Display local notification
     await _showLocalNotification(message);
+  }
+
+  /// Save chat message from FCM data to local database
+  Future<void> _saveChatMessageFromFCM(Map<String, dynamic> data) async {
+    try {
+      print('💾 Attempting to save FCM chat message to database...');
+      
+      // Extract message data from FCM payload
+      final messageId = data['messageId'] as String?;
+      final senderId = data['senderId'] as String?;
+      final recipientId = data['recipientId'] as String?;
+      final encryptedContent = data['encryptedContent'] as String?;
+      final timestampMs = data['timestamp'] as String?;
+      
+      // Validate required fields
+      if (messageId == null || senderId == null || recipientId == null || encryptedContent == null) {
+        print('⚠️ Missing required fields in FCM message data');
+        print('messageId: $messageId, senderId: $senderId, recipientId: $recipientId, encrypted: ${encryptedContent != null}');
+        return;
+      }
+      
+      // Get current user ID
+      final userRepository = getIt<UserRepository>();
+      final currentUserId = await userRepository.getUserId();
+      
+      if (currentUserId == null) {
+        print('❌ Current user ID not available, cannot save message');
+        return;
+      }
+      
+      // Parse timestamp
+      DateTime timestamp;
+      if (timestampMs != null) {
+        try {
+          timestamp = DateTime.fromMillisecondsSinceEpoch(int.parse(timestampMs));
+        } catch (e) {
+          timestamp = DateTime.now();
+        }
+      } else {
+        timestamp = DateTime.now();
+      }
+      
+      // Create ChatMessage object
+      final chatMessage = ChatMessage(
+        id: messageId,
+        senderId: senderId,
+        recipientId: recipientId,
+        encryptedTextPayload: encryptedContent,
+        plainText: null, // Will be decrypted when user opens chat
+        timestamp: timestamp,
+        isSentByCurrentUser: senderId == currentUserId,
+      );
+      
+      // Get or create conversation
+      final chatRepository = getIt<ChatRepository>();
+      final conversation = await chatRepository.getOrCreateConversation(
+        userId1: currentUserId,
+        userId2: senderId == currentUserId ? recipientId : senderId,
+      );
+      
+      // Save message to database
+      await chatRepository.saveMessage(chatMessage, conversation.conversationId);
+      
+      print('✅ FCM chat message saved to database successfully');
+      print('   Message ID: $messageId');
+      print('   Conversation ID: ${conversation.conversationId}');
+      print('   Sender: $senderId');
+      
+    } catch (e) {
+      print('❌ Error saving FCM chat message to database: $e');
+      print('Stack trace: ${StackTrace.current}');
+    }
   }
 
   /// Show local notification for foreground messages

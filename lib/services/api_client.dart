@@ -8,6 +8,11 @@ import 'package:barter_app/models/notifications/notification_models.dart';
 import 'package:barter_app/models/postings/posting_data_response.dart';
 import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/models/relationships/user_relationships_response.dart';
+import 'package:barter_app/models/reviews/reputation_response.dart';
+import 'package:barter_app/models/reviews/review_eligibility.dart';
+import 'package:barter_app/models/reviews/review_response.dart';
+import 'package:barter_app/models/reviews/review_submission.dart';
+import 'package:barter_app/models/reviews/transaction_response.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/user/user_attributes_data.dart';
 import 'package:barter_app/models/user/user_onboarding_data.dart';
@@ -295,6 +300,72 @@ abstract class ApiClient {
   @POST('/api/v1/notifications/attributes/batch')
   Future<BatchAttributePreferencesResponse> batchCreateAttributePreferences(
       @Body() AttributeBatchRequest request);
+
+  // Transaction Endpoints
+
+  // TODO decide on timing when to call this
+  /// Create a new barter transaction between two users
+  /// Returns CreateTransactionResponse with success status and transaction ID
+  @POST('/api/v1/transactions/create')
+  Future<CreateTransactionResponse> createTransaction(
+      @Body() CreateTransactionRequest request);
+
+  /// Update transaction status (e.g., mark as "done")
+  /// Valid statuses: pending, done, cancelled, expired, no_deal, scam, disputed
+  /// Returns SuccessResponse
+  @PUT('/api/v1/transactions/{id}/status')
+  Future<SuccessResponse> updateTransactionStatus(
+      @Path('id') String transactionId,
+      @Body() UpdateTransactionStatusRequest request);
+
+  /// Get all transactions for a user
+  /// Returns list of TransactionResponse
+  @GET('/api/v1/transactions/user/{userId}')
+  Future<List<TransactionResponse>> getUserTransactions(
+      @Path('userId') String userId);
+
+  // Reviews API
+  
+  /// Check if user can review another user (for conversation deletion flow)
+  /// Returns ReviewEligibilityResponse with eligibility status and transaction info
+  @GET('/api/v1/reviews/eligibility/{userId}/with/{otherUserId}')
+  Future<ReviewEligibilityResponse> checkReviewEligibility(
+      @Path('userId') String userId,
+      @Path('otherUserId') String otherUserId);
+
+  /// Submit a review for a completed transaction
+  /// Request body should include: transactionId, reviewerId, targetUserId, 
+  /// rating (1-5), reviewText (optional, max 500 chars), transactionStatus
+  /// Returns SubmitReviewResponse with success status and review ID
+  @POST('/api/v1/reviews/submit')
+  Future<SubmitReviewResponse> submitReview(
+      @Body() SubmitReviewRequest reviewRequest);
+
+  /// Get all visible reviews for a user
+  /// Returns UserReviewsResponse with reviews list, totalCount, and averageRating
+  @GET('/api/v1/reviews/user/{userId}')
+  Future<UserReviewsResponse> getUserReviews(
+      @Path('userId') String userId);
+
+  /// Get reviews for a specific transaction (both parties must be involved)
+  /// Returns list of ReviewResponse for the transaction
+  @GET('/api/v1/reviews/transaction/{transactionId}')
+  Future<List<ReviewResponse>> getTransactionReviews(
+      @Path('transactionId') String transactionId);
+
+  // Reputation Endpoints
+  
+  /// Get comprehensive reputation score for a user
+  /// Returns ReputationResponse with averageRating, totalReviews, trustLevel, badges, etc.
+  @GET('/api/v1/reputation/{userId}')
+  Future<ReputationResponse> getReputation(
+      @Path('userId') String userId);
+
+  /// Get detailed badge information for a user
+  /// Returns UserBadgesResponse with list of earned badges
+  @GET('/api/v1/reputation/{userId}/badges')
+  Future<UserBadgesResponse> getUserBadges(
+      @Path('userId') String userId);
 
   // Posting Notification Preferences
 

@@ -2,15 +2,18 @@ import 'package:barter_app/data/local/app_database.dart';
 import 'package:barter_app/models/chat/chat_message.dart';
 import 'package:barter_app/models/chat/e_chat_message_status.dart';
 import 'package:barter_app/models/chat/file_attachment.dart';
+import 'package:barter_app/repositories/user_repository.dart';
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 
 /// Repository for managing chat messages and conversations in local database
 @singleton
+@injectable
 class ChatRepository {
   final AppDatabase _database;
+  final UserRepository _userRepository;
 
-  ChatRepository(this._database);
+  ChatRepository(this._database, this._userRepository);
 
   // ==================== USER PROFILES ====================
 
@@ -196,6 +199,12 @@ class ChatRepository {
   /// Save a message to the database
   Future<int> saveMessage(ChatMessage message, String conversationId) async {
     try {
+      // Get current user ID to determine if this message is sent by current user
+      final currentUserId = await _userRepository.getUserId();
+
+      // Determine if this message is sent by the current user
+      final isSentByCurrentUser = message.senderId == currentUserId;
+      
       // Ensure sender profile exists
       await ensureUserProfileExists(message.senderId);
 
@@ -271,6 +280,11 @@ class ChatRepository {
       if (lastMessageText.isEmpty && message.fileAttachment != null) {
         lastMessageText = '📎 ${message.fileAttachment!.filename}';
       }
+      
+      // If still empty (encrypted message without plaintext), use placeholder
+      if (lastMessageText.isEmpty && message.encryptedTextPayload.isNotEmpty) {
+        lastMessageText = 'New message'; // Placeholder for encrypted messages
+      }
 
       if (lastMessageText.isNotEmpty) {
         await updateConversationLastMessage(
@@ -278,7 +292,7 @@ class ChatRepository {
           lastMessage: lastMessageText,
           senderId: message.senderId,
           timestamp: message.timestamp,
-          incrementUnread: !message.isSentByCurrentUser,
+          incrementUnread: !isSentByCurrentUser, // Use locally calculated value
         );
       }
 
@@ -391,6 +405,7 @@ class ChatRepository {
       encryptedTextPayload: dbMessage.encryptedContent,
       timestamp: dbMessage.timestamp,
       status: _stringToStatus(dbMessage.status),
+      isSentByCurrentUser: dbMessage.senderId == currentUserId,
       fileAttachment: fileAttachment,
     );
   }

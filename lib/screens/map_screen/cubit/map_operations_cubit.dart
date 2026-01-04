@@ -47,9 +47,9 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
       List<PointOfInterest> poisToRemoveFromRemaining = [];
 
       for (var otherPoi in remainingPois) {
-        if (GeoUtils.calculateDistance(currentPoi.profile.latitude,
-            currentPoi.profile.longitude, otherPoi.profile.latitude,
-            otherPoi.profile.longitude) < MAIN_CLUSTER_THRESHOLD_KM) {
+        if (GeoUtils.calculateDistance(currentPoi.profile.latitude ?? 0.0,
+            currentPoi.profile.longitude ?? 0.0, otherPoi.profile.latitude ?? 0.0,
+            otherPoi.profile.longitude ?? 0.0) < MAIN_CLUSTER_THRESHOLD_KM) {
           currentMainClusterGroup.add(otherPoi);
           poisToRemoveFromRemaining.add(otherPoi);
         }
@@ -59,8 +59,8 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
       if (currentMainClusterGroup.length >= MIN_POIS_FOR_MAIN_CLUSTER_DISPLAY) {
         double sumLat = 0, sumLon = 0;
         for (var p in currentMainClusterGroup) {
-          sumLat += p.profile.latitude;
-          sumLon += p.profile.longitude;
+          sumLat += p.profile.latitude ?? 0.0;
+          sumLon += p.profile.longitude ?? 0.0;
         }
         GeoPoint centroid = GeoPoint(latitude: sumLat / currentMainClusterGroup.length, longitude: sumLon / currentMainClusterGroup.length);
         String clusterId = "main_cluster_${centroid.latitude}_${centroid.longitude}_${clusterCounter++}";
@@ -108,9 +108,9 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
       List<PointOfInterest> poisToRemoveFromRemaining = [];
 
       for (var otherPoi in remainingPoisForSub) {
-        if (GeoUtils.calculateDistance(currentPoi.profile.latitude,
-            currentPoi.profile.longitude, otherPoi.profile.latitude,
-            otherPoi.profile.longitude) * 1000 < SUB_CLUSTER_THRESHOLD_M) {
+        if (GeoUtils.calculateDistance(currentPoi.profile.latitude ?? 0.0,
+            currentPoi.profile.longitude ?? 0.0, otherPoi.profile.latitude ?? 0.0,
+            otherPoi.profile.longitude ?? 0.0) * 1000 < SUB_CLUSTER_THRESHOLD_M) {
           currentSubClusterGroup.add(otherPoi);
           poisToRemoveFromRemaining.add(otherPoi);
         }
@@ -120,8 +120,8 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
       if (currentSubClusterGroup.length >= MIN_POIS_FOR_SUB_CLUSTER_DISPLAY) {
         double sumLat = 0, sumLon = 0;
         for (var p in currentSubClusterGroup) {
-          sumLat += p.profile.latitude;
-          sumLon += p.profile.longitude;
+          sumLat += p.profile.latitude ?? 0.0;
+          sumLon += p.profile.longitude ?? 0.0;
         }
         GeoPoint centroid = GeoPoint(latitude: sumLat / currentSubClusterGroup.length, longitude: sumLon / currentSubClusterGroup.length);
         String subClusterId = "${idPrefix}sub_cluster_${centroid.latitude}_${centroid.longitude}_${subClusterCounter++}";
