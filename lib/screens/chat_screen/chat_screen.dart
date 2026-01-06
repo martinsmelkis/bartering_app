@@ -1,7 +1,7 @@
 import 'package:barter_app/l10n/app_localizations.mapper.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
-import 'package:barter_app/services/chat_notification_service.dart';
+import 'package:barter_app/services/messaging/chat_notification_service.dart';
 import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:barter_app/services/file_transfer_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
@@ -38,19 +38,6 @@ class ChatScreen extends StatefulWidget {
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
-
-// In _ChatScreenState, you could use these parameters:
-// @override
-// void initState() {
-//   super.initState();
-//   if (widget.poiId != null) {
-//     print("Chatting about POI: ${widget.poiName} (ID: ${widget.poiId})");
-//     // You could use this ID to fetch specific chat history for this POI,
-//     // or set the AppBar title, etc.
-//     // For example, tell the cubit to load a chat for this POI:
-//     // context.read<ChatCubit>().loadChatForPoi(widget.poiId!);
-//   }
-// }
 
 class _ChatScreenState extends State<ChatScreen> {
   late ChatCubit _chatCubit;
@@ -116,9 +103,9 @@ class _ChatScreenState extends State<ChatScreen> {
     if (recipientPublicKey == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Cannot send file: Recipient public key not available'),
+          content: Text(l10n.cannotSendFileNoRecipientKey),
           action: SnackBarAction(
-            label: 'Retry',
+            label: l10n.retry,
             onPressed: () {
               // Keys might have been exchanged by now
               _pickAndSendFile();
@@ -139,12 +126,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: [
                   ListTile(
                     leading: Icon(Icons.photo_library),
-                    title: Text('Gallery'),
+                    title: Text(l10n.gallery),
                     onTap: () => Navigator.pop(context, ImageSource.gallery),
                   ),
                   ListTile(
                     leading: Icon(Icons.camera_alt),
-                    title: Text('Camera'),
+                    title: Text(l10n.camera),
                     onTap: () => Navigator.pop(context, ImageSource.camera),
                   ),
                 ],
@@ -168,7 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
               SizedBox(width: 12),
-              Text('Uploading file...'),
+              Text(l10n.uploadingFile),
             ],
           ),
           duration: Duration(hours: 1), // Keep showing until we dismiss
@@ -210,7 +197,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('File sent successfully!'),
+            content: Text(l10n.fileSentSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
@@ -219,7 +206,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString()}'),
+          content: Text(l10n.errorWithMessage(e.toString())),
           backgroundColor: Colors.red,
         ),
       );
@@ -280,6 +267,28 @@ class _ChatScreenState extends State<ChatScreen> {
             .of(context)
             .primaryColor,
         foregroundColor: AppColors.background,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'finish_transaction') {
+                _handleFinishTransaction(context);
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem<String>(
+                value: 'finish_transaction',
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle_outline),
+                    SizedBox(width: 8.w),
+                    Text(l10n.finishTransaction),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       )
           : null,
       body: BlocConsumer<ChatCubit, ChatState>(
@@ -298,6 +307,40 @@ class _ChatScreenState extends State<ChatScreen> {
             // Public key is already updated in the cubit
             // Force UI refresh if needed
             setState(() {});
+          }
+          if (state is ChatTransactionInProgress) {
+            // Show loading dialog
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          if (state is ChatTransactionCompleted) {
+            // Close loading dialog
+            Navigator.of(context).pop();
+            // Show success message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.transactionCompleted),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+          if (state is ChatTransactionError) {
+            // Close loading dialog
+            Navigator.of(context).pop();
+            // Show error message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.errorCreatingTransaction(state.error)),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 4),
+              ),
+            );
           }
           if (state is ChatError) {
             print('@@@@@@@@@@ Chat Error: ${state.message}');
@@ -569,6 +612,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _downloadFile(FileAttachment attachment) async {
+    final l10n = AppLocalizations.of(context)!;
+    
     try {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -580,7 +625,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
               SizedBox(width: 12),
-              Text('Downloading ${attachment.filename}...'),
+              Text(l10n.downloadingFile(attachment.filename)),
             ],
           ),
           duration: Duration(hours: 1),
@@ -631,10 +676,11 @@ class _ChatScreenState extends State<ChatScreen> {
         await _openFile(localPath);
       }
     } catch (e) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Download failed: ${e.toString()}'),
+          content: Text(l10n.downloadFailed(e.toString())),
           backgroundColor: Colors.red,
         ),
       );
@@ -642,6 +688,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _openFile(String filePath) async {
+    final l10n = AppLocalizations.of(context)!;
+    
     try {
       print('@@@@@@@@@ Opening file: $filePath');
       final result = await OpenFilex.open(filePath);
@@ -663,14 +711,14 @@ class _ChatScreenState extends State<ChatScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('No app found to open this file type'),
+            content: Text(l10n.noAppToOpenFile),
             backgroundColor: Colors.orange,
             action: SnackBarAction(
               label: 'Show Path',
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('File saved at: $filePath'),
+                    content: Text(l10n.fileSavedAt(filePath)),
                     duration: Duration(seconds: 5),
                   ),
                 );
@@ -683,7 +731,7 @@ class _ChatScreenState extends State<ChatScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('File not found: $filePath'),
+            content: Text(l10n.fileNotFound(filePath)),
             backgroundColor: Colors.red,
           ),
         );
@@ -692,7 +740,7 @@ class _ChatScreenState extends State<ChatScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Permission denied to open file'),
+            content: Text(l10n.permissionDeniedOpenFile),
             backgroundColor: Colors.red,
           ),
         );
@@ -701,7 +749,7 @@ class _ChatScreenState extends State<ChatScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error opening file: ${result.message}'),
+            content: Text(l10n.errorOpeningFile(result.message)),
             backgroundColor: Colors.orange,
           ),
         );
@@ -711,14 +759,14 @@ class _ChatScreenState extends State<ChatScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not open file: $e'),
+          content: Text(l10n.couldNotOpenFile(e.toString())),
           backgroundColor: Colors.red,
           action: SnackBarAction(
             label: 'Show Path',
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('File saved at: $filePath'),
+                    content: Text(l10n.fileSavedAt(filePath)),
                   duration: Duration(seconds: 5),
                 ),
               );
@@ -727,6 +775,38 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
     }
+  }
+
+  Future<void> _handleFinishTransaction(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.finishTransaction),
+        content: Text(l10n.finishTransactionConfirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.finishTransaction),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    // Call cubit to handle transaction
+    context.read<ChatCubit>().finishTransaction();
   }
 
   Widget _buildMessageInputField() {

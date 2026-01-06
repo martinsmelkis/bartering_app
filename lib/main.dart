@@ -1,6 +1,6 @@
 import 'package:barter_app/application.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
-import 'package:barter_app/services/firebase_service.dart';
+import 'package:barter_app/services/messaging/firebase_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 

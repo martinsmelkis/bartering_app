@@ -24,7 +24,7 @@ import 'package:barter_app/screens/onboarding_screen/cubit/onboarding_cubit.dart
     as _i12;
 import 'package:barter_app/services/api_client.dart' as _i205;
 import 'package:barter_app/services/app_module.dart' as _i716;
-import 'package:barter_app/services/chat_notification_service.dart' as _i636;
+import 'package:barter_app/services/messaging/chat_notification_service.dart' as _i636;
 import 'package:barter_app/services/secure_storage_service.dart' as _i607;
 import 'package:barter_app/services/settings_service.dart' as _i627;
 import 'package:get_it/get_it.dart' as _i174;

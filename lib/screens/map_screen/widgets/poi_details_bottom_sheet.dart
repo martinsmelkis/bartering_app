@@ -7,6 +7,7 @@ import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
+import 'package:barter_app/widgets/rating_circle_avatar.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -58,6 +59,10 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   // Avatar/POI icon state
   Widget? _avatarIcon;
   bool _isLoadingAvatar = true;
+  
+  // User rating state
+  double? _averageRating;
+  bool _isLoadingRating = true;
 
   @override
   void initState() {
@@ -72,6 +77,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
         _loadPostings();
         _favoriteStatusFuture = _loadFavoriteStatus();
         _loadAvatarIcon();
+        _loadUserRating();
       }
     });
   }
@@ -188,6 +194,28 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       if (mounted) {
         setState(() {
           _isLoadingAvatar = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadUserRating() async {
+    try {
+      final apiClient = getIt<ApiClient>();
+      final reviewsResponse = await apiClient.getUserReviews(widget.poi.profile.userId);
+      
+      if (mounted) {
+        setState(() {
+          _averageRating = reviewsResponse.averageRating;
+          _isLoadingRating = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading user rating: $e');
+      if (mounted) {
+        setState(() {
+          _averageRating = null;
+          _isLoadingRating = false;
         });
       }
     }
@@ -676,10 +704,11 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Avatar/POI icon on the left
-                      Container(
-                        width: 42,
-                        height: 42,
+                      // Avatar/POI icon on the left with rating circle
+                      RatingCircleAvatar(
+                        size: 56,
+                        rating: _averageRating,
+                        isLoading: _isLoadingRating,
                         child: _isLoadingAvatar
                             ? const Center(
                                 child: SizedBox(

@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:barter_app/services/local_notification_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
 
-import '../models/chat/chat_message.dart';
+import '../../models/chat/chat_message.dart';
+import 'local_notification_service.dart';
 
 /// Service to handle chat message notifications when user is not in chat screen
 /// NOTE: This service uses the LocalNotificationService singleton

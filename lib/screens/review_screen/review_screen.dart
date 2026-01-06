@@ -1,12 +1,14 @@
-import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/models/reviews/review_eligibility.dart';
-import 'package:barter_app/models/reviews/review_submission.dart';
 import 'package:barter_app/models/reviews/transaction_status.dart';
-import 'package:barter_app/repositories/user_repository.dart';
-import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../l10n/app_localizations.dart';
+import 'cubit/review_cubit.dart';
+import 'models/risk_analysis_model.dart';
+import 'widgets/risk_warning_dialog.dart';
 
 class ReviewScreen extends StatefulWidget {
   final String otherUserId;
@@ -25,70 +27,43 @@ class ReviewScreen extends StatefulWidget {
 }
 
 class _ReviewScreenState extends State<ReviewScreen> {
-  int rating = 0;
-  TransactionStatus? selectedStatus;
   final TextEditingController reviewTextController = TextEditingController();
-  bool isSubmitting = false;
   bool _guidelinesExpanded = false;
+  late ReviewCubit _reviewCubit;
 
-  bool get isFormValid => rating > 0 && selectedStatus != null;
+  @override
+  void initState() {
+    super.initState();
+    _reviewCubit = ReviewCubit(
+      otherUserId: widget.otherUserId,
+      eligibility: widget.eligibility,
+    );
+  }
 
   @override
   void dispose() {
     reviewTextController.dispose();
+    _reviewCubit.close();
     super.dispose();
   }
 
   Future<void> _submitReview() async {
-    if (!isFormValid) return;
+    if (!_reviewCubit.isFormValid) return;
 
-    // Show scam warning if reporting scam
-    if (selectedStatus == TransactionStatus.scam) {
-      final confirmed = await _showScamWarningDialog();
-      if (confirmed != true) return;
-    }
+    final l10n = AppLocalizations.of(context)!;
 
-    setState(() => isSubmitting = true);
+    // Update cubit with current form data
+    _reviewCubit.updateReviewText(reviewTextController.text);
 
-    try {
-      final userRepository = getIt<UserRepository>();
-      final currentUserId = await userRepository.getUserId();
-
-      if (currentUserId == null) {
-        throw Exception('User not authenticated');
-      }
-
-      final submission = SubmitReviewRequest(
-        transactionId: widget.eligibility.transactionId!,
-        reviewerId: currentUserId,
-        targetUserId: widget.otherUserId,
-        rating: rating,
-        reviewText: reviewTextController.text.isEmpty ? null : reviewTextController.text,
-        transactionStatus: selectedStatus!.value,
-      );
-
-      final apiClient = getIt<ApiClient>();
-      final response = await apiClient.submitReview(submission);
-
-      if (mounted) {
-        if (response.success) {
-          await _showSuccessDialog();
-        } else {
-          _showErrorDialog('Failed to submit review');
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        _showErrorDialog(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => isSubmitting = false);
-      }
-    }
+    // Submit review through cubit
+    await _reviewCubit.submitReview(
+      defaultErrorMessage: l10n.failedToSubmitReview,
+    );
   }
 
   Future<bool?> _showScamWarningDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -96,25 +71,25 @@ class _ReviewScreenState extends State<ReviewScreen> {
           children: [
             const Icon(Icons.warning, color: Colors.red),
             const SizedBox(width: 8),
-            const Text('Report Scam'),
+            Text(l10n.reportScam),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Are you sure you want to report this user for scam?'),
-            const SizedBox(height: 16),
-            const Text(
-              'This will:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Text('• Flag this transaction for moderator review'),
-            const Text('• Potentially suspend the other user'),
-            const Text('• Require evidence from you'),
+            Text(l10n.reportScamConfirmation),
             const SizedBox(height: 16),
             Text(
-              'False reports may result in penalties to your account.',
+              l10n.reportScamConsequencesTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(l10n.reportScamConsequence1),
+            Text(l10n.reportScamConsequence2),
+            Text(l10n.reportScamConsequence3),
+            const SizedBox(height: 16),
+            Text(
+              l10n.falseReportsWarning,
               style: TextStyle(color: Colors.red, fontSize: 12.sp),
             ),
           ],
@@ -122,19 +97,29 @@ class _ReviewScreenState extends State<ReviewScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Report'),
+            child: Text(l10n.report),
           ),
         ],
       ),
     );
   }
 
+  Future<bool?> _showRiskWarningDialog(RiskAnalysisReport riskReport) async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: !riskReport.isCritical, // Can't dismiss critical warnings
+      builder: (context) => RiskWarningDialog(riskReport: riskReport),
+    );
+  }
+
   Future<void> _showSuccessDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -143,14 +128,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
           children: [
             const Icon(Icons.check_circle, color: Colors.green),
             const SizedBox(width: 8),
-            const Text('Review Submitted!'),
+            Text(l10n.reviewSubmitted),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Thank you for your feedback!'),
+            Text(l10n.thankYouForFeedback),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
@@ -164,8 +149,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Your review will be visible after ${widget.otherUserName} '
-                      'submits their review, or in 14 days.',
+                      l10n.reviewVisibilityNotice(widget.otherUserName),
                       style: const TextStyle(fontSize: 12),
                     ),
                   ),
@@ -180,7 +164,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
               Navigator.pop(context); // Close dialog
               Navigator.pop(context, true); // Close review screen with success
             },
-            child: const Text('Done'),
+            child: Text(l10n.done),
           ),
         ],
       ),
@@ -188,15 +172,17 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 
   void _showErrorDialog(String error) {
+    final l10n = AppLocalizations.of(context)!;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Error'),
+        title: Text(l10n.error),
         content: Text(error),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text(l10n.ok),
           ),
         ],
       ),
@@ -204,22 +190,21 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 
   Future<void> _showSkipConfirmationDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Skip Review?'),
-        content: const Text(
-          'You can review this user later from your transaction history. '
-          'Reviews help build trust in the community.',
-        ),
+        title: Text(l10n.skipReviewTitle),
+        content: Text(l10n.skipReviewMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Go Back'),
+            child: Text(l10n.goBack),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Skip'),
+            child: Text(l10n.skip),
           ),
         ],
       ),
@@ -232,114 +217,172 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Review ${widget.otherUserName}'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.background,
-      ),
-      backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildRatingSection(),
-            SizedBox(height: 16.h),
-            _buildStatusSection(),
-            SizedBox(height: 16.h),
-            _buildReviewTextSection(),
-            SizedBox(height: 16.h),
-            _buildGuidelinesSection(),
-            SizedBox(height: 24.h),
-            _buildActionButtons(),
-          ],
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocProvider.value(
+      value: _reviewCubit,
+      child: BlocListener<ReviewCubit, ReviewState>(
+        listener: (context, state) async {
+          if (state is ReviewScamWarningRequired) {
+            // Show scam warning dialog
+            final confirmed = await _showScamWarningDialog();
+            if (confirmed == true) {
+              // Continue with submission after confirmation
+              _reviewCubit.submitReviewAfterScamConfirmation(
+                defaultErrorMessage: l10n.failedToSubmitReview,
+              );
+            }
+          } else if (state is ReviewRiskAnalysisDetected) {
+            // Show risk warning dialog
+            final shouldProceed = await _showRiskWarningDialog(state.riskReport);
+            if (shouldProceed == true || state.riskReport.isCritical) {
+              // For critical risks, user can only acknowledge (no choice to continue)
+              // For other risks, user chose to continue or just acknowledged
+              _reviewCubit.acknowledgeRiskAndProceed();
+            } else {
+              // User cancelled after seeing risk
+              _reviewCubit.cancelAfterRisk();
+            }
+          } else if (state is ReviewSubmitSuccess) {
+            // Show success dialog
+            await _showSuccessDialog();
+          } else if (state is ReviewSubmitError) {
+            // Show error dialog
+            _showErrorDialog(state.errorMessage);
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(l10n.reviewUser(widget.otherUserName)),
+            backgroundColor: AppColors.primary,
+            foregroundColor: AppColors.background,
+          ),
+          backgroundColor: AppColors.background,
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildRatingSection(),
+                SizedBox(height: 16.h),
+                _buildStatusSection(),
+                SizedBox(height: 16.h),
+                _buildReviewTextSection(),
+                SizedBox(height: 16.h),
+                _buildGuidelinesSection(),
+                SizedBox(height: 24.h),
+                _buildActionButtons(),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildRatingSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Rating *',
-          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-        ),
-        SizedBox(height: 12.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(5, (index) {
-            return GestureDetector(
-              onTap: () => setState(() => rating = index + 1),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                child: Icon(
-                  index < rating ? Icons.star : Icons.star_border,
-                  color: Colors.amber,
-                  size: 48.sp,
-                ),
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocBuilder<ReviewCubit, ReviewState>(
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.ratingRequired,
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (index) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _reviewCubit.updateRating(index + 1);
+                    });
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                    child: Icon(
+                      index < _reviewCubit.rating ? Icons.star : Icons.star_border,
+                      color: Colors.amber,
+                      size: 48.sp,
+                    ),
+                  ),
+                );
+              }),
+            ),
+            SizedBox(height: 8.h),
+            Center(
+              child: Text(
+                _getRatingDescription(_reviewCubit.rating),
+                style: TextStyle(color: Colors.grey[600], fontSize: 14.sp),
               ),
-            );
-          }),
-        ),
-        SizedBox(height: 8.h),
-        Center(
-          child: Text(
-            _getRatingDescription(rating),
-            style: TextStyle(color: Colors.grey[600], fontSize: 14.sp),
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 
   String _getRatingDescription(int rating) {
+    final l10n = AppLocalizations.of(context)!;
+    
     switch (rating) {
       case 5:
-        return "Excellent";
+        return l10n.ratingExcellent;
       case 4:
-        return "Good";
+        return l10n.ratingGood;
       case 3:
-        return "Okay";
+        return l10n.ratingOkay;
       case 2:
-        return "Poor";
+        return l10n.ratingPoor;
       case 1:
-        return "Very Bad";
+        return l10n.ratingVeryBad;
       default:
-        return "Tap to rate";
+        return l10n.tapToRate;
     }
   }
 
   Widget _buildStatusSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'How did it go? *',
-          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-        ),
-        //SizedBox(height: 4.h),
-        ...TransactionStatus.values.map((status) {
-          return RadioListTile<TransactionStatus>(
-            value: status,
-            groupValue: selectedStatus,
-            onChanged: (value) => setState(() => selectedStatus = value),
-            title: Row(
-              children: [
-                Icon(
-                  _getStatusIcon(status),
-                  color: _getStatusColor(status),
-                  size: 20.sp,
-                ),
-                SizedBox(width: 8.w),
-                Text(_getStatusLabel(status)),
-              ],
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocBuilder<ReviewCubit, ReviewState>(
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.howDidItGo,
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
             ),
-          );
-        }),
-      ],
+            //SizedBox(height: 4.h),
+            ...TransactionStatus.values.map((status) {
+              return RadioListTile<TransactionStatus>(
+                value: status,
+                groupValue: _reviewCubit.selectedStatus,
+                onChanged: (value) {
+                  setState(() {
+                    _reviewCubit.updateStatus(value);
+                  });
+                },
+                title: Row(
+                  children: [
+                    Icon(
+                      _getStatusIcon(status),
+                      color: _getStatusColor(status),
+                      size: 20.sp,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(_getStatusLabel(status)),
+                  ],
+                ),
+              );
+            }),
+          ],
+        );
+      },
     );
   }
 
@@ -368,24 +411,28 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 
   String _getStatusLabel(TransactionStatus status) {
+    final l10n = AppLocalizations.of(context)!;
+    
     switch (status) {
       case TransactionStatus.done:
-        return "Successful Trade";
+        return l10n.transactionStatusSuccessful;
       case TransactionStatus.cancelled:
-        return "Cancelled";
+        return l10n.transactionStatusCancelled;
       case TransactionStatus.noDeal:
-        return "Talked but no deal";
+        return l10n.transactionStatusNoDeal;
       case TransactionStatus.scam:
-        return "🚩 Report Scam";
+        return l10n.transactionStatusScam;
     }
   }
 
   Widget _buildReviewTextSection() {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Tell us more (optional)',
+          l10n.tellUsMore,
           style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: 8.h),
@@ -394,11 +441,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
           maxLength: 500,
           maxLines: 5,
           decoration: InputDecoration(
-            hintText: 'Share your experience...',
+            hintText: l10n.shareYourExperience,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            helperText: 'Be specific and constructive',
+            helperText: l10n.beSpecificAndConstructive,
           ),
         ),
       ],
@@ -406,10 +453,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 
   Widget _buildGuidelinesSection() {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Card(
       child: ExpansionTile(
         leading: const Icon(Icons.info_outline),
-        title: const Text('Review Guidelines'),
+        title: Text(l10n.reviewGuidelines),
         initiallyExpanded: _guidelinesExpanded,
         onExpansionChanged: (expanded) {
           setState(() => _guidelinesExpanded = expanded);
@@ -420,11 +469,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildGuideline('Be honest and fair'),
-                _buildGuideline('Focus on your actual experience'),
-                _buildGuideline('Reviews become visible after both parties submit'),
-                _buildGuideline('You have 90 days to submit a review'),
-                _buildGuideline('False reports may result in account suspension'),
+                _buildGuideline(l10n.guidelineHonest),
+                _buildGuideline(l10n.guidelineFocusExperience),
+                _buildGuideline(l10n.guidelineVisibility),
+                _buildGuideline(l10n.guideline90Days),
+                _buildGuideline(l10n.guidelineFalseReports),
               ],
             ),
           ),
@@ -448,29 +497,37 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 
   Widget _buildActionButtons() {
-    return Column(
-      children: [
-        ElevatedButton(
-          onPressed: isFormValid && !isSubmitting ? _submitReview : null,
-          style: ElevatedButton.styleFrom(
-            minimumSize: Size(double.infinity, 42.h),
-            backgroundColor: AppColors.primary,
-            disabledBackgroundColor: Colors.grey,
-          ),
-          child: isSubmitting
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                )
-              : const Text('Submit Review', style: TextStyle(color: Colors.white)),
-        ),
-        SizedBox(height: 8.h),
-        TextButton(
-          onPressed: isSubmitting ? null : _showSkipConfirmationDialog,
-          child: const Text('Skip for Now'),
-        ),
-      ],
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocBuilder<ReviewCubit, ReviewState>(
+      builder: (context, state) {
+        final isSubmitting = state is ReviewSubmitting;
+        
+        return Column(
+          children: [
+            ElevatedButton(
+              onPressed: _reviewCubit.isFormValid && !isSubmitting ? _submitReview : null,
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(double.infinity, 42.h),
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor: Colors.grey,
+              ),
+              child: isSubmitting
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : Text(l10n.submitReview, style: const TextStyle(color: Colors.white)),
+            ),
+            SizedBox(height: 8.h),
+            TextButton(
+              onPressed: isSubmitting ? null : _showSkipConfirmationDialog,
+              child: Text(l10n.skipForNow),
+            ),
+          ],
+        );
+      },
     );
   }
 }

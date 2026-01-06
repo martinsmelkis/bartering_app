@@ -9,7 +9,6 @@ import 'package:barter_app/screens/map_screen/widgets/search_in_map.dart';
 import 'package:barter_app/screens/map_screen/widgets/zoom_buttons.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart';
-import 'package:barter_app/services/firebase_service.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
@@ -27,7 +26,8 @@ import '../../l10n/app_localizations.dart';
 import '../../models/map/point_of_interest.dart';
 import '../../models/profile/user_profile_data.dart';
 import '../../models/user/user_attribute_entry_data.dart';
-import '../../services/firebase_auth_service.dart';
+import '../../services/messaging/firebase_auth_service.dart';
+import '../../services/messaging/firebase_service.dart';
 import '../../utils/geo_utils.dart';
 import '../../utils/responsive_breakpoints.dart';
 import '../chat_screen/chat_screen.dart';
@@ -729,7 +729,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         Positioned(
                           top: kIsWeb ? 26 : topPadding,
                           left: 64,
-                          right: 64,
+                          right: 100,
                           child: PointerInterceptor(
                             child: SearchInMap(
                               controller: _mapController, poiCubit: poiCubit,),
@@ -806,8 +806,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         ),
                         // Search nearby users button
                         Positioned(
-                          top: 88,
-                          right: 12,
+                          top: kIsWeb ? 20 : (topPadding ?? 20.0),
+                          right: 56,
                           child: PointerInterceptor(
                             child: Container(
                               decoration: BoxDecoration(
@@ -829,12 +829,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                   for (var c in mapOperationsCubit.mainPoiClusters) {
                                     c.isExpanded = false;
                                   }
-                                  
+
                                   // Get search settings
                                   final settingsService = getIt<SettingsService>();
                                   final useMapCenter = await settingsService.getUseMapCenterForSearch();
                                   final radiusKm = await settingsService.getNearbyUsersRadius();
-                                  
+
                                   if (useMapCenter) {
                                     // Use map center
                                     final mapCenter = await _mapController.centerMap;

@@ -6,14 +6,14 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
-import 'package:barter_app/services/local_notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-import '../configure_dependencies.dart';
-import '../models/notifications/notification_models.dart';
-import 'api_client.dart';
+import '../../configure_dependencies.dart';
+import '../../models/notifications/notification_models.dart';
+import '../api_client.dart';
+import 'local_notification_service.dart';
 
 /// Top-level function to handle background messages
 @pragma('vm:entry-point')

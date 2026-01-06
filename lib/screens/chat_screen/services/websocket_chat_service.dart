@@ -9,7 +9,7 @@ import '../../../models/chat/chat_message.dart';
 import '../../../models/chat/e_chat_message_status.dart';
 import '../../../models/chat/file_notification_message.dart';
 import '../../../services/crypto/crypto_service.dart';
-import '../../../services/chat_notification_service.dart';
+import '../../../services/messaging/chat_notification_service.dart';
 
 class WebSocketChatService {
   // Optional: Notification service for background notifications

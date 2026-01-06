@@ -1,9 +1,9 @@
-import 'package:barter_app/services/firebase_service.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/security_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/messaging/firebase_service.dart';
 
 /// PIN verification screen for go_router
 /// Shows a PIN input screen and navigates to the target route on success

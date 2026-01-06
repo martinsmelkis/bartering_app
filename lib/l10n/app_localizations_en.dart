@@ -1975,4 +1975,231 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorDeletingProfile => 'Error deleting profile';
+
+  @override
+  String get review => 'Review';
+
+  @override
+  String get reportScam => 'Report Scam';
+
+  @override
+  String get reportScamConfirmation =>
+      'Are you sure you want to report this user for scam?';
+
+  @override
+  String get reportScamConsequencesTitle => 'This will:';
+
+  @override
+  String get reportScamConsequence1 =>
+      '• Flag this transaction for moderator review';
+
+  @override
+  String get reportScamConsequence2 => '• Potentially suspend the other user';
+
+  @override
+  String get reportScamConsequence3 => '• Require evidence from you';
+
+  @override
+  String get falseReportsWarning =>
+      'False reports may result in penalties to your account.';
+
+  @override
+  String get report => 'Report';
+
+  @override
+  String get reviewSubmitted => 'Review Submitted!';
+
+  @override
+  String get thankYouForFeedback => 'Thank you for your feedback!';
+
+  @override
+  String reviewVisibilityNotice(String otherUserName) {
+    return 'Your review will be visible after $otherUserName submits their review, or in 14 days.';
+  }
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get skipReviewTitle => 'Skip Review?';
+
+  @override
+  String get skipReviewMessage =>
+      'You can review this user later from your transaction history. Reviews help build trust in the community.';
+
+  @override
+  String get goBack => 'Go Back';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String reviewUser(String userName) {
+    return 'Review $userName';
+  }
+
+  @override
+  String get ratingRequired => 'Rating *';
+
+  @override
+  String get ratingExcellent => 'Excellent';
+
+  @override
+  String get ratingGood => 'Good';
+
+  @override
+  String get ratingOkay => 'Okay';
+
+  @override
+  String get ratingPoor => 'Poor';
+
+  @override
+  String get ratingVeryBad => 'Very Bad';
+
+  @override
+  String get tapToRate => 'Tap to rate';
+
+  @override
+  String get howDidItGo => 'How did it go? *';
+
+  @override
+  String get transactionStatusSuccessful => 'Successful Trade';
+
+  @override
+  String get transactionStatusCancelled => 'Cancelled';
+
+  @override
+  String get transactionStatusNoDeal => 'Talked but no deal';
+
+  @override
+  String get transactionStatusScam => '🚩 Report Scam';
+
+  @override
+  String get tellUsMore => 'Tell us more (optional)';
+
+  @override
+  String get shareYourExperience => 'Share your experience...';
+
+  @override
+  String get beSpecificAndConstructive => 'Be specific and constructive';
+
+  @override
+  String get reviewGuidelines => 'Review Guidelines';
+
+  @override
+  String get guidelineHonest => 'Be honest and fair';
+
+  @override
+  String get guidelineFocusExperience => 'Focus on your actual experience';
+
+  @override
+  String get guidelineVisibility =>
+      'Reviews become visible after both parties submit';
+
+  @override
+  String get guideline90Days => 'You have 90 days to submit a review';
+
+  @override
+  String get guidelineFalseReports =>
+      'False reports may result in account suspension';
+
+  @override
+  String get submitReview => 'Submit Review';
+
+  @override
+  String get skipForNow => 'Skip for Now';
+
+  @override
+  String get failedToSubmitReview => 'Failed to submit review';
+
+  @override
+  String get archiveConversationTitle => 'Archive Conversation?';
+
+  @override
+  String get archiveConversationMessage =>
+      'Would you like to archive this conversation now?';
+
+  @override
+  String get keep => 'Keep';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get unableToReviewUser => 'Unable to review this user at this time';
+
+  @override
+  String get cannotSendFileNoRecipientKey =>
+      'Cannot send file: Recipient public key not available';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get uploadingFile => 'Uploading file...';
+
+  @override
+  String get fileSentSuccessfully => 'File sent successfully!';
+
+  @override
+  String downloadingFile(String filename) {
+    return 'Downloading $filename...';
+  }
+
+  @override
+  String downloadFailed(String error) {
+    return 'Download failed: $error';
+  }
+
+  @override
+  String get noAppToOpenFile => 'No app found to open this file type';
+
+  @override
+  String fileSavedAt(String filePath) {
+    return 'File saved at: $filePath';
+  }
+
+  @override
+  String fileNotFound(String filePath) {
+    return 'File not found: $filePath';
+  }
+
+  @override
+  String get permissionDeniedOpenFile => 'Permission denied to open file';
+
+  @override
+  String errorOpeningFile(String message) {
+    return 'Error opening file: $message';
+  }
+
+  @override
+  String couldNotOpenFile(String error) {
+    return 'Could not open file: $error';
+  }
+
+  @override
+  String get finishTransaction => 'Finish Transaction';
+
+  @override
+  String get finishTransactionConfirmation =>
+      'Are you sure you want to mark this transaction as completed?';
+
+  @override
+  String get transactionCreated => 'Transaction created successfully';
+
+  @override
+  String get transactionCompleted => 'Transaction marked as completed';
+
+  @override
+  String errorCreatingTransaction(String error) {
+    return 'Error creating transaction: $error';
+  }
+
+  @override
+  String errorUpdatingTransaction(String error) {
+    return 'Error updating transaction: $error';
+  }
 }

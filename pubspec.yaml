@@ -82,6 +82,8 @@ dependencies:
   # Optional: For navigation/deep linking
   go_router: ^13.0.0
 
+  device_info_plus: ^11.2.0
+
   #google_sign_in: ^7.2.0
   # Crypto wallets
   #web3auth_flutter: ^6.1.2

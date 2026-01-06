@@ -5,7 +5,8 @@ import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/data/local/app_database.dart';
 import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
-import 'package:barter_app/services/chat_notification_service.dart';
+import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/services/messaging/chat_notification_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../models/chat/auth_request.dart';
 import '../../../models/chat/chat_message.dart';
 import '../../../models/chat/e_chat_message_status.dart';
+import '../../../models/reviews/transaction_response.dart';
 import '../../../services/crypto/crypto_service.dart';
 import '../../../services/secure_storage_service.dart';
 import '../services/websocket_chat_service.dart';
@@ -385,6 +387,58 @@ class ChatCubit extends Cubit<ChatState> {
         print('❌ Error saving file message: $e');
         emit(ChatError('Failed to send file message'));
       }
+    }
+  }
+
+  /// Finish transaction - creates a transaction and marks it as done
+  Future<void> finishTransaction() async {
+    emit(ChatTransactionInProgress());
+
+    try {
+      final apiClient = getIt<ApiClient>();
+      final userRepository = getIt<UserRepository>();
+      final userId = await userRepository.getUserId();
+
+      if (userId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      if (recipientUserId.isEmpty) {
+        throw Exception('Invalid recipient user ID');
+      }
+
+      // Step 1: Create transaction
+      print('@@@@@@@@@ Creating transaction between $userId and $recipientUserId');
+      final createRequest = CreateTransactionRequest(
+        user1Id: userId,
+        user2Id: recipientUserId,
+      );
+
+      final createResponse = await apiClient.createTransaction(createRequest);
+
+      if (!createResponse.success) {
+        throw Exception('Failed to create transaction');
+      }
+
+      print('@@@@@@@@@ Transaction created with ID: ${createResponse.transactionId}');
+
+      // Step 2: Update transaction status to "done"
+      final updateRequest = UpdateTransactionStatusRequest(status: 'done');
+      final updateResponse = await apiClient.updateTransactionStatus(
+        createResponse.transactionId,
+        updateRequest,
+      );
+
+      if (!updateResponse.success) {
+        throw Exception('Failed to update transaction status');
+      }
+
+      print('@@@@@@@@@ Transaction status updated to "done"');
+
+      emit(ChatTransactionCompleted(createResponse.transactionId));
+    } catch (e) {
+      print('@@@@@@@@@ Error finishing transaction: $e');
+      emit(ChatTransactionError(e.toString()));
     }
   }
 

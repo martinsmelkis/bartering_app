@@ -10,7 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repositories/user_repository.dart';
-import '../../services/chat_notification_service.dart';
+import '../../services/messaging/chat_notification_service.dart';
 import '../../theme/app_colors.dart';
 
 class CreatePostingScreen extends StatefulWidget {

@@ -656,6 +656,143 @@
   "deleteProfile": "Delete Profile",
   "deleteProfileConfirmation": "Are you sure you want to delete your profile? This action cannot be undone. All your data, postings, and conversations will be permanently removed.",
   "profileDeleted": "Profile deleted successfully",
-  "errorDeletingProfile": "Error deleting profile"
+  "errorDeletingProfile": "Error deleting profile",
+
+  "review": "Review",
+  "reportScam": "Report Scam",
+  "reportScamConfirmation": "Are you sure you want to report this user for scam?",
+  "reportScamConsequencesTitle": "This will:",
+  "reportScamConsequence1": "• Flag this transaction for moderator review",
+  "reportScamConsequence2": "• Potentially suspend the other user",
+  "reportScamConsequence3": "• Require evidence from you",
+  "falseReportsWarning": "False reports may result in penalties to your account.",
+  "report": "Report",
+  "reviewSubmitted": "Review Submitted!",
+  "thankYouForFeedback": "Thank you for your feedback!",
+  "reviewVisibilityNotice": "Your review will be visible after {otherUserName} submits their review, or in 14 days.",
+  "@reviewVisibilityNotice": {
+    "placeholders": {
+      "otherUserName": {
+        "type": "String"
+      }
+    }
+  },
+  "ok": "OK",
+  "skipReviewTitle": "Skip Review?",
+  "skipReviewMessage": "You can review this user later from your transaction history. Reviews help build trust in the community.",
+  "goBack": "Go Back",
+  "skip": "Skip",
+  "reviewUser": "Review {userName}",
+  "@reviewUser": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "ratingRequired": "Rating *",
+  "ratingExcellent": "Excellent",
+  "ratingGood": "Good",
+  "ratingOkay": "Okay",
+  "ratingPoor": "Poor",
+  "ratingVeryBad": "Very Bad",
+  "tapToRate": "Tap to rate",
+  "howDidItGo": "How did it go? *",
+  "transactionStatusSuccessful": "Successful Trade",
+  "transactionStatusCancelled": "Cancelled",
+  "transactionStatusNoDeal": "Talked but no deal",
+  "transactionStatusScam": "🚩 Report Scam",
+  "tellUsMore": "Tell us more (optional)",
+  "shareYourExperience": "Share your experience...",
+  "beSpecificAndConstructive": "Be specific and constructive",
+  "reviewGuidelines": "Review Guidelines",
+  "guidelineHonest": "Be honest and fair",
+  "guidelineFocusExperience": "Focus on your actual experience",
+  "guidelineVisibility": "Reviews become visible after both parties submit",
+  "guideline90Days": "You have 90 days to submit a review",
+  "guidelineFalseReports": "False reports may result in account suspension",
+  "submitReview": "Submit Review",
+  "skipForNow": "Skip for Now",
+  "failedToSubmitReview": "Failed to submit review",
+  "archiveConversationTitle": "Archive Conversation?",
+  "archiveConversationMessage": "Would you like to archive this conversation now?",
+  "keep": "Keep",
+  "archive": "Archive",
+  "unableToReviewUser": "Unable to review this user at this time",
+  "cannotSendFileNoRecipientKey": "Cannot send file: Recipient public key not available",
+  "gallery": "Gallery",
+  "camera": "Camera",
+  "uploadingFile": "Uploading file...",
+  "fileSentSuccessfully": "File sent successfully!",
+  "downloadingFile": "Downloading {filename}...",
+  "@downloadingFile": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadFailed": "Download failed: {error}",
+  "@downloadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noAppToOpenFile": "No app found to open this file type",
+  "fileSavedAt": "File saved at: {filePath}",
+  "@fileSavedAt": {
+    "placeholders": {
+      "filePath": {
+        "type": "String"
+      }
+    }
+  },
+  "fileNotFound": "File not found: {filePath}",
+  "@fileNotFound": {
+    "placeholders": {
+      "filePath": {
+        "type": "String"
+      }
+    }
+  },
+  "permissionDeniedOpenFile": "Permission denied to open file",
+  "errorOpeningFile": "Error opening file: {message}",
+  "@errorOpeningFile": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "couldNotOpenFile": "Could not open file: {error}",
+  "@couldNotOpenFile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "finishTransaction": "Finish Transaction",
+  "finishTransactionConfirmation": "Are you sure you want to mark this transaction as completed?",
+  "transactionCreated": "Transaction created successfully",
+  "transactionCompleted": "Transaction marked as completed",
+  "errorCreatingTransaction": "Error creating transaction: {error}",
+  "@errorCreatingTransaction": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdatingTransaction": "Error updating transaction: {error}",
+  "@errorUpdatingTransaction": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 
 }

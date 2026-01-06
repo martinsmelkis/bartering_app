@@ -48,3 +48,23 @@ class ChatMessageSent extends ChatState {
 class ChatKeysExchanged extends ChatState {
   ChatKeysExchanged() : super([]);
 }
+
+class ChatTransactionInProgress extends ChatState {
+  ChatTransactionInProgress() : super([]);
+}
+
+class ChatTransactionCompleted extends ChatState {
+  final String transactionId;
+  ChatTransactionCompleted(this.transactionId) : super([]);
+  
+  @override
+  List<Object> get props => [transactionId];
+}
+
+class ChatTransactionError extends ChatState {
+  final String error;
+  ChatTransactionError(this.error) : super([]);
+  
+  @override
+  List<Object> get props => [error];
+}

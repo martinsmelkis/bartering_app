@@ -3,7 +3,6 @@ class ReviewEligibilityResponse {
   final bool eligible;
   final String? transactionId;
   final String? reason;
-  final String otherUserName;
   final String? otherUserAvatarUrl;
   final int? transactionCompletedAt;
 
@@ -11,7 +10,6 @@ class ReviewEligibilityResponse {
     required this.eligible,
     this.transactionId,
     this.reason,
-    required this.otherUserName,
     this.otherUserAvatarUrl,
     this.transactionCompletedAt,
   });
@@ -21,7 +19,6 @@ class ReviewEligibilityResponse {
       eligible: json['eligible'] as bool,
       transactionId: json['transactionId'] as String?,
       reason: json['reason'] as String?,
-      otherUserName: json['otherUserName'] as String,
       otherUserAvatarUrl: json['otherUserAvatarUrl'] as String?,
       transactionCompletedAt: json['transactionCompletedAt'] as int?,
     );
@@ -32,7 +29,6 @@ class ReviewEligibilityResponse {
       'eligible': eligible,
       'transactionId': transactionId,
       'reason': reason,
-      'otherUserName': otherUserName,
       'otherUserAvatarUrl': otherUserAvatarUrl,
       'transactionCompletedAt': transactionCompletedAt,
     };

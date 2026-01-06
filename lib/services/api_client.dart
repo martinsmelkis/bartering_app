@@ -28,6 +28,7 @@ import 'package:dio/dio.dart';
 import '../models/map/point_of_interest.dart';
 import '../repositories/user_repository.dart';
 import 'crypto/crypto_service.dart';
+import 'interceptors/review_risks_interceptor.dart';
 
 part 'api_client.g.dart';
 
@@ -54,6 +55,7 @@ abstract class ApiClient {
     dio.options.connectTimeout = Duration(seconds: 10);
     // Add interceptors for logging, auth, etc. if needed
     dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+    dio.interceptors.add(ReviewRiskTrackingInterceptor());
     // Example: Add an Auth Interceptor
     dio.interceptors.add(InterceptorsWrapper(
 
@@ -303,7 +305,6 @@ abstract class ApiClient {
 
   // Transaction Endpoints
 
-  // TODO decide on timing when to call this
   /// Create a new barter transaction between two users
   /// Returns CreateTransactionResponse with success status and transaction ID
   @POST('/api/v1/transactions/create')
@@ -318,8 +319,7 @@ abstract class ApiClient {
       @Path('id') String transactionId,
       @Body() UpdateTransactionStatusRequest request);
 
-  /// Get all transactions for a user
-  /// Returns list of TransactionResponse
+  /// Get all transactions for a user | Returns list of TransactionResponse
   @GET('/api/v1/transactions/user/{userId}')
   Future<List<TransactionResponse>> getUserTransactions(
       @Path('userId') String userId);
@@ -338,34 +338,29 @@ abstract class ApiClient {
   /// rating (1-5), reviewText (optional, max 500 chars), transactionStatus
   /// Returns SubmitReviewResponse with success status and review ID
   @POST('/api/v1/reviews/submit')
-  Future<SubmitReviewResponse> submitReview(
-      @Body() SubmitReviewRequest reviewRequest);
+  Future<SubmitReviewResponse> submitReview(@Body() SubmitReviewRequest reviewRequest);
 
   /// Get all visible reviews for a user
   /// Returns UserReviewsResponse with reviews list, totalCount, and averageRating
   @GET('/api/v1/reviews/user/{userId}')
-  Future<UserReviewsResponse> getUserReviews(
-      @Path('userId') String userId);
+  Future<UserReviewsResponse> getUserReviews(@Path('userId') String userId);
 
   /// Get reviews for a specific transaction (both parties must be involved)
   /// Returns list of ReviewResponse for the transaction
   @GET('/api/v1/reviews/transaction/{transactionId}')
-  Future<List<ReviewResponse>> getTransactionReviews(
-      @Path('transactionId') String transactionId);
+  Future<List<ReviewResponse>> getTransactionReviews(@Path('transactionId') String transactionId);
 
   // Reputation Endpoints
   
   /// Get comprehensive reputation score for a user
   /// Returns ReputationResponse with averageRating, totalReviews, trustLevel, badges, etc.
   @GET('/api/v1/reputation/{userId}')
-  Future<ReputationResponse> getReputation(
-      @Path('userId') String userId);
+  Future<ReputationResponse> getReputation(@Path('userId') String userId);
 
   /// Get detailed badge information for a user
   /// Returns UserBadgesResponse with list of earned badges
   @GET('/api/v1/reputation/{userId}/badges')
-  Future<UserBadgesResponse> getUserBadges(
-      @Path('userId') String userId);
+  Future<UserBadgesResponse> getUserBadges(@Path('userId') String userId);
 
   // Posting Notification Preferences
 

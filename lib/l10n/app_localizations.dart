@@ -3909,6 +3909,402 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error deleting profile'**
   String get errorDeletingProfile;
+
+  /// No description provided for @review.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get review;
+
+  /// No description provided for @reportScam.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Scam'**
+  String get reportScam;
+
+  /// No description provided for @reportScamConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to report this user for scam?'**
+  String get reportScamConfirmation;
+
+  /// No description provided for @reportScamConsequencesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This will:'**
+  String get reportScamConsequencesTitle;
+
+  /// No description provided for @reportScamConsequence1.
+  ///
+  /// In en, this message translates to:
+  /// **'• Flag this transaction for moderator review'**
+  String get reportScamConsequence1;
+
+  /// No description provided for @reportScamConsequence2.
+  ///
+  /// In en, this message translates to:
+  /// **'• Potentially suspend the other user'**
+  String get reportScamConsequence2;
+
+  /// No description provided for @reportScamConsequence3.
+  ///
+  /// In en, this message translates to:
+  /// **'• Require evidence from you'**
+  String get reportScamConsequence3;
+
+  /// No description provided for @falseReportsWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'False reports may result in penalties to your account.'**
+  String get falseReportsWarning;
+
+  /// No description provided for @report.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get report;
+
+  /// No description provided for @reviewSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Submitted!'**
+  String get reviewSubmitted;
+
+  /// No description provided for @thankYouForFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your feedback!'**
+  String get thankYouForFeedback;
+
+  /// No description provided for @reviewVisibilityNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review will be visible after {otherUserName} submits their review, or in 14 days.'**
+  String reviewVisibilityNotice(String otherUserName);
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @skipReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip Review?'**
+  String get skipReviewTitle;
+
+  /// No description provided for @skipReviewMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can review this user later from your transaction history. Reviews help build trust in the community.'**
+  String get skipReviewMessage;
+
+  /// No description provided for @goBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get goBack;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @reviewUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Review {userName}'**
+  String reviewUser(String userName);
+
+  /// No description provided for @ratingRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating *'**
+  String get ratingRequired;
+
+  /// No description provided for @ratingExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get ratingExcellent;
+
+  /// No description provided for @ratingGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get ratingGood;
+
+  /// No description provided for @ratingOkay.
+  ///
+  /// In en, this message translates to:
+  /// **'Okay'**
+  String get ratingOkay;
+
+  /// No description provided for @ratingPoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get ratingPoor;
+
+  /// No description provided for @ratingVeryBad.
+  ///
+  /// In en, this message translates to:
+  /// **'Very Bad'**
+  String get ratingVeryBad;
+
+  /// No description provided for @tapToRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to rate'**
+  String get tapToRate;
+
+  /// No description provided for @howDidItGo.
+  ///
+  /// In en, this message translates to:
+  /// **'How did it go? *'**
+  String get howDidItGo;
+
+  /// No description provided for @transactionStatusSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Successful Trade'**
+  String get transactionStatusSuccessful;
+
+  /// No description provided for @transactionStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get transactionStatusCancelled;
+
+  /// No description provided for @transactionStatusNoDeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Talked but no deal'**
+  String get transactionStatusNoDeal;
+
+  /// No description provided for @transactionStatusScam.
+  ///
+  /// In en, this message translates to:
+  /// **'🚩 Report Scam'**
+  String get transactionStatusScam;
+
+  /// No description provided for @tellUsMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us more (optional)'**
+  String get tellUsMore;
+
+  /// No description provided for @shareYourExperience.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your experience...'**
+  String get shareYourExperience;
+
+  /// No description provided for @beSpecificAndConstructive.
+  ///
+  /// In en, this message translates to:
+  /// **'Be specific and constructive'**
+  String get beSpecificAndConstructive;
+
+  /// No description provided for @reviewGuidelines.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Guidelines'**
+  String get reviewGuidelines;
+
+  /// No description provided for @guidelineHonest.
+  ///
+  /// In en, this message translates to:
+  /// **'Be honest and fair'**
+  String get guidelineHonest;
+
+  /// No description provided for @guidelineFocusExperience.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus on your actual experience'**
+  String get guidelineFocusExperience;
+
+  /// No description provided for @guidelineVisibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews become visible after both parties submit'**
+  String get guidelineVisibility;
+
+  /// No description provided for @guideline90Days.
+  ///
+  /// In en, this message translates to:
+  /// **'You have 90 days to submit a review'**
+  String get guideline90Days;
+
+  /// No description provided for @guidelineFalseReports.
+  ///
+  /// In en, this message translates to:
+  /// **'False reports may result in account suspension'**
+  String get guidelineFalseReports;
+
+  /// No description provided for @submitReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Review'**
+  String get submitReview;
+
+  /// No description provided for @skipForNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for Now'**
+  String get skipForNow;
+
+  /// No description provided for @failedToSubmitReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit review'**
+  String get failedToSubmitReview;
+
+  /// No description provided for @archiveConversationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Conversation?'**
+  String get archiveConversationTitle;
+
+  /// No description provided for @archiveConversationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to archive this conversation now?'**
+  String get archiveConversationMessage;
+
+  /// No description provided for @keep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get keep;
+
+  /// No description provided for @archive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get archive;
+
+  /// No description provided for @unableToReviewUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to review this user at this time'**
+  String get unableToReviewUser;
+
+  /// No description provided for @cannotSendFileNoRecipientKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot send file: Recipient public key not available'**
+  String get cannotSendFileNoRecipientKey;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @uploadingFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading file...'**
+  String get uploadingFile;
+
+  /// No description provided for @fileSentSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'File sent successfully!'**
+  String get fileSentSuccessfully;
+
+  /// No description provided for @downloadingFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading {filename}...'**
+  String downloadingFile(String filename);
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed: {error}'**
+  String downloadFailed(String error);
+
+  /// No description provided for @noAppToOpenFile.
+  ///
+  /// In en, this message translates to:
+  /// **'No app found to open this file type'**
+  String get noAppToOpenFile;
+
+  /// No description provided for @fileSavedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'File saved at: {filePath}'**
+  String fileSavedAt(String filePath);
+
+  /// No description provided for @fileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'File not found: {filePath}'**
+  String fileNotFound(String filePath);
+
+  /// No description provided for @permissionDeniedOpenFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission denied to open file'**
+  String get permissionDeniedOpenFile;
+
+  /// No description provided for @errorOpeningFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Error opening file: {message}'**
+  String errorOpeningFile(String message);
+
+  /// No description provided for @couldNotOpenFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open file: {error}'**
+  String couldNotOpenFile(String error);
+
+  /// No description provided for @finishTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish Transaction'**
+  String get finishTransaction;
+
+  /// No description provided for @finishTransactionConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to mark this transaction as completed?'**
+  String get finishTransactionConfirmation;
+
+  /// No description provided for @transactionCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction created successfully'**
+  String get transactionCreated;
+
+  /// No description provided for @transactionCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction marked as completed'**
+  String get transactionCompleted;
+
+  /// No description provided for @errorCreatingTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating transaction: {error}'**
+  String errorCreatingTransaction(String error);
+
+  /// No description provided for @errorUpdatingTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating transaction: {error}'**
+  String errorUpdatingTransaction(String error);
 }
 
 class _AppLocalizationsDelegate

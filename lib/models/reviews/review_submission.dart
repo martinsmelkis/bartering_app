@@ -1,3 +1,4 @@
+import '../../screens/review_screen/models/risk_analysis_model.dart';
 import 'transaction_status.dart';
 
 /// Request model for submitting a review
@@ -35,11 +36,13 @@ class SubmitReviewResponse {
   final bool success;
   final String? reviewId;
   final String message;
+  final RiskAnalysisReport? riskAnalysisReport;
 
   SubmitReviewResponse({
     required this.success,
     this.reviewId,
     required this.message,
+    this.riskAnalysisReport
   });
 
   factory SubmitReviewResponse.fromJson(Map<String, dynamic> json) {
@@ -47,6 +50,9 @@ class SubmitReviewResponse {
       success: json['success'] as bool,
       reviewId: json['reviewId'] as String?,
       message: json['message'] as String,
+      riskAnalysisReport: json['riskAnalysisReport'] != null
+          ? RiskAnalysisReport.fromJson(json['riskAnalysisReport'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -55,6 +61,7 @@ class SubmitReviewResponse {
       'success': success,
       'reviewId': reviewId,
       'message': message,
+      'riskAnalysisReport': riskAnalysisReport,
     };
   }
 }

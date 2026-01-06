@@ -11,7 +11,6 @@ import 'package:barter_app/screens/onboarding_screen/onboarding_screen.dart';
 import 'package:barter_app/screens/manage_postings_screen/manage_postings_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dart';
 import 'package:barter_app/services/api_client.dart';
-import 'package:barter_app/services/firebase_auth_service.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +18,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/messaging/firebase_auth_service.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/text_utils.dart';
 import '../onboarding_screen/cubit/onboarding_cubit.dart';

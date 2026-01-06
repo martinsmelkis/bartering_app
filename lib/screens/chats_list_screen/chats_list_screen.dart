@@ -206,8 +206,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     // First, check if user can review the other party
-    final canShowReview = true;
-    //await _checkReviewEligibility(conversation); // TODO use
+    final canShowReview = await _checkReviewEligibility(conversation);
 
     return showDialog<bool>(
       context: context,
@@ -229,7 +228,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.blue,
                 ),
-                child: const Text('Review'),
+                child: Text(l10n.review),
               ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -277,14 +276,16 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
   Conversation? _lastCheckedConversation;
 
   Future<void> _showReviewScreen(Conversation conversation) async {
-    if (_lastCheckedEligibility == null || _lastCheckedConversation?.conversationId != conversation.conversationId) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    if (_lastCheckedEligibility == null ||
+        _lastCheckedConversation?.conversationId != conversation.conversationId) {
       // Eligibility not cached, check again
-      final canReview = true;
-      //await _checkReviewEligibility(conversation); //TODO use
-      if (!canReview/* || _lastCheckedEligibility == null*/) {
+      final canReview = await _checkReviewEligibility(conversation);
+      if (!canReview || _lastCheckedEligibility == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unable to review this user at this time')),
+            SnackBar(content: Text(l10n.unableToReviewUser)),
           );
         }
         return;
@@ -307,27 +308,27 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
           builder: (_) => ReviewScreen(
             otherUserId: otherUserId,
             otherUserName: "",//_lastCheckedEligibility!.otherUserName, TODO adjust
-            eligibility: ReviewEligibilityResponse(eligible: true, transactionId: conversation.conversationId,
-              otherUserName: "", otherUserAvatarUrl: "", reason: "")//) //_lastCheckedEligibility!,
+            eligibility: _lastCheckedEligibility!
           ),
         ),
       );
 
       // If review was submitted, optionally delete/archive conversation
       if (reviewed == true && mounted) {
+        final l10n = AppLocalizations.of(context)!;
         final shouldDelete = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Archive Conversation?'),
-            content: const Text('Would you like to archive this conversation now?'),
+            title: Text(l10n.archiveConversationTitle),
+            content: Text(l10n.archiveConversationMessage),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Keep'),
+                child: Text(l10n.keep),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('Archive'),
+                child: Text(l10n.archive),
               ),
             ],
           ),

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:barter_app/models/notifications/notification_models.dart';
 import 'package:barter_app/services/api_client.dart';
 
-import '../configure_dependencies.dart';
+import '../../configure_dependencies.dart';
 import 'firebase_service.dart';
 
 class FCMTokenService {
