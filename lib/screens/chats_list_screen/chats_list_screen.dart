@@ -172,6 +172,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
 
   Future<void> _openChat(Conversation conversation) async {
     final l10n = AppLocalizations.of(context)!;
+    final apiClient = getIt<ApiClient>();
 
     // Get the other participant's ID
     final participants = await _chatRepository.getConversationParticipants(
@@ -188,11 +189,23 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
 
     final otherUserId = participants.first;
 
+    // Try to fetch the other user's name from API
+    String? otherUserName;
+    try {
+      final userProfile = await apiClient.getProfileInfo(otherUserId);
+      otherUserName = userProfile.name;
+    } catch (e) {
+      // Failed to fetch user profile, will use userId as fallback
+      print('Failed to fetch user profile for $otherUserId: $e');
+    }
+
+    final fallbackUserName = otherUserName ?? otherUserId;
+
     //If callback is provided (side-by-side mode), use it
     if (widget.onChatSelected != null) {
       widget.onChatSelected!(
         otherUserId,
-        otherUserId,
+        fallbackUserName,
       );
       return;
     }
@@ -307,7 +320,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
         MaterialPageRoute(
           builder: (_) => ReviewScreen(
             otherUserId: otherUserId,
-            otherUserName: "",//_lastCheckedEligibility!.otherUserName, TODO adjust
+            otherUserName: "",
             eligibility: _lastCheckedEligibility!
           ),
         ),

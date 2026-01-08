@@ -5,6 +5,7 @@ import 'package:barter_app/screens/interests_screen/interests_screen.dart';
 import 'package:barter_app/screens/location_picker_screen/location_picker_osm_screen.dart';
 import 'package:barter_app/screens/map_screen/map_screen.dart';
 import 'package:barter_app/screens/match_history_screen/match_history_screen.dart';
+import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/screens/notifications_screen/notifications_screen.dart';
 import 'package:barter_app/screens/offers_screen/offers_screen.dart';
 import 'package:barter_app/screens/onboarding_screen/onboarding_screen.dart';
@@ -14,6 +15,7 @@ import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../configure_dependencies.dart';
@@ -486,41 +488,82 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 SizedBox(width: 12.w),
                 // Match History Button
-                InkWell(
-                  onTap: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const MatchHistoryScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 12.w, vertical: 6.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                BlocBuilder<NotificationsCubit, NotificationsState>(
+                  bloc: getIt<NotificationsCubit>()..loadMatchHistory(),
+                  builder: (context, notificationState) {
+                    final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
+
+                    return Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        Icon(
-                          Icons.history,
-                          size: 18.sp,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          l10n.matchHistory,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                        InkWell(
+                          onTap: () async {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const MatchHistoryScreen(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 6.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.history,
+                                  size: 18.sp,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 4.w),
+                                Text(
+                                  l10n.matchHistory,
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+                        if (unreadCount > 0)
+                          Positioned(
+                            top: -6,
+                            right: -6,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                ),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 28,
+                                minHeight: 28,
+                              ),
+                              child: Text(
+                                unreadCount > 99 ? '99+' : '$unreadCount',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
                       ],
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ],
             ),

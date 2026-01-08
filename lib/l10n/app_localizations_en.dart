@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Barter App';
+  String get appTitle => 'Bartering App';
 
   @override
   String get tapToChat => 'Tap to chat';
@@ -1578,7 +1578,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get welcomeStep2Description =>
-      'Find people with matching or complementary interests, search by keywords';
+      'Find similar or complementary people, search by keywords';
 
   @override
   String get welcomeStep3Title => 'Start Chatting';

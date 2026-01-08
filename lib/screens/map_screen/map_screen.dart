@@ -995,15 +995,15 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                 ),
                               ),
                               constraints: const BoxConstraints(
-                                minWidth: 18,
-                                minHeight: 18,
+                                minWidth: 33,
+                                minHeight: 33,
                               ),
                               child: Center(
                                 child: Text(
                                   unreadCount > 99 ? '99+' : unreadCount.toString(),
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 10,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

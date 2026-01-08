@@ -97,7 +97,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Barter App'**
+  /// **'Bartering App'**
   String get appTitle;
 
   /// No description provided for @tapToChat.
@@ -3145,7 +3145,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeStep2Description.
   ///
   /// In en, this message translates to:
-  /// **'Find people with matching or complementary interests, search by keywords'**
+  /// **'Find similar or complementary people, search by keywords'**
   String get welcomeStep2Description;
 
   /// No description provided for @welcomeStep3Title.

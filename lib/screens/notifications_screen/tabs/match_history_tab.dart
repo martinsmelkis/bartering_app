@@ -138,7 +138,7 @@ class _MatchHistoryCard extends StatelessWidget {
       elevation: match.viewed ? 1 : 3,
       color: match.viewed
           ? Colors.white
-          : AppColors.primary.withValues(alpha: 0.05),
+          : Colors.white70.withValues(alpha: 0.5),
       child: InkWell(
         onTap: () => _viewMatch(context, match),
         child: Padding(
@@ -240,6 +240,40 @@ class _MatchHistoryCard extends StatelessWidget {
                   ),
                 ],
               ),
+              if (match.matchReason != null && match.matchReason!.isNotEmpty) ...[
+                SizedBox(height: 8.h),
+                Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: Colors.grey.shade200,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16.sp,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          match.matchReason!,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Colors.grey.shade800,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               SizedBox(height: 8.h),
               Row(
                 children: [

@@ -13,8 +13,8 @@ Use together with [bartering_app_backend](https://github.com/martinsmelkis/barte
 
 ### Key Features
 
-- **🗺️ Location-Based Discovery**: Interactive map interface to find barter opportunities near you.
-- **🔍 Search is based on embedding models**: To find contextually relevant matches.
+- **🗺️ Location-Based Discovery**: Interactive map interface to find exchange opportunities near you.
+- **🔍 Search is based on AI embedding models**: To find contextually relevant matches.
 - **🔐 End-to-End Encrypted Chat**: Secure, private messaging with ECC encryption
 - **👤 Rich User Profiles**: Showcase your skills, interests, and what you're looking for
 - **📋 Posting System**: Create detailed offers and requests for services or items
