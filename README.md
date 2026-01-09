@@ -8,7 +8,7 @@ share knowledge, or trade items.
 
 Use together with [bartering_app_backend](https://github.com/martinsmelkis/bartering_app_backend).
 
-<img width="185" height="413" alt="Ekrānuzņēmums 2026-01-02 143619" src="https://github.com/user-attachments/assets/ed4323f5-feb7-41ef-8dec-fe30774a9772" /> <img width="185" height="413" alt="Ekrānuzņēmums 2026-01-02 143445" src="https://github.com/user-attachments/assets/dc41a7cc-ce14-4c42-b7cd-a996062b2056" /> <img width="185" height="413" alt="Ekrānuzņēmums 2026-01-02 143514" src="https://github.com/user-attachments/assets/2647bc81-3310-4a87-ac42-32c2207b7842" />
+<img width="185" height="413" alt="Ekrānuzņēmums 2026-01-09 135136" src="https://github.com/user-attachments/assets/cf9b23fb-3be7-4ac2-8123-b048bdffa57e" /> <img width="185" height="413" alt="Ekrānuzņēmums 2026-01-09 134448" src="https://github.com/user-attachments/assets/89c4ed47-02b6-4797-8030-b78fa2157ac4" /> <img width="185" height="413" alt="Ekrānuzņēmums 2026-01-09 141046" src="https://github.com/user-attachments/assets/7a556db1-5f41-4e58-9c38-d1973ab0f8fc" /> <img width="185" height="413" alt="Ekrānuzņēmums 2026-01-09 134907" src="https://github.com/user-attachments/assets/bf1e8a15-e365-40d8-b066-68f3f7ef5807" /> <img width="185" height="413" alt="Ekrānuzņēmums 2026-01-09 140142" src="https://github.com/user-attachments/assets/23b6a256-2f95-4303-80f5-47ea484ff003" /> 
 
 
 ### Key Features
