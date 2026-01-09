@@ -1,5 +1,6 @@
 class AuthRequest {
   final String userId;
+  final String userName;
   final String peerUserId;
   final String publicKey;
   final int timestamp; // Unix timestamp in milliseconds
@@ -7,6 +8,7 @@ class AuthRequest {
 
   AuthRequest({
     required this.userId,
+    required this.userName,
     required this.peerUserId,
     required this.publicKey,
     required this.timestamp,
@@ -17,6 +19,7 @@ class AuthRequest {
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
+      'userName': userName,
       'peerUserId': peerUserId,
       'publicKey': publicKey,
       'timestamp': timestamp,
@@ -37,6 +40,7 @@ class AuthRequest {
     }
     return AuthRequest(
       userId: json['userId'] as String,
+      userName: json['userName'] as String? ?? '',
       peerUserId: json['peerUserId'] as String,
       publicKey: json['publicKey'] as String,
       timestamp: json['timestamp'] as int,
@@ -46,7 +50,7 @@ class AuthRequest {
 
   @override
   String toString() {
-    return 'AuthRequest(userId: $userId, peerUserId: $peerUserId, timestamp: $timestamp)';
+    return 'AuthRequest(userId: $userId, userName: $userName, peerUserId: $peerUserId, timestamp: $timestamp)';
   }
 
   // Optional: For equality and hashCode, especially if used in collections or as BLoC states
@@ -56,6 +60,7 @@ class AuthRequest {
 
     return other is AuthRequest &&
         other.userId == userId &&
+        other.userName == userName &&
         other.peerUserId == peerUserId &&
         other.timestamp == timestamp &&
         other.signature == signature;
@@ -64,6 +69,7 @@ class AuthRequest {
   @override
   int get hashCode =>
       userId.hashCode ^
+      userName.hashCode ^
       peerUserId.hashCode ^
       timestamp.hashCode ^
       signature.hashCode;

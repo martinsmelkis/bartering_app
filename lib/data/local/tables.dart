@@ -21,6 +21,8 @@ class Conversations extends Table {
 
   TextColumn get lastMessageSenderId => text().nullable()();
 
+  TextColumn get lastMessageSenderName => text().nullable()();
+
   // Unread count for current user
   IntColumn get unreadCount => integer().withDefault(const Constant(0))();
 
@@ -29,6 +31,9 @@ class Conversations extends Table {
 
   // Optional conversation name (for group chats)
   TextColumn get name => text().nullable()();
+
+  // Optional transaction ID to link conversation with a transaction
+  TextColumn get transactionId => text().nullable()();
 
   // Metadata
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -47,6 +52,7 @@ class UserChats extends Table {
   // Foreign key to the conversation this message belongs to.
   TextColumn get conversationId => text().references(Conversations, #conversationId)();
   TextColumn get senderId => text().references(Profiles, #userId)();
+  TextColumn get senderName => text().nullable()(); // Optional sender name for display
   TextColumn get recipientId => text().nullable().references(Profiles, #userId)();
 
   // Store both encrypted and decrypted content

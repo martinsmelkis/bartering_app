@@ -2202,4 +2202,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String errorUpdatingTransaction(String error) {
     return 'Error updating transaction: $error';
   }
+
+  @override
+  String get noUsersNearbyTitle => 'No Users Nearby';
+
+  @override
+  String get noUsersNearbyMessage =>
+      'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!';
+
+  @override
+  String get shareApp => 'Share App';
+
+  @override
+  String get copyLink => 'Copy Link';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get linkCopiedToClipboard => 'Link copied to clipboard!';
+
+  @override
+  String get unableToShareAtThisTime => 'Unable to share at this time';
+
+  @override
+  String inviteMessageShare(String appLink) {
+    return 'Hey! Join me on BarterApp - a great way to trade items and services with people nearby! 🔄\n\n$appLink';
+  }
+
+  @override
+  String get inviteMessageSubject => 'Join me on BarterApp!';
 }

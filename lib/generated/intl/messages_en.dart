@@ -20,17 +20,45 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static String m0(error) => "Error finding location: ${error}";
+  static String m0(error) => "Could not open file: ${error}";
 
-  static String m1(errorMessage) => "Error: ${errorMessage}";
+  static String m1(error) => "Download failed: ${error}";
 
-  static String m2(id) => "Mock POI with id ${id} not found in service";
+  static String m2(filename) => "Downloading ${filename}...";
 
-  static String m3(id) => "Mock POI with id ${id} not found for update";
+  static String m3(error) => "Error creating transaction: ${error}";
 
-  static String m4(count) => "${count} questions answered";
+  static String m4(error) => "Error finding location: ${error}";
 
-  static String m5(number) => "Style ${number}";
+  static String m5(message) => "Error opening file: ${message}";
+
+  static String m6(error) => "Error updating transaction: ${error}";
+
+  static String m7(errorMessage) => "Error: ${errorMessage}";
+
+  static String m8(filePath) => "File not found: ${filePath}";
+
+  static String m9(filePath) => "File saved at: ${filePath}";
+
+  static String m10(appLink) =>
+      "Hey! Join me on BarterApp - a great way to trade items and services with people nearby! 🔄\n\n${appLink}";
+
+  static String m11(id) => "Mock POI with id ${id} not found in service";
+
+  static String m12(id) => "Mock POI with id ${id} not found for update";
+
+  static String m13(attempts) => "Incorrect PIN (Attempt ${attempts})";
+
+  static String m14(count) => "${count} questions answered";
+
+  static String m15(userName) => "Review ${userName}";
+
+  static String m16(otherUserName) =>
+      "Your review will be visible after ${otherUserName} submits their review, or in 14 days.";
+
+  static String m17(attempts) => "Incorrect answer (Attempt ${attempts})";
+
+  static String m18(number) => "Style ${number}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -55,7 +83,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "anUnknownErrorOccurred": MessageLookupByLibrary.simpleMessage(
       "An unknown error occurred.",
     ),
-    "appTitle": MessageLookupByLibrary.simpleMessage("Barter App"),
+    "answerHint": MessageLookupByLibrary.simpleMessage("Enter your answer"),
+    "answerSecurityQuestion": MessageLookupByLibrary.simpleMessage(
+      "Answer Security Question",
+    ),
+    "answerTooShort": MessageLookupByLibrary.simpleMessage(
+      "Answer must be at least 2 characters",
+    ),
+    "appTitle": MessageLookupByLibrary.simpleMessage("Bartering App"),
+    "archive": MessageLookupByLibrary.simpleMessage("Archive"),
+    "archiveConversationMessage": MessageLookupByLibrary.simpleMessage(
+      "Would you like to archive this conversation now?",
+    ),
+    "archiveConversationTitle": MessageLookupByLibrary.simpleMessage(
+      "Archive Conversation?",
+    ),
     "archiveWishlist": MessageLookupByLibrary.simpleMessage("Archive"),
     "atLeastOneKeyword": MessageLookupByLibrary.simpleMessage(
       "Please enter at least one keyword",
@@ -482,7 +524,14 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "attributes": MessageLookupByLibrary.simpleMessage("Attributes"),
     "attributesSelected": MessageLookupByLibrary.simpleMessage("selected"),
+    "beSpecificAndConstructive": MessageLookupByLibrary.simpleMessage(
+      "Be specific and constructive",
+    ),
+    "camera": MessageLookupByLibrary.simpleMessage("Camera"),
     "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+    "cannotSendFileNoRecipientKey": MessageLookupByLibrary.simpleMessage(
+      "Cannot send file: Recipient public key not available",
+    ),
     "category": MessageLookupByLibrary.simpleMessage("Category"),
     "categoryActiveDescription": MessageLookupByLibrary.simpleMessage(
       "Sports, partying, dancing, running, physical, mechanical",
@@ -547,6 +596,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "category_yellow": MessageLookupByLibrary.simpleMessage(
       "Chat, social activities, casual conversation, local events, new contacts, communication",
     ),
+    "changeSecurityQuestion": MessageLookupByLibrary.simpleMessage(
+      "Change Security Question",
+    ),
     "chat": MessageLookupByLibrary.simpleMessage("Chat"),
     "chatError_Offline": MessageLookupByLibrary.simpleMessage("User Offline"),
     "chooseFromGallery": MessageLookupByLibrary.simpleMessage(
@@ -555,22 +607,26 @@ class MessageLookup extends MessageLookupByLibrary {
     "clearQuietHours": MessageLookupByLibrary.simpleMessage(
       "Clear Quiet Hours",
     ),
+    "close": MessageLookupByLibrary.simpleMessage("Close"),
     "closeLocations": MessageLookupByLibrary.simpleMessage("Close Locations"),
     "completeSetup": MessageLookupByLibrary.simpleMessage("Complete Setup"),
+    "confirmPinLabel": MessageLookupByLibrary.simpleMessage("Confirm PIN"),
+    "contactSupportForPinReset": MessageLookupByLibrary.simpleMessage(
+      "Please contact support for PIN reset assistance",
+    ),
     "contacts": MessageLookupByLibrary.simpleMessage("Contacts"),
     "continueButton": MessageLookupByLibrary.simpleMessage("Continue"),
-    "continueWithGoogle": MessageLookupByLibrary.simpleMessage(
-      "Continue with Google",
-    ),
     "conversationDeleted": MessageLookupByLibrary.simpleMessage(
       "Conversation deleted",
     ),
     "copiedToClipboard": MessageLookupByLibrary.simpleMessage(
       "Copied to clipboard",
     ),
+    "copyLink": MessageLookupByLibrary.simpleMessage("Copy Link"),
     "couldNotFindChatParticipant": MessageLookupByLibrary.simpleMessage(
       "Could not find chat participant",
     ),
+    "couldNotOpenFile": m0,
     "create5DigitPin": MessageLookupByLibrary.simpleMessage(
       "Create a 5-digit PIN",
     ),
@@ -596,6 +652,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteConversationConfirmation": MessageLookupByLibrary.simpleMessage(
       "Are you sure you want to delete this conversation? All messages will be permanently removed.",
     ),
+    "deletePosting": MessageLookupByLibrary.simpleMessage("Delete Posting"),
+    "deletePostingConfirmation": MessageLookupByLibrary.simpleMessage(
+      "Are you sure you want to delete this posting?",
+    ),
     "deletePreference": MessageLookupByLibrary.simpleMessage(
       "Delete Preference",
     ),
@@ -619,6 +679,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "dismissed": MessageLookupByLibrary.simpleMessage("Dismissed"),
     "done": MessageLookupByLibrary.simpleMessage("Done"),
+    "downloadFailed": m1,
+    "downloadingFile": m2,
     "drawer_menu_complementary_users": MessageLookupByLibrary.simpleMessage(
       "Find complementary users",
     ),
@@ -633,6 +695,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Edit Your Overall Interests",
     ),
     "editLocation": MessageLookupByLibrary.simpleMessage("Edit Location"),
+    "editPosting": MessageLookupByLibrary.simpleMessage("Edit Posting"),
     "editPreference": MessageLookupByLibrary.simpleMessage("Edit Preference"),
     "editWishlistItem": MessageLookupByLibrary.simpleMessage(
       "Edit Wishlist Item",
@@ -659,8 +722,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "enterNewPinDescription": MessageLookupByLibrary.simpleMessage(
       "Enter a new 5-digit PIN",
     ),
+    "enterPinDescription": MessageLookupByLibrary.simpleMessage(
+      "Enter your PIN to unlock the app",
+    ),
+    "enterPinTitle": MessageLookupByLibrary.simpleMessage("Enter PIN"),
+    "enterYourAnswer": MessageLookupByLibrary.simpleMessage(
+      "Enter your answer",
+    ),
     "enterYourPin": MessageLookupByLibrary.simpleMessage("Enter Your PIN"),
     "error": MessageLookupByLibrary.simpleMessage("Error"),
+    "errorCreatingTransaction": m3,
     "errorCreatingWishlistItem": MessageLookupByLibrary.simpleMessage(
       "Error creating wishlist item",
     ),
@@ -676,7 +747,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "errorDuringInitialization": MessageLookupByLibrary.simpleMessage(
       "Error during initialization.",
     ),
-    "errorFindingLocation": m0,
+    "errorFindingLocation": m4,
     "errorLoadingAttributes": MessageLookupByLibrary.simpleMessage(
       "Error loading attributes",
     ),
@@ -689,36 +760,82 @@ class MessageLookup extends MessageLookupByLibrary {
     "errorLoadingWishlist": MessageLookupByLibrary.simpleMessage(
       "Error loading wishlist",
     ),
+    "errorOpeningFile": m5,
     "errorUpdatingFavorite": MessageLookupByLibrary.simpleMessage(
       "Error updating favorite",
     ),
+    "errorUpdatingTransaction": m6,
     "errorUpdatingWishlistItem": MessageLookupByLibrary.simpleMessage(
       "Error updating wishlist item",
     ),
-    "errorWithMessage": m1,
+    "errorWithMessage": m7,
     "expirationDate": MessageLookupByLibrary.simpleMessage("Expiration Date"),
+    "expires": MessageLookupByLibrary.simpleMessage("Expires"),
     "expiresPrefix": MessageLookupByLibrary.simpleMessage("Expires"),
     "eyes": MessageLookupByLibrary.simpleMessage("Eyes"),
+    "failedToSubmitReview": MessageLookupByLibrary.simpleMessage(
+      "Failed to submit review",
+    ),
+    "falseReportsWarning": MessageLookupByLibrary.simpleMessage(
+      "False reports may result in penalties to your account.",
+    ),
+    "fileNotFound": m8,
+    "fileSavedAt": m9,
+    "fileSentSuccessfully": MessageLookupByLibrary.simpleMessage(
+      "File sent successfully!",
+    ),
     "finishOnboarding": MessageLookupByLibrary.simpleMessage("Finish"),
+    "finishTransaction": MessageLookupByLibrary.simpleMessage(
+      "Finish Transaction",
+    ),
+    "finishTransactionConfirmation": MessageLookupByLibrary.simpleMessage(
+      "Are you sure you want to mark this transaction as completed?",
+    ),
     "forgotPin": MessageLookupByLibrary.simpleMessage("Forgot PIN?"),
     "forgotPinSubtitle": MessageLookupByLibrary.simpleMessage(
       "Enter your email address to receive a PIN reset link.",
     ),
     "frequency": MessageLookupByLibrary.simpleMessage("Frequency"),
+    "gallery": MessageLookupByLibrary.simpleMessage("Gallery"),
     "generateAvatar": MessageLookupByLibrary.simpleMessage("Generate Avatar"),
     "generateCryptoWallet": MessageLookupByLibrary.simpleMessage(
       "Generate Crypto Wallet",
     ),
     "generateWallet": MessageLookupByLibrary.simpleMessage("Generate Wallet"),
     "getStarted": MessageLookupByLibrary.simpleMessage("Get Started"),
+    "goBack": MessageLookupByLibrary.simpleMessage("Go Back"),
     "googleSignInNotImplemented": MessageLookupByLibrary.simpleMessage(
       "Google Sign-In not implemented.",
     ),
+    "guideline90Days": MessageLookupByLibrary.simpleMessage(
+      "You have 90 days to submit a review",
+    ),
+    "guidelineFalseReports": MessageLookupByLibrary.simpleMessage(
+      "False reports may result in account suspension",
+    ),
+    "guidelineFocusExperience": MessageLookupByLibrary.simpleMessage(
+      "Focus on your actual experience",
+    ),
+    "guidelineHonest": MessageLookupByLibrary.simpleMessage(
+      "Be honest and fair",
+    ),
+    "guidelineVisibility": MessageLookupByLibrary.simpleMessage(
+      "Reviews become visible after both parties submit",
+    ),
     "hairColor": MessageLookupByLibrary.simpleMessage("Hair Color"),
     "hairStyle": MessageLookupByLibrary.simpleMessage("Hair Style"),
+    "howDidItGo": MessageLookupByLibrary.simpleMessage("How did it go? *"),
     "howItWorks": MessageLookupByLibrary.simpleMessage("How It Works"),
     "instant": MessageLookupByLibrary.simpleMessage("Instant"),
     "interest": MessageLookupByLibrary.simpleMessage("Interest"),
+    "inviteMessageShare": m10,
+    "inviteMessageSubject": MessageLookupByLibrary.simpleMessage(
+      "Join me on BarterApp!",
+    ),
+    "keep": MessageLookupByLibrary.simpleMessage("Keep"),
+    "linkCopiedToClipboard": MessageLookupByLibrary.simpleMessage(
+      "Link copied to clipboard!",
+    ),
     "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
     "locationNotFound": MessageLookupByLibrary.simpleMessage(
       "Location not found.",
@@ -726,6 +843,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "locationSaved": MessageLookupByLibrary.simpleMessage("Location saved!"),
     "locations": MessageLookupByLibrary.simpleMessage("Locations"),
     "lookingFor": MessageLookupByLibrary.simpleMessage("Looking For"),
+    "managePostings": MessageLookupByLibrary.simpleMessage("Manage Postings"),
+    "manageSecurityQuestion": MessageLookupByLibrary.simpleMessage(
+      "Manage Security Question",
+    ),
     "manual": MessageLookupByLibrary.simpleMessage("Manual"),
     "markAsFulfilled": MessageLookupByLibrary.simpleMessage(
       "Mark as Fulfilled",
@@ -740,14 +861,21 @@ class MessageLookup extends MessageLookupByLibrary {
       "Maximum 3 images allowed",
     ),
     "minMatchScore": MessageLookupByLibrary.simpleMessage("Min. Match Score"),
-    "mockPoiNotFound": m2,
-    "mockPoiNotFoundForUpdate": m3,
+    "mockPoiNotFound": m11,
+    "mockPoiNotFoundForUpdate": m12,
     "mouth": MessageLookupByLibrary.simpleMessage("Mouth"),
     "myWishlist": MessageLookupByLibrary.simpleMessage("My Wishlist"),
+    "need": MessageLookupByLibrary.simpleMessage("Need"),
     "newBadge": MessageLookupByLibrary.simpleMessage("NEW"),
     "newPostings": MessageLookupByLibrary.simpleMessage("New Postings"),
     "newUsers": MessageLookupByLibrary.simpleMessage("New Users"),
     "ninetyNinePlus": MessageLookupByLibrary.simpleMessage("99+"),
+    "noActivePostings": MessageLookupByLibrary.simpleMessage(
+      "No active postings",
+    ),
+    "noAppToOpenFile": MessageLookupByLibrary.simpleMessage(
+      "No app found to open this file type",
+    ),
     "noAttributePreferences": MessageLookupByLibrary.simpleMessage(
       "No attribute preferences",
     ),
@@ -766,8 +894,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "noPushTokens": MessageLookupByLibrary.simpleMessage(
       "No push notification tokens registered",
     ),
+    "noSecurityQuestion": MessageLookupByLibrary.simpleMessage(
+      "No security question configured",
+    ),
+    "noSecurityQuestionSet": MessageLookupByLibrary.simpleMessage(
+      "No security question set up",
+    ),
     "noUnviewedMatches": MessageLookupByLibrary.simpleMessage(
       "No unviewed matches",
+    ),
+    "noUsersNearbyMessage": MessageLookupByLibrary.simpleMessage(
+      "It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!",
+    ),
+    "noUsersNearbyTitle": MessageLookupByLibrary.simpleMessage(
+      "No Users Nearby",
     ),
     "noWishlistItems": MessageLookupByLibrary.simpleMessage(
       "No wishlist items yet",
@@ -787,8 +927,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "notifyOnNewUsers": MessageLookupByLibrary.simpleMessage(
       "Notify on new users",
     ),
+    "offer": MessageLookupByLibrary.simpleMessage("Offer"),
     "offering": MessageLookupByLibrary.simpleMessage("Offering"),
     "offers": MessageLookupByLibrary.simpleMessage("Offers"),
+    "ok": MessageLookupByLibrary.simpleMessage("OK"),
     "onboardingScreenQuestion": MessageLookupByLibrary.simpleMessage(
       "How much are you interested in this?",
     ),
@@ -796,19 +938,41 @@ class MessageLookup extends MessageLookupByLibrary {
     "optionalField": MessageLookupByLibrary.simpleMessage("Optional"),
     "or": MessageLookupByLibrary.simpleMessage("OR"),
     "pauseWishlist": MessageLookupByLibrary.simpleMessage("Pause"),
+    "permissionDeniedOpenFile": MessageLookupByLibrary.simpleMessage(
+      "Permission denied to open file",
+    ),
     "phoneNumber": MessageLookupByLibrary.simpleMessage("Phone Number"),
     "phoneUpdated": MessageLookupByLibrary.simpleMessage("Phone updated"),
     "pickYourLocation": MessageLookupByLibrary.simpleMessage(
       "Pick your location",
     ),
+    "pinErrorEmpty": MessageLookupByLibrary.simpleMessage("Please enter a PIN"),
+    "pinErrorIncorrect": m13,
+    "pinErrorMismatch": MessageLookupByLibrary.simpleMessage(
+      "PINs do not match",
+    ),
+    "pinErrorTooShort": MessageLookupByLibrary.simpleMessage(
+      "PIN must be at least 4 digits",
+    ),
+    "pinHint": MessageLookupByLibrary.simpleMessage("Enter 4-6 digits"),
+    "pinLabel": MessageLookupByLibrary.simpleMessage("PIN"),
     "pinResetSuccess": MessageLookupByLibrary.simpleMessage(
       "Your PIN has been successfully reset.",
+    ),
+    "pinResetSuccessfully": MessageLookupByLibrary.simpleMessage(
+      "PIN reset successfully",
+    ),
+    "pinSetSuccessfully": MessageLookupByLibrary.simpleMessage(
+      "PIN set successfully",
     ),
     "pinSetupDescription": MessageLookupByLibrary.simpleMessage(
       "Please set up a 5-digit PIN for security",
     ),
     "pleaseEnter5DigitPin": MessageLookupByLibrary.simpleMessage(
       "Please enter a 5-digit PIN.",
+    ),
+    "pleaseEnterAnswer": MessageLookupByLibrary.simpleMessage(
+      "Please enter your answer",
     ),
     "pleaseEnterTitle": MessageLookupByLibrary.simpleMessage(
       "Please enter a title",
@@ -822,12 +986,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseSelectLocationFirst": MessageLookupByLibrary.simpleMessage(
       "Please select a location first.",
     ),
+    "pleaseSelectQuestion": MessageLookupByLibrary.simpleMessage(
+      "Please select a security question",
+    ),
     "pointsOfInterest": MessageLookupByLibrary.simpleMessage(
       "Points of Interest",
     ),
     "postedPrefix": MessageLookupByLibrary.simpleMessage("Posted"),
     "postingCreatedSuccess": MessageLookupByLibrary.simpleMessage(
       "Posting created successfully!",
+    ),
+    "postingDeleted": MessageLookupByLibrary.simpleMessage(
+      "Posting deleted successfully",
     ),
     "postingDescription": MessageLookupByLibrary.simpleMessage("Description"),
     "postingDescriptionHint": MessageLookupByLibrary.simpleMessage(
@@ -854,6 +1024,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "postingTitleTooShort": MessageLookupByLibrary.simpleMessage(
       "Title must be at least 3 characters",
     ),
+    "postingUpdatedSuccess": MessageLookupByLibrary.simpleMessage(
+      "Posting updated successfully",
+    ),
     "postingValue": MessageLookupByLibrary.simpleMessage("Value (Optional)"),
     "postingValueHint": MessageLookupByLibrary.simpleMessage("Estimated value"),
     "postingValueInvalid": MessageLookupByLibrary.simpleMessage(
@@ -879,12 +1052,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "pushTokenRemoved": MessageLookupByLibrary.simpleMessage(
       "Push token removed",
     ),
-    "questionsAnswered": m4,
+    "questionsAnswered": m14,
     "quietHours": MessageLookupByLibrary.simpleMessage("Quiet Hours"),
     "quietHoursDescription": MessageLookupByLibrary.simpleMessage(
       "Do not send notifications during these hours",
     ),
     "randomize": MessageLookupByLibrary.simpleMessage("Randomize"),
+    "ratingExcellent": MessageLookupByLibrary.simpleMessage("Excellent"),
+    "ratingGood": MessageLookupByLibrary.simpleMessage("Good"),
+    "ratingOkay": MessageLookupByLibrary.simpleMessage("Okay"),
+    "ratingPoor": MessageLookupByLibrary.simpleMessage("Poor"),
+    "ratingRequired": MessageLookupByLibrary.simpleMessage("Rating *"),
+    "ratingVeryBad": MessageLookupByLibrary.simpleMessage("Very Bad"),
     "relevancy": MessageLookupByLibrary.simpleMessage("Relevancy"),
     "remove": MessageLookupByLibrary.simpleMessage("Remove"),
     "removePushToken": MessageLookupByLibrary.simpleMessage(
@@ -893,25 +1072,85 @@ class MessageLookup extends MessageLookupByLibrary {
     "removePushTokenConfirmation": MessageLookupByLibrary.simpleMessage(
       "Are you sure you want to remove this push token?",
     ),
+    "report": MessageLookupByLibrary.simpleMessage("Report"),
+    "reportScam": MessageLookupByLibrary.simpleMessage("Report Scam"),
+    "reportScamConfirmation": MessageLookupByLibrary.simpleMessage(
+      "Are you sure you want to report this user for scam?",
+    ),
+    "reportScamConsequence1": MessageLookupByLibrary.simpleMessage(
+      "• Flag this transaction for moderator review",
+    ),
+    "reportScamConsequence2": MessageLookupByLibrary.simpleMessage(
+      "• Potentially suspend the other user",
+    ),
+    "reportScamConsequence3": MessageLookupByLibrary.simpleMessage(
+      "• Require evidence from you",
+    ),
+    "reportScamConsequencesTitle": MessageLookupByLibrary.simpleMessage(
+      "This will:",
+    ),
     "resetLinkSentMessage": MessageLookupByLibrary.simpleMessage(
       "If an account exists, a reset link has been sent.",
     ),
     "resetYourPin": MessageLookupByLibrary.simpleMessage("Reset Your PIN"),
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
+    "review": MessageLookupByLibrary.simpleMessage("Review"),
+    "reviewGuidelines": MessageLookupByLibrary.simpleMessage(
+      "Review Guidelines",
+    ),
+    "reviewSubmitted": MessageLookupByLibrary.simpleMessage(
+      "Review Submitted!",
+    ),
+    "reviewUser": m15,
+    "reviewVisibilityNotice": m16,
     "save": MessageLookupByLibrary.simpleMessage("Save"),
     "saveAndContinue": MessageLookupByLibrary.simpleMessage("Save & Continue"),
     "saveEmail": MessageLookupByLibrary.simpleMessage("Save Email"),
     "saveLocation": MessageLookupByLibrary.simpleMessage("Save Location"),
+    "saveSecurityQuestion": MessageLookupByLibrary.simpleMessage(
+      "Save Security Question",
+    ),
     "searchForAKeyword": MessageLookupByLibrary.simpleMessage(
       "Search for a keyword",
     ),
     "searchForALocation": MessageLookupByLibrary.simpleMessage(
       "Search for a location",
     ),
+    "securityAnswerIncorrect": m17,
+    "securityAnswerNote": MessageLookupByLibrary.simpleMessage(
+      "Note: Answers are case-insensitive",
+    ),
+    "securityQuestion1": MessageLookupByLibrary.simpleMessage(
+      "What was the name of your first pet?",
+    ),
+    "securityQuestion2": MessageLookupByLibrary.simpleMessage(
+      "What city were you born in?",
+    ),
+    "securityQuestion3": MessageLookupByLibrary.simpleMessage(
+      "What is your mother\'s maiden name?",
+    ),
+    "securityQuestion4": MessageLookupByLibrary.simpleMessage(
+      "What was the name of your elementary school?",
+    ),
+    "securityQuestion5": MessageLookupByLibrary.simpleMessage(
+      "What is your favorite book?",
+    ),
+    "securityQuestionDescription": MessageLookupByLibrary.simpleMessage(
+      "Set up a security question to help recover your PIN if you forget it",
+    ),
+    "securityQuestionSaved": MessageLookupByLibrary.simpleMessage(
+      "Security question saved successfully",
+    ),
+    "securityQuestionSet": MessageLookupByLibrary.simpleMessage(
+      "Security question is set up",
+    ),
     "selectAttributes": MessageLookupByLibrary.simpleMessage(
       "Select Attributes",
     ),
     "selectLocation": MessageLookupByLibrary.simpleMessage("Select Location"),
+    "selectSecurityQuestion": MessageLookupByLibrary.simpleMessage(
+      "Select a question",
+    ),
     "selectYourInterests": MessageLookupByLibrary.simpleMessage(
       "What do you seek/require?",
     ),
@@ -919,7 +1158,73 @@ class MessageLookup extends MessageLookupByLibrary {
       "What do you have/offer?",
     ),
     "sendResetLink": MessageLookupByLibrary.simpleMessage("Send Reset Link"),
+    "setPinButton": MessageLookupByLibrary.simpleMessage("Set PIN"),
+    "setPinDescription": MessageLookupByLibrary.simpleMessage(
+      "Create a 4-6 digit PIN to secure your app",
+    ),
+    "setPinTitle": MessageLookupByLibrary.simpleMessage("Set Up PIN"),
     "setUpAccount": MessageLookupByLibrary.simpleMessage("Set Up Account"),
+    "settingsChangePinButton": MessageLookupByLibrary.simpleMessage(
+      "Change PIN",
+    ),
+    "settingsChangePinDescription": MessageLookupByLibrary.simpleMessage(
+      "Update your security PIN",
+    ),
+    "settingsKeywordSearchRadiusDescription":
+        MessageLookupByLibrary.simpleMessage(
+          "Search radius when using keyword search",
+        ),
+    "settingsKeywordSearchRadiusTitle": MessageLookupByLibrary.simpleMessage(
+      "Keyword Search Radius",
+    ),
+    "settingsKeywordSearchWeightDescription":
+        MessageLookupByLibrary.simpleMessage(
+          "Weight parameter for keyword search relevance (10-100)",
+        ),
+    "settingsKeywordSearchWeightTitle": MessageLookupByLibrary.simpleMessage(
+      "Keyword Search Weight",
+    ),
+    "settingsNearbyUsersRadiusDescription":
+        MessageLookupByLibrary.simpleMessage(
+          "How far to search for nearby users",
+        ),
+    "settingsNearbyUsersRadiusTitle": MessageLookupByLibrary.simpleMessage(
+      "Nearby Users Search Radius",
+    ),
+    "settingsPinDisabledDescription": MessageLookupByLibrary.simpleMessage(
+      "Enable PIN for extra security",
+    ),
+    "settingsPinEnabledDescription": MessageLookupByLibrary.simpleMessage(
+      "App is protected with PIN",
+    ),
+    "settingsPinTitle": MessageLookupByLibrary.simpleMessage("PIN Protection"),
+    "settingsSaved": MessageLookupByLibrary.simpleMessage(
+      "Settings saved successfully",
+    ),
+    "settingsSearchCenterMapCenter": MessageLookupByLibrary.simpleMessage(
+      "Map Center",
+    ),
+    "settingsSearchCenterMapCenterDescription":
+        MessageLookupByLibrary.simpleMessage(
+          "Search from the current map center",
+        ),
+    "settingsSearchCenterPointDescription":
+        MessageLookupByLibrary.simpleMessage(
+          "Choose the center point for nearby user searches",
+        ),
+    "settingsSearchCenterPointTitle": MessageLookupByLibrary.simpleMessage(
+      "Center Point of Search",
+    ),
+    "settingsSearchCenterUserLocation": MessageLookupByLibrary.simpleMessage(
+      "User Location",
+    ),
+    "settingsSearchCenterUserLocationDescription":
+        MessageLookupByLibrary.simpleMessage("Search from your saved location"),
+    "settingsSearchSection": MessageLookupByLibrary.simpleMessage(
+      "Search Settings",
+    ),
+    "settingsSecuritySection": MessageLookupByLibrary.simpleMessage("Security"),
+    "settingsTitle": MessageLookupByLibrary.simpleMessage("Settings"),
     "setupAttributeNotifications": MessageLookupByLibrary.simpleMessage(
       "Set Up Notifications",
     ),
@@ -930,12 +1235,30 @@ class MessageLookup extends MessageLookupByLibrary {
       "Enter your email address to receive notifications",
     ),
     "setupEmailTitle": MessageLookupByLibrary.simpleMessage("Set Up Email"),
+    "setupSecurityQuestion": MessageLookupByLibrary.simpleMessage(
+      "Setup Security Question",
+    ),
+    "setupSecurityQuestionButton": MessageLookupByLibrary.simpleMessage(
+      "Setup Security Question",
+    ),
+    "shareApp": MessageLookupByLibrary.simpleMessage("Share App"),
+    "shareYourExperience": MessageLookupByLibrary.simpleMessage(
+      "Share your experience...",
+    ),
     "skin": MessageLookupByLibrary.simpleMessage("Skin"),
+    "skip": MessageLookupByLibrary.simpleMessage("Skip"),
+    "skipForNow": MessageLookupByLibrary.simpleMessage("Skip for Now"),
+    "skipPinButton": MessageLookupByLibrary.simpleMessage("Skip for now"),
+    "skipReviewMessage": MessageLookupByLibrary.simpleMessage(
+      "You can review this user later from your transaction history. Reviews help build trust in the community.",
+    ),
+    "skipReviewTitle": MessageLookupByLibrary.simpleMessage("Skip Review?"),
     "startConversationFromMap": MessageLookupByLibrary.simpleMessage(
       "Start a conversation from the map",
     ),
     "startTime": MessageLookupByLibrary.simpleMessage("Start Time"),
-    "styleNumber": m5,
+    "styleNumber": m18,
+    "submitReview": MessageLookupByLibrary.simpleMessage("Submit Review"),
     "submitting": MessageLookupByLibrary.simpleMessage("Submitting..."),
     "submittingOffers": MessageLookupByLibrary.simpleMessage(
       "Submitting offers...",
@@ -948,15 +1271,49 @@ class MessageLookup extends MessageLookupByLibrary {
     "tapToExpandSubCluster": MessageLookupByLibrary.simpleMessage(
       "Tap to expand sub-cluster",
     ),
+    "tapToRate": MessageLookupByLibrary.simpleMessage("Tap to rate"),
     "tapToSelectDate": MessageLookupByLibrary.simpleMessage(
       "Tap to select expiration date (optional)",
     ),
+    "tellUsMore": MessageLookupByLibrary.simpleMessage(
+      "Tell us more (optional)",
+    ),
+    "thankYouForFeedback": MessageLookupByLibrary.simpleMessage(
+      "Thank you for your feedback!",
+    ),
+    "transactionCompleted": MessageLookupByLibrary.simpleMessage(
+      "Transaction marked as completed",
+    ),
+    "transactionCreated": MessageLookupByLibrary.simpleMessage(
+      "Transaction created successfully",
+    ),
+    "transactionStatusCancelled": MessageLookupByLibrary.simpleMessage(
+      "Cancelled",
+    ),
+    "transactionStatusNoDeal": MessageLookupByLibrary.simpleMessage(
+      "Talked but no deal",
+    ),
+    "transactionStatusScam": MessageLookupByLibrary.simpleMessage(
+      "🚩 Report Scam",
+    ),
+    "transactionStatusSuccessful": MessageLookupByLibrary.simpleMessage(
+      "Successful Trade",
+    ),
     "typeAMessage": MessageLookupByLibrary.simpleMessage("Type a message..."),
+    "unableToReviewUser": MessageLookupByLibrary.simpleMessage(
+      "Unable to review this user at this time",
+    ),
+    "unableToShareAtThisTime": MessageLookupByLibrary.simpleMessage(
+      "Unable to share at this time",
+    ),
     "unknownUser": MessageLookupByLibrary.simpleMessage("Unknown User"),
+    "unlockButton": MessageLookupByLibrary.simpleMessage("Unlock"),
     "unviewed": MessageLookupByLibrary.simpleMessage("Unviewed"),
     "unviewedOnly": MessageLookupByLibrary.simpleMessage("Unviewed Only"),
     "updateEmail": MessageLookupByLibrary.simpleMessage("Update Email"),
     "updatePhone": MessageLookupByLibrary.simpleMessage("Update Phone"),
+    "updatePosting": MessageLookupByLibrary.simpleMessage("Update Posting"),
+    "uploadingFile": MessageLookupByLibrary.simpleMessage("Uploading file..."),
     "userId": MessageLookupByLibrary.simpleMessage("User ID"),
     "userInterestedIn": MessageLookupByLibrary.simpleMessage("Interested in:"),
     "userLocation": MessageLookupByLibrary.simpleMessage("Location:"),
@@ -966,6 +1323,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "username": MessageLookupByLibrary.simpleMessage("User name"),
     "valuePrefix": MessageLookupByLibrary.simpleMessage("Value"),
     "verified": MessageLookupByLibrary.simpleMessage("Verified"),
+    "verifyAndResetPin": MessageLookupByLibrary.simpleMessage(
+      "Verify and Reset PIN",
+    ),
     "viewMatches": MessageLookupByLibrary.simpleMessage("View Matches"),
     "weekly": MessageLookupByLibrary.simpleMessage("Weekly"),
     "welcomeStep1Description": MessageLookupByLibrary.simpleMessage(
@@ -975,7 +1335,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Create your Profile",
     ),
     "welcomeStep2Description": MessageLookupByLibrary.simpleMessage(
-      "Find people with matching or complementary interests, search by keywords",
+      "Find similar or complementary people, search by keywords",
     ),
     "welcomeStep2Title": MessageLookupByLibrary.simpleMessage(
       "Discover, Search, Post",
@@ -1028,5 +1388,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "wishlistStatusPaused": MessageLookupByLibrary.simpleMessage("Paused"),
     "yesterday": MessageLookupByLibrary.simpleMessage("Yesterday"),
+    "yourAnswer": MessageLookupByLibrary.simpleMessage("Your Answer"),
   };
 }

@@ -793,6 +793,23 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "noUsersNearbyTitle": "No Users Nearby",
+  "noUsersNearbyMessage": "It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!",
+  "shareApp": "Share App",
+  "copyLink": "Copy Link",
+  "close": "Close",
+  "linkCopiedToClipboard": "Link copied to clipboard!",
+  "unableToShareAtThisTime": "Unable to share at this time",
+  "inviteMessageShare": "Hey! Join me on BarterApp - a great way to trade items and services with people nearby! 🔄\n\n{appLink}",
+  "@inviteMessageShare": {
+    "placeholders": {
+      "appLink": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteMessageSubject": "Join me on BarterApp!"
 
 }

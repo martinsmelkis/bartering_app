@@ -20,6 +20,7 @@ class WebSocketChatService {
   CryptoService _cryptoService;
   SecureStorageService secureStorage = SecureStorageService();
   String _currentUserId;
+  String _currentUserName;
   String _serverUrl;
 
   // Cache of contact public keys: userId -> base64 public key
@@ -29,6 +30,7 @@ class WebSocketChatService {
 
   WebSocketChatService(this._cryptoService,
       this._currentUserId,
+      this._currentUserName,
       this._serverUrl,
       {ChatNotificationService? notificationService})
       : _notificationService = notificationService;
@@ -106,9 +108,32 @@ class WebSocketChatService {
               return; // Don't process this as a chat message
             }
 
+            if (messageJson['messageType'] != null &&
+                messageJson['messageType'].toString().contains('TransactionCreatedMessage')) {
+              final transactionId = messageJson['transactionId'] as String?;
+              if (transactionId != null) {
+                print('@@@@@@@@@ Transaction created: $transactionId');
+                // Create a system message to display in chat
+                final systemMessage = ChatMessage(
+                  id: 'system_transaction_$transactionId',
+                  senderId: messageJson['partnerId'] as String? ?? "System",
+                  recipientId: _currentUserId,
+                  encryptedTextPayload: '',
+                  plainText: '🤝 Transaction created. Use top-right menu to complete Transaction.',
+                  timestamp: DateTime.now(),
+                  status: EChatMessageStatus.delivered,
+                  transactionId: transactionId,
+                  isSentByCurrentUser: false,
+                );
+                
+                _messageController.add(systemMessage);
+              }
+              return;
+            }
+
             // Handle file notifications
-            if (messageJson['type'] ==
-                'org.barter.features.chat.model.FileNotificationMessage') {
+            if (messageJson['messageType'] != null &&
+                messageJson['messageType'].toString().contains('FileNotificationMessage')) {
               print('@@@@@@@@@ File notification received!');
               try {
                 final fileNotification = FileNotificationMessage.fromJson(
@@ -133,6 +158,7 @@ class WebSocketChatService {
                       fileNotification.timestamp),
                   status: EChatMessageStatus.delivered,
                   fileAttachment: fileNotification.toFileAttachment(),
+                  senderName: messageJson['senderName'] as String?,
                 );
 
                 print('@@@@@@@@@ Adding file message to stream');
@@ -140,9 +166,10 @@ class WebSocketChatService {
 
                 // Show notification if user is not in this chat
                 if (_notificationService != null) {
+                  final senderName = messageJson['senderName'] as String? ?? fileNotification.senderId;
                   _notificationService!.handleIncomingMessage(
                     chatMessage,
-                    senderName: fileNotification.senderId,
+                    senderName: senderName,
                   );
                 }
 
@@ -157,9 +184,14 @@ class WebSocketChatService {
             if (messageJson['text'] != null) {
               final encryptedText = messageJson['text'] as String;
               final senderId = messageJson['senderId'] as String?;
+              final transactionId = messageJson['transactionId'] as String?;
 
               debugPrint('@@@@@@@@@@@@@@ Encrypted message received: '
                   '${encryptedText.substring(0, 20)}...');
+              
+              if (transactionId != null) {
+                print('@@@@@@@@@@ Message has transactionId: $transactionId');
+              }
 
               // Decrypt using the sender's public key from cache
               String? messageDecrypted;
@@ -182,13 +214,16 @@ class WebSocketChatService {
                 encryptedTextPayload: networkMessage.encryptedTextPayload,
                 timestamp: networkMessage.timestamp,
                 status: EChatMessageStatus.delivered,
+                senderName: messageJson['senderName'] as String?,
+                transactionId: transactionId,
               );
 
               // Show notification if user is not in this chat
               if (_notificationService != null && senderId != null) {
+                final senderName = messageJson['senderName'] as String? ?? senderId;
                 _notificationService!.handleIncomingMessage(
                   chatMsg,
-                  senderName: senderId, // You can replace with actual user name if available
+                  senderName: senderName,
                 );
               }
 
@@ -279,6 +314,7 @@ class WebSocketChatService {
         "data": {
           "id": messageId,
           "senderId": _currentUserId,
+          "senderName": _currentUserName,
           "recipientId": recipientId,
           "encryptedPayload": encryptedPayload,
           "timestamp": DateTime.now().toIso8601String(),

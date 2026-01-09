@@ -407,9 +407,9 @@ class _ConversationTile extends StatelessWidget {
 
     // Adjust sizes for web side-by-side view
     final double avatarSize = isWebSideBySide ? 40 : 64.w;
-    final double horizontalPadding = isWebSideBySide ? 8 : 16.w;
+    final double horizontalPadding = isWebSideBySide ? 8 : 8.w;
     final double verticalPadding = isWebSideBySide ? 2 : 4.h;
-    final double spacing = isWebSideBySide ? 6 : 12.w;
+    final double spacing = isWebSideBySide ? 6 : 8.w;
     final double nameFontSize = isWebSideBySide ? 12 : 16.sp;
     final double timestampFontSize = isWebSideBySide ? 9 : 12.sp;
     final double messageFontSize = isWebSideBySide ? 10 : 14.sp;
@@ -453,7 +453,11 @@ class _ConversationTile extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              _formatUserId(otherUserId, context),
+                              _getDisplayName(
+                                otherUserId,
+                                conversation.lastMessageSenderName,
+                                context,
+                              ),
                               style: TextStyle(
                                 fontSize: nameFontSize,
                                 fontWeight: FontWeight.w600,
@@ -594,6 +598,16 @@ class _ConversationTile extends StatelessWidget {
       return '${l10n.userPrefix} ${userId.substring(0, 8)}...';
     }
     return userId;
+  }
+
+  /// Get display name for a user, preferring senderName if available
+  String _getDisplayName(String userId, String? senderName, BuildContext context) {
+    // If we have the sender name, use it
+    if (senderName != null && senderName.isNotEmpty) {
+      return senderName;
+    }
+    // Otherwise, format the User ID
+    return _formatUserId(userId, context);
   }
 
   String _formatTimestamp(DateTime timestamp, BuildContext context) {

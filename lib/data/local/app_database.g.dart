@@ -321,6 +321,17 @@ class $ConversationsTable extends Conversations
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _lastMessageSenderNameMeta =
+      const VerificationMeta('lastMessageSenderName');
+  @override
+  late final GeneratedColumn<String> lastMessageSenderName =
+      GeneratedColumn<String>(
+        'last_message_sender_name',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _unreadCountMeta = const VerificationMeta(
     'unreadCount',
   );
@@ -347,6 +358,17 @@ class $ConversationsTable extends Conversations
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
     'name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _transactionIdMeta = const VerificationMeta(
+    'transactionId',
+  );
+  @override
+  late final GeneratedColumn<String> transactionId = GeneratedColumn<String>(
+    'transaction_id',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -398,9 +420,11 @@ class $ConversationsTable extends Conversations
     lastMessage,
     lastMessageTimestamp,
     lastMessageSenderId,
+    lastMessageSenderName,
     unreadCount,
     type,
     name,
+    transactionId,
     createdAt,
     updatedAt,
     isArchived,
@@ -458,6 +482,15 @@ class $ConversationsTable extends Conversations
         ),
       );
     }
+    if (data.containsKey('last_message_sender_name')) {
+      context.handle(
+        _lastMessageSenderNameMeta,
+        lastMessageSenderName.isAcceptableOrUnknown(
+          data['last_message_sender_name']!,
+          _lastMessageSenderNameMeta,
+        ),
+      );
+    }
     if (data.containsKey('unread_count')) {
       context.handle(
         _unreadCountMeta,
@@ -477,6 +510,15 @@ class $ConversationsTable extends Conversations
       context.handle(
         _nameMeta,
         name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    }
+    if (data.containsKey('transaction_id')) {
+      context.handle(
+        _transactionIdMeta,
+        transactionId.isAcceptableOrUnknown(
+          data['transaction_id']!,
+          _transactionIdMeta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -526,6 +568,10 @@ class $ConversationsTable extends Conversations
         DriftSqlType.string,
         data['${effectivePrefix}last_message_sender_id'],
       ),
+      lastMessageSenderName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_message_sender_name'],
+      ),
       unreadCount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}unread_count'],
@@ -537,6 +583,10 @@ class $ConversationsTable extends Conversations
       name: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}name'],
+      ),
+      transactionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transaction_id'],
       ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -565,9 +615,11 @@ class Conversation extends DataClass implements Insertable<Conversation> {
   final String? lastMessage;
   final DateTime? lastMessageTimestamp;
   final String? lastMessageSenderId;
+  final String? lastMessageSenderName;
   final int unreadCount;
   final String type;
   final String? name;
+  final String? transactionId;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isArchived;
@@ -577,9 +629,11 @@ class Conversation extends DataClass implements Insertable<Conversation> {
     this.lastMessage,
     this.lastMessageTimestamp,
     this.lastMessageSenderId,
+    this.lastMessageSenderName,
     required this.unreadCount,
     required this.type,
     this.name,
+    this.transactionId,
     required this.createdAt,
     required this.updatedAt,
     required this.isArchived,
@@ -598,10 +652,16 @@ class Conversation extends DataClass implements Insertable<Conversation> {
     if (!nullToAbsent || lastMessageSenderId != null) {
       map['last_message_sender_id'] = Variable<String>(lastMessageSenderId);
     }
+    if (!nullToAbsent || lastMessageSenderName != null) {
+      map['last_message_sender_name'] = Variable<String>(lastMessageSenderName);
+    }
     map['unread_count'] = Variable<int>(unreadCount);
     map['type'] = Variable<String>(type);
     if (!nullToAbsent || name != null) {
       map['name'] = Variable<String>(name);
+    }
+    if (!nullToAbsent || transactionId != null) {
+      map['transaction_id'] = Variable<String>(transactionId);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -622,9 +682,15 @@ class Conversation extends DataClass implements Insertable<Conversation> {
       lastMessageSenderId: lastMessageSenderId == null && nullToAbsent
           ? const Value.absent()
           : Value(lastMessageSenderId),
+      lastMessageSenderName: lastMessageSenderName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastMessageSenderName),
       unreadCount: Value(unreadCount),
       type: Value(type),
       name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      transactionId: transactionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(transactionId),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       isArchived: Value(isArchived),
@@ -646,9 +712,13 @@ class Conversation extends DataClass implements Insertable<Conversation> {
       lastMessageSenderId: serializer.fromJson<String?>(
         json['lastMessageSenderId'],
       ),
+      lastMessageSenderName: serializer.fromJson<String?>(
+        json['lastMessageSenderName'],
+      ),
       unreadCount: serializer.fromJson<int>(json['unreadCount']),
       type: serializer.fromJson<String>(json['type']),
       name: serializer.fromJson<String?>(json['name']),
+      transactionId: serializer.fromJson<String?>(json['transactionId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       isArchived: serializer.fromJson<bool>(json['isArchived']),
@@ -665,9 +735,13 @@ class Conversation extends DataClass implements Insertable<Conversation> {
         lastMessageTimestamp,
       ),
       'lastMessageSenderId': serializer.toJson<String?>(lastMessageSenderId),
+      'lastMessageSenderName': serializer.toJson<String?>(
+        lastMessageSenderName,
+      ),
       'unreadCount': serializer.toJson<int>(unreadCount),
       'type': serializer.toJson<String>(type),
       'name': serializer.toJson<String?>(name),
+      'transactionId': serializer.toJson<String?>(transactionId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'isArchived': serializer.toJson<bool>(isArchived),
@@ -680,9 +754,11 @@ class Conversation extends DataClass implements Insertable<Conversation> {
     Value<String?> lastMessage = const Value.absent(),
     Value<DateTime?> lastMessageTimestamp = const Value.absent(),
     Value<String?> lastMessageSenderId = const Value.absent(),
+    Value<String?> lastMessageSenderName = const Value.absent(),
     int? unreadCount,
     String? type,
     Value<String?> name = const Value.absent(),
+    Value<String?> transactionId = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isArchived,
@@ -696,9 +772,15 @@ class Conversation extends DataClass implements Insertable<Conversation> {
     lastMessageSenderId: lastMessageSenderId.present
         ? lastMessageSenderId.value
         : this.lastMessageSenderId,
+    lastMessageSenderName: lastMessageSenderName.present
+        ? lastMessageSenderName.value
+        : this.lastMessageSenderName,
     unreadCount: unreadCount ?? this.unreadCount,
     type: type ?? this.type,
     name: name.present ? name.value : this.name,
+    transactionId: transactionId.present
+        ? transactionId.value
+        : this.transactionId,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     isArchived: isArchived ?? this.isArchived,
@@ -718,11 +800,17 @@ class Conversation extends DataClass implements Insertable<Conversation> {
       lastMessageSenderId: data.lastMessageSenderId.present
           ? data.lastMessageSenderId.value
           : this.lastMessageSenderId,
+      lastMessageSenderName: data.lastMessageSenderName.present
+          ? data.lastMessageSenderName.value
+          : this.lastMessageSenderName,
       unreadCount: data.unreadCount.present
           ? data.unreadCount.value
           : this.unreadCount,
       type: data.type.present ? data.type.value : this.type,
       name: data.name.present ? data.name.value : this.name,
+      transactionId: data.transactionId.present
+          ? data.transactionId.value
+          : this.transactionId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       isArchived: data.isArchived.present
@@ -739,9 +827,11 @@ class Conversation extends DataClass implements Insertable<Conversation> {
           ..write('lastMessage: $lastMessage, ')
           ..write('lastMessageTimestamp: $lastMessageTimestamp, ')
           ..write('lastMessageSenderId: $lastMessageSenderId, ')
+          ..write('lastMessageSenderName: $lastMessageSenderName, ')
           ..write('unreadCount: $unreadCount, ')
           ..write('type: $type, ')
           ..write('name: $name, ')
+          ..write('transactionId: $transactionId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isArchived: $isArchived')
@@ -756,9 +846,11 @@ class Conversation extends DataClass implements Insertable<Conversation> {
     lastMessage,
     lastMessageTimestamp,
     lastMessageSenderId,
+    lastMessageSenderName,
     unreadCount,
     type,
     name,
+    transactionId,
     createdAt,
     updatedAt,
     isArchived,
@@ -772,9 +864,11 @@ class Conversation extends DataClass implements Insertable<Conversation> {
           other.lastMessage == this.lastMessage &&
           other.lastMessageTimestamp == this.lastMessageTimestamp &&
           other.lastMessageSenderId == this.lastMessageSenderId &&
+          other.lastMessageSenderName == this.lastMessageSenderName &&
           other.unreadCount == this.unreadCount &&
           other.type == this.type &&
           other.name == this.name &&
+          other.transactionId == this.transactionId &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.isArchived == this.isArchived);
@@ -786,9 +880,11 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
   final Value<String?> lastMessage;
   final Value<DateTime?> lastMessageTimestamp;
   final Value<String?> lastMessageSenderId;
+  final Value<String?> lastMessageSenderName;
   final Value<int> unreadCount;
   final Value<String> type;
   final Value<String?> name;
+  final Value<String?> transactionId;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<bool> isArchived;
@@ -798,9 +894,11 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
     this.lastMessage = const Value.absent(),
     this.lastMessageTimestamp = const Value.absent(),
     this.lastMessageSenderId = const Value.absent(),
+    this.lastMessageSenderName = const Value.absent(),
     this.unreadCount = const Value.absent(),
     this.type = const Value.absent(),
     this.name = const Value.absent(),
+    this.transactionId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isArchived = const Value.absent(),
@@ -811,9 +909,11 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
     this.lastMessage = const Value.absent(),
     this.lastMessageTimestamp = const Value.absent(),
     this.lastMessageSenderId = const Value.absent(),
+    this.lastMessageSenderName = const Value.absent(),
     this.unreadCount = const Value.absent(),
     this.type = const Value.absent(),
     this.name = const Value.absent(),
+    this.transactionId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isArchived = const Value.absent(),
@@ -824,9 +924,11 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
     Expression<String>? lastMessage,
     Expression<DateTime>? lastMessageTimestamp,
     Expression<String>? lastMessageSenderId,
+    Expression<String>? lastMessageSenderName,
     Expression<int>? unreadCount,
     Expression<String>? type,
     Expression<String>? name,
+    Expression<String>? transactionId,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<bool>? isArchived,
@@ -839,9 +941,12 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
         'last_message_timestamp': lastMessageTimestamp,
       if (lastMessageSenderId != null)
         'last_message_sender_id': lastMessageSenderId,
+      if (lastMessageSenderName != null)
+        'last_message_sender_name': lastMessageSenderName,
       if (unreadCount != null) 'unread_count': unreadCount,
       if (type != null) 'type': type,
       if (name != null) 'name': name,
+      if (transactionId != null) 'transaction_id': transactionId,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isArchived != null) 'is_archived': isArchived,
@@ -854,9 +959,11 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
     Value<String?>? lastMessage,
     Value<DateTime?>? lastMessageTimestamp,
     Value<String?>? lastMessageSenderId,
+    Value<String?>? lastMessageSenderName,
     Value<int>? unreadCount,
     Value<String>? type,
     Value<String?>? name,
+    Value<String?>? transactionId,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<bool>? isArchived,
@@ -867,9 +974,12 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
       lastMessage: lastMessage ?? this.lastMessage,
       lastMessageTimestamp: lastMessageTimestamp ?? this.lastMessageTimestamp,
       lastMessageSenderId: lastMessageSenderId ?? this.lastMessageSenderId,
+      lastMessageSenderName:
+          lastMessageSenderName ?? this.lastMessageSenderName,
       unreadCount: unreadCount ?? this.unreadCount,
       type: type ?? this.type,
       name: name ?? this.name,
+      transactionId: transactionId ?? this.transactionId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isArchived: isArchived ?? this.isArchived,
@@ -898,6 +1008,11 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
         lastMessageSenderId.value,
       );
     }
+    if (lastMessageSenderName.present) {
+      map['last_message_sender_name'] = Variable<String>(
+        lastMessageSenderName.value,
+      );
+    }
     if (unreadCount.present) {
       map['unread_count'] = Variable<int>(unreadCount.value);
     }
@@ -906,6 +1021,9 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (transactionId.present) {
+      map['transaction_id'] = Variable<String>(transactionId.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -927,9 +1045,11 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
           ..write('lastMessage: $lastMessage, ')
           ..write('lastMessageTimestamp: $lastMessageTimestamp, ')
           ..write('lastMessageSenderId: $lastMessageSenderId, ')
+          ..write('lastMessageSenderName: $lastMessageSenderName, ')
           ..write('unreadCount: $unreadCount, ')
           ..write('type: $type, ')
           ..write('name: $name, ')
+          ..write('transactionId: $transactionId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isArchived: $isArchived')
@@ -996,6 +1116,17 @@ class $UserChatsTable extends UserChats
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES profiles (user_id)',
     ),
+  );
+  static const VerificationMeta _senderNameMeta = const VerificationMeta(
+    'senderName',
+  );
+  @override
+  late final GeneratedColumn<String> senderName = GeneratedColumn<String>(
+    'sender_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _recipientIdMeta = const VerificationMeta(
     'recipientId',
@@ -1188,6 +1319,7 @@ class $UserChatsTable extends UserChats
     messageId,
     conversationId,
     senderId,
+    senderName,
     recipientId,
     encryptedContent,
     decryptedContent,
@@ -1246,6 +1378,12 @@ class $UserChatsTable extends UserChats
       );
     } else if (isInserting) {
       context.missing(_senderIdMeta);
+    }
+    if (data.containsKey('sender_name')) {
+      context.handle(
+        _senderNameMeta,
+        senderName.isAcceptableOrUnknown(data['sender_name']!, _senderNameMeta),
+      );
     }
     if (data.containsKey('recipient_id')) {
       context.handle(
@@ -1387,6 +1525,10 @@ class $UserChatsTable extends UserChats
         DriftSqlType.string,
         data['${effectivePrefix}sender_id'],
       )!,
+      senderName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sender_name'],
+      ),
       recipientId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}recipient_id'],
@@ -1465,6 +1607,7 @@ class UserChat extends DataClass implements Insertable<UserChat> {
   final String messageId;
   final String conversationId;
   final String senderId;
+  final String? senderName;
   final String? recipientId;
   final String encryptedContent;
   final String? decryptedContent;
@@ -1486,6 +1629,7 @@ class UserChat extends DataClass implements Insertable<UserChat> {
     required this.messageId,
     required this.conversationId,
     required this.senderId,
+    this.senderName,
     this.recipientId,
     required this.encryptedContent,
     this.decryptedContent,
@@ -1510,6 +1654,9 @@ class UserChat extends DataClass implements Insertable<UserChat> {
     map['message_id'] = Variable<String>(messageId);
     map['conversation_id'] = Variable<String>(conversationId);
     map['sender_id'] = Variable<String>(senderId);
+    if (!nullToAbsent || senderName != null) {
+      map['sender_name'] = Variable<String>(senderName);
+    }
     if (!nullToAbsent || recipientId != null) {
       map['recipient_id'] = Variable<String>(recipientId);
     }
@@ -1555,6 +1702,9 @@ class UserChat extends DataClass implements Insertable<UserChat> {
       messageId: Value(messageId),
       conversationId: Value(conversationId),
       senderId: Value(senderId),
+      senderName: senderName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(senderName),
       recipientId: recipientId == null && nullToAbsent
           ? const Value.absent()
           : Value(recipientId),
@@ -1604,6 +1754,7 @@ class UserChat extends DataClass implements Insertable<UserChat> {
       messageId: serializer.fromJson<String>(json['messageId']),
       conversationId: serializer.fromJson<String>(json['conversationId']),
       senderId: serializer.fromJson<String>(json['senderId']),
+      senderName: serializer.fromJson<String?>(json['senderName']),
       recipientId: serializer.fromJson<String?>(json['recipientId']),
       encryptedContent: serializer.fromJson<String>(json['encryptedContent']),
       decryptedContent: serializer.fromJson<String?>(json['decryptedContent']),
@@ -1630,6 +1781,7 @@ class UserChat extends DataClass implements Insertable<UserChat> {
       'messageId': serializer.toJson<String>(messageId),
       'conversationId': serializer.toJson<String>(conversationId),
       'senderId': serializer.toJson<String>(senderId),
+      'senderName': serializer.toJson<String?>(senderName),
       'recipientId': serializer.toJson<String?>(recipientId),
       'encryptedContent': serializer.toJson<String>(encryptedContent),
       'decryptedContent': serializer.toJson<String?>(decryptedContent),
@@ -1654,6 +1806,7 @@ class UserChat extends DataClass implements Insertable<UserChat> {
     String? messageId,
     String? conversationId,
     String? senderId,
+    Value<String?> senderName = const Value.absent(),
     Value<String?> recipientId = const Value.absent(),
     String? encryptedContent,
     Value<String?> decryptedContent = const Value.absent(),
@@ -1675,6 +1828,7 @@ class UserChat extends DataClass implements Insertable<UserChat> {
     messageId: messageId ?? this.messageId,
     conversationId: conversationId ?? this.conversationId,
     senderId: senderId ?? this.senderId,
+    senderName: senderName.present ? senderName.value : this.senderName,
     recipientId: recipientId.present ? recipientId.value : this.recipientId,
     encryptedContent: encryptedContent ?? this.encryptedContent,
     decryptedContent: decryptedContent.present
@@ -1704,6 +1858,9 @@ class UserChat extends DataClass implements Insertable<UserChat> {
           ? data.conversationId.value
           : this.conversationId,
       senderId: data.senderId.present ? data.senderId.value : this.senderId,
+      senderName: data.senderName.present
+          ? data.senderName.value
+          : this.senderName,
       recipientId: data.recipientId.present
           ? data.recipientId.value
           : this.recipientId,
@@ -1740,6 +1897,7 @@ class UserChat extends DataClass implements Insertable<UserChat> {
           ..write('messageId: $messageId, ')
           ..write('conversationId: $conversationId, ')
           ..write('senderId: $senderId, ')
+          ..write('senderName: $senderName, ')
           ..write('recipientId: $recipientId, ')
           ..write('encryptedContent: $encryptedContent, ')
           ..write('decryptedContent: $decryptedContent, ')
@@ -1761,11 +1919,12 @@ class UserChat extends DataClass implements Insertable<UserChat> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     messageId,
     conversationId,
     senderId,
+    senderName,
     recipientId,
     encryptedContent,
     decryptedContent,
@@ -1782,7 +1941,7 @@ class UserChat extends DataClass implements Insertable<UserChat> {
     localPath,
     isDownloaded,
     isDeleted,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1791,6 +1950,7 @@ class UserChat extends DataClass implements Insertable<UserChat> {
           other.messageId == this.messageId &&
           other.conversationId == this.conversationId &&
           other.senderId == this.senderId &&
+          other.senderName == this.senderName &&
           other.recipientId == this.recipientId &&
           other.encryptedContent == this.encryptedContent &&
           other.decryptedContent == this.decryptedContent &&
@@ -1814,6 +1974,7 @@ class UserChatsCompanion extends UpdateCompanion<UserChat> {
   final Value<String> messageId;
   final Value<String> conversationId;
   final Value<String> senderId;
+  final Value<String?> senderName;
   final Value<String?> recipientId;
   final Value<String> encryptedContent;
   final Value<String?> decryptedContent;
@@ -1835,6 +1996,7 @@ class UserChatsCompanion extends UpdateCompanion<UserChat> {
     this.messageId = const Value.absent(),
     this.conversationId = const Value.absent(),
     this.senderId = const Value.absent(),
+    this.senderName = const Value.absent(),
     this.recipientId = const Value.absent(),
     this.encryptedContent = const Value.absent(),
     this.decryptedContent = const Value.absent(),
@@ -1857,6 +2019,7 @@ class UserChatsCompanion extends UpdateCompanion<UserChat> {
     required String messageId,
     required String conversationId,
     required String senderId,
+    this.senderName = const Value.absent(),
     this.recipientId = const Value.absent(),
     required String encryptedContent,
     this.decryptedContent = const Value.absent(),
@@ -1883,6 +2046,7 @@ class UserChatsCompanion extends UpdateCompanion<UserChat> {
     Expression<String>? messageId,
     Expression<String>? conversationId,
     Expression<String>? senderId,
+    Expression<String>? senderName,
     Expression<String>? recipientId,
     Expression<String>? encryptedContent,
     Expression<String>? decryptedContent,
@@ -1905,6 +2069,7 @@ class UserChatsCompanion extends UpdateCompanion<UserChat> {
       if (messageId != null) 'message_id': messageId,
       if (conversationId != null) 'conversation_id': conversationId,
       if (senderId != null) 'sender_id': senderId,
+      if (senderName != null) 'sender_name': senderName,
       if (recipientId != null) 'recipient_id': recipientId,
       if (encryptedContent != null) 'encrypted_content': encryptedContent,
       if (decryptedContent != null) 'decrypted_content': decryptedContent,
@@ -1929,6 +2094,7 @@ class UserChatsCompanion extends UpdateCompanion<UserChat> {
     Value<String>? messageId,
     Value<String>? conversationId,
     Value<String>? senderId,
+    Value<String?>? senderName,
     Value<String?>? recipientId,
     Value<String>? encryptedContent,
     Value<String?>? decryptedContent,
@@ -1951,6 +2117,7 @@ class UserChatsCompanion extends UpdateCompanion<UserChat> {
       messageId: messageId ?? this.messageId,
       conversationId: conversationId ?? this.conversationId,
       senderId: senderId ?? this.senderId,
+      senderName: senderName ?? this.senderName,
       recipientId: recipientId ?? this.recipientId,
       encryptedContent: encryptedContent ?? this.encryptedContent,
       decryptedContent: decryptedContent ?? this.decryptedContent,
@@ -1984,6 +2151,9 @@ class UserChatsCompanion extends UpdateCompanion<UserChat> {
     }
     if (senderId.present) {
       map['sender_id'] = Variable<String>(senderId.value);
+    }
+    if (senderName.present) {
+      map['sender_name'] = Variable<String>(senderName.value);
     }
     if (recipientId.present) {
       map['recipient_id'] = Variable<String>(recipientId.value);
@@ -2043,6 +2213,7 @@ class UserChatsCompanion extends UpdateCompanion<UserChat> {
           ..write('messageId: $messageId, ')
           ..write('conversationId: $conversationId, ')
           ..write('senderId: $senderId, ')
+          ..write('senderName: $senderName, ')
           ..write('recipientId: $recipientId, ')
           ..write('encryptedContent: $encryptedContent, ')
           ..write('decryptedContent: $decryptedContent, ')
@@ -2605,9 +2776,11 @@ typedef $$ConversationsTableCreateCompanionBuilder =
       Value<String?> lastMessage,
       Value<DateTime?> lastMessageTimestamp,
       Value<String?> lastMessageSenderId,
+      Value<String?> lastMessageSenderName,
       Value<int> unreadCount,
       Value<String> type,
       Value<String?> name,
+      Value<String?> transactionId,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isArchived,
@@ -2619,9 +2792,11 @@ typedef $$ConversationsTableUpdateCompanionBuilder =
       Value<String?> lastMessage,
       Value<DateTime?> lastMessageTimestamp,
       Value<String?> lastMessageSenderId,
+      Value<String?> lastMessageSenderName,
       Value<int> unreadCount,
       Value<String> type,
       Value<String?> name,
+      Value<String?> transactionId,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isArchived,
@@ -2725,6 +2900,11 @@ class $$ConversationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get lastMessageSenderName => $composableBuilder(
+    column: $table.lastMessageSenderName,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get unreadCount => $composableBuilder(
     column: $table.unreadCount,
     builder: (column) => ColumnFilters(column),
@@ -2737,6 +2917,11 @@ class $$ConversationsTableFilterComposer
 
   ColumnFilters<String> get name => $composableBuilder(
     column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get transactionId => $composableBuilder(
+    column: $table.transactionId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2842,6 +3027,11 @@ class $$ConversationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get lastMessageSenderName => $composableBuilder(
+    column: $table.lastMessageSenderName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get unreadCount => $composableBuilder(
     column: $table.unreadCount,
     builder: (column) => ColumnOrderings(column),
@@ -2854,6 +3044,11 @@ class $$ConversationsTableOrderingComposer
 
   ColumnOrderings<String> get name => $composableBuilder(
     column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transactionId => $composableBuilder(
+    column: $table.transactionId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2905,6 +3100,11 @@ class $$ConversationsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get lastMessageSenderName => $composableBuilder(
+    column: $table.lastMessageSenderName,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get unreadCount => $composableBuilder(
     column: $table.unreadCount,
     builder: (column) => column,
@@ -2915,6 +3115,11 @@ class $$ConversationsTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get transactionId => $composableBuilder(
+    column: $table.transactionId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -3016,9 +3221,11 @@ class $$ConversationsTableTableManager
                 Value<String?> lastMessage = const Value.absent(),
                 Value<DateTime?> lastMessageTimestamp = const Value.absent(),
                 Value<String?> lastMessageSenderId = const Value.absent(),
+                Value<String?> lastMessageSenderName = const Value.absent(),
                 Value<int> unreadCount = const Value.absent(),
                 Value<String> type = const Value.absent(),
                 Value<String?> name = const Value.absent(),
+                Value<String?> transactionId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
@@ -3028,9 +3235,11 @@ class $$ConversationsTableTableManager
                 lastMessage: lastMessage,
                 lastMessageTimestamp: lastMessageTimestamp,
                 lastMessageSenderId: lastMessageSenderId,
+                lastMessageSenderName: lastMessageSenderName,
                 unreadCount: unreadCount,
                 type: type,
                 name: name,
+                transactionId: transactionId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isArchived: isArchived,
@@ -3042,9 +3251,11 @@ class $$ConversationsTableTableManager
                 Value<String?> lastMessage = const Value.absent(),
                 Value<DateTime?> lastMessageTimestamp = const Value.absent(),
                 Value<String?> lastMessageSenderId = const Value.absent(),
+                Value<String?> lastMessageSenderName = const Value.absent(),
                 Value<int> unreadCount = const Value.absent(),
                 Value<String> type = const Value.absent(),
                 Value<String?> name = const Value.absent(),
+                Value<String?> transactionId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
@@ -3054,9 +3265,11 @@ class $$ConversationsTableTableManager
                 lastMessage: lastMessage,
                 lastMessageTimestamp: lastMessageTimestamp,
                 lastMessageSenderId: lastMessageSenderId,
+                lastMessageSenderName: lastMessageSenderName,
                 unreadCount: unreadCount,
                 type: type,
                 name: name,
+                transactionId: transactionId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isArchived: isArchived,
@@ -3154,6 +3367,7 @@ typedef $$UserChatsTableCreateCompanionBuilder =
       required String messageId,
       required String conversationId,
       required String senderId,
+      Value<String?> senderName,
       Value<String?> recipientId,
       required String encryptedContent,
       Value<String?> decryptedContent,
@@ -3177,6 +3391,7 @@ typedef $$UserChatsTableUpdateCompanionBuilder =
       Value<String> messageId,
       Value<String> conversationId,
       Value<String> senderId,
+      Value<String?> senderName,
       Value<String?> recipientId,
       Value<String> encryptedContent,
       Value<String?> decryptedContent,
@@ -3276,6 +3491,11 @@ class $$UserChatsTableFilterComposer
 
   ColumnFilters<String> get messageId => $composableBuilder(
     column: $table.messageId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get senderName => $composableBuilder(
+    column: $table.senderName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3443,6 +3663,11 @@ class $$UserChatsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get senderName => $composableBuilder(
+    column: $table.senderName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get encryptedContent => $composableBuilder(
     column: $table.encryptedContent,
     builder: (column) => ColumnOrderings(column),
@@ -3603,6 +3828,11 @@ class $$UserChatsTableAnnotationComposer
   GeneratedColumn<String> get messageId =>
       $composableBuilder(column: $table.messageId, builder: (column) => column);
 
+  GeneratedColumn<String> get senderName => $composableBuilder(
+    column: $table.senderName,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get encryptedContent => $composableBuilder(
     column: $table.encryptedContent,
     builder: (column) => column,
@@ -3762,6 +3992,7 @@ class $$UserChatsTableTableManager
                 Value<String> messageId = const Value.absent(),
                 Value<String> conversationId = const Value.absent(),
                 Value<String> senderId = const Value.absent(),
+                Value<String?> senderName = const Value.absent(),
                 Value<String?> recipientId = const Value.absent(),
                 Value<String> encryptedContent = const Value.absent(),
                 Value<String?> decryptedContent = const Value.absent(),
@@ -3783,6 +4014,7 @@ class $$UserChatsTableTableManager
                 messageId: messageId,
                 conversationId: conversationId,
                 senderId: senderId,
+                senderName: senderName,
                 recipientId: recipientId,
                 encryptedContent: encryptedContent,
                 decryptedContent: decryptedContent,
@@ -3806,6 +4038,7 @@ class $$UserChatsTableTableManager
                 required String messageId,
                 required String conversationId,
                 required String senderId,
+                Value<String?> senderName = const Value.absent(),
                 Value<String?> recipientId = const Value.absent(),
                 required String encryptedContent,
                 Value<String?> decryptedContent = const Value.absent(),
@@ -3827,6 +4060,7 @@ class $$UserChatsTableTableManager
                 messageId: messageId,
                 conversationId: conversationId,
                 senderId: senderId,
+                senderName: senderName,
                 recipientId: recipientId,
                 encryptedContent: encryptedContent,
                 decryptedContent: decryptedContent,

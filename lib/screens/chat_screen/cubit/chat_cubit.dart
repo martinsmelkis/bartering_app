@@ -23,6 +23,7 @@ part 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
   String currentUserId;
+  String currentUserName;
   String recipientUserId;
   final List<ChatMessage> messages = [];
   String? recipientPublicKey; // Exposed recipient's public key
@@ -38,6 +39,7 @@ class ChatCubit extends Cubit<ChatState> {
 
   ChatCubit({
     required this.currentUserId,
+    required this.currentUserName,
     required this.recipientUserId,
   }) : super(ChatInitial()) {}
 
@@ -227,6 +229,7 @@ class ChatCubit extends Cubit<ChatState> {
       _webSocketService = WebSocketChatService(
           cryptoService!,
           userId,
+          currentUserName,
           kIsWeb ? "ws://localhost:8081/chat" : "ws://10.0.2.2:8081/chat",
           notificationService: notificationService
       );
@@ -264,6 +267,7 @@ class ChatCubit extends Cubit<ChatState> {
 
       final authRequest = AuthRequest(
         userId: userId,
+        userName: currentUserName,
         peerUserId: recipientUserId,
         publicKey: pubKey,
         timestamp: timestamp,
@@ -390,7 +394,7 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  /// Finish transaction - creates a transaction and marks it as done
+  /// Finish transaction - gets existing transaction from database or creates a new one
   Future<void> finishTransaction() async {
     emit(ChatTransactionInProgress());
 
@@ -407,39 +411,38 @@ class ChatCubit extends Cubit<ChatState> {
         throw Exception('Invalid recipient user ID');
       }
 
-      // Step 1: Create transaction
-      print('@@@@@@@@@ Creating transaction between $userId and $recipientUserId');
-      final createRequest = CreateTransactionRequest(
-        user1Id: userId,
-        user2Id: recipientUserId,
-      );
-
-      final createResponse = await apiClient.createTransaction(createRequest);
-
-      if (!createResponse.success) {
-        throw Exception('Failed to create transaction');
+      if (_currentConversationId == null) {
+        throw Exception('No active conversation');
       }
 
-      print('@@@@@@@@@ Transaction created with ID: ${createResponse.transactionId}');
-
-      // Step 2: Update transaction status to "done"
-      final updateRequest = UpdateTransactionStatusRequest(status: 'done');
-      final updateResponse = await apiClient.updateTransactionStatus(
-        createResponse.transactionId,
-        updateRequest,
-      );
-
-      if (!updateResponse.success) {
-        throw Exception('Failed to update transaction status');
+      String? transactionId;
+      if (_chatRepository != null) {
+        transactionId = await _chatRepository!.getConversationTransactionId(
+          _currentConversationId!,
+        );
       }
 
-      print('@@@@@@@@@ Transaction status updated to "done"');
+      if (transactionId != null && transactionId.isNotEmpty) {
+        print('@@@@@@@@@ Found existing transaction ID: $transactionId');
 
-      emit(ChatTransactionCompleted(createResponse.transactionId));
+        final updateRequest = UpdateTransactionStatusRequest(status: 'done');
+        final updateResponse = await apiClient.updateTransactionStatus(
+          transactionId,
+          updateRequest,
+        );
+
+        if (!updateResponse.success) {
+          throw Exception('Failed to update transaction status');
+        }
+
+        print('@@@@@@@@@ Transaction status updated to "done"');
+        emit(ChatTransactionCompleted(transactionId));
+      }
     } catch (e) {
       print('@@@@@@@@@ Error finishing transaction: $e');
       emit(ChatTransactionError(e.toString()));
     }
+
   }
 
   @override

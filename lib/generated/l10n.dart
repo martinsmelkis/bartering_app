@@ -54,9 +54,9 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
-  /// `Barter App`
+  /// `Bartering App`
   String get appTitle {
-    return Intl.message('Barter App', name: 'appTitle', desc: '', args: []);
+    return Intl.message('Bartering App', name: 'appTitle', desc: '', args: []);
   }
 
   /// `Tap to chat`
@@ -419,6 +419,726 @@ class S {
     );
   }
 
+  /// `Settings`
+  String get settingsTitle {
+    return Intl.message('Settings', name: 'settingsTitle', desc: '', args: []);
+  }
+
+  /// `Settings saved successfully`
+  String get settingsSaved {
+    return Intl.message(
+      'Settings saved successfully',
+      name: 'settingsSaved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search Settings`
+  String get settingsSearchSection {
+    return Intl.message(
+      'Search Settings',
+      name: 'settingsSearchSection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Center Point of Search`
+  String get settingsSearchCenterPointTitle {
+    return Intl.message(
+      'Center Point of Search',
+      name: 'settingsSearchCenterPointTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose the center point for nearby user searches`
+  String get settingsSearchCenterPointDescription {
+    return Intl.message(
+      'Choose the center point for nearby user searches',
+      name: 'settingsSearchCenterPointDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User Location`
+  String get settingsSearchCenterUserLocation {
+    return Intl.message(
+      'User Location',
+      name: 'settingsSearchCenterUserLocation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search from your saved location`
+  String get settingsSearchCenterUserLocationDescription {
+    return Intl.message(
+      'Search from your saved location',
+      name: 'settingsSearchCenterUserLocationDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Map Center`
+  String get settingsSearchCenterMapCenter {
+    return Intl.message(
+      'Map Center',
+      name: 'settingsSearchCenterMapCenter',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search from the current map center`
+  String get settingsSearchCenterMapCenterDescription {
+    return Intl.message(
+      'Search from the current map center',
+      name: 'settingsSearchCenterMapCenterDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Nearby Users Search Radius`
+  String get settingsNearbyUsersRadiusTitle {
+    return Intl.message(
+      'Nearby Users Search Radius',
+      name: 'settingsNearbyUsersRadiusTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `How far to search for nearby users`
+  String get settingsNearbyUsersRadiusDescription {
+    return Intl.message(
+      'How far to search for nearby users',
+      name: 'settingsNearbyUsersRadiusDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Keyword Search Radius`
+  String get settingsKeywordSearchRadiusTitle {
+    return Intl.message(
+      'Keyword Search Radius',
+      name: 'settingsKeywordSearchRadiusTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search radius when using keyword search`
+  String get settingsKeywordSearchRadiusDescription {
+    return Intl.message(
+      'Search radius when using keyword search',
+      name: 'settingsKeywordSearchRadiusDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Keyword Search Weight`
+  String get settingsKeywordSearchWeightTitle {
+    return Intl.message(
+      'Keyword Search Weight',
+      name: 'settingsKeywordSearchWeightTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Weight parameter for keyword search relevance (10-100)`
+  String get settingsKeywordSearchWeightDescription {
+    return Intl.message(
+      'Weight parameter for keyword search relevance (10-100)',
+      name: 'settingsKeywordSearchWeightDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Set Up PIN`
+  String get setPinTitle {
+    return Intl.message('Set Up PIN', name: 'setPinTitle', desc: '', args: []);
+  }
+
+  /// `Create a 4-6 digit PIN to secure your app`
+  String get setPinDescription {
+    return Intl.message(
+      'Create a 4-6 digit PIN to secure your app',
+      name: 'setPinDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Set PIN`
+  String get setPinButton {
+    return Intl.message('Set PIN', name: 'setPinButton', desc: '', args: []);
+  }
+
+  /// `Skip for now`
+  String get skipPinButton {
+    return Intl.message(
+      'Skip for now',
+      name: 'skipPinButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `PIN`
+  String get pinLabel {
+    return Intl.message('PIN', name: 'pinLabel', desc: '', args: []);
+  }
+
+  /// `Enter 4-6 digits`
+  String get pinHint {
+    return Intl.message(
+      'Enter 4-6 digits',
+      name: 'pinHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm PIN`
+  String get confirmPinLabel {
+    return Intl.message(
+      'Confirm PIN',
+      name: 'confirmPinLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter a PIN`
+  String get pinErrorEmpty {
+    return Intl.message(
+      'Please enter a PIN',
+      name: 'pinErrorEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `PIN must be at least 4 digits`
+  String get pinErrorTooShort {
+    return Intl.message(
+      'PIN must be at least 4 digits',
+      name: 'pinErrorTooShort',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `PINs do not match`
+  String get pinErrorMismatch {
+    return Intl.message(
+      'PINs do not match',
+      name: 'pinErrorMismatch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `PIN set successfully`
+  String get pinSetSuccessfully {
+    return Intl.message(
+      'PIN set successfully',
+      name: 'pinSetSuccessfully',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter PIN`
+  String get enterPinTitle {
+    return Intl.message('Enter PIN', name: 'enterPinTitle', desc: '', args: []);
+  }
+
+  /// `Enter your PIN to unlock the app`
+  String get enterPinDescription {
+    return Intl.message(
+      'Enter your PIN to unlock the app',
+      name: 'enterPinDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlock`
+  String get unlockButton {
+    return Intl.message('Unlock', name: 'unlockButton', desc: '', args: []);
+  }
+
+  /// `Incorrect PIN (Attempt {attempts})`
+  String pinErrorIncorrect(int attempts) {
+    return Intl.message(
+      'Incorrect PIN (Attempt $attempts)',
+      name: 'pinErrorIncorrect',
+      desc: '',
+      args: [attempts],
+    );
+  }
+
+  /// `Security`
+  String get settingsSecuritySection {
+    return Intl.message(
+      'Security',
+      name: 'settingsSecuritySection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `PIN Protection`
+  String get settingsPinTitle {
+    return Intl.message(
+      'PIN Protection',
+      name: 'settingsPinTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `App is protected with PIN`
+  String get settingsPinEnabledDescription {
+    return Intl.message(
+      'App is protected with PIN',
+      name: 'settingsPinEnabledDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enable PIN for extra security`
+  String get settingsPinDisabledDescription {
+    return Intl.message(
+      'Enable PIN for extra security',
+      name: 'settingsPinDisabledDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change PIN`
+  String get settingsChangePinButton {
+    return Intl.message(
+      'Change PIN',
+      name: 'settingsChangePinButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update your security PIN`
+  String get settingsChangePinDescription {
+    return Intl.message(
+      'Update your security PIN',
+      name: 'settingsChangePinDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Setup Security Question`
+  String get setupSecurityQuestion {
+    return Intl.message(
+      'Setup Security Question',
+      name: 'setupSecurityQuestion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Set up a security question to help recover your PIN if you forget it`
+  String get securityQuestionDescription {
+    return Intl.message(
+      'Set up a security question to help recover your PIN if you forget it',
+      name: 'securityQuestionDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select a question`
+  String get selectSecurityQuestion {
+    return Intl.message(
+      'Select a question',
+      name: 'selectSecurityQuestion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your Answer`
+  String get yourAnswer {
+    return Intl.message('Your Answer', name: 'yourAnswer', desc: '', args: []);
+  }
+
+  /// `Enter your answer`
+  String get answerHint {
+    return Intl.message(
+      'Enter your answer',
+      name: 'answerHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please select a security question`
+  String get pleaseSelectQuestion {
+    return Intl.message(
+      'Please select a security question',
+      name: 'pleaseSelectQuestion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter your answer`
+  String get pleaseEnterAnswer {
+    return Intl.message(
+      'Please enter your answer',
+      name: 'pleaseEnterAnswer',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Answer must be at least 2 characters`
+  String get answerTooShort {
+    return Intl.message(
+      'Answer must be at least 2 characters',
+      name: 'answerTooShort',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note: Answers are case-insensitive`
+  String get securityAnswerNote {
+    return Intl.message(
+      'Note: Answers are case-insensitive',
+      name: 'securityAnswerNote',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save Security Question`
+  String get saveSecurityQuestion {
+    return Intl.message(
+      'Save Security Question',
+      name: 'saveSecurityQuestion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Security question saved successfully`
+  String get securityQuestionSaved {
+    return Intl.message(
+      'Security question saved successfully',
+      name: 'securityQuestionSaved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `What was the name of your first pet?`
+  String get securityQuestion1 {
+    return Intl.message(
+      'What was the name of your first pet?',
+      name: 'securityQuestion1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `What city were you born in?`
+  String get securityQuestion2 {
+    return Intl.message(
+      'What city were you born in?',
+      name: 'securityQuestion2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `What is your mother's maiden name?`
+  String get securityQuestion3 {
+    return Intl.message(
+      'What is your mother\'s maiden name?',
+      name: 'securityQuestion3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `What was the name of your elementary school?`
+  String get securityQuestion4 {
+    return Intl.message(
+      'What was the name of your elementary school?',
+      name: 'securityQuestion4',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `What is your favorite book?`
+  String get securityQuestion5 {
+    return Intl.message(
+      'What is your favorite book?',
+      name: 'securityQuestion5',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Answer Security Question`
+  String get answerSecurityQuestion {
+    return Intl.message(
+      'Answer Security Question',
+      name: 'answerSecurityQuestion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter your answer`
+  String get enterYourAnswer {
+    return Intl.message(
+      'Enter your answer',
+      name: 'enterYourAnswer',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Verify and Reset PIN`
+  String get verifyAndResetPin {
+    return Intl.message(
+      'Verify and Reset PIN',
+      name: 'verifyAndResetPin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Incorrect answer (Attempt {attempts})`
+  String securityAnswerIncorrect(int attempts) {
+    return Intl.message(
+      'Incorrect answer (Attempt $attempts)',
+      name: 'securityAnswerIncorrect',
+      desc: '',
+      args: [attempts],
+    );
+  }
+
+  /// `PIN reset successfully`
+  String get pinResetSuccessfully {
+    return Intl.message(
+      'PIN reset successfully',
+      name: 'pinResetSuccessfully',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No security question set up`
+  String get noSecurityQuestionSet {
+    return Intl.message(
+      'No security question set up',
+      name: 'noSecurityQuestionSet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please contact support for PIN reset assistance`
+  String get contactSupportForPinReset {
+    return Intl.message(
+      'Please contact support for PIN reset assistance',
+      name: 'contactSupportForPinReset',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Manage Security Question`
+  String get manageSecurityQuestion {
+    return Intl.message(
+      'Manage Security Question',
+      name: 'manageSecurityQuestion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Security question is set up`
+  String get securityQuestionSet {
+    return Intl.message(
+      'Security question is set up',
+      name: 'securityQuestionSet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No security question configured`
+  String get noSecurityQuestion {
+    return Intl.message(
+      'No security question configured',
+      name: 'noSecurityQuestion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Setup Security Question`
+  String get setupSecurityQuestionButton {
+    return Intl.message(
+      'Setup Security Question',
+      name: 'setupSecurityQuestionButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change Security Question`
+  String get changeSecurityQuestion {
+    return Intl.message(
+      'Change Security Question',
+      name: 'changeSecurityQuestion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Manage Postings`
+  String get managePostings {
+    return Intl.message(
+      'Manage Postings',
+      name: 'managePostings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No active postings`
+  String get noActivePostings {
+    return Intl.message(
+      'No active postings',
+      name: 'noActivePostings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete Posting`
+  String get deletePosting {
+    return Intl.message(
+      'Delete Posting',
+      name: 'deletePosting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete this posting?`
+  String get deletePostingConfirmation {
+    return Intl.message(
+      'Are you sure you want to delete this posting?',
+      name: 'deletePostingConfirmation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Posting deleted successfully`
+  String get postingDeleted {
+    return Intl.message(
+      'Posting deleted successfully',
+      name: 'postingDeleted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create Posting`
+  String get createPosting {
+    return Intl.message(
+      'Create Posting',
+      name: 'createPosting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Offer`
+  String get offer {
+    return Intl.message('Offer', name: 'offer', desc: '', args: []);
+  }
+
+  /// `Need`
+  String get need {
+    return Intl.message('Need', name: 'need', desc: '', args: []);
+  }
+
+  /// `Expires`
+  String get expires {
+    return Intl.message('Expires', name: 'expires', desc: '', args: []);
+  }
+
+  /// `Retry`
+  String get retry {
+    return Intl.message('Retry', name: 'retry', desc: '', args: []);
+  }
+
+  /// `Cancel`
+  String get cancel {
+    return Intl.message('Cancel', name: 'cancel', desc: '', args: []);
+  }
+
+  /// `Edit Posting`
+  String get editPosting {
+    return Intl.message(
+      'Edit Posting',
+      name: 'editPosting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Posting updated successfully`
+  String get postingUpdatedSuccess {
+    return Intl.message(
+      'Posting updated successfully',
+      name: 'postingUpdatedSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update Posting`
+  String get updatePosting {
+    return Intl.message(
+      'Update Posting',
+      name: 'updatePosting',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Continue`
   String get continueButton {
     return Intl.message('Continue', name: 'continueButton', desc: '', args: []);
@@ -674,16 +1394,6 @@ class S {
     return Intl.message(
       'Set Up Account',
       name: 'setUpAccount',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Continue with Google`
-  String get continueWithGoogle {
-    return Intl.message(
-      'Continue with Google',
-      name: 'continueWithGoogle',
       desc: '',
       args: [],
     );
@@ -3459,16 +4169,6 @@ class S {
     );
   }
 
-  /// `Create Posting`
-  String get createPosting {
-    return Intl.message(
-      'Create Posting',
-      name: 'createPosting',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Posting created successfully!`
   String get postingCreatedSuccess {
     return Intl.message(
@@ -3517,11 +4217,6 @@ class S {
       desc: '',
       args: [],
     );
-  }
-
-  /// `Cancel`
-  String get cancel {
-    return Intl.message('Cancel', name: 'cancel', desc: '', args: []);
   }
 
   /// `Delete`
@@ -3739,10 +4434,10 @@ class S {
     );
   }
 
-  /// `Find people with matching or complementary interests, search by keywords`
+  /// `Find similar or complementary people, search by keywords`
   String get welcomeStep2Description {
     return Intl.message(
-      'Find people with matching or complementary interests, search by keywords',
+      'Find similar or complementary people, search by keywords',
       name: 'welcomeStep2Description',
       desc: '',
       args: [],
@@ -4689,11 +5384,6 @@ class S {
     );
   }
 
-  /// `Retry`
-  String get retry {
-    return Intl.message('Retry', name: 'retry', desc: '', args: []);
-  }
-
   /// `Offering`
   String get offering {
     return Intl.message('Offering', name: 'offering', desc: '', args: []);
@@ -4849,6 +5539,656 @@ class S {
     return Intl.message(
       'Error deleting profile',
       name: 'errorDeletingProfile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review`
+  String get review {
+    return Intl.message('Review', name: 'review', desc: '', args: []);
+  }
+
+  /// `Report Scam`
+  String get reportScam {
+    return Intl.message('Report Scam', name: 'reportScam', desc: '', args: []);
+  }
+
+  /// `Are you sure you want to report this user for scam?`
+  String get reportScamConfirmation {
+    return Intl.message(
+      'Are you sure you want to report this user for scam?',
+      name: 'reportScamConfirmation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This will:`
+  String get reportScamConsequencesTitle {
+    return Intl.message(
+      'This will:',
+      name: 'reportScamConsequencesTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `• Flag this transaction for moderator review`
+  String get reportScamConsequence1 {
+    return Intl.message(
+      '• Flag this transaction for moderator review',
+      name: 'reportScamConsequence1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `• Potentially suspend the other user`
+  String get reportScamConsequence2 {
+    return Intl.message(
+      '• Potentially suspend the other user',
+      name: 'reportScamConsequence2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `• Require evidence from you`
+  String get reportScamConsequence3 {
+    return Intl.message(
+      '• Require evidence from you',
+      name: 'reportScamConsequence3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `False reports may result in penalties to your account.`
+  String get falseReportsWarning {
+    return Intl.message(
+      'False reports may result in penalties to your account.',
+      name: 'falseReportsWarning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Report`
+  String get report {
+    return Intl.message('Report', name: 'report', desc: '', args: []);
+  }
+
+  /// `Review Submitted!`
+  String get reviewSubmitted {
+    return Intl.message(
+      'Review Submitted!',
+      name: 'reviewSubmitted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Thank you for your feedback!`
+  String get thankYouForFeedback {
+    return Intl.message(
+      'Thank you for your feedback!',
+      name: 'thankYouForFeedback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your review will be visible after {otherUserName} submits their review, or in 14 days.`
+  String reviewVisibilityNotice(String otherUserName) {
+    return Intl.message(
+      'Your review will be visible after $otherUserName submits their review, or in 14 days.',
+      name: 'reviewVisibilityNotice',
+      desc: '',
+      args: [otherUserName],
+    );
+  }
+
+  /// `OK`
+  String get ok {
+    return Intl.message('OK', name: 'ok', desc: '', args: []);
+  }
+
+  /// `Skip Review?`
+  String get skipReviewTitle {
+    return Intl.message(
+      'Skip Review?',
+      name: 'skipReviewTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can review this user later from your transaction history. Reviews help build trust in the community.`
+  String get skipReviewMessage {
+    return Intl.message(
+      'You can review this user later from your transaction history. Reviews help build trust in the community.',
+      name: 'skipReviewMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Go Back`
+  String get goBack {
+    return Intl.message('Go Back', name: 'goBack', desc: '', args: []);
+  }
+
+  /// `Skip`
+  String get skip {
+    return Intl.message('Skip', name: 'skip', desc: '', args: []);
+  }
+
+  /// `Review {userName}`
+  String reviewUser(String userName) {
+    return Intl.message(
+      'Review $userName',
+      name: 'reviewUser',
+      desc: '',
+      args: [userName],
+    );
+  }
+
+  /// `Rating *`
+  String get ratingRequired {
+    return Intl.message('Rating *', name: 'ratingRequired', desc: '', args: []);
+  }
+
+  /// `Excellent`
+  String get ratingExcellent {
+    return Intl.message(
+      'Excellent',
+      name: 'ratingExcellent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Good`
+  String get ratingGood {
+    return Intl.message('Good', name: 'ratingGood', desc: '', args: []);
+  }
+
+  /// `Okay`
+  String get ratingOkay {
+    return Intl.message('Okay', name: 'ratingOkay', desc: '', args: []);
+  }
+
+  /// `Poor`
+  String get ratingPoor {
+    return Intl.message('Poor', name: 'ratingPoor', desc: '', args: []);
+  }
+
+  /// `Very Bad`
+  String get ratingVeryBad {
+    return Intl.message('Very Bad', name: 'ratingVeryBad', desc: '', args: []);
+  }
+
+  /// `Tap to rate`
+  String get tapToRate {
+    return Intl.message('Tap to rate', name: 'tapToRate', desc: '', args: []);
+  }
+
+  /// `How did it go? *`
+  String get howDidItGo {
+    return Intl.message(
+      'How did it go? *',
+      name: 'howDidItGo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Successful Trade`
+  String get transactionStatusSuccessful {
+    return Intl.message(
+      'Successful Trade',
+      name: 'transactionStatusSuccessful',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancelled`
+  String get transactionStatusCancelled {
+    return Intl.message(
+      'Cancelled',
+      name: 'transactionStatusCancelled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Talked but no deal`
+  String get transactionStatusNoDeal {
+    return Intl.message(
+      'Talked but no deal',
+      name: 'transactionStatusNoDeal',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `🚩 Report Scam`
+  String get transactionStatusScam {
+    return Intl.message(
+      '🚩 Report Scam',
+      name: 'transactionStatusScam',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tell us more (optional)`
+  String get tellUsMore {
+    return Intl.message(
+      'Tell us more (optional)',
+      name: 'tellUsMore',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share your experience...`
+  String get shareYourExperience {
+    return Intl.message(
+      'Share your experience...',
+      name: 'shareYourExperience',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Be specific and constructive`
+  String get beSpecificAndConstructive {
+    return Intl.message(
+      'Be specific and constructive',
+      name: 'beSpecificAndConstructive',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review Guidelines`
+  String get reviewGuidelines {
+    return Intl.message(
+      'Review Guidelines',
+      name: 'reviewGuidelines',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Be honest and fair`
+  String get guidelineHonest {
+    return Intl.message(
+      'Be honest and fair',
+      name: 'guidelineHonest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Focus on your actual experience`
+  String get guidelineFocusExperience {
+    return Intl.message(
+      'Focus on your actual experience',
+      name: 'guidelineFocusExperience',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reviews become visible after both parties submit`
+  String get guidelineVisibility {
+    return Intl.message(
+      'Reviews become visible after both parties submit',
+      name: 'guidelineVisibility',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You have 90 days to submit a review`
+  String get guideline90Days {
+    return Intl.message(
+      'You have 90 days to submit a review',
+      name: 'guideline90Days',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `False reports may result in account suspension`
+  String get guidelineFalseReports {
+    return Intl.message(
+      'False reports may result in account suspension',
+      name: 'guidelineFalseReports',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Submit Review`
+  String get submitReview {
+    return Intl.message(
+      'Submit Review',
+      name: 'submitReview',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Skip for Now`
+  String get skipForNow {
+    return Intl.message('Skip for Now', name: 'skipForNow', desc: '', args: []);
+  }
+
+  /// `Failed to submit review`
+  String get failedToSubmitReview {
+    return Intl.message(
+      'Failed to submit review',
+      name: 'failedToSubmitReview',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Archive Conversation?`
+  String get archiveConversationTitle {
+    return Intl.message(
+      'Archive Conversation?',
+      name: 'archiveConversationTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Would you like to archive this conversation now?`
+  String get archiveConversationMessage {
+    return Intl.message(
+      'Would you like to archive this conversation now?',
+      name: 'archiveConversationMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Keep`
+  String get keep {
+    return Intl.message('Keep', name: 'keep', desc: '', args: []);
+  }
+
+  /// `Archive`
+  String get archive {
+    return Intl.message('Archive', name: 'archive', desc: '', args: []);
+  }
+
+  /// `Unable to review this user at this time`
+  String get unableToReviewUser {
+    return Intl.message(
+      'Unable to review this user at this time',
+      name: 'unableToReviewUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cannot send file: Recipient public key not available`
+  String get cannotSendFileNoRecipientKey {
+    return Intl.message(
+      'Cannot send file: Recipient public key not available',
+      name: 'cannotSendFileNoRecipientKey',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Gallery`
+  String get gallery {
+    return Intl.message('Gallery', name: 'gallery', desc: '', args: []);
+  }
+
+  /// `Camera`
+  String get camera {
+    return Intl.message('Camera', name: 'camera', desc: '', args: []);
+  }
+
+  /// `Uploading file...`
+  String get uploadingFile {
+    return Intl.message(
+      'Uploading file...',
+      name: 'uploadingFile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `File sent successfully!`
+  String get fileSentSuccessfully {
+    return Intl.message(
+      'File sent successfully!',
+      name: 'fileSentSuccessfully',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Downloading {filename}...`
+  String downloadingFile(String filename) {
+    return Intl.message(
+      'Downloading $filename...',
+      name: 'downloadingFile',
+      desc: '',
+      args: [filename],
+    );
+  }
+
+  /// `Download failed: {error}`
+  String downloadFailed(String error) {
+    return Intl.message(
+      'Download failed: $error',
+      name: 'downloadFailed',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `No app found to open this file type`
+  String get noAppToOpenFile {
+    return Intl.message(
+      'No app found to open this file type',
+      name: 'noAppToOpenFile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `File saved at: {filePath}`
+  String fileSavedAt(String filePath) {
+    return Intl.message(
+      'File saved at: $filePath',
+      name: 'fileSavedAt',
+      desc: '',
+      args: [filePath],
+    );
+  }
+
+  /// `File not found: {filePath}`
+  String fileNotFound(String filePath) {
+    return Intl.message(
+      'File not found: $filePath',
+      name: 'fileNotFound',
+      desc: '',
+      args: [filePath],
+    );
+  }
+
+  /// `Permission denied to open file`
+  String get permissionDeniedOpenFile {
+    return Intl.message(
+      'Permission denied to open file',
+      name: 'permissionDeniedOpenFile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error opening file: {message}`
+  String errorOpeningFile(String message) {
+    return Intl.message(
+      'Error opening file: $message',
+      name: 'errorOpeningFile',
+      desc: '',
+      args: [message],
+    );
+  }
+
+  /// `Could not open file: {error}`
+  String couldNotOpenFile(String error) {
+    return Intl.message(
+      'Could not open file: $error',
+      name: 'couldNotOpenFile',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `Finish Transaction`
+  String get finishTransaction {
+    return Intl.message(
+      'Finish Transaction',
+      name: 'finishTransaction',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to mark this transaction as completed?`
+  String get finishTransactionConfirmation {
+    return Intl.message(
+      'Are you sure you want to mark this transaction as completed?',
+      name: 'finishTransactionConfirmation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Transaction created successfully`
+  String get transactionCreated {
+    return Intl.message(
+      'Transaction created successfully',
+      name: 'transactionCreated',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Transaction marked as completed`
+  String get transactionCompleted {
+    return Intl.message(
+      'Transaction marked as completed',
+      name: 'transactionCompleted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error creating transaction: {error}`
+  String errorCreatingTransaction(String error) {
+    return Intl.message(
+      'Error creating transaction: $error',
+      name: 'errorCreatingTransaction',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `Error updating transaction: {error}`
+  String errorUpdatingTransaction(String error) {
+    return Intl.message(
+      'Error updating transaction: $error',
+      name: 'errorUpdatingTransaction',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `No Users Nearby`
+  String get noUsersNearbyTitle {
+    return Intl.message(
+      'No Users Nearby',
+      name: 'noUsersNearbyTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!`
+  String get noUsersNearbyMessage {
+    return Intl.message(
+      'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!',
+      name: 'noUsersNearbyMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share App`
+  String get shareApp {
+    return Intl.message('Share App', name: 'shareApp', desc: '', args: []);
+  }
+
+  /// `Copy Link`
+  String get copyLink {
+    return Intl.message('Copy Link', name: 'copyLink', desc: '', args: []);
+  }
+
+  /// `Close`
+  String get close {
+    return Intl.message('Close', name: 'close', desc: '', args: []);
+  }
+
+  /// `Link copied to clipboard!`
+  String get linkCopiedToClipboard {
+    return Intl.message(
+      'Link copied to clipboard!',
+      name: 'linkCopiedToClipboard',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to share at this time`
+  String get unableToShareAtThisTime {
+    return Intl.message(
+      'Unable to share at this time',
+      name: 'unableToShareAtThisTime',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hey! Join me on BarterApp - a great way to trade items and services with people nearby! 🔄\n\n{appLink}`
+  String inviteMessageShare(String appLink) {
+    return Intl.message(
+      'Hey! Join me on BarterApp - a great way to trade items and services with people nearby! 🔄\n\n$appLink',
+      name: 'inviteMessageShare',
+      desc: '',
+      args: [appLink],
+    );
+  }
+
+  /// `Join me on BarterApp!`
+  String get inviteMessageSubject {
+    return Intl.message(
+      'Join me on BarterApp!',
+      name: 'inviteMessageSubject',
       desc: '',
       args: [],
     );

@@ -13,6 +13,8 @@ class ChatMessage {
   EChatMessageStatus? status;
   bool isSentByCurrentUser; // UI helper
   FileAttachment? fileAttachment; // Optional file attachment
+  String? senderName; // Optional sender name for display in UI
+  String? transactionId; // Optional transaction ID to link message to a transaction
 
   ChatMessage({
     required this.id,
@@ -24,6 +26,8 @@ class ChatMessage {
     this.status,
     this.isSentByCurrentUser = false,
     this.fileAttachment,
+    this.senderName,
+    this.transactionId,
   });
 
   // Factory for creating a message to be sent (will be encrypted by cubit/service)
@@ -34,6 +38,7 @@ class ChatMessage {
     required String encryptedTextPayload,
     required String textToSend, // Plain text before encryption
     required DateTime timestamp,
+    String? transactionId,
   }) {
     return ChatMessage(
       id: id,
@@ -44,6 +49,7 @@ class ChatMessage {
       timestamp: timestamp,
       status: EChatMessageStatus.sending,
       isSentByCurrentUser: false,
+      transactionId: transactionId,
     );
   }
 
@@ -54,6 +60,7 @@ class ChatMessage {
     required String recipientId,
     required String encryptedPayload,
     required DateTime timestamp,
+    String? transactionId,
   }) {
     return ChatMessage(
       id: id,
@@ -62,6 +69,7 @@ class ChatMessage {
       encryptedTextPayload: encryptedPayload,
       timestamp: timestamp,
       isSentByCurrentUser: false,
+      transactionId: transactionId,
     );
   }
 
@@ -74,18 +82,21 @@ class ChatMessage {
     'status': status,
     'timestamp': timestamp.toIso8601String(),
     'fileAttachment': fileAttachment?.toJson(),
+    if (transactionId != null) 'transactionId': transactionId,
   };
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     final senderId = json['senderId'] as String;
     final recipientId = json['recipientId'] as String;
     final chatMsgText = json['text'] as String;
+    final transactionId = json['transactionId'] as String?;
     return ChatMessage.received(
       id: DateTime.now().toIso8601String(),
       senderId: senderId,
       recipientId: recipientId,
       encryptedPayload: chatMsgText,
       timestamp: DateTime.now(),
+      transactionId: transactionId,
       // isSentByCurrentUser will be determined in Cubit based on senderId
     );
   }

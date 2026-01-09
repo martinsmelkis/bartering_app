@@ -3,12 +3,13 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
 import 'package:barter_app/screens/map_screen/widgets/drawer_main.dart';
+import 'package:barter_app/screens/map_screen/widgets/invite_friends_dialog.dart';
 import 'package:barter_app/screens/map_screen/widgets/main_navigation.dart';
 import 'package:barter_app/screens/map_screen/widgets/poi_details_bottom_sheet.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_in_map.dart';
+import 'package:barter_app/screens/map_screen/widgets/user_avatar_fab.dart';
 import 'package:barter_app/screens/map_screen/widgets/zoom_buttons.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
-import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
@@ -16,6 +17,7 @@ import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -24,8 +26,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/map/point_of_interest.dart';
-import '../../models/profile/user_profile_data.dart';
-import '../../models/user/user_attribute_entry_data.dart';
 import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/messaging/firebase_service.dart';
 import '../../utils/geo_utils.dart';
@@ -51,7 +51,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   final MapController _mapController = MapController.customLayer(
     initPosition: GeoPoint(latitude: 48.8584, longitude: 2.2945), // Paris
     customTile: CustomTile(
-      sourceName: "osmFrance", //for caching |
+      sourceName: "osmFrance", // for caching
       tileExtension: ".png",
       minZoomLevel: 2,
       maxZoomLevel: 19,
@@ -73,7 +73,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   bool _isMapReady = false; // Track map initialization status
   int _currentRenderOperation = 0; // Track current render operation to cancel stale ones
   bool _isUpdatingVisuals = false; // Prevent concurrent updates
-
+  Region? _previousMapRegion = null;
+  GeoPoint? _noUsersMarkerPosition; // Position of the "no users nearby" marker
   // Avatar SVG assets (dynamically generated)
   static const int _svgAssetCount = 25;
 
@@ -90,7 +91,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   String? _currentUserName;
   List<ParsedAttributeData>? _userInterests;
   List<ParsedAttributeData>? _userOfferings;
-
   // GlobalKey to preserve Scaffold state and prevent map rebuilds
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -99,23 +99,17 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     super.initState();
     poiCubit = context.read<PoiCubit>();
     mapOperationsCubit = context.read<MapOperationsCubit>();
-
     _mapController.addObserver(this);
     _loadUserProfile();
-    
-    // Load match history to update badge count
+
+    // Handle any pending notification that opened the app when it was terminated
+    // Add a delay to ensure the route is fully settled before attempting navigation
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<NotificationsCubit>().loadMatchHistory();
       }
-    });
-    
-    // Handle any pending notification that opened the app when it was terminated
-    // Add a delay to ensure the route is fully settled before attempting navigation
-    WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          print('🗺️ Map screen is mounted and ready, handling pending messages...');
           FirebaseService().handlePendingInitialMessage();
         }
       });
@@ -140,12 +134,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     if (mounted) setState(() {});
   }
 
-  @override
-  void dispose() {
-    _mapController.dispose();
-    super.dispose();
-  }
-
   Future<void> _zoomToSavedLocation() async {
     final locationString = await SecureStorageService().getOwnLocation();
     if (locationString != null && locationString.isNotEmpty) {
@@ -163,11 +151,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   void _onMapReady(bool isReady) {
     _isMapReady = true;
-    
     // If initial POIs were provided (e.g., from match history), use them instead of fetching
     if (widget.initialPois != null && widget.initialPois!.isNotEmpty) {
-      print('🗺️ Using provided initial POIs (${widget.initialPois!.length} items)');
-      
       // Center map on the first POI
       final firstPoi = widget.initialPois!.first;
       _mapController.setZoom(zoomLevel: 15.0);
@@ -175,12 +160,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         GeoPoint(latitude: firstPoi.profile.latitude ?? 0.0,
             longitude: firstPoi.profile.longitude ?? 0.0),
       );
-      
       _processPois(widget.initialPois!);
     } else {
       // Default behavior: zoom to saved location and fetch nearby POIs
       _zoomToSavedLocation();
-      print('🗺️ No initial POIs provided, fetching nearby POIs');
       poiCubit.fetchPois(radius: 65000);
       // If POIs were already loaded before map was ready, process them now
       if (_allPois.isNotEmpty) {
@@ -191,6 +174,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   void _processPois(List<PointOfInterest> pois) {
     _allPois = List.from(pois);
+    
+    // Remove the "no users" marker if POIs are now available
+    if (_allPois.isNotEmpty && _noUsersMarkerPosition != null) {
+      _removeNoUsersMarker();
+    }
+    
     if (zoomLevelNotifier.value.toDouble() <= 13.5) {
       mapOperationsCubit.performMainClustering(_allPois);
     }
@@ -201,6 +190,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       _updateMapVisuals();
     } else {
       print('Map not ready yet, POIs stored. Will display when map is ready.');
+    }
+
+    // If no POIs found, show the special "invite friends" marker
+    if (_allPois.isEmpty && _isMapReady && _mapController.isAllLayersVisible) {
+      _showNoUsersMarker();
+      return;
     }
   }
 
@@ -359,41 +354,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       }
     }
 
-    Set<String> renderedPoiIds = {};
-
-    print('@@@@@@@@@@@ Calculating truly individual POIs...');
-    // Collect all POIs that have been rendered (either as individual or in clusters)
-    for (var mc in mapOperationsCubit.mainPoiClusters) {
-      if (mc.isExpanded) {
-        // If main cluster is expanded, track POIs from sub-clusters
-        for (var sc in mc.subClusters) {
-          for (var p in sc.pois) {
-            renderedPoiIds.add(p.profile.userId);
-          }
-        }
-        // Also track individual POIs within the expanded main cluster
-        for (var p in mc.individualPoisWithinExpandedCluster) {
-          renderedPoiIds.add(p.profile.userId);
-        }
-      } else {
-        // If main cluster is collapsed, track all POIs in the cluster
-        for (var p in mc.allPoisInCluster) {
-          renderedPoiIds.add(p.profile.userId);
-        }
-      }
-    }
-
-    // Track POIs in loose sub-clusters
-    for (var sc in mapOperationsCubit.looseSubClusters) {
-      for (var p in sc.pois) {
-        renderedPoiIds.add(p.profile.userId);
-      }
-    }
-
-    List<PointOfInterest> trulyIndividualPois =
-    _allPois.where((p) => !renderedPoiIds.contains(p.profile.userId)).toList();
-
-    print('@@@@@@@@@@@ Truly individual POIs: ${trulyIndividualPois.length}');
+    // Calculate which POIs are truly individual (not part of any cluster)
+    List<PointOfInterest> trulyIndividualPois = mapOperationsCubit.calculateTrulyIndividualPois(_allPois);
     for (var poi in trulyIndividualPois) {
       print('@@@@@@@@@@@ Adding truly individual POI marker: ${poi.profile
           .userId}');
@@ -459,12 +421,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   /// Opens chat adaptively based on screen size using ChatPanelCubit
   void _openChat(String poiId, String poiName) {
     final chatCubit = context.read<ChatPanelCubit>();
-
     if (context.canShowSideBySide) {
-      // Large screen: Open as side panel via cubit (no setState needed!)
       chatCubit.openChat(poiId, poiName);
     } else {
-      // Small screen: Navigate to full screen
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) =>
@@ -588,54 +547,32 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   void _onGeoPointTapped(GeoPoint point) {
-    double minDistance = double.infinity;
-    dynamic closestItem;
-    void checkItem(dynamic item, GeoPoint itemLocation) {
-      final distance = GeoUtils.calculateDistance(point.latitude, point.longitude, itemLocation.latitude, itemLocation.longitude);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestItem = item;
+    // Check if the "no users nearby" marker was tapped
+    if (_noUsersMarkerPosition != null) {
+      final distanceToNoUsersMarker = GeoUtils.calculateDistance(
+        point.latitude,
+        point.longitude,
+        _noUsersMarkerPosition!.latitude,
+        _noUsersMarkerPosition!.longitude,
+      );
+      
+      if (distanceToNoUsersMarker < 0.1) { // 100 meters threshold
+        _showInviteFriendsDialog();
+        return;
       }
     }
-    // Iterate through all potentially visible items
-    for (var mainCluster in mapOperationsCubit.mainPoiClusters) {
-      if (!mainCluster.isExpanded) {
-        checkItem(mainCluster, mainCluster.centroid);
-      } else {
-        for (var subCluster in mainCluster.subClusters) {
-          if (!subCluster.isExpanded) {
-            checkItem(subCluster, subCluster.centroid);
-          } else {
-            for (var poi in subCluster.pois) {
-              checkItem(poi, GeoPoint(latitude: poi.profile.latitude ?? 0.0,
-                  longitude: poi.profile.longitude ?? 0.0));
-            }
-          }
-        }
-        for (var poi in mainCluster.individualPoisWithinExpandedCluster) {
-          checkItem(poi, GeoPoint(latitude: poi.profile.latitude ?? 0.0,
-              longitude: poi.profile.longitude ?? 0.0));
-        }
-      }
-    }
-    for (var looseSubCluster in mapOperationsCubit.looseSubClusters) {
-      if (!looseSubCluster.isExpanded) {
-        checkItem(looseSubCluster, looseSubCluster.centroid);
-      } else {
-        for (var poi in looseSubCluster.pois) {
-          checkItem(poi, GeoPoint(latitude: poi.profile.latitude ?? 0.0,
-              longitude: poi.profile.longitude ?? 0.0));
-        }
-      }
-    }
-    for (var poi in mapOperationsCubit.individualPois) {
-      checkItem(poi, GeoPoint(latitude: poi.profile.latitude ?? 0.0,
-          longitude: poi.profile.longitude ?? 0.0));
-    }
-    for (var poi in widget.initialPois ?? List.empty()) {
-      checkItem(poi, GeoPoint(latitude: poi.profile.latitude, longitude: poi.profile.longitude));
-    }
-    const tapThresholdKm = 0.1; // 50 meters
+    
+    // Find the closest item to the tapped point using the cubit
+    final result = mapOperationsCubit.findClosestItemToPoint(
+      point,
+      widget.initialPois,
+    );
+
+    if (result == null) return;
+
+    final (closestItem, minDistance) = result;
+    const tapThresholdKm = 0.1; // 100 meters
+
     if (minDistance < tapThresholdKm) {
       if (closestItem is PoiClusterOsm) {
         _onMainClusterTap(closestItem);
@@ -646,8 +583,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       }
     }
   }
-
-  Region? _previousMapRegion = null;
 
   @override
   Widget build(BuildContext context) {
@@ -724,7 +659,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         Positioned(
                           bottom: 32,
                           right: 16,
-                          child: PointerInterceptor(child: _buildUserAvatarFAB()),
+                          child: PointerInterceptor(
+                            child: UserAvatarFab(
+                              userId: _currentUserId,
+                              userName: _currentUserName,
+                              userInterests: _userInterests,
+                              userOfferings: _userOfferings,
+                            ),
+                          ),
                         ),
                         Positioned(
                           top: kIsWeb ? 26 : topPadding,
@@ -748,12 +690,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                     FloatingActionButton(
                                       onPressed: () {
                                         final chatCubit = context.read<ChatPanelCubit>();
-
                                         if (context.canShowSideBySide) {
-                                          // Large screen: Open as side panel
                                           chatCubit.openChatsList();
                                         } else {
-                                          // Small screen: Navigate to full screen
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (_) => const ChatsListScreen(),
@@ -786,9 +725,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                           ),
                                           child: Center(
                                             child: Text(
-                                              badgeState.unreadCount > 99
-                                                  ? '99+'
-                                                  : badgeState.unreadCount.toString(),
+                                              badgeState.unreadCount > 99 ? 
+                                                '99+' : badgeState.unreadCount.toString(),
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 10,
@@ -822,21 +760,22 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                 ],
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.settings_input_antenna, color: Colors
-                                    .black87),
+                                icon: SvgPicture.asset(
+                                  'assets/icons/search_nearby_users.svg',
+                                  width: 28,
+                                  height: 28,
+                                  // Removed colorFilter to preserve SVG's original colors
+                                ),
                                 onPressed: () async {
                                   mapOperationsCubit.reset();
                                   for (var c in mapOperationsCubit.mainPoiClusters) {
                                     c.isExpanded = false;
                                   }
-
-                                  // Get search settings
                                   final settingsService = getIt<SettingsService>();
                                   final useMapCenter = await settingsService.getUseMapCenterForSearch();
                                   final radiusKm = await settingsService.getNearbyUsersRadius();
 
                                   if (useMapCenter) {
-                                    // Use map center
                                     final mapCenter = await _mapController.centerMap;
                                     await poiCubit.fetchPois(
                                       lat: mapCenter.latitude,
@@ -878,153 +817,56 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     );
   }
 
-  Widget _buildUserAvatarFAB() {
-    if (_currentUserId == null) {
-      return const SizedBox.shrink();
-    }
-
-    final userRepository = getIt<UserRepository>();
-    final userInterests = _userInterests?.isEmpty == true ? userRepository.userInterests : _userInterests;
-    final userOfferings = _userOfferings?.isEmpty == true ? userRepository.userOfferings : _userOfferings;
-
-    print('@@@@@@@@@ _buildUserAvatarFAB ${_currentUserId} ${userRepository.userInterests} ||| ${_userInterests}');
-
-    final List<UserAttributeEntryData> attrList = List.of(userOfferings?.map((e) => UserAttributeEntryData(
-        attributeId: e.attribute, type: 0, relevancy: e.relevancyScore,
-        description: "", uiStyleHint: e.uiStyleHint),) ?? []);
-    attrList.addAll(userInterests?.map((e) => UserAttributeEntryData(
-        attributeId: e.attribute, type: 1, relevancy: e.relevancyScore,
-        description: "", uiStyleHint: e.uiStyleHint)) ?? List.empty());
-    // Create a dummy POI for the user
-    final userPoi = PointOfInterest(
-      profile: UserProfileData(
-        userId: _currentUserId ?? "",
-        name: _currentUserName ?? "",
-        latitude: 0,
-        longitude: 0,
-        attributes: attrList,
-        profileKeywordDataMap: null,
-        activePostingIds: List.empty(growable: false),
+  /// Shows a special marker when no users are nearby
+  Future<void> _showNoUsersMarker() async {
+    _removeNoUsersMarker();
+    // Get current map center to place the marker
+    final mapCenter = await _mapController.centerMap;
+    _noUsersMarkerPosition = mapCenter;
+    // Load and create the special marker with path26.svg
+    final svgString = await rootBundle.loadString('assets/icons/path26.svg');
+    final marker = MarkerIcon(
+      iconWidget: SvgPicture.string(
+        svgString,
+        width: AppDimensions.poiMarkerSize * 1.1, // Make it slightly larger
+        height: AppDimensions.poiMarkerSize * 1.1,
+        key: const ValueKey('no_users_marker'),
       ),
-      distanceKm: 0,
     );
 
-    return FutureBuilder<MarkerIcon>(
-      future: _createPoiMarker(userPoi, AppLocalizations.of(context)!, isSelfAvatar: true),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const CircularProgressIndicator();
-        final markerWidget = snapshot.data!.iconWidget!;
+    await _mapController.addMarker(
+      mapCenter,
+      markerIcon: marker,
+    );
+    _currentMarkerPositions.add(mapCenter);
+  }
 
-        return GestureDetector(
-          onTap: () async {
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) =>
-                    UserProfileScreen(
-                      userId: _currentUserId!,
-                      userName: _currentUserName!,
-                      interests: userInterests,
-                      offerings: userOfferings,
-                    ),
-              ),
-            );
-            // Reload match history when user returns
-            if (mounted) {
-              context.read<NotificationsCubit>().loadMatchHistory();
-            }
-          },
-          child: Stack(
-            children: [
-              Container(
-                width: AppDimensions.userAvatarSize,
-                height: AppDimensions.userAvatarSize,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 1,
-                      offset: const Offset(1, 1),
-                    ),
-                  ],
-                ),
-                child: markerWidget,
-              ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: BlocBuilder<NotificationsCubit, NotificationsState>(
-                  builder: (context, notificationState) {
-                    final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
-                    
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          width: AppDimensions.avatarEditIconSize,
-                          height: AppDimensions.avatarEditIconSize,
-                          decoration: BoxDecoration(
-                            color: AppColors.background,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.edit,
-                            size: AppDimensions.avatarEditIconInnerSize,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        if (unreadCount > 0)
-                          Positioned(
-                            top: -4,
-                            right: -4,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppColors.background,
-                                  width: 1.5,
-                                ),
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 33,
-                                minHeight: 33,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  unreadCount > 99 ? '99+' : unreadCount.toString(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+  void _removeNoUsersMarker() {
+    if (_noUsersMarkerPosition != null) {
+      try {
+        _mapController.removeMarker(_noUsersMarkerPosition!);
+        _currentMarkerPositions.remove(_noUsersMarkerPosition);
+      } catch (e) {
+        print('@@@@@@@@@@@ Error removing no users marker: $e');
+      }
+      _noUsersMarkerPosition = null;
+    }
+  }
+
+  void _showInviteFriendsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const InviteFriendsDialog(),
     );
   }
 
   @override
-  Future<void> mapIsReady(bool isReady) async {
-
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
+
+  @override
+  Future<void> mapIsReady(bool isReady) async {}
 
 }

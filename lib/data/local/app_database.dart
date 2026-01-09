@@ -19,7 +19,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 4; // v4: Added file attachment fields
+  int get schemaVersion => 7; // v7: Added transactionId to conversations
 
   @override
   MigrationStrategy get migration {
@@ -53,11 +53,25 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(userChats, userChats.localPath);
           await m.addColumn(userChats, userChats.isDownloaded);
         }
+
+        // Migration from v4 to v5: Add senderName field to messages
+        if (from < 5) {
+          await m.addColumn(userChats, userChats.senderName);
+        }
+
+        // Migration from v5 to v6: Add lastMessageSenderName to conversations
+        if (from < 6) {
+          await m.addColumn(conversations, conversations.lastMessageSenderName);
+        }
+
+        // Migration from v6 to v7: Add transactionId to conversations
+        if (from < 7) {
+          await m.addColumn(conversations, conversations.transactionId);
+        }
       },
       beforeOpen: (details) async {
-        if (kDebugMode) {
-          await customStatement('PRAGMA foreign_keys = ON');
-        }
+        // Enable foreign keys for data integrity
+        await customStatement('PRAGMA foreign_keys = ON');
       },
     );
   }

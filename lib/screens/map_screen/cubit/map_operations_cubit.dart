@@ -350,4 +350,143 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     lastAutoCollapsedSubClusterIds.clear();
   }
 
+  /// Calculates which POIs are truly individual (not part of any cluster)
+  /// by filtering out POIs that are already rendered in clusters
+  List<PointOfInterest> calculateTrulyIndividualPois(List<PointOfInterest> allPois) {
+    Set<String> renderedPoiIds = {};
+
+    print('@@@@@@@@@@@ Calculating truly individual POIs...');
+    // Collect all POIs that have been rendered (either as individual or in clusters)
+    for (var mc in mainPoiClusters) {
+      if (mc.isExpanded) {
+        // If main cluster is expanded, track POIs from sub-clusters
+        for (var sc in mc.subClusters) {
+          for (var p in sc.pois) {
+            renderedPoiIds.add(p.profile.userId);
+          }
+        }
+        // Also track individual POIs within the expanded main cluster
+        for (var p in mc.individualPoisWithinExpandedCluster) {
+          renderedPoiIds.add(p.profile.userId);
+        }
+      } else {
+        // If main cluster is collapsed, track all POIs in the cluster
+        for (var p in mc.allPoisInCluster) {
+          renderedPoiIds.add(p.profile.userId);
+        }
+      }
+    }
+
+    // Track POIs in loose sub-clusters
+    for (var sc in looseSubClusters) {
+      for (var p in sc.pois) {
+        renderedPoiIds.add(p.profile.userId);
+      }
+    }
+
+    List<PointOfInterest> trulyIndividualPois =
+        allPois.where((p) => !renderedPoiIds.contains(p.profile.userId)).toList();
+
+    print('@@@@@@@@@@@ Truly individual POIs: ${trulyIndividualPois.length}');
+    return trulyIndividualPois;
+  }
+
+  /// Finds the closest item (POI, main cluster, or sub-cluster) to a tapped point
+  /// Returns a record with (closestItem, distance in km)
+  /// Returns null if no items exist
+  (dynamic, double)? findClosestItemToPoint(
+    GeoPoint tappedPoint,
+    List<PointOfInterest>? additionalPois,
+  ) {
+    double minDistance = double.infinity;
+    dynamic closestItem;
+
+    void checkItem(dynamic item, GeoPoint itemLocation) {
+      final distance = GeoUtils.calculateDistance(
+        tappedPoint.latitude,
+        tappedPoint.longitude,
+        itemLocation.latitude,
+        itemLocation.longitude,
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestItem = item;
+      }
+    }
+
+    // Iterate through all potentially visible items
+    for (var mainCluster in mainPoiClusters) {
+      if (!mainCluster.isExpanded) {
+        checkItem(mainCluster, mainCluster.centroid);
+      } else {
+        for (var subCluster in mainCluster.subClusters) {
+          if (!subCluster.isExpanded) {
+            checkItem(subCluster, subCluster.centroid);
+          } else {
+            for (var poi in subCluster.pois) {
+              checkItem(
+                poi,
+                GeoPoint(
+                  latitude: poi.profile.latitude ?? 0.0,
+                  longitude: poi.profile.longitude ?? 0.0,
+                ),
+              );
+            }
+          }
+        }
+        for (var poi in mainCluster.individualPoisWithinExpandedCluster) {
+          checkItem(
+            poi,
+            GeoPoint(
+              latitude: poi.profile.latitude ?? 0.0,
+              longitude: poi.profile.longitude ?? 0.0,
+            ),
+          );
+        }
+      }
+    }
+
+    for (var looseSubCluster in looseSubClusters) {
+      if (!looseSubCluster.isExpanded) {
+        checkItem(looseSubCluster, looseSubCluster.centroid);
+      } else {
+        for (var poi in looseSubCluster.pois) {
+          checkItem(
+            poi,
+            GeoPoint(
+              latitude: poi.profile.latitude ?? 0.0,
+              longitude: poi.profile.longitude ?? 0.0,
+            ),
+          );
+        }
+      }
+    }
+
+    for (var poi in individualPois) {
+      checkItem(
+        poi,
+        GeoPoint(
+          latitude: poi.profile.latitude ?? 0.0,
+          longitude: poi.profile.longitude ?? 0.0,
+        ),
+      );
+    }
+
+    // Check additional POIs (e.g., initial POIs passed to the map)
+    if (additionalPois != null) {
+      for (var poi in additionalPois) {
+        checkItem(
+          poi,
+          GeoPoint(
+            latitude: poi.profile.latitude ?? 0.0,
+            longitude: poi.profile.longitude ?? 0.0,
+          ),
+        );
+      }
+    }
+
+    if (closestItem == null) return null;
+    return (closestItem, minDistance);
+  }
+
 }

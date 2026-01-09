@@ -106,6 +106,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
           create: (context) {
             return ChatCubit(
                 currentUserId: '',
+                currentUserName: '',
                 recipientUserId: '');
           },
         ),

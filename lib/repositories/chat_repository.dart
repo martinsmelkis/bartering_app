@@ -24,14 +24,22 @@ class ChatRepository {
         .getSingleOrNull();
 
     if (existing == null) {
-      // Create a minimal profile entry for this user
-      await _database.into(_database.profiles).insert(
-        ProfilesCompanion(
-          userId: Value(userId),
-          onboardingData: Value('{}'), // Empty JSON for now
-        ),
-        mode: InsertMode.insertOrIgnore, // Ignore if already exists
-      );
+      print('📝 Creating profile for user: $userId');
+      try {
+        // Create a minimal profile entry for this user
+        await _database.into(_database.profiles).insert(
+          ProfilesCompanion(
+            userId: Value(userId),
+            onboardingData: Value('{}'), // Empty JSON for now
+          ),
+        );
+        print('✅ Profile created for user: $userId');
+      } catch (e) {
+        print('❌ Error creating profile for user $userId: $e');
+        rethrow;
+      }
+    } else {
+      print('✅ Profile already exists for user: $userId');
     }
   }
 
@@ -41,6 +49,7 @@ class ChatRepository {
   Future<Conversation> getOrCreateConversation({
     required String userId1,
     required String userId2,
+    String? transactionId,
   }) async {
     // First, ensure both users exist in profiles table
     await ensureUserProfileExists(userId1);
@@ -55,6 +64,19 @@ class ChatRepository {
         .getSingleOrNull();
 
     if (existing != null) {
+      // If transaction ID is provided and different from existing, update it
+      if (transactionId != null && existing.transactionId != transactionId) {
+        await (_database.update(_database.conversations)
+          ..where((tbl) => tbl.conversationId.equals(conversationId)))
+            .write(ConversationsCompanion(
+          transactionId: Value(transactionId),
+          updatedAt: Value(DateTime.now()),
+        ));
+        // Return updated conversation
+        return (await (_database.select(_database.conversations)
+          ..where((tbl) => tbl.conversationId.equals(conversationId)))
+            .getSingle());
+      }
       return existing;
     }
 
@@ -62,6 +84,7 @@ class ChatRepository {
     final conversationData = ConversationsCompanion(
       conversationId: Value(conversationId),
       type: const Value('direct'),
+      transactionId: transactionId != null ? Value(transactionId) : const Value.absent(),
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
     );
@@ -133,6 +156,7 @@ class ChatRepository {
     required String conversationId,
     required String lastMessage,
     required String senderId,
+    String? senderName,
     required DateTime timestamp,
     bool incrementUnread = false,
   }) async {
@@ -145,6 +169,9 @@ class ChatRepository {
     final update = ConversationsCompanion(
       lastMessage: Value(lastMessage),
       lastMessageSenderId: Value(senderId),
+      lastMessageSenderName: senderName != null && senderName.isNotEmpty
+          ? Value(senderName)
+          : const Value.absent(),
       lastMessageTimestamp: Value(timestamp),
       updatedAt: Value(DateTime.now()),
       unreadCount: incrementUnread
@@ -194,17 +221,113 @@ class ChatRepository {
         .go();
   }
 
+  /// Get the transaction ID associated with a conversation
+  Future<String?> getConversationTransactionId(String conversationId) async {
+    final conversation = await (_database.select(_database.conversations)
+      ..where((tbl) => tbl.conversationId.equals(conversationId)))
+        .getSingleOrNull();
+
+    return conversation?.transactionId;
+  }
+
+  /// Set or update the transaction ID for a conversation
+  Future<void> setConversationTransactionId({
+    required String conversationId,
+    required String transactionId,
+  }) async {
+    await (_database.update(_database.conversations)
+      ..where((tbl) => tbl.conversationId.equals(conversationId)))
+        .write(ConversationsCompanion(
+      transactionId: Value(transactionId),
+      updatedAt: Value(DateTime.now()),
+    ));
+  }
+
+  /// Clear the transaction ID from a conversation
+  Future<void> clearConversationTransactionId(String conversationId) async {
+    await (_database.update(_database.conversations)
+      ..where((tbl) => tbl.conversationId.equals(conversationId)))
+        .write(ConversationsCompanion(
+      transactionId: const Value(null),
+      updatedAt: Value(DateTime.now()),
+    ));
+  }
+
+  /// Get conversation by transaction ID
+  Future<Conversation?> getConversationByTransactionId(String transactionId) async {
+    return await (_database.select(_database.conversations)
+      ..where((tbl) => tbl.transactionId.equals(transactionId)))
+        .getSingleOrNull();
+  }
+
   // ==================== MESSAGES ====================
 
   /// Save a message to the database
   Future<int> saveMessage(ChatMessage message, String conversationId) async {
     try {
       // Get current user ID to determine if this message is sent by current user
-      final currentUserId = await _userRepository.getUserId();
+      final currentUserId = await _userRepository.getUserId() ?? '';
+
+      if (currentUserId.isEmpty) {
+        throw Exception('Current user ID not found');
+      }
 
       // Determine if this message is sent by the current user
       final isSentByCurrentUser = message.senderId == currentUserId;
+
+      print('💬 Saving message: ${message.id}, conversation: $conversationId');
       
+      // If message has a transactionId, link it to the conversation
+      if (message.transactionId != null && message.transactionId!.isNotEmpty) {
+        print('🔗 Message has transactionId: ${message.transactionId}, linking to conversation');
+        final conversation = await (_database.select(_database.conversations)
+          ..where((tbl) => tbl.conversationId.equals(conversationId)))
+            .getSingleOrNull();
+        
+        if (conversation != null && conversation.transactionId != message.transactionId) {
+          await setConversationTransactionId(
+            conversationId: conversationId,
+            transactionId: message.transactionId!,
+          );
+          print('✅ Conversation linked to transaction: ${message.transactionId}');
+        }
+      }
+
+      // Verify conversation exists, recreate if needed
+      final conversation = await (_database.select(_database.conversations)
+        ..where((tbl) => tbl.conversationId.equals(conversationId)))
+          .getSingleOrNull();
+
+      if (conversation == null) {
+        print('⚠️ Conversation not found: $conversationId. Recreating...');
+        try {
+          // For direct conversations, there are only two participants: sender and recipient
+          // Use the message sender and current user to recreate
+          String otherUserId;
+
+          if (message.senderId == currentUserId) {
+            // Message is from current user, need recipient
+            if (message.recipientId.isNotEmpty) {
+              otherUserId = message.recipientId;
+            } else {
+              throw Exception('Recipient ID is empty in message');
+            }
+          } else {
+            // Message is from other user, sender is the other participant
+            otherUserId = message.senderId;
+          }
+
+          await getOrCreateConversation(
+            userId1: currentUserId,
+            userId2: otherUserId,
+          );
+          print('✅ Conversation recreated successfully with user: $otherUserId');
+        } catch (e) {
+          print('❌ Failed to recreate conversation: $e');
+          throw Exception('Failed to recreate conversation: $e');
+        }
+      }
+
       // Ensure sender profile exists
       await ensureUserProfileExists(message.senderId);
 
@@ -231,10 +354,34 @@ class ChatRepository {
             .id}');
       }
 
+      // Verify both profiles exist before insertion
+      final senderProfile = await (_database.select(_database.profiles)
+        ..where((tbl) => tbl.userId.equals(message.senderId)))
+          .getSingleOrNull();
+
+      if (senderProfile == null) {
+        throw Exception('Sender profile does not exist: ${message.senderId}');
+      }
+
+      if (recipientId != null) {
+        final recipientProfile = await (_database.select(_database.profiles)
+          ..where((tbl) => tbl.userId.equals(recipientId!)))
+            .getSingleOrNull();
+
+        if (recipientProfile == null) {
+          throw Exception('Recipient profile does not exist: $recipientId');
+        }
+      }
+
+      print('✅ All profiles verified, inserting message...');
+
       final messageData = UserChatsCompanion(
         messageId: Value(message.id),
         conversationId: Value(conversationId),
         senderId: Value(message.senderId),
+        senderName: message.senderName != null && message.senderName!.isNotEmpty
+            ? Value(message.senderName!)
+            : const Value.absent(),
         recipientId: recipientId != null && recipientId.isNotEmpty
             ? Value(recipientId)
             : const Value.absent(),
@@ -291,6 +438,7 @@ class ChatRepository {
           conversationId: conversationId,
           lastMessage: lastMessageText,
           senderId: message.senderId,
+          senderName: message.senderName,
           timestamp: message.timestamp,
           incrementUnread: !isSentByCurrentUser, // Use locally calculated value
         );
@@ -399,6 +547,7 @@ class ChatRepository {
     return ChatMessage(
       id: dbMessage.messageId,
       senderId: dbMessage.senderId,
+      senderName: dbMessage.senderName,
       recipientId: dbMessage.recipientId ?? '',
       // Handle nullable recipientId
       plainText: dbMessage.decryptedContent,

@@ -233,6 +233,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final userRepository = getIt<UserRepository>();
     _chatCubit = context.read<ChatCubit>();
     _chatCubit.currentUserId = await userRepository.getUserId() ?? "";
+    _chatCubit.currentUserName = await userRepository.getUserName() ?? "";
     _chatCubit.recipientUserId = widget.poiId ?? "";
     _chatCubit.initializeChatSession();
 
@@ -386,6 +387,11 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildMessageBubble(ChatMessage message) {
+    // Check if this is a system message
+    if (message.id.contains('system_transaction')) {
+      return _buildSystemMessage(message);
+    }
+    
     // Check if message is from current user by comparing sender ID
     final bool isMe = message.senderId == _chatCubit.currentUserId;
     final alignment = isMe ? Alignment.centerRight : Alignment.centerLeft;
@@ -455,6 +461,37 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSystemMessage(ChatMessage message) {
+    // Use much smaller sizes for web side-by-side view
+    final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
+        context.canShowSideBySide;
+    final double messageFontSize = isWebSideBySide ? 12 : 13.sp;
+    final double verticalMargin = isWebSideBySide ? 8 : 12.h;
+
+    return Center(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: verticalMargin),
+        padding: EdgeInsets.symmetric(
+          vertical: isWebSideBySide ? 6 : 8.h,
+          horizontal: isWebSideBySide ? 12 : 16.w,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(isWebSideBySide ? 12 : 16.r),
+        ),
+        child: Text(
+          message.plainText ?? '',
+          style: TextStyle(
+            color: Colors.grey.shade700,
+            fontSize: messageFontSize,
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: TextAlign.center,
         ),
       ),
     );

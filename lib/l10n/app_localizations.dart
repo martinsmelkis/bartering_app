@@ -4305,6 +4305,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error updating transaction: {error}'**
   String errorUpdatingTransaction(String error);
+
+  /// No description provided for @noUsersNearbyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Users Nearby'**
+  String get noUsersNearbyTitle;
+
+  /// No description provided for @noUsersNearbyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!'**
+  String get noUsersNearbyMessage;
+
+  /// No description provided for @shareApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share App'**
+  String get shareApp;
+
+  /// No description provided for @copyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Link'**
+  String get copyLink;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @linkCopiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied to clipboard!'**
+  String get linkCopiedToClipboard;
+
+  /// No description provided for @unableToShareAtThisTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to share at this time'**
+  String get unableToShareAtThisTime;
+
+  /// No description provided for @inviteMessageShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Hey! Join me on BarterApp - a great way to trade items and services with people nearby! 🔄\n\n{appLink}'**
+  String inviteMessageShare(String appLink);
+
+  /// No description provided for @inviteMessageSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Join me on BarterApp!'**
+  String get inviteMessageSubject;
 }
 
 class _AppLocalizationsDelegate
