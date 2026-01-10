@@ -7,6 +7,7 @@ import 'package:barter_app/screens/map_screen/widgets/invite_friends_dialog.dart
 import 'package:barter_app/screens/map_screen/widgets/main_navigation.dart';
 import 'package:barter_app/screens/map_screen/widgets/poi_details_bottom_sheet.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_in_map.dart';
+import 'package:barter_app/screens/map_screen/widgets/search_results_list_view.dart';
 import 'package:barter_app/screens/map_screen/widgets/user_avatar_fab.dart';
 import 'package:barter_app/screens/map_screen/widgets/zoom_buttons.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
@@ -93,6 +94,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   List<ParsedAttributeData>? _userOfferings;
   // GlobalKey to preserve Scaffold state and prevent map rebuilds
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
+  // Search results list view state
+  bool _showSearchResultsList = false;
+  List<PointOfInterest> _searchResults = [];
 
   @override
   void initState() {
@@ -172,12 +177,25 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
   }
 
-  void _processPois(List<PointOfInterest> pois) {
+  void _processPois(List<PointOfInterest> pois) async {
     _allPois = List.from(pois);
     
     // Remove the "no users" marker if POIs are now available
     if (_allPois.isNotEmpty && _noUsersMarkerPosition != null) {
       _removeNoUsersMarker();
+    }
+    
+    // Check if we should show results as list
+    final settingsService = getIt<SettingsService>();
+    final showAsList = await settingsService.getShowSearchResultsAsList();
+    
+    if (showAsList && _allPois.isNotEmpty) {
+      // Show list view instead of map markers
+      setState(() {
+        _searchResults = _allPois;
+        _showSearchResultsList = true;
+      });
+      return;
     }
     
     if (zoomLevelNotifier.value.toDouble() <= 13.5) {
@@ -799,6 +817,32 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                             zoomNotifier: zoomLevelNotifier,
                           ),
                         ),
+                        // Search results list view overlay
+                        if (_showSearchResultsList)
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            top: MediaQuery.of(context).size.height * 0.15,
+                            child: SearchResultsListView(
+                              pois: _searchResults,
+                              onClose: () {
+                                setState(() {
+                                  _showSearchResultsList = false;
+                                  _searchResults = [];
+                                });
+                              },
+                              onPoiTap: (poi) {
+                                setState(() {
+                                  _showSearchResultsList = false;
+                                });
+                                _onIndividualPoiTap(poi);
+                              },
+                              onChatTap: (poi) {
+                                _openChat(poi.profile.userId, poi.profile.name);
+                              },
+                            ),
+                          ),
                       ]
                   );
                 },

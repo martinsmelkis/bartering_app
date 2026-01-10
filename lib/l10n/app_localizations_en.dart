@@ -196,6 +196,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Weight parameter for keyword search relevance (10-100)';
 
   @override
+  String get settingsShowResultsAsListTitle => 'Display Search Results As List';
+
+  @override
+  String get settingsShowResultsAsListDescription =>
+      'Show keyword and nearby search results in a list view instead of on the map';
+
+  @override
+  String get settingsShowResultsOnMapDescription =>
+      'Show search results on the map (default)';
+
+  @override
+  String get settingsShowResultsAsListViewDescription =>
+      'Show search results in a list view';
+
+  @override
   String get setPinTitle => 'Set Up PIN';
 
   @override

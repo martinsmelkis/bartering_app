@@ -20,6 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   double _nearbyUsersRadius = SettingsService.defaultNearbyUsersRadius;
   double _keywordSearchRadius = SettingsService.defaultKeywordSearchRadius;
   double _keywordSearchWeight = SettingsService.defaultKeywordSearchWeight.toDouble();
+  bool _showSearchResultsAsList = false;
   bool _pinEnabled = false;
   bool _hasSecurityQuestion = false;
   bool _isLoading = true;
@@ -35,6 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final nearbyRadius = await _settingsService.getNearbyUsersRadius();
     final keywordRadius = await _settingsService.getKeywordSearchRadius();
     final keywordWeight = await _settingsService.getKeywordSearchWeight();
+    final showResultsAsList = await _settingsService.getShowSearchResultsAsList();
     final pinEnabled = await _settingsService.isPinEnabled();
     final hasSecurityQuestion = await SecureStorageService().hasSecurityQuestion();
     
@@ -43,6 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _nearbyUsersRadius = nearbyRadius;
       _keywordSearchRadius = keywordRadius;
       _keywordSearchWeight = keywordWeight.toDouble();
+      _showSearchResultsAsList = showResultsAsList;
       _pinEnabled = pinEnabled;
       _hasSecurityQuestion = hasSecurityQuestion;
       _isLoading = false;
@@ -54,6 +57,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _useMapCenterForSearch = value;
     });
     await _settingsService.setUseMapCenterForSearch(value);
+    _showSettingsSaved();
+  }
+
+  Future<void> _saveShowSearchResultsAsList(bool value) async {
+    setState(() {
+      _showSearchResultsAsList = value;
+    });
+    await _settingsService.setShowSearchResultsAsList(value);
     _showSettingsSaved();
   }
 
@@ -317,6 +328,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                           ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Display Search Results As List
+                Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.settingsShowResultsAsListTitle,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _showSearchResultsAsList
+                                        ? l10n.settingsShowResultsAsListViewDescription
+                                        : l10n.settingsShowResultsOnMapDescription,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Switch(
+                              value: _showSearchResultsAsList,
+                              activeColor: AppColors.primary,
+                              onChanged: (value) {
+                                _saveShowSearchResultsAsList(value);
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          l10n.settingsShowResultsAsListDescription,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                            fontStyle: FontStyle.italic,
+                          ),
                         ),
                       ],
                     ),

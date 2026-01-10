@@ -12,6 +12,7 @@ class SettingsService {
   static const String _keywordSearchWeightKey = 'keyword_search_weight';
   static const String _pinEnabledKey = 'pin_enabled';
   static const String _pinSetupCompletedKey = 'pin_setup_completed';
+  static const String _showSearchResultsAsListKey = 'show_search_results_as_list';
 
   // Default values
   static const double defaultNearbyUsersRadius = 50.0; // km
@@ -141,5 +142,24 @@ class SettingsService {
   Future<bool> isPinSetupCompleted() async {
     final prefs = await _preferences;
     return prefs.getBool(_pinSetupCompletedKey) ?? false;
+  }
+
+  // --- Search Results Display Settings ---
+
+  /// Save whether to show search results as list instead of map
+  Future<bool> setShowSearchResultsAsList(bool value) async {
+    final prefs = await _preferences;
+    return await prefs.setBool(_showSearchResultsAsListKey, value);
+  }
+
+  /// Get whether to show search results as list
+  Future<bool> getShowSearchResultsAsList() async {
+    final prefs = await _preferences;
+    return prefs.getBool(_showSearchResultsAsListKey) ?? false;
+  }
+
+  /// Get synchronously if already initialized
+  bool getShowSearchResultsAsListSync() {
+    return _prefs?.getBool(_showSearchResultsAsListKey) ?? false;
   }
 }

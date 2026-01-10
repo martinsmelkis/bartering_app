@@ -436,6 +436,30 @@ abstract class AppLocalizations {
   /// **'Weight parameter for keyword search relevance (10-100)'**
   String get settingsKeywordSearchWeightDescription;
 
+  /// No description provided for @settingsShowResultsAsListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Search Results As List'**
+  String get settingsShowResultsAsListTitle;
+
+  /// No description provided for @settingsShowResultsAsListDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show keyword and nearby search results in a list view instead of on the map'**
+  String get settingsShowResultsAsListDescription;
+
+  /// No description provided for @settingsShowResultsOnMapDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show search results on the map (default)'**
+  String get settingsShowResultsOnMapDescription;
+
+  /// No description provided for @settingsShowResultsAsListViewDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show search results in a list view'**
+  String get settingsShowResultsAsListViewDescription;
+
   /// No description provided for @setPinTitle.
   ///
   /// In en, this message translates to:

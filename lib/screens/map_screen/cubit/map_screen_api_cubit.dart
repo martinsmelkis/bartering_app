@@ -16,6 +16,27 @@ class PoiCubit extends Cubit<PoiState> {
 
   PoiCubit(this._apiClient) : super(PoiInitial());
 
+  /// Sorts POIs by distance (ascending) and then by relevancy score (descending)
+  List<PointOfInterest> _sortPois(List<PointOfInterest> pois) {
+    final sorted = List<PointOfInterest>.from(pois);
+    sorted.sort((a, b) {
+      // First, sort by distance (ascending - closest first)
+      final distanceA = a.distanceKm ?? double.maxFinite;
+      final distanceB = b.distanceKm ?? double.maxFinite;
+      final distanceComparison = distanceA.compareTo(distanceB);
+      
+      if (distanceComparison != 0) {
+        return distanceComparison;
+      }
+      
+      // If distances are equal, sort by relevancy score (descending - highest first)
+      final relevancyA = a.matchRelevancyScore ?? 0.0;
+      final relevancyB = b.matchRelevancyScore ?? 0.0;
+      return relevancyB.compareTo(relevancyA);
+    });
+    return sorted;
+  }
+
   /// Fetches all points of interest.
   /// If lat/lon are provided, uses those coordinates (typically from map center when setting is enabled).
   /// Otherwise, uses user's saved location.
@@ -45,7 +66,8 @@ class PoiCubit extends Cubit<PoiState> {
       final pois = await _apiClient.getPointsOfInterest(
           latitude, longitude, radius ?? 5000.0, userId);
       print('@@@@@@@@@@@ POIs loaded: $pois');
-      emit(PoiLoaded(pois));
+      final sortedPois = _sortPois(pois);
+      emit(PoiLoaded(sortedPois));
     } catch (e) {
       log("Failed to fetch POIs: ${e.toString()}");
       emit(PoiError("Failed to fetch POIs: ${e.toString()}"));
@@ -72,7 +94,8 @@ class PoiCubit extends Cubit<PoiState> {
       poi.forEach((poi) {
         print('@@@@@@@@@@@ POI loaded: ${poi.profile.userId} ${poi.matchRelevancyScore}');
       });
-      emit(PoiLoaded(poi));
+      final sortedPois = _sortPois(poi);
+      emit(PoiLoaded(sortedPois));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
     }
@@ -82,7 +105,8 @@ class PoiCubit extends Cubit<PoiState> {
     try {
       emit(PoiLoading());
       final poi = await _apiClient.findSimilarProfiles(userId ?? "");
-      emit(PoiLoaded(poi));
+      final sortedPois = _sortPois(poi);
+      emit(PoiLoaded(sortedPois));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
     }
@@ -92,7 +116,8 @@ class PoiCubit extends Cubit<PoiState> {
     try {
       emit(PoiLoading());
       final poi = await _apiClient.findComplementaryProfiles(userId ?? "");
-      emit(PoiLoaded(poi));
+      final sortedPois = _sortPois(poi);
+      emit(PoiLoaded(sortedPois));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
     }
@@ -103,7 +128,8 @@ class PoiCubit extends Cubit<PoiState> {
       emit(PoiLoading());
       final poi = await _apiClient.findFavoriteProfiles(userId ?? "");
       final mappedToPOI = poi.map((profile) => PointOfInterest(profile: profile, distanceKm: 0.0)).toList();
-      emit(PoiLoaded(mappedToPOI));
+      final sortedPois = _sortPois(mappedToPOI);
+      emit(PoiLoaded(sortedPois));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
     }
