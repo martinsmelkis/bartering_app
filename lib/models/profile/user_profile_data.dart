@@ -13,6 +13,12 @@ class UserProfileData {
   final List<UserAttributeEntryData>? attributes;
   final Map<String, double>? profileKeywordDataMap;
   final List<String>? activePostingIds;
+  
+  @JsonKey(includeIfNull: false)
+  final String? preferredLanguage;
+  
+  @JsonKey(includeIfNull: false)
+  final bool? isOnline;
 
   const UserProfileData({
     required this.userId,
@@ -22,6 +28,8 @@ class UserProfileData {
     required this.attributes,
     required this.profileKeywordDataMap,
     required this.activePostingIds,
+    this.preferredLanguage,
+    this.isOnline,
   });
 
   // Factory constructor for creating a new UserProfileData instance from a map.
@@ -41,6 +49,8 @@ class UserProfileData {
     List<UserAttributeEntryData>? attributes,
     Map<String, double>? profileKeywordDataMap,
     List<String>? activePostingIds,
+    String? preferredLanguage,
+    bool? isOnline,
   }) {
     return UserProfileData(
       userId: userId ?? this.userId,
@@ -50,6 +60,8 @@ class UserProfileData {
       attributes: attributes ?? this.attributes,
       profileKeywordDataMap: profileKeywordDataMap ?? this.profileKeywordDataMap,
       activePostingIds: activePostingIds ?? this.activePostingIds,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
+      isOnline: isOnline ?? this.isOnline,
     );
   }
 }

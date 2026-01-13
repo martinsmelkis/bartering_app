@@ -24,6 +24,8 @@ UserProfileData _$UserProfileDataFromJson(Map<String, dynamic> json) =>
       activePostingIds: (json['activePostingIds'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      preferredLanguage: json['preferredLanguage'] as String?,
+      isOnline: json['isOnline'] as bool?,
     );
 
 Map<String, dynamic> _$UserProfileDataToJson(UserProfileData instance) =>
@@ -35,4 +37,6 @@ Map<String, dynamic> _$UserProfileDataToJson(UserProfileData instance) =>
       'attributes': instance.attributes,
       'profileKeywordDataMap': instance.profileKeywordDataMap,
       'activePostingIds': instance.activePostingIds,
+      'preferredLanguage': ?instance.preferredLanguage,
+      'isOnline': ?instance.isOnline,
     };

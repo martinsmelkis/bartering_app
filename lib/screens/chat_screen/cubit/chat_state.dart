@@ -68,3 +68,56 @@ class ChatTransactionError extends ChatState {
   @override
   List<Object> get props => [error];
 }
+
+// User moderation states
+class ChatUserBlockInProgress extends ChatState {
+  ChatUserBlockInProgress() : super([]);
+}
+
+class ChatUserBlockSuccess extends ChatState {
+  ChatUserBlockSuccess() : super([]);
+}
+
+class ChatUserBlockError extends ChatState {
+  final String error;
+  ChatUserBlockError(this.error) : super([]);
+  
+  @override
+  List<Object> get props => [error];
+}
+
+class ChatUserUnblockInProgress extends ChatState {
+  ChatUserUnblockInProgress() : super([]);
+}
+
+class ChatUserUnblockSuccess extends ChatState {
+  ChatUserUnblockSuccess() : super([]);
+}
+
+class ChatUserUnblockError extends ChatState {
+  final String error;
+  ChatUserUnblockError(this.error) : super([]);
+  
+  @override
+  List<Object> get props => [error];
+}
+
+class ChatUserReportInProgress extends ChatState {
+  ChatUserReportInProgress() : super([]);
+}
+
+class ChatUserReportSuccess extends ChatState {
+  final String reportId;
+  ChatUserReportSuccess(this.reportId) : super([]);
+  
+  @override
+  List<Object> get props => [reportId];
+}
+
+class ChatUserReportError extends ChatState {
+  final String error;
+  ChatUserReportError(this.error) : super([]);
+  
+  @override
+  List<Object> get props => [error];
+}

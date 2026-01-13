@@ -6,6 +6,7 @@ import '../../../models/map/point_of_interest.dart';
 import '../../../theme/app_colors.dart';
 import '../../../utils/avatar_color_utils.dart';
 import '../../../utils/text_utils.dart';
+import '../../../widgets/online_status_badge.dart';
 
 class SearchResultsListView extends StatelessWidget {
   final List<PointOfInterest> pois;
@@ -24,6 +25,17 @@ class SearchResultsListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    
+    // Sort POIs with online users getting a 10% boost to their relevancy score
+    final sortedPois = List<PointOfInterest>.from(pois);
+    sortedPois.sort((a, b) {
+      // Calculate effective scores with online boost
+      final aScore = (a.matchRelevancyScore ?? 0.0) * (a.isOnline ? 1.1 : 1.0);
+      final bScore = (b.matchRelevancyScore ?? 0.0) * (b.isOnline ? 1.1 : 1.0);
+      
+      // Sort in descending order (highest score first)
+      return bScore.compareTo(aScore);
+    });
     
     return Container(
       decoration: BoxDecoration(
@@ -54,7 +66,7 @@ class SearchResultsListView extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    '${pois.length} ${pois.length == 1 ? 'result' : 'results'} found',
+                    '${sortedPois.length} ${sortedPois.length == 1 ? 'result' : 'results'} found',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -71,7 +83,7 @@ class SearchResultsListView extends StatelessWidget {
           ),
           // List of results
           Expanded(
-            child: pois.isEmpty
+            child: sortedPois.isEmpty
                 ? Center(
                     child: Text(
                       'No results found',
@@ -83,10 +95,10 @@ class SearchResultsListView extends StatelessWidget {
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
-                    itemCount: pois.length,
+                    itemCount: sortedPois.length,
                     separatorBuilder: (context, index) => const Divider(height: 24),
                     itemBuilder: (context, index) {
-                      final poi = pois[index];
+                      final poi = sortedPois[index];
                       return _buildPoiListItem(context, poi);
                     },
                   ),
@@ -122,26 +134,39 @@ class SearchResultsListView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                // Smaller Avatar
-                FutureBuilder<String>(
-                  future: _loadAndModifySvg(poi),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return SvgPicture.string(
-                        snapshot.data!,
-                        width: 32,
-                        height: 32,
-                      );
-                    }
-                    return Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        shape: BoxShape.circle,
-                      ),
-                    );
-                  },
+                // Smaller Avatar with online badge
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    FutureBuilder<String>(
+                      future: _loadAndModifySvg(poi),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return SvgPicture.string(
+                            snapshot.data!,
+                            width: 32,
+                            height: 32,
+                          );
+                        }
+                        return Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            shape: BoxShape.circle,
+                          ),
+                        );
+                      },
+                    ),
+                    // Online status badge - positioned closer to the edge
+                    PositionedOnlineStatusBadge(
+                      isOnline: poi.isOnline,
+                      size: 10.0,
+                      right: -5,
+                      top: -5,
+                      borderWidth: 2.0,
+                    ),
+                  ],
                 ),
                 const SizedBox(width: 4),
                 const Icon(

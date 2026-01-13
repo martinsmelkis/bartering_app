@@ -231,6 +231,30 @@ abstract class ApiClient {
   @GET('/api/v1/relationships/favorites/profiles/{userId}')
   Future<List<UserProfileData>> findFavoriteProfiles(@Path('userId') String userId);
 
+  ///////////// BLOCKING & REPORTING ////////////
+
+  @POST('/api/v1/users/block')
+  Future<String> blockUser(@Body() Map<String, dynamic> request);
+
+  @POST('/api/v1/users/unblock')
+  Future<String> unblockUser(@Body() Map<String, dynamic> request);
+
+  @GET('/api/v1/users/isBlocked')
+  Future<bool> isUserBlocked(
+      @Query('fromUserId') String fromUserId,
+      @Query('toUserId') String toUserId);
+
+  @GET('/api/v1/users/blocked/{userId}')
+  Future<List<UserProfileData>> getBlockedUsers(@Path('userId') String userId);
+
+  @POST('/api/v1/reports/create')
+  Future<String> createReport(@Body() Map<String, dynamic> request);
+
+  @GET('/api/v1/reports/check')
+  Future<bool> checkReport(
+      @Query('reporterUserId') String reporterUserId,
+      @Query('reportedUserId') String reportedUserId);
+
   ///////////// FILE TRANSFERS ////////////
 
   /// Upload an encrypted file

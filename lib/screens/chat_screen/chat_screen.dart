@@ -6,6 +6,8 @@ import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:barter_app/services/file_transfer_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:barter_app/models/relationships/report_models.dart';
+import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -274,6 +276,10 @@ class _ChatScreenState extends State<ChatScreen> {
             onSelected: (value) {
               if (value == 'finish_transaction') {
                 _handleFinishTransaction(context);
+              } else if (value == 'report_user') {
+                _handleReportUser(context);
+              } else if (value == 'block_user') {
+                _handleBlockUser(context);
               }
             },
             itemBuilder: (BuildContext context) => [
@@ -284,6 +290,26 @@ class _ChatScreenState extends State<ChatScreen> {
                     const Icon(Icons.check_circle_outline),
                     SizedBox(width: 8.w),
                     Text(l10n.finishTransaction),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'report_user',
+                child: Row(
+                  children: [
+                    const Icon(Icons.report_outlined),
+                    SizedBox(width: 8.w),
+                    Text(l10n.reportUser),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'block_user',
+                child: Row(
+                  children: [
+                    const Icon(Icons.block),
+                    SizedBox(width: 8.w),
+                    Text(l10n.blockUser),
                   ],
                 ),
               ),
@@ -350,6 +376,56 @@ class _ChatScreenState extends State<ChatScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: errorText,
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          // Block user states
+          if (state is ChatUserBlockInProgress) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          if (state is ChatUserBlockSuccess) {
+            Navigator.of(context).pop(); // Close loading dialog
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.userBlocked),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+          if (state is ChatUserBlockError) {
+            Navigator.of(context).pop(); // Close loading dialog
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.failedToBlockUser),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          // Report user states
+          if (state is ChatUserReportInProgress) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          if (state is ChatUserReportSuccess) {
+            Navigator.of(context).pop(); // Close loading dialog
+          }
+          if (state is ChatUserReportError) {
+            Navigator.of(context).pop(); // Close loading dialog
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.failedToSubmitReport),
                 backgroundColor: Colors.red,
               ),
             );
@@ -844,6 +920,106 @@ class _ChatScreenState extends State<ChatScreen> {
 
     // Call cubit to handle transaction
     context.read<ChatCubit>().finishTransaction();
+  }
+
+  Future<void> _handleReportUser(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (widget.poiId == null) return;
+
+    // Show report dialog with reason selection
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (dialogContext) => ReportUserDialog(
+        targetUserName: widget.poiName ?? l10n.unknownUser,
+      ),
+    );
+
+    if (result == null || !mounted) return;
+
+    final ReportReason reason = result['reason'];
+    final String? description = result['description'];
+
+    // Report the user via cubit
+    final reportId = await context.read<ChatCubit>().reportUser(
+      reportedUserId: widget.poiId!,
+      reason: reason,
+      description: description,
+      contextType: ReportContextType.chat,
+      contextId: widget.poiId,
+    );
+
+    if (!mounted) return;
+
+    if (reportId != null) {
+      // Show success and offer to block
+      final shouldBlock = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.userReported),
+          content: Text(l10n.reportSubmittedOfferBlock),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(l10n.blockUser),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldBlock == true && mounted) {
+        await _handleBlockUser(context);
+      }
+    }
+  }
+
+  Future<void> _handleBlockUser(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (widget.poiId == null) return;
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.blockUser),
+        content: Text(l10n.blockUserConfirmationDetailed(widget.poiName ?? l10n.unknownUser)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.block),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    // Block the user via cubit
+    final success = await context.read<ChatCubit>().blockUser(widget.poiId!);
+
+    if (!mounted) return;
+
+    if (success) {
+      // Close chat screen after blocking
+      Navigator.of(context).pop();
+    }
   }
 
   Widget _buildMessageInputField() {

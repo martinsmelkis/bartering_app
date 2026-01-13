@@ -586,6 +586,30 @@ abstract class AppLocalizations {
   /// **'Update your security PIN'**
   String get settingsChangePinDescription;
 
+  /// No description provided for @settingsLanguageSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguageSection;
+
+  /// No description provided for @settingsLanguageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App Language'**
+  String get settingsLanguageTitle;
+
+  /// No description provided for @settingsLanguageDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your preferred language for the app'**
+  String get settingsLanguageDescription;
+
+  /// No description provided for @settingsLanguageRestartMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please restart the app to apply language changes'**
+  String get settingsLanguageRestartMessage;
+
   /// No description provided for @setupSecurityQuestion.
   ///
   /// In en, this message translates to:
@@ -4383,6 +4407,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Join me on BarterApp!'**
   String get inviteMessageSubject;
+
+  /// No description provided for @reportUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Report User'**
+  String get reportUser;
+
+  /// No description provided for @blockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Block User'**
+  String get blockUser;
+
+  /// No description provided for @reportUserConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a reason for reporting this user.'**
+  String get reportUserConfirmation;
+
+  /// No description provided for @reportReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason for report (optional)'**
+  String get reportReason;
+
+  /// No description provided for @userReported.
+  ///
+  /// In en, this message translates to:
+  /// **'User reported successfully'**
+  String get userReported;
+
+  /// No description provided for @blockUserConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to block this user? You will no longer be able to communicate with them.'**
+  String get blockUserConfirmation;
+
+  /// No description provided for @block.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get block;
+
+  /// No description provided for @userBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'User blocked successfully'**
+  String get userBlocked;
+
+  /// No description provided for @failedToBlockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to block user'**
+  String get failedToBlockUser;
+
+  /// No description provided for @failedToSubmitReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit report. Please try again.'**
+  String get failedToSubmitReport;
+
+  /// No description provided for @reportSubmittedOfferBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for helping keep the community safe. Would you also like to block this user?'**
+  String get reportSubmittedOfferBlock;
+
+  /// No description provided for @reportUserTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report {userName}'**
+  String reportUserTitle(String userName);
+
+  /// No description provided for @blockUserConfirmationDetailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocking {userName} will prevent them from:\n• Sending you messages\n• Seeing your profile\n• Commenting on your postings'**
+  String blockUserConfirmationDetailed(String userName);
+
+  /// No description provided for @whyReportingUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Why are you reporting this user?'**
+  String get whyReportingUser;
+
+  /// No description provided for @reportReasonSpam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam'**
+  String get reportReasonSpam;
+
+  /// No description provided for @reportReasonHarassment.
+  ///
+  /// In en, this message translates to:
+  /// **'Harassment'**
+  String get reportReasonHarassment;
+
+  /// No description provided for @reportReasonInappropriateContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Inappropriate Content'**
+  String get reportReasonInappropriateContent;
+
+  /// No description provided for @reportReasonScam.
+  ///
+  /// In en, this message translates to:
+  /// **'Scam'**
+  String get reportReasonScam;
+
+  /// No description provided for @reportReasonFakeProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Fake Profile'**
+  String get reportReasonFakeProfile;
+
+  /// No description provided for @reportReasonImpersonation.
+  ///
+  /// In en, this message translates to:
+  /// **'Impersonation'**
+  String get reportReasonImpersonation;
+
+  /// No description provided for @reportReasonThreateningBehavior.
+  ///
+  /// In en, this message translates to:
+  /// **'Threatening Behavior'**
+  String get reportReasonThreateningBehavior;
+
+  /// No description provided for @reportReasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get reportReasonOther;
+
+  /// No description provided for @additionalDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional details (optional)'**
+  String get additionalDetails;
+
+  /// No description provided for @provideMoreContext.
+  ///
+  /// In en, this message translates to:
+  /// **'Provide more context...'**
+  String get provideMoreContext;
+
+  /// No description provided for @submitReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Report'**
+  String get submitReport;
 }
 
 class _AppLocalizationsDelegate

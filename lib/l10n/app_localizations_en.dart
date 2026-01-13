@@ -276,6 +276,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsChangePinDescription => 'Update your security PIN';
 
   @override
+  String get settingsLanguageSection => 'Language';
+
+  @override
+  String get settingsLanguageTitle => 'App Language';
+
+  @override
+  String get settingsLanguageDescription =>
+      'Choose your preferred language for the app';
+
+  @override
+  String get settingsLanguageRestartMessage =>
+      'Please restart the app to apply language changes';
+
+  @override
   String get setupSecurityQuestion => 'Setup Security Question';
 
   @override
@@ -2247,4 +2261,87 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get inviteMessageSubject => 'Join me on BarterApp!';
+
+  @override
+  String get reportUser => 'Report User';
+
+  @override
+  String get blockUser => 'Block User';
+
+  @override
+  String get reportUserConfirmation =>
+      'Please provide a reason for reporting this user.';
+
+  @override
+  String get reportReason => 'Reason for report (optional)';
+
+  @override
+  String get userReported => 'User reported successfully';
+
+  @override
+  String get blockUserConfirmation =>
+      'Are you sure you want to block this user? You will no longer be able to communicate with them.';
+
+  @override
+  String get block => 'Block';
+
+  @override
+  String get userBlocked => 'User blocked successfully';
+
+  @override
+  String get failedToBlockUser => 'Failed to block user';
+
+  @override
+  String get failedToSubmitReport =>
+      'Failed to submit report. Please try again.';
+
+  @override
+  String get reportSubmittedOfferBlock =>
+      'Thank you for helping keep the community safe. Would you also like to block this user?';
+
+  @override
+  String reportUserTitle(String userName) {
+    return 'Report $userName';
+  }
+
+  @override
+  String blockUserConfirmationDetailed(String userName) {
+    return 'Blocking $userName will prevent them from:\n• Sending you messages\n• Seeing your profile\n• Commenting on your postings';
+  }
+
+  @override
+  String get whyReportingUser => 'Why are you reporting this user?';
+
+  @override
+  String get reportReasonSpam => 'Spam';
+
+  @override
+  String get reportReasonHarassment => 'Harassment';
+
+  @override
+  String get reportReasonInappropriateContent => 'Inappropriate Content';
+
+  @override
+  String get reportReasonScam => 'Scam';
+
+  @override
+  String get reportReasonFakeProfile => 'Fake Profile';
+
+  @override
+  String get reportReasonImpersonation => 'Impersonation';
+
+  @override
+  String get reportReasonThreateningBehavior => 'Threatening Behavior';
+
+  @override
+  String get reportReasonOther => 'Other';
+
+  @override
+  String get additionalDetails => 'Additional details (optional)';
+
+  @override
+  String get provideMoreContext => 'Provide more context...';
+
+  @override
+  String get submitReport => 'Submit Report';
 }

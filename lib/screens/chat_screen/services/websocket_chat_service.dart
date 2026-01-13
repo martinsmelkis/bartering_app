@@ -73,9 +73,6 @@ class WebSocketChatService {
           print("WebSocket: Received raw: $rawMessage");
           if (rawMessage?.toString().contains(" is offline") == true &&
               rawMessage?.toString().contains("ErrorMessage") == true) {
-            _messageController.add(ChatMessage(id: "chatError_Offline",
-                senderId: "", recipientId: "",
-                encryptedTextPayload: "", timestamp: DateTime.now()));
             return;
           }
           try {

@@ -16,6 +16,7 @@ import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
+import 'package:barter_app/widgets/online_status_badge.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -471,11 +472,24 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     final localSvgCopy = String.fromCharCodes(svgString.runes);
 
     return MarkerIcon(
-      iconWidget: SvgPicture.string(
-        localSvgCopy,
-        width: AppDimensions.poiMarkerSize,
-        height: AppDimensions.poiMarkerSize,
-        key: ValueKey('poi_marker_${poi.profile.userId}'),
+      iconWidget: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          SvgPicture.string(
+            localSvgCopy,
+            width: AppDimensions.poiMarkerSize,
+            height: AppDimensions.poiMarkerSize,
+            key: ValueKey('poi_marker_${poi.profile.userId}'),
+          ),
+          // Online status badge - positioned closer to the edge
+          PositionedOnlineStatusBadge(
+            isOnline: poi.isOnline,
+            size: 25.0,
+            right: 33,
+            top: 33,
+            borderWidth: 2.5,
+          ),
+        ],
       ),
     );
   }

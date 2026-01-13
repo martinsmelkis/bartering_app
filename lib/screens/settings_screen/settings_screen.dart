@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/profile/user_profile_data.dart';
+import '../../models/user/user_attribute_entry_data.dart';
+import '../../repositories/user_repository.dart';
+import '../../services/api_client.dart';
 import '../../services/settings_service.dart';
 import '../../services/secure_storage_service.dart';
 import '../../theme/app_colors.dart';
@@ -16,6 +20,8 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsService _settingsService = getIt<SettingsService>();
+  final UserRepository _userRepository = getIt<UserRepository>();
+  final ApiClient _apiClient = getIt<ApiClient>();
   bool _useMapCenterForSearch = false;
   double _nearbyUsersRadius = SettingsService.defaultNearbyUsersRadius;
   double _keywordSearchRadius = SettingsService.defaultKeywordSearchRadius;
@@ -24,6 +30,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _pinEnabled = false;
   bool _hasSecurityQuestion = false;
   bool _isLoading = true;
+  String _selectedLanguage = 'en';
 
   @override
   void initState() {
@@ -39,6 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final showResultsAsList = await _settingsService.getShowSearchResultsAsList();
     final pinEnabled = await _settingsService.isPinEnabled();
     final hasSecurityQuestion = await SecureStorageService().hasSecurityQuestion();
+    final language = await _settingsService.getPreferredLanguage();
     
     setState(() {
       _useMapCenterForSearch = useMapCenter;
@@ -48,6 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _showSearchResultsAsList = showResultsAsList;
       _pinEnabled = pinEnabled;
       _hasSecurityQuestion = hasSecurityQuestion;
+      _selectedLanguage = language ?? 'en';
       _isLoading = false;
     });
   }
@@ -493,9 +502,134 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                
+                // Language Settings Section
+                _buildSectionHeader('Language'),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'App Language',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Choose your preferred language for the app',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          value: _selectedLanguage,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'en',
+                              child: Text('English'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'lv',
+                              child: Text('Latviešu'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'fr',
+                              child: Text('Français'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'de',
+                              child: Text('Deutsch'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'es',
+                              child: Text('Español'),
+                            ),
+                          ],
+                          onChanged: (value) async {
+                            if (value != null) {
+                              // Save to local settings
+                              await _settingsService.setPreferredLanguage(value);
+                              
+                              // Update user profile via API
+                              await _updateUserProfileLanguage(value);
+                              
+                              _showSettingsSaved();
+                              
+                              // Show restart message
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Please restart the app to apply language changes',
+                                    ),
+                                    backgroundColor: AppColors.primary,
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                              }
+                              setState(() {
+                                _selectedLanguage = value;
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
               ],
             ),
     );
+  }
+
+  Future<void> _updateUserProfileLanguage(String languageCode) async {
+    try {
+      // Get current user data
+      final userId = await _userRepository.getUserId();
+      final userName = await _userRepository.getUserName();
+
+      if (userId == null || userName == null) {
+        print('Cannot update profile: userId or userName is null');
+        return;
+      }
+      
+      // Create updated profile with new language
+      final updatedProfile = UserProfileData(
+        userId: userId,
+        name: userName,
+        latitude: _userRepository.latitude,
+        longitude: _userRepository.longitude,
+        attributes: List.empty(growable: false),
+        profileKeywordDataMap: _userRepository.getProfileKeywordData,
+        activePostingIds: [],
+        preferredLanguage: languageCode,
+      );
+      
+      // Send to API
+      await _apiClient.updateProfileInfo(updatedProfile);
+      print('Profile language updated successfully to: $languageCode');
+    } catch (e) {
+      print('Error updating profile language: $e');
+      // Don't show error to user since local setting is still saved
+    }
   }
 
   void _showSettingsSaved() {

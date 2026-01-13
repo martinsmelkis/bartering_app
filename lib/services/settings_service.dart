@@ -13,6 +13,7 @@ class SettingsService {
   static const String _pinEnabledKey = 'pin_enabled';
   static const String _pinSetupCompletedKey = 'pin_setup_completed';
   static const String _showSearchResultsAsListKey = 'show_search_results_as_list';
+  static const String _preferredLanguageKey = 'preferred_language';
 
   // Default values
   static const double defaultNearbyUsersRadius = 50.0; // km
@@ -161,5 +162,25 @@ class SettingsService {
   /// Get synchronously if already initialized
   bool getShowSearchResultsAsListSync() {
     return _prefs?.getBool(_showSearchResultsAsListKey) ?? false;
+  }
+
+  // --- Language Settings ---
+
+  /// Save the preferred language code
+  Future<bool> setPreferredLanguage(String languageCode) async {
+    final prefs = await _preferences;
+    return await prefs.setString(_preferredLanguageKey, languageCode);
+  }
+
+  /// Get the preferred language code
+  /// Returns null if not set (will use system default)
+  Future<String?> getPreferredLanguage() async {
+    final prefs = await _preferences;
+    return prefs.getString(_preferredLanguageKey);
+  }
+
+  /// Get preferred language synchronously
+  String? getPreferredLanguageSync() {
+    return _prefs?.getString(_preferredLanguageKey);
   }
 }

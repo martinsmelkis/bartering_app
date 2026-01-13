@@ -114,6 +114,14 @@ class AppLocalizationsMapper {
           localizations.settingsKeywordSearchWeightTitle,
       'settingsKeywordSearchWeightDescription':
           localizations.settingsKeywordSearchWeightDescription,
+      'settingsShowResultsAsListTitle':
+          localizations.settingsShowResultsAsListTitle,
+      'settingsShowResultsAsListDescription':
+          localizations.settingsShowResultsAsListDescription,
+      'settingsShowResultsOnMapDescription':
+          localizations.settingsShowResultsOnMapDescription,
+      'settingsShowResultsAsListViewDescription':
+          localizations.settingsShowResultsAsListViewDescription,
       'setPinTitle': localizations.setPinTitle,
       'setPinDescription': localizations.setPinDescription,
       'setPinButton': localizations.setPinButton,
@@ -137,6 +145,11 @@ class AppLocalizationsMapper {
       'settingsChangePinButton': localizations.settingsChangePinButton,
       'settingsChangePinDescription':
           localizations.settingsChangePinDescription,
+      'settingsLanguageSection': localizations.settingsLanguageSection,
+      'settingsLanguageTitle': localizations.settingsLanguageTitle,
+      'settingsLanguageDescription': localizations.settingsLanguageDescription,
+      'settingsLanguageRestartMessage':
+          localizations.settingsLanguageRestartMessage,
       'setupSecurityQuestion': localizations.setupSecurityQuestion,
       'securityQuestionDescription': localizations.securityQuestionDescription,
       'selectSecurityQuestion': localizations.selectSecurityQuestion,
@@ -768,6 +781,31 @@ class AppLocalizationsMapper {
       'linkCopiedToClipboard': localizations.linkCopiedToClipboard,
       'unableToShareAtThisTime': localizations.unableToShareAtThisTime,
       'inviteMessageSubject': localizations.inviteMessageSubject,
+      'reportUser': localizations.reportUser,
+      'blockUser': localizations.blockUser,
+      'reportUserConfirmation': localizations.reportUserConfirmation,
+      'reportReason': localizations.reportReason,
+      'userReported': localizations.userReported,
+      'blockUserConfirmation': localizations.blockUserConfirmation,
+      'block': localizations.block,
+      'userBlocked': localizations.userBlocked,
+      'failedToBlockUser': localizations.failedToBlockUser,
+      'failedToSubmitReport': localizations.failedToSubmitReport,
+      'reportSubmittedOfferBlock': localizations.reportSubmittedOfferBlock,
+      'whyReportingUser': localizations.whyReportingUser,
+      'reportReasonSpam': localizations.reportReasonSpam,
+      'reportReasonHarassment': localizations.reportReasonHarassment,
+      'reportReasonInappropriateContent':
+          localizations.reportReasonInappropriateContent,
+      'reportReasonScam': localizations.reportReasonScam,
+      'reportReasonFakeProfile': localizations.reportReasonFakeProfile,
+      'reportReasonImpersonation': localizations.reportReasonImpersonation,
+      'reportReasonThreateningBehavior':
+          localizations.reportReasonThreateningBehavior,
+      'reportReasonOther': localizations.reportReasonOther,
+      'additionalDetails': localizations.additionalDetails,
+      'provideMoreContext': localizations.provideMoreContext,
+      'submitReport': localizations.submitReport,
       'errorWithMessage': (errorMessage) =>
           localizations.errorWithMessage(errorMessage),
       'questionsAnswered': (count) => localizations.questionsAnswered(count),
@@ -796,6 +834,9 @@ class AppLocalizationsMapper {
           localizations.errorUpdatingTransaction(error),
       'inviteMessageShare': (appLink) =>
           localizations.inviteMessageShare(appLink),
+      'reportUserTitle': (userName) => localizations.reportUserTitle(userName),
+      'blockUserConfirmationDetailed': (userName) =>
+          localizations.blockUserConfirmationDetailed(userName),
     };
   }
 }

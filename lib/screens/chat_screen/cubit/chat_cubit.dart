@@ -14,6 +14,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../models/chat/auth_request.dart';
 import '../../../models/chat/chat_message.dart';
 import '../../../models/chat/e_chat_message_status.dart';
+import '../../../models/profile/user_profile_data.dart';
+import '../../../models/relationships/report_models.dart';
 import '../../../models/reviews/transaction_response.dart';
 import '../../../services/crypto/crypto_service.dart';
 import '../../../services/secure_storage_service.dart';
@@ -443,6 +445,141 @@ class ChatCubit extends Cubit<ChatState> {
       emit(ChatTransactionError(e.toString()));
     }
 
+  }
+
+  // ============ USER MODERATION METHODS ============
+
+  /// Block a user
+  Future<bool> blockUser(String userIdToBlock) async {
+    emit(ChatUserBlockInProgress());
+    
+    try {
+      final apiClient = getIt<ApiClient>();
+      
+      final request = RelationshipRequest(
+        fromUserId: currentUserId,
+        toUserId: userIdToBlock,
+        relationshipType: 'blocked',
+      );
+
+      final response = await apiClient.blockUser(request.toJson());
+      final success = response == true;
+      
+      if (success) {
+        emit(ChatUserBlockSuccess());
+      } else {
+        emit(ChatUserBlockError('Failed to block user'));
+      }
+      
+      return success;
+    } catch (e) {
+      print('Error blocking user: $e');
+      emit(ChatUserBlockError(e.toString()));
+      return false;
+    }
+  }
+
+  /// Unblock a user
+  Future<bool> unblockUser(String userIdToUnblock) async {
+    emit(ChatUserUnblockInProgress());
+    
+    try {
+      final apiClient = getIt<ApiClient>();
+      
+      final request = RelationshipRequest(
+        fromUserId: currentUserId,
+        toUserId: userIdToUnblock,
+        relationshipType: 'blocked',
+      );
+
+      final response = await apiClient.unblockUser(request.toJson());
+      final success = response == true;
+      
+      if (success) {
+        emit(ChatUserUnblockSuccess());
+      } else {
+        emit(ChatUserUnblockError('Failed to unblock user'));
+      }
+      
+      return success;
+    } catch (e) {
+      print('Error unblocking user: $e');
+      emit(ChatUserUnblockError(e.toString()));
+      return false;
+    }
+  }
+
+  /// Check if a user is blocked
+  Future<bool> isUserBlocked(String otherUserId) async {
+    try {
+      final apiClient = getIt<ApiClient>();
+      final response = await apiClient.isUserBlocked(currentUserId, otherUserId);
+      return response == true;
+    } catch (e) {
+      print('Error checking block status: $e');
+      return false;
+    }
+  }
+
+  /// Get list of blocked users
+  Future<List<UserProfileData>> getBlockedUsers() async {
+    try {
+      final apiClient = getIt<ApiClient>();
+      return await apiClient.getBlockedUsers(currentUserId);
+    } catch (e) {
+      print('Error fetching blocked users: $e');
+      return [];
+    }
+  }
+
+  /// Report a user
+  Future<String?> reportUser({
+    required String reportedUserId,
+    required ReportReason reason,
+    String? description,
+    ReportContextType? contextType,
+    String? contextId,
+  }) async {
+    emit(ChatUserReportInProgress());
+    
+    try {
+      final apiClient = getIt<ApiClient>();
+      
+      final request = UserReportRequest(
+        reporterUserId: currentUserId,
+        reportedUserId: reportedUserId,
+        reportReason: reason.value,
+        description: description,
+        contextType: contextType?.value,
+        contextId: contextId,
+      );
+
+      final response = await apiClient.createReport(request.toJson());
+      
+      if (response != null && response.contains("error")) {
+        emit(ChatUserReportSuccess(response));
+      } else {
+        emit(ChatUserReportError('Failed to submit report'));
+      }
+      
+      return response;
+    } catch (e) {
+      print('Error reporting user: $e');
+      emit(ChatUserReportError(e.toString()));
+      return null;
+    }
+  }
+
+  /// Check if user has already reported another user
+  Future<bool> hasReportedUser(String reportedUserId) async {
+    try {
+      final apiClient = getIt<ApiClient>();
+      final response = await apiClient.checkReport(currentUserId, reportedUserId);
+      return response == true;
+    } catch (e) {
+      print('Error checking report status: $e');
+      return false;
+    }
   }
 
   @override

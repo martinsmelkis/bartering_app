@@ -13,6 +13,9 @@ class PointOfInterest {
     required this.profile,
     required this.distanceKm,
   });
+  
+  // Helper method to get online status from profile
+  bool get isOnline => profile.isOnline ?? false;
 
   // Factory constructor for creating a new PointOfInterest instance from a map.
   // Tell json_serializable to use this for deserialization.

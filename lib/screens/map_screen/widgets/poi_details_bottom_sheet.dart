@@ -7,6 +7,7 @@ import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
+import 'package:barter_app/widgets/online_status_badge.dart';
 import 'package:barter_app/widgets/rating_circle_avatar.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -704,22 +705,35 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Avatar/POI icon on the left with rating circle
-                      RatingCircleAvatar(
-                        size: 56,
-                        rating: _averageRating,
-                        isLoading: _isLoadingRating,
-                        child: _isLoadingAvatar
-                            ? const Center(
-                                child: SizedBox(
-                                  width: 26,
-                                  height: 26,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                              )
-                            : _avatarIcon ?? const Icon(Icons.person, size: 32),
+                      // Avatar/POI icon on the left with rating circle and online badge
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          RatingCircleAvatar(
+                            size: 56,
+                            rating: _averageRating,
+                            isLoading: _isLoadingRating,
+                            child: _isLoadingAvatar
+                                ? const Center(
+                                    child: SizedBox(
+                                      width: 26,
+                                      height: 26,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  )
+                                : _avatarIcon ?? const Icon(Icons.person, size: 32),
+                          ),
+                          // Online status badge - positioned closer to the edge
+                          PositionedOnlineStatusBadge(
+                            isOnline: widget.poi.isOnline,
+                            size: 16.0,
+                            right: -5,
+                            top: -5,
+                            borderWidth: 2.5,
+                          ),
+                        ],
                       ),
                       const SizedBox(width: 8),
                       // Name in the center
