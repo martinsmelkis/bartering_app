@@ -16,7 +16,7 @@ if (keyPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "org.barter.barterapp.barter_app"
+    namespace = "app.bartering.barter_app"
     compileSdk = 36
     ndkVersion = "27.0.12077973"
     compileOptions {
@@ -35,7 +35,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "org.barter.barterapp.barter_app"
+        applicationId = "app.bartering.barter_app"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

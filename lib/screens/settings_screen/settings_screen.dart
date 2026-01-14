@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/profile/user_profile_data.dart';
-import '../../models/user/user_attribute_entry_data.dart';
 import '../../repositories/user_repository.dart';
 import '../../services/api_client.dart';
 import '../../services/settings_service.dart';

@@ -1,11 +1,11 @@
-package org.barter.barterapp.barter_app
+package app.bartering.barter_app
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "org.barter.barterapp.barter_app/integrity"
+    private val CHANNEL = "app.bartering.barter_app/integrity"
     private lateinit var integrityHelper: IntegrityHelper
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {

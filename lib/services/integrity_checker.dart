@@ -15,7 +15,7 @@ class IntegrityChecker {
 
     try {
       // Use MethodChannel to get package signature from Android
-      const platform = MethodChannel('org.barter.barterapp.barter_app/integrity');
+      const platform = MethodChannel('app.bartering.barter_app/integrity');
       final String? signature = await platform.invokeMethod('getSignature');
 
       if (signature == null) {
@@ -51,7 +51,7 @@ class IntegrityChecker {
     if (!Platform.isAndroid) return true;
 
     try {
-      const platform = MethodChannel('org.barter.barterapp.barter_app/integrity');
+      const platform = MethodChannel('app.bartering.barter_app/integrity');
       final String? installer = await platform.invokeMethod('getInstallSource');
 
       // Allow installation from official sources
@@ -85,7 +85,7 @@ class IntegrityChecker {
     if (!Platform.isAndroid) return true; // Simplified for this example
 
     try {
-      const platform = MethodChannel('org.barter.barterapp.barter_app/integrity');
+      const platform = MethodChannel('app.bartering.barter_app/integrity');
       final bool? isRooted = await platform.invokeMethod('isDeviceRooted');
 
       if (isRooted == true) {
