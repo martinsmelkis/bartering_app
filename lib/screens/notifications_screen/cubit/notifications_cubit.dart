@@ -1,5 +1,7 @@
 import 'package:barter_app/models/notifications/notification_models.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/dio_error_handler.dart';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
@@ -21,6 +23,12 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       emit(state.copyWith(
         contacts: response.contacts,
         status: NotificationsStatus.success,
+      ));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to load contacts');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -52,6 +60,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       final response = await _apiClient.updateNotificationContacts(updateRequest);
       emit(state.copyWith(contacts: response.contacts));
       return 'Contacts updated successfully';
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to update contacts');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
+      rethrow;
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
@@ -68,6 +83,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       // Reload contacts to get updated push tokens list
       await loadContacts();
       return response.message;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to add push token');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
+      rethrow;
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
@@ -84,6 +106,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       // Reload contacts to get updated push tokens list
       await loadContacts();
       return response.message;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to remove push token');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
+      rethrow;
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
@@ -102,6 +131,12 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       emit(state.copyWith(
         attributePreferences: response.preferences,
         status: NotificationsStatus.success,
+      ));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to load attribute preferences');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -133,6 +168,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
       emit(state.copyWith(attributePreferences: updatedList));
       return 'Preference updated';
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to update preference');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
+      rethrow;
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
@@ -154,6 +196,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
       emit(state.copyWith(attributePreferences: updatedList));
       return response.message;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to delete preference');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
+      rethrow;
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
@@ -172,6 +221,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       // Reload to get all preferences
       await loadAttributePreferences();
       return 'Created ${response.created} preferences (${response.skipped} skipped)';
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to create preferences');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
+      rethrow;
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
@@ -186,6 +242,12 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     try {
       final history = await _apiClient.getMatchHistory(unviewedOnly, limit);
       emit(state.copyWith(matchHistory: history));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to load match history');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
@@ -201,6 +263,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       // Reload match history
       await loadMatchHistory();
       return response.message;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to mark match as viewed');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
+      rethrow;
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
@@ -217,6 +286,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       // Reload match history
       await loadMatchHistory();
       return response.message;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to dismiss match');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
+      rethrow;
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,

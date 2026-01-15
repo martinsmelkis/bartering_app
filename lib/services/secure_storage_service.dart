@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
@@ -23,8 +24,7 @@ class SecureStorageService {
   static const _interestsKey = '1243344gfyfdrjH';
   static const _offeringsKey = '124667gfyfdrjH';
   static const _profileKeywordDataMapKey = '124668gfyfdrjH';
-  static const _contactPublicKeyPrefix =
-      'contact_pubkey_'; // Prefix for contact public keys
+  static const _contactPublicKeyPrefix = 'contact_pubkey_';
   static const _securityQuestionKey = 'security_question';
   static const _securityAnswerKey = 'security_answer_hash';
 
@@ -39,8 +39,6 @@ class SecureStorageService {
     return password;
   }
 
-  // TODO save string, use pkcs12?
-  // https://dev-crypto.bouncycastle.narkive.com/mTDBPlpx/save-ec-public-private-keys-to-database-for-reuse
   Future<void> saveOwnPublicKey(String publicKey) async {
     await _secureStorage.write(key: _ownPublicKeyKey, value: publicKey);
   }
@@ -104,12 +102,11 @@ class SecureStorageService {
     if (jsonString == null || jsonString.isEmpty) return null;
 
     try {
-      print('@@@@@@@@@@ jsonString: $jsonString');
       final List<dynamic> jsonList = jsonDecode(jsonString);
       return jsonList.map((e) =>
           ParsedAttributeData.fromJson(e as Map<String, dynamic>)).toList();
     } catch (e) {
-      print('Error parsing interests attributes: $e');
+      logDebugError('Error parsing interests attributes: $e');
       return null;
     }
   }
@@ -131,7 +128,7 @@ class SecureStorageService {
       return jsonList.map((e) =>
           ParsedAttributeData.fromJson(e as Map<String, dynamic>)).toList();
     } catch (e) {
-      print('Error parsing offerings attributes: $e');
+      logDebugError('Error parsing offerings attributes: $e');
       return null;
     }
   }
@@ -157,7 +154,7 @@ class SecureStorageService {
       return jsonMap.map((key, value) =>
           MapEntry(key, (value as num).toDouble()));
     } catch (e) {
-      print('Error parsing profile keyword data map: $e');
+      logDebugError('Error parsing profile keyword data map: $e');
       return null;
     }
   }

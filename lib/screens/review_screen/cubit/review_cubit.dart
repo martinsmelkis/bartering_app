@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/models/reviews/review_eligibility.dart';
 import 'package:barter_app/models/reviews/review_submission.dart';
@@ -7,6 +5,7 @@ import 'package:barter_app/models/reviews/transaction_status.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/review_screen/models/risk_analysis_model.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/dio_error_handler.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -111,34 +110,7 @@ class ReviewCubit extends Cubit<ReviewState> {
         emit(ReviewSubmitError(defaultErrorMessage));
       }
     } on DioException catch (e) {
-
-      if (e.response?.statusCode == 403) {
-        // Blocked by risk analysis
-        emit(ReviewSubmitError('Transaction blocked'));
-      }
-
-      // Extract error message from API response
-      String errorMessage = defaultErrorMessage;
-
-      if (e.response?.data != null) {
-        try {
-          // Try to parse JSON response
-          final data = e.response!.data;
-          if (data is Map<String, dynamic> && data.containsKey('error')) {
-            errorMessage = data['error'];
-          } else if (data is String) {
-            // Try to parse string as JSON
-            final jsonData = jsonDecode(data);
-            if (jsonData is Map<String, dynamic> && jsonData.containsKey('error')) {
-              errorMessage = jsonData['error'];
-            }
-          }
-        } catch (parseError) {
-          // If parsing fails, use the default error message
-          print('Error parsing error response: $parseError');
-        }
-      }
-
+      final errorMessage = DioErrorHandler.getErrorMessage(e, defaultErrorMessage);
       emit(ReviewSubmitError(errorMessage));
     } catch (e) {
       emit(ReviewSubmitError(e.toString()));

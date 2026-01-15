@@ -3,6 +3,9 @@ import 'package:equatable/equatable.dart';
 import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/models/relationships/report_models.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/dio_error_handler.dart';
+import 'package:dio/dio.dart';
 
 part 'user_moderation_state.dart';
 
@@ -43,8 +46,13 @@ class UserModerationCubit extends Cubit<UserModerationState> {
         emit(const UserModerationError('Failed to block user'));
         return false;
       }
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to block user');
+      logDebugError('Error blocking user: $errorMessage');
+      emit(UserModerationError(errorMessage));
+      return false;
     } catch (e) {
-      print('Error blocking user: $e');
+      logDebugError('Error blocking user: $e');
       emit(UserModerationError(e.toString()));
       return false;
     }
@@ -72,8 +80,13 @@ class UserModerationCubit extends Cubit<UserModerationState> {
         emit(const UserModerationError('Failed to unblock user'));
         return false;
       }
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to unblock user');
+      logDebugError('Error unblocking user: $errorMessage');
+      emit(UserModerationError(errorMessage));
+      return false;
     } catch (e) {
-      print('Error unblocking user: $e');
+      logDebugError('Error unblocking user: $e');
       emit(UserModerationError(e.toString()));
       return false;
     }
@@ -110,8 +123,13 @@ class UserModerationCubit extends Cubit<UserModerationState> {
         emit(const UserModerationError('Failed to report user'));
         return null;
       }
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to report user');
+      logDebugError('Error reporting user: $errorMessage');
+      emit(UserModerationError(errorMessage));
+      return null;
     } catch (e) {
-      print('Error reporting user: $e');
+      logDebugError('Error reporting user: $e');
       emit(UserModerationError(e.toString()));
       return null;
     }
@@ -126,8 +144,12 @@ class UserModerationCubit extends Cubit<UserModerationState> {
       _blockedUserIds.clear();
       _blockedUserIds.addAll(profiles.map((p) => p.userId));
       emit(BlockedUsersLoaded(_blockedUserIds.toList()));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to fetch blocked users');
+      logDebugError('Error fetching blocked users: $errorMessage');
+      emit(UserModerationError(errorMessage));
     } catch (e) {
-      print('Error fetching blocked users: $e');
+      logDebugError('Error fetching blocked users: $e');
       emit(UserModerationError(e.toString()));
     }
   }
@@ -141,8 +163,12 @@ class UserModerationCubit extends Cubit<UserModerationState> {
         _blockedUserIds.add(otherUserId);
       }
       return isBlocked;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to check block status');
+      logDebugError('Error checking block status: $errorMessage');
+      return false;
     } catch (e) {
-      print('Error checking block status: $e');
+      logDebugError('Error checking block status: $e');
       return false;
     }
   }

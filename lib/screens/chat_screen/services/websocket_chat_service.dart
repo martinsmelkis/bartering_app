@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:barter_app/services/secure_storage_service.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
@@ -39,16 +40,16 @@ class WebSocketChatService {
   // This is useful when initializing a chat session
   Future<void> loadContactPublicKey(String userId) async {
     if (_publicKeyCache.containsKey(userId)) {
-      print('@@@@@@@@@@@@ Public key already cached for: $userId');
+      logDebug('@@@@@@@@@@@@ Public key already cached for: $userId');
       return;
     }
 
     final publicKey = await secureStorage.getContactPublicKey(userId);
     if (publicKey != null) {
       _publicKeyCache[userId] = publicKey;
-      print('@@@@@@@@@@@@ Preloaded public key from storage for: $userId');
+      logDebug('@@@@@@@@@@@@ Preloaded public key from storage for: $userId');
     } else {
-      print('@@@@@@@@@@@@ No cached public key found for: $userId');
+      logDebug('@@@@@@@@@@@@ No cached public key found for: $userId');
     }
   }
 
@@ -83,13 +84,13 @@ class WebSocketChatService {
                 messageJson['publicKey'] as String != "") {
               final receivedPublicKey = messageJson['publicKey'] as String;
               final senderId = messageJson['senderId'] as String?;
-              print('@@@@@@@@@@@@ received message with ids $senderId for $_currentUserId');
+              logDebug('@@@@@@@@@@@@ received message with ids $senderId for $_currentUserId');
               if (_currentUserId == senderId) {
-                print('@@@@@@@@@@ self-message received, skipping...');
+                logDebug('@@@@@@@@@@ self-message received, skipping...');
                 return;
               }
 
-              print('@@@@@@@@@ Other user(${senderId}) public key received: '
+              logDebug('@@@@@@@@@ Other user(${senderId}) public key received: '
                   '${receivedPublicKey.substring(0, 20)}...');
 
               if (senderId != null && senderId.isNotEmpty) {
@@ -98,10 +99,10 @@ class WebSocketChatService {
 
                 // Also persist it for future sessions
                 await secureStorage.saveContactPublicKey(senderId, receivedPublicKey);
-                print('@@@@@@@@@@@@ Public key cached for user: $senderId');
+                logDebug('@@@@@@@@@@@@ Public key cached for user: $senderId');
               }
 
-              print('@@@@@@@@@@@@ Public keys exchanged successfully');
+              logDebug('@@@@@@@@@@@@ Public keys exchanged successfully');
               return; // Don't process this as a chat message
             }
 
@@ -109,7 +110,7 @@ class WebSocketChatService {
                 messageJson['messageType'].toString().contains('TransactionCreatedMessage')) {
               final transactionId = messageJson['transactionId'] as String?;
               if (transactionId != null) {
-                print('@@@@@@@@@ Transaction created: $transactionId');
+                logDebug('@@@@@@@@@ Transaction created: $transactionId');
                 // Create a system message to display in chat
                 final systemMessage = ChatMessage(
                   id: 'system_transaction_$transactionId',
@@ -131,18 +132,18 @@ class WebSocketChatService {
             // Handle file notifications
             if (messageJson['messageType'] != null &&
                 messageJson['messageType'].toString().contains('FileNotificationMessage')) {
-              print('@@@@@@@@@ File notification received!');
+              logDebug('@@@@@@@@@ File notification received!');
               try {
                 final fileNotification = FileNotificationMessage.fromJson(
                     messageJson);
 
                 // Don't show file notification from self
                 if (fileNotification.senderId == _currentUserId) {
-                  print('@@@@@@@@@ File notification from self, skipping...');
+                  logDebug('@@@@@@@@@ File notification from self, skipping...');
                   return;
                 }
 
-                print('@@@@@@@@@ Creating chat message with file attachment');
+                logDebug('@@@@@@@@@ Creating chat message with file attachment');
                 final chatMessage = ChatMessage(
                   id: fileNotification.fileId,
                   senderId: fileNotification.senderId,
@@ -158,7 +159,7 @@ class WebSocketChatService {
                   senderName: messageJson['senderName'] as String?,
                 );
 
-                print('@@@@@@@@@ Adding file message to stream');
+                logDebug('@@@@@@@@@ Adding file message to stream');
                 _messageController.add(chatMessage);
 
                 // Show notification if user is not in this chat
@@ -170,10 +171,10 @@ class WebSocketChatService {
                   );
                 }
 
-                print('@@@@@@@@@ File notification processed successfully');
+                logDebug('@@@@@@@@@ File notification processed successfully');
                 return;
               } catch (e) {
-                print('@@@@@@@@@ Error processing file notification: $e');
+                logDebug('@@@@@@@@@ Error processing file notification: $e');
               }
             }
 
@@ -187,7 +188,7 @@ class WebSocketChatService {
                   '${encryptedText.substring(0, 20)}...');
               
               if (transactionId != null) {
-                print('@@@@@@@@@@ Message has transactionId: $transactionId');
+                logDebug('@@@@@@@@@@ Message has transactionId: $transactionId');
               }
 
               // Decrypt using the sender's public key from cache
@@ -199,7 +200,7 @@ class WebSocketChatService {
                 print("ERROR: No senderId in message");
               }
 
-              print('@@@@@@@@@@ messageDecrypted ${DateTime.now()}: $messageDecrypted');
+              logDebug('@@@@@@@@@@ messageDecrypted ${DateTime.now()}: $messageDecrypted');
               final networkMessage = ChatMessage.fromJson(messageJson);
 
               ChatMessage chatMsg = ChatMessage(
@@ -257,7 +258,7 @@ class WebSocketChatService {
           await secureStorage.getContactPublicKey(senderId);
       if (senderPublicKeyBase64 != null) {
         _publicKeyCache[senderId] = senderPublicKeyBase64;
-        print('@@@@@@@@@@@@@@ Loaded public key from storage for: $senderId');
+        logDebug('@@@@@@@@@@@@@@ Loaded public key from storage for: $senderId');
       }
     }
 

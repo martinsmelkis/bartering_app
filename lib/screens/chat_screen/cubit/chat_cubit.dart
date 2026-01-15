@@ -7,6 +7,9 @@ import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/messaging/chat_notification_service.dart';
+import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/dio_error_handler.dart';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,25 +60,25 @@ class ChatCubit extends Cubit<ChatState> {
             // Refresh recipient public key
             recipientPublicKey =
             await secureStorage.getContactPublicKey(recipientUserId);
-            print(
+            logDebug(
                 '@@@@@@@@@@ Keys exchanged! Recipient public key updated: ${recipientPublicKey !=
                     null}');
             emit(ChatKeysExchanged());
             return;
           }
-          print('@@@@@@@@@@@@@ message received ${chatMessage.toJson()}');
+          logDebug('@@@@@@@@@@@@@ message received ${chatMessage.toJson()}');
 
           // Skip empty messages UNLESS they have a file attachment
           if (chatMessage.plainText?.isEmpty == true &&
               chatMessage.fileAttachment == null) {
-            print('@@@@@@@@@ Skipping empty message without attachment');
+            logDebug('@@@@@@@@@ Skipping empty message without attachment');
             return;
           }
 
           // Save message to database ONLY - DB stream will update UI
           if (_chatRepository != null && _currentConversationId != null) {
             try {
-              print(
+              logDebug(
                   '@@@@@@@@@@@@ Current chat recipientUserId: $recipientUserId, '
                       'message senderId: ${chatMessage.senderId}, '
                       'message recipientId: ${chatMessage.recipientId}, '
@@ -93,12 +96,12 @@ class ChatCubit extends Cubit<ChatState> {
 
               if (isFromCurrentRecipient || isToCurrentRecipient) {
                 // Message belongs to CURRENT conversation
-                print(
+                logDebug(
                     '✅ Message is part of current chat (from: $isFromCurrentRecipient, to: $isToCurrentRecipient), '
                         'saving to current conversation: $_currentConversationId');
                 await _chatRepository!.saveMessage(
                     chatMessage, _currentConversationId!);
-                print(
+                logDebug(
                     '✅ Message saved to CURRENT conversation (will appear in current chat)');
               } else {
                 // Message is from/to a DIFFERENT user - find/create their conversation
@@ -110,18 +113,18 @@ class ChatCubit extends Cubit<ChatState> {
                     currentUserId, otherUserId);
                 final otherConversationId = convId?.conversationId ?? "Unknown";
 
-                print('⚠️ Message from/to different user ($otherUserId)! '
+                logDebug('⚠️ Message from/to different user ($otherUserId)! '
                     'Saving to conversation: $otherConversationId '
                     '(NOT current: $_currentConversationId)');
 
                 await _chatRepository!.saveMessage(
                     chatMessage, otherConversationId);
 
-                print(
+                logDebug(
                     '✅ Message saved to OTHER conversation (will NOT appear in current chat)');
               }
             } catch (e) {
-              print('❌ @@@@@@@@ Error saving message to database: $e');
+              logDebug('❌ @@@@@@@@ Error saving message to database: $e');
             }
           }
         }, onError: (error) {
@@ -141,7 +144,7 @@ class ChatCubit extends Cubit<ChatState> {
         msg.conversationId == _currentConversationId
         ).toList();
 
-        print(
+          logDebug(
             '@@@@@@@@@ DB stream update: ${dbMessages.length} total messages, '
                 '${filteredMessages
                 .length} for current conversation $_currentConversationId');
@@ -166,13 +169,13 @@ class ChatCubit extends Cubit<ChatState> {
     try {
       try {
         _chatRepository = getIt<ChatRepository>();
-        print('✅ ChatRepository initialized');
+          logDebug('✅ ChatRepository initialized');
       } catch (e) {
-        print('⚠️ ChatRepository not available: $e');
+          logDebug('⚠️ ChatRepository not available: $e');
       }
 
       cryptoService = await CryptoService.create();
-      print('@@@@@@ CryptoService created, isReady: ${cryptoService?.isReady}');
+          logDebug('@@@@@@ CryptoService created, isReady: ${cryptoService?.isReady}');
 
       final pubKey = await secureStorage.getOwnPublicKey();
       final String? userId = await secureStorage.getOwnUserId()
@@ -193,10 +196,10 @@ class ChatCubit extends Cubit<ChatState> {
 
       // Get or create conversation
       if (_chatRepository != null) {
-        print('@@@@@ Getting chat session from DB with ${userId} ${recipientUserId}');
+          logDebug('@@@@@ Getting chat session from DB with ${userId} ${recipientUserId}');
         final conversation = await _getConversationFromDB(userId, recipientUserId);
         _currentConversationId = conversation?.conversationId;
-        print('✅ Conversation ID: $_currentConversationId');
+          logDebug('✅ Conversation ID: $_currentConversationId');
 
         // Load existing messages from database
         final existingMessages = await _chatRepository!.getRecentMessages(
@@ -204,13 +207,13 @@ class ChatCubit extends Cubit<ChatState> {
           limit: 100,
         );
 
-        print('@@@@@@@@@@ Loaded ${existingMessages.length} messages from database');
+          logDebug('@@@@@@@@@@ Loaded ${existingMessages.length} messages from database');
         if (existingMessages.isNotEmpty) {
           messages.clear();
           messages.addAll(
             _chatRepository!.userChatsToChatMessages(existingMessages, userId),
           );
-          print('✅ Added ${messages.length} messages from database');
+          logDebug('✅ Added ${messages.length} messages from database');
         }
         emit(ChatLoaded(List.from(messages)));
 
@@ -218,14 +221,14 @@ class ChatCubit extends Cubit<ChatState> {
         await _chatRepository!.markConversationAsRead(_currentConversationId!);
       }
 
-      print('@@@@@@@@@@@@@ Init chat session - Connecting WebSocket');
+          logDebug('@@@@@@@@@@@@@ Init chat session - Connecting WebSocket');
 
       // Get notification service
       ChatNotificationService? notificationService;
       try {
         notificationService = getIt<ChatNotificationService>();
       } catch (e) {
-        print('⚠️ ChatNotificationService not available: $e');
+          logDebug('⚠️ ChatNotificationService not available: $e');
       }
 
       _webSocketService = WebSocketChatService(
@@ -242,14 +245,14 @@ class ChatCubit extends Cubit<ChatState> {
       // Load recipient's public key for file encryption
       recipientPublicKey =
       await secureStorage.getContactPublicKey(recipientUserId);
-      print('@@@@@@@@@@ Recipient public key loaded: ${recipientPublicKey !=
+          logDebug('@@@@@@@@@@ Recipient public key loaded: ${recipientPublicKey !=
           null}');
 
       _webSocketService?.connect(userId);
       _listenToMessages();
 
-      print('@@@@@@@@@@@@@ Init chat session - Creating auth signature');
-      print('Key: $pubKey, userId: $userId, recipientUserId: $recipientUserId');
+          logDebug('@@@@@@@@@@@@@ Init chat session - Creating auth signature');
+          logDebug('Key: $pubKey, userId: $userId, recipientUserId: $recipientUserId');
 
       // Create timestamp and signature for authentication
       final timestamp = DateTime
@@ -257,7 +260,7 @@ class ChatCubit extends Cubit<ChatState> {
           .millisecondsSinceEpoch;
       final messageToSign = "$timestamp.$userId.$recipientUserId";
 
-      print('@@@@@@@@@@@@@ Message to sign: $messageToSign');
+          logDebug('@@@@@@@@@@@@@ Message to sign: $messageToSign');
       final signature = cryptoService?.signMessage(messageToSign);
 
       if (signature == null) {
@@ -265,7 +268,7 @@ class ChatCubit extends Cubit<ChatState> {
         return;
       }
 
-      print('@@@@@@@@@@ Signature generated: ${signature.substring(0, 20)}...');
+          logDebug('@@@@@@@@@@ Signature generated: ${signature.substring(0, 20)}...');
 
       final authRequest = AuthRequest(
         userId: userId,
@@ -277,12 +280,12 @@ class ChatCubit extends Cubit<ChatState> {
       );
 
       final authJson = jsonEncode(authRequest.toJson());
-      print('@@@@@@@@@@@@@ Sending auth request: $authJson');
+          logDebug('@@@@@@@@@@@@@ Sending auth request: $authJson');
       _webSocketService?.sendAuthMessage(authJson);
 
       emit(ChatLoaded(List.from(messages)));
     } catch (e) {
-      print('@@@@@@@@@@@@@ Chat initialization error: $e');
+          logDebug('@@@@@@@@@@@@@ Chat initialization error: $e');
       emit(ChatError("Chat session initialization failed: ${e.toString()}"));
     }
   }
@@ -295,7 +298,7 @@ class ChatCubit extends Cubit<ChatState> {
       );
       return conversation;
     } catch (e) {
-      print('@@@@@@@@@@@@@ Error getting conversation ID: $e');
+          logDebug('@@@@@@@@@@@@@ Error getting conversation ID: $e');
       return Future.value(null);
     }
   }
@@ -308,7 +311,7 @@ class ChatCubit extends Cubit<ChatState> {
 
   Future<void> sendMessage(String text) async {
     // 1. Get the recipient's public key from cache or storage
-    print(
+          logDebug(
         '@@@@@@@@@ sendMessage - Getting recipient public key for: $recipientUserId');
 
     String? recipientPublicKeyBase64 = await secureStorage.getContactPublicKey(
@@ -329,7 +332,7 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     // 2. Encrypt the message using the recipient's public key
-    print('@@@@@@@@@ sendMessage ${cryptoService} ${cryptoService
+          logDebug('@@@@@@@@@ sendMessage ${cryptoService} ${cryptoService
         ?.getPublicKey()} ${text}');
     var encryptedPayload = cryptoService?.encrypt(text, recipientPublicKey);
 
@@ -339,9 +342,7 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     // 3. Save message to database first (with "sending" status)
-    final messageId = "client_${DateTime
-        .now()
-        .millisecondsSinceEpoch}";
+    final messageId = "client_${DateTime.now().millisecondsSinceEpoch}";
     final chatMessage = ChatMessage(
       id: messageId,
       senderId: currentUserId,
@@ -356,9 +357,9 @@ class ChatCubit extends Cubit<ChatState> {
       try {
         await _chatRepository!.saveMessage(
             chatMessage, _currentConversationId!);
-        print('✅ Sent message saved to database');
+          logDebug('✅ Sent message saved to database');
       } catch (e) {
-        print('❌ Error saving sent message to database: $e');
+          logDebug('❌ Error saving sent message to database: $e');
       }
     }
 
@@ -375,7 +376,7 @@ class ChatCubit extends Cubit<ChatState> {
             EChatMessageStatus.sent,
           );
         } catch (e) {
-          print('❌ Error updating message status: $e');
+          logDebug('❌ Error updating message status: $e');
         }
       });
     }
@@ -388,9 +389,9 @@ class ChatCubit extends Cubit<ChatState> {
         // Save to database
         await _chatRepository!.saveMessage(
             fileMessage, _currentConversationId!);
-        print('✅ File message saved to database');
+          logDebug('✅ File message saved to database');
       } catch (e) {
-        print('❌ Error saving file message: $e');
+          logDebug('❌ Error saving file message: $e');
         emit(ChatError('Failed to send file message'));
       }
     }
@@ -425,7 +426,7 @@ class ChatCubit extends Cubit<ChatState> {
       }
 
       if (transactionId != null && transactionId.isNotEmpty) {
-        print('@@@@@@@@@ Found existing transaction ID: $transactionId');
+          logDebug('@@@@@@@@@ Found existing transaction ID: $transactionId');
 
         final updateRequest = UpdateTransactionStatusRequest(status: 'done');
         final updateResponse = await apiClient.updateTransactionStatus(
@@ -437,11 +438,15 @@ class ChatCubit extends Cubit<ChatState> {
           throw Exception('Failed to update transaction status');
         }
 
-        print('@@@@@@@@@ Transaction status updated to "done"');
+          logDebug('@@@@@@@@@ Transaction status updated to "done"');
         emit(ChatTransactionCompleted(transactionId));
       }
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to finish transaction');
+          logDebug('@@@@@@@@@ Error finishing transaction: $errorMessage');
+      emit(ChatTransactionError(errorMessage));
     } catch (e) {
-      print('@@@@@@@@@ Error finishing transaction: $e');
+          logDebug('@@@@@@@@@ Error finishing transaction: $e');
       emit(ChatTransactionError(e.toString()));
     }
 
@@ -472,8 +477,13 @@ class ChatCubit extends Cubit<ChatState> {
       }
       
       return success;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to block user');
+          logDebug('Error blocking user: $errorMessage');
+      emit(ChatUserBlockError(errorMessage));
+      return false;
     } catch (e) {
-      print('Error blocking user: $e');
+          logDebug('Error blocking user: $e');
       emit(ChatUserBlockError(e.toString()));
       return false;
     }
@@ -502,8 +512,13 @@ class ChatCubit extends Cubit<ChatState> {
       }
       
       return success;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to unblock user');
+          logDebug('Error unblocking user: $errorMessage');
+      emit(ChatUserUnblockError(errorMessage));
+      return false;
     } catch (e) {
-      print('Error unblocking user: $e');
+          logDebug('Error unblocking user: $e');
       emit(ChatUserUnblockError(e.toString()));
       return false;
     }
@@ -516,7 +531,7 @@ class ChatCubit extends Cubit<ChatState> {
       final response = await apiClient.isUserBlocked(currentUserId, otherUserId);
       return response == true;
     } catch (e) {
-      print('Error checking block status: $e');
+          logDebug('Error checking block status: $e');
       return false;
     }
   }
@@ -527,7 +542,7 @@ class ChatCubit extends Cubit<ChatState> {
       final apiClient = getIt<ApiClient>();
       return await apiClient.getBlockedUsers(currentUserId);
     } catch (e) {
-      print('Error fetching blocked users: $e');
+          logDebug('Error fetching blocked users: $e');
       return [];
     }
   }
@@ -563,8 +578,13 @@ class ChatCubit extends Cubit<ChatState> {
       }
       
       return response;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to submit report');
+          logDebug('Error reporting user: $errorMessage');
+      emit(ChatUserReportError(errorMessage));
+      return null;
     } catch (e) {
-      print('Error reporting user: $e');
+          logDebug('Error reporting user: $e');
       emit(ChatUserReportError(e.toString()));
       return null;
     }
@@ -577,7 +597,7 @@ class ChatCubit extends Cubit<ChatState> {
       final response = await apiClient.checkReport(currentUserId, reportedUserId);
       return response == true;
     } catch (e) {
-      print('Error checking report status: $e');
+          logDebug('Error checking report status: $e');
       return false;
     }
   }

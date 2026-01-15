@@ -13,10 +13,8 @@ class UserProfileData {
   final List<UserAttributeEntryData>? attributes;
   final Map<String, double>? profileKeywordDataMap;
   final List<String>? activePostingIds;
-  
   @JsonKey(includeIfNull: false)
   final String? preferredLanguage;
-  
   @JsonKey(includeIfNull: false)
   final bool? isOnline;
 

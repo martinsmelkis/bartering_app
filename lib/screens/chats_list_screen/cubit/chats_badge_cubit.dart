@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// State for the chats badge (total unread count)
@@ -58,13 +59,13 @@ class ChatsBadgeCubit extends Cubit<ChatsBadgeState> {
             isLoading: false,
           ));
           
-          print('📬 Chat badge updated: $totalUnread unread messages');
+          logDebug('📬 Chat badge updated: $totalUnread unread messages');
         });
       } else {
         emit(const ChatsBadgeState(isLoading: false));
       }
     } catch (e) {
-      print('❌ Error initializing chat badge cubit: $e');
+      logDebugError('Error initializing chat badge cubit', e);
       emit(const ChatsBadgeState(isLoading: false));
     }
   }
@@ -79,9 +80,9 @@ class ChatsBadgeCubit extends Cubit<ChatsBadgeState> {
       try {
         final count = await _chatRepository.getTotalUnreadCount(_currentUserId!);
         emit(state.copyWith(unreadCount: count));
-        print('📬 Chat badge refreshed: $count unread messages');
+        logDebug('📬 Chat badge refreshed: $count unread messages');
       } catch (e) {
-        print('❌ Error refreshing chat badge: $e');
+        logDebugError('Error refreshing chat badge', e);
       }
     }
   }

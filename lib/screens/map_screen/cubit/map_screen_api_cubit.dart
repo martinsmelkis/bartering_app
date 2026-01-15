@@ -1,6 +1,8 @@
 import 'dart:developer' show log;
 
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/dio_error_handler.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart'; // For value equality in states
 import '../../../configure_dependencies.dart';
@@ -68,6 +70,10 @@ class PoiCubit extends Cubit<PoiState> {
       print('@@@@@@@@@@@ POIs loaded: $pois');
       final sortedPois = _sortPois(pois);
       emit(PoiLoaded(sortedPois));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch POIs");
+      log("Failed to fetch POIs: $errorMessage");
+      emit(PoiError(errorMessage));
     } catch (e) {
       log("Failed to fetch POIs: ${e.toString()}");
       emit(PoiError("Failed to fetch POIs: ${e.toString()}"));
@@ -96,6 +102,9 @@ class PoiCubit extends Cubit<PoiState> {
       });
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch POI with keyword $keyword");
+      emit(PoiError(errorMessage));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
     }
@@ -107,6 +116,9 @@ class PoiCubit extends Cubit<PoiState> {
       final poi = await _apiClient.findSimilarProfiles(userId ?? "");
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch similar profiles");
+      emit(PoiError(errorMessage));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
     }
@@ -118,6 +130,9 @@ class PoiCubit extends Cubit<PoiState> {
       final poi = await _apiClient.findComplementaryProfiles(userId ?? "");
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch complementary profiles");
+      emit(PoiError(errorMessage));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
     }
@@ -130,6 +145,9 @@ class PoiCubit extends Cubit<PoiState> {
       final mappedToPOI = poi.map((profile) => PointOfInterest(profile: profile, distanceKm: 0.0)).toList();
       final sortedPois = _sortPois(mappedToPOI);
       emit(PoiLoaded(sortedPois));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch favorite profiles");
+      emit(PoiError(errorMessage));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
     }
@@ -142,6 +160,10 @@ class PoiCubit extends Cubit<PoiState> {
       final profile = await _apiClient.getProfileInfo(targetUserId);
       final poi = PointOfInterest(profile: profile, distanceKm: 0.0);
       emit(PoiLoaded([poi]));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch user profile");
+      log("Failed to fetch user profile: $errorMessage");
+      emit(PoiError(errorMessage));
     } catch (e) {
       log("Failed to fetch user profile: ${e.toString()}");
       emit(PoiError("Failed to fetch user profile: ${e.toString()}"));

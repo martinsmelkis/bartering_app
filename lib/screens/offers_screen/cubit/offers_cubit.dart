@@ -1,7 +1,9 @@
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/user/user_attributes_data.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/dio_error_handler.dart';
 import 'package:barter_app/utils/text_utils.dart';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -133,6 +135,12 @@ class OffersCubit extends Cubit<OffersState> {
       print('@@@@@@@@@@@@ parse offers submitResult $submitResult');
 
       emit(state.copyWith(status: OffersStatus.success));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to parse offerings');
+      emit(state.copyWith(
+        status: OffersStatus.error,
+        errorMessage: errorMessage,
+      ));
     } catch (e) {
       emit(state.copyWith(
         status: OffersStatus.error,

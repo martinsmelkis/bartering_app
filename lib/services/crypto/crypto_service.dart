@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:barter_app/services/secure_storage_service.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pointycastle/export.dart' as pc;
@@ -18,9 +19,9 @@ Future<pc.AsymmetricKeyPair<pc.ECPublicKey, pc.ECPrivateKey>> _generateEcKeyPair
   final keyGen = pc.ECKeyGenerator();
   keyGen.init(pc.ParametersWithRandom(pc.ECKeyGeneratorParameters(domainParams), secureRandom));
 
-  print('@@@@@@@@@@@ Starting EC keyPair generation in background... ${DateTime.now().millisecondsSinceEpoch}');
+  logDebug('@@@@@@@@@@@ Starting EC keyPair generation in background... ${DateTime.now().millisecondsSinceEpoch}');
   final pair = keyGen.generateKeyPair();
-  print('@@@@@@@@@@@ Finished EC keyPair generation in background ${DateTime.now().millisecondsSinceEpoch}');
+  logDebug('@@@@@@@@@@@ Finished EC keyPair generation in background ${DateTime.now().millisecondsSinceEpoch}');
   return pc.AsymmetricKeyPair<pc.ECPublicKey, pc.ECPrivateKey>(
       pair.publicKey as pc.ECPublicKey, pair.privateKey as pc.ECPrivateKey);
 }
@@ -44,7 +45,7 @@ class CryptoService {
 
   static Future<CryptoService> create({String curveName = 'secp256r1'}) async {
     if (_instance != null && _instance!.isReady) {
-      print("@@@@@@@@@@@ Returning existing CryptoService instance");
+      logDebug("@@@@@@@@@@@ Returning existing CryptoService instance");
       return _instance!;
     }
 
@@ -66,7 +67,7 @@ class CryptoService {
       // Save the new private and public keys
       await secureStorage.saveOwnPrivateKey(ecPrivateKeyToString(getPrivateKey()!));
       await secureStorage.saveOwnPublicKey(ecPublicKeyToString(getPublicKey()));
-      print("@@@@@@@@@@@ New key pair generated and saved.");
+      logDebug("@@@@@@@@@@@ New key pair generated and saved.");
     }
   }
 
@@ -80,7 +81,7 @@ class CryptoService {
 
     if (privateKeyHex != null && privateKeyHex.isNotEmpty) {
       // 2. If it exists, reconstruct the private and public keys
-      print("@@@@@@@@@@@ Found existing private key. Loading from storage...");
+      logDebug("@@@@@@@@@@@ Found existing private key. Loading from storage...");
       try {
         final privateKey = ecPrivateKeyFromString(privateKeyHex);
 
@@ -90,22 +91,22 @@ class CryptoService {
 
         _keyPair = pc.AsymmetricKeyPair<pc.ECPublicKey, pc.ECPrivateKey>(publicKey, privateKey);
         _isInitialized = true;
-        print("@@@@@@@@@@@ Key pair successfully loaded from storage.");
+        logDebug("@@@@@@@@@@@ Key pair successfully loaded from storage.");
       } catch (e) {
-        print("ERROR: Failed to load key from storage, will generate a new one. Error: $e");
+        logDebug("ERROR: Failed to load key from storage, will generate a new one. Error: $e");
         // Fallback to generating a new key if loading fails
         await _generateAndSaveNewKeyPair(curveName);
       }
     } else {
       // 3. If it doesn't exist, generate a new one and save it
-      print("@@@@@@@@@@@ No private key found. Generating a new key pair...");
+      debugPrint("@@@@@@@@@@@ No private key found. Generating a new key pair...");
       await _generateAndSaveNewKeyPair(curveName);
     }
 
     if (isReady) {
-      print("My EC Public Key: ${ecPublicKeyToString(getPublicKey()!)}");
+      logDebug("My EC Public Key: ${ecPublicKeyToString(getPublicKey()!)}");
     } else {
-      print("ERROR: EC Key pair initialization failed.");
+      logDebug("ERROR: EC Key pair initialization failed.");
     }
   }
 
@@ -127,7 +128,7 @@ class CryptoService {
       int fieldSize = (_domainParameters!.curve.fieldSize / 8).ceil();
       return _bigIntToBytes(sharedBigInt, fieldSize);
     } catch (e) {
-      print("Error deriving shared secret: $e");
+      logDebug("Error deriving shared secret: $e");
       return null;
     }
   }
@@ -158,20 +159,19 @@ class CryptoService {
 
   String? encrypt(String plainText, pc.ECPublicKey recipientPublicKey) {
     if (!isReady) {
-      print("Encryption failed: Service not ready. isReady=$isReady");
+      logDebug("Encryption failed: Service not ready. isReady=$isReady");
       return null;
     }
 
-    print(
+    logDebug(
         "@@@@@@@@@@@ Encrypting message with recipient key: ${ecPublicKeyToString(
             recipientPublicKey).substring(0, 20)}...");
     final sharedSecret = _deriveSharedSecret(
         getPrivateKey()!, recipientPublicKey);
     if (sharedSecret == null) {
-      print("Encryption failed: Could not derive shared secret.");
+      logDebug("Encryption failed: Could not derive shared secret.");
       return null;
     }
-    print("@@@@@@@@@@@ Shared secret derived (${sharedSecret.length} bytes)");
 
     // --- Generate a unique, random salt for each encryption ---
     final secureRandom = pc.FortunaRandom()..seed(pc.KeyParameter(
@@ -204,7 +204,7 @@ class CryptoService {
 
       return base64Encode(payloadWithSaltAndIv);
     } catch (e) {
-      print("AES-GCM Encryption error: $e");
+      logDebug("AES-GCM Encryption error: $e");
       return null;
     }
   }
@@ -212,35 +212,33 @@ class CryptoService {
   // --- Decryption (AES-GCM) ---
   String? decrypt(String base64PayloadWithSaltAndIv, pc.ECPublicKey? senderPublicKey) {
     if (!isReady) {
-      print("Decryption failed: Service not ready.");
+      logDebug("Decryption failed: Service not ready.");
       return null;
     }
 
     if (senderPublicKey == null) {
-      print("Decryption failed: Sender's public key is null");
+      logDebug("Decryption failed: Sender's public key is null");
       return null;
     }
 
-    print(
+    logDebug(
         "@@@@@@@@@@@ Decrypting message with sender key: ${ecPublicKeyToString(
             senderPublicKey).substring(0, 20)}...");
-    print("@@@@@@@@@@@ My private key exists: ${getPrivateKey() != null}");
+    logDebug("@@@@@@@@@@@ My private key exists: ${getPrivateKey() != null}");
 
     final sharedSecret = _deriveSharedSecret(getPrivateKey()!, senderPublicKey);
     if (sharedSecret == null) {
-      print(
+      logDebug(
           "Decryption failed: Could not derive shared secret with sender's key.");
       return null;
     }
-    print("@@@@@@@@@@@ Shared secret derived for decryption (${sharedSecret
-        .length} bytes)");
 
     try {
 
       final payloadWithSaltAndIv = base64Decode(base64PayloadWithSaltAndIv);
 
       if (payloadWithSaltAndIv.length < SALT_LENGTH_BYTES + IV_LENGTH_BYTES) {
-        print("Decryption failed: Payload too short to contain salt and IV.");
+        logDebug("Decryption failed: Payload too short to contain salt and IV.");
         return null;
       }
 
@@ -258,10 +256,10 @@ class CryptoService {
       final decryptedBytes = cipher.process(encryptedBytes);
       return utf8.decode(decryptedBytes);
     } on pc.InvalidCipherTextException { // This is crucial for GCM
-      print("Decryption failed: Ciphertext authentication failed (tampered, wrong key, or wrong IV).");
+      logDebug("Decryption failed: Ciphertext authentication failed (tampered, wrong key, or wrong IV).");
       return null;
     } catch (e) {
-      print("AES-GCM Decryption error: $e");
+      logDebug("AES-GCM Decryption error: $e");
       return null;
     }
   }
@@ -282,7 +280,7 @@ class CryptoService {
       if (point == null) return null;
       return pc.ECPublicKey(point, _domainParameters);
     } catch (e) {
-      print("Error parsing EC public key from string: $e");
+      logDebug("Error parsing EC public key from string: $e");
       return null;
     }
   }
@@ -304,11 +302,11 @@ class CryptoService {
   /// Signs a message using ECDSA with SHA-256
   /// Returns the signature as a base64-encoded string
   String? signMessage(String message) {
-    print(
+    logDebug(
         "@@@@@@@@@@@ signMessage called - isReady: $isReady, _isInitialized: $_isInitialized, _keyPair: ${_keyPair !=
             null}, _domainParameters: ${_domainParameters != null}");
     if (!isReady || _keyPair == null) {
-      print("Signing failed: Service not ready. isReady=$isReady, _keyPair=${_keyPair == null}");
+      logDebug("Signing failed: Service not ready. isReady=$isReady, _keyPair=${_keyPair == null}");
       return null;
     }
 
@@ -335,7 +333,7 @@ class CryptoService {
       final signatureBytes = _encodeECDSASignature(signature);
       return base64Encode(signatureBytes);
     } catch (e) {
-      print("Signing error: $e");
+      logDebug("Signing error: $e");
       return null;
     }
   }
@@ -345,7 +343,7 @@ class CryptoService {
   bool verifySignature(String message, String base64Signature,
       pc.ECPublicKey publicKey) {
     if (!isReady) {
-      print("Verification failed: Service not ready.");
+      logDebug("Verification failed: Service not ready.");
       return false;
     }
 
@@ -359,7 +357,7 @@ class CryptoService {
 
       return signer.verifySignature(messageBytes, signature);
     } catch (e) {
-      print("Verification error: $e");
+      logDebug("Verification error: $e");
       return false;
     }
   }
@@ -466,7 +464,7 @@ class CryptoService {
       throw Exception("Invalid recipient public key");
     }
 
-    print("@@@@@@@@@@@ Encrypting ${plainBytes.length} bytes");
+    logDebug("@@@@@@@@@@@ Encrypting ${plainBytes.length} bytes");
     final sharedSecret = _deriveSharedSecret(
         getPrivateKey()!, recipientPublicKey);
     if (sharedSecret == null) {
@@ -497,10 +495,10 @@ class CryptoService {
       payloadWithSaltAndIv.setAll(salt.length, iv);
       payloadWithSaltAndIv.setAll(salt.length + iv.length, encryptedBytes);
 
-      print("@@@@@@@@@@@ Encrypted to ${payloadWithSaltAndIv.length} bytes");
+      logDebug("@@@@@@@@@@@ Encrypted to ${payloadWithSaltAndIv.length} bytes");
       return payloadWithSaltAndIv;
     } catch (e) {
-      print("AES-GCM bytes encryption error: $e");
+      logDebug("AES-GCM bytes encryption error: $e");
       throw Exception("Encryption failed: $e");
     }
   }
@@ -518,7 +516,7 @@ class CryptoService {
       throw Exception("Invalid sender public key");
     }
 
-    print("@@@@@@@@@@@ Decrypting ${encryptedPayload.length} bytes");
+    logDebug("@@@@@@@@@@@ Decrypting ${encryptedPayload.length} bytes");
     final sharedSecret = _deriveSharedSecret(getPrivateKey()!, senderPublicKey);
     if (sharedSecret == null) {
       throw Exception("Could not derive shared secret");
@@ -544,13 +542,13 @@ class CryptoService {
           pc.KeyParameter(symmetricKey), TAG_LENGTH_BITS, iv, Uint8List(0)));
 
       final decryptedBytes = cipher.process(encryptedBytes);
-      print("@@@@@@@@@@@ Decrypted to ${decryptedBytes.length} bytes");
+      logDebug("@@@@@@@@@@@ Decrypted to ${decryptedBytes.length} bytes");
       return decryptedBytes;
     } on pc.InvalidCipherTextException {
-      print("Decryption failed: Ciphertext authentication failed");
+      logDebug("Decryption failed: Ciphertext authentication failed");
       throw Exception("Decryption failed: Authentication failed");
     } catch (e) {
-      print("AES-GCM bytes decryption error: $e");
+      logDebug("AES-GCM bytes decryption error: $e");
       throw Exception("Decryption failed: $e");
     }
   }
@@ -558,7 +556,7 @@ class CryptoService {
   /// Dispose of the CryptoService and clear all sensitive data
   /// This resets the singleton instance and clears keys from memory
   void dispose() {
-    print("@@@@@@@@@@@ Disposing CryptoService instance");
+    logDebug("@@@@@@@@@@@ Disposing CryptoService instance");
 
     // Clear sensitive data from memory
     _keyPair = null;
@@ -568,7 +566,7 @@ class CryptoService {
     // Clear singleton instance
     _instance = null;
 
-    print("@@@@@@@@@@@ CryptoService disposed successfully");
+    logDebug("@@@@@@@@@@@ CryptoService disposed successfully");
   }
 
   /// Static method to dispose the singleton instance
