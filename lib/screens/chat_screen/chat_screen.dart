@@ -11,10 +11,12 @@ import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:open_filex/open_filex.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 
 import '../../configure_dependencies.dart';
@@ -523,10 +525,16 @@ class _ChatScreenState extends State<ChatScreen> {
             // Text message
             if (message.plainText != null && message.plainText!.isNotEmpty) ...[
               if (message.fileAttachment != null) SizedBox(height: spacing),
-              Text(
-                message.plainText ?? "",
+              SelectableLinkify(
+                text: message.plainText ?? "",
                 style: TextStyle(color: textColor, fontSize: messageFontSize),
-              ),
+                linkStyle: TextStyle(color: Colors.blue),
+                onOpen: (link) async {
+                  if (await canLaunchUrl(Uri.parse(link.url))) {
+                    await launchUrl(Uri.parse(link.url));
+                  }
+                },
+              )
             ],
             SizedBox(height: spacing),
             Text(
