@@ -7,9 +7,17 @@ import 'package:flutter/services.dart';
 class AvatarColorUtils {
   /// Determines the dominant color from a list of UI style hints
   /// Returns a color based on the most common color hint and an optional relevancy score
+  /// 
+  /// Parameters:
+  /// - [profileKeywordDataMap]: Optional map of keywords to relevancy scores.
+  ///   Keys matching color categories (GREEN, RED, YELLOW, ORANGE, TEAL, PURPLE, BLUE)
+  ///   will boost their respective color counts based on relevancy:
+  ///   - Score >= 0.9: +2 to color count
+  ///   - Score >= 0.7: +1 to color count
   static Color getDominantColorFromAttributes({
     required List<String>? attributes,
     double? relevancyScore,
+    Map<String, double>? profileKeywordDataMap,
   }) {
     if (attributes == null || attributes.isEmpty) {
       return Colors.grey.shade100.withValues(alpha: 0.5);
@@ -17,13 +25,46 @@ class AvatarColorUtils {
 
     // Join all attributes and count color occurrences
     final attributesString = attributes.join(", ");
-    final mG = (attributesString.split("GREEN").length) - 1;
-    final mR = (attributesString.split("RED").length) - 1;
-    final mY = (attributesString.split("YELLOW").length) - 1;
-    final mO = (attributesString.split("ORANGE").length) - 1;
-    final mT = (attributesString.split("TEAL").length) - 1;
-    final mP = (attributesString.split("PURPLE").length) - 1;
-    final mB = (attributesString.split("BLUE").length) - 1;
+    var mG = (attributesString.split("GREEN").length) - 1;
+    var mR = (attributesString.split("RED").length) - 1;
+    var mY = (attributesString.split("YELLOW").length) - 1;
+    var mO = (attributesString.split("ORANGE").length) - 1;
+    var mT = (attributesString.split("TEAL").length) - 1;
+    var mP = (attributesString.split("PURPLE").length) - 1;
+    var mB = (attributesString.split("BLUE").length) - 1;
+
+    // Boost color counts based on profileKeywordDataMap relevancy scores
+    if (profileKeywordDataMap != null && profileKeywordDataMap.isNotEmpty) {
+      int idx = 0;
+      profileKeywordDataMap.forEach((keyword, score) {
+        int boost = 0;
+        
+        if (score >= 0.9) {
+          boost = 2;
+        } else if (score >= 0.7) {
+          boost = 1;
+        }
+
+        if (boost > 0) {
+          if (idx == 0) {
+            mG += boost;
+          } else if (idx == 1) {
+            mR += boost;
+          } else if (idx == 2) {
+            mB += boost;
+          } else if (idx == 3) {
+            mP += boost;
+          } else if (idx == 4) {
+            mY += boost;
+          } else if (idx == 5) {
+            mO += boost;
+          } else if (idx == 6) {
+            mT += boost;
+          }
+        }
+        idx++;
+      });
+    }
 
     final domColor = max(mG, max(mR, max(mY, max(mO, max(mT, max(mP, mB))))));
 
@@ -123,15 +164,24 @@ class AvatarColorUtils {
   /// 
   /// This is a convenience method that combines [getDominantColorFromAttributes]
   /// and [loadAndColorSvg]
+  /// 
+  /// Parameters:
+  /// - [profileKeywordDataMap]: Optional map of keywords to relevancy scores.
+  ///   Keys matching color categories (GREEN, RED, YELLOW, ORANGE, TEAL, PURPLE, BLUE)
+  ///   will boost their respective color counts based on relevancy:
+  ///   - Score >= 0.9: +2 to color count
+  ///   - Score >= 0.7: +1 to color count
   static Future<String> loadAndColorSvgFromAttributes({
     required String assetPath,
     required List<String>? attributes,
     double? relevancyScore,
+    Map<String, double>? profileKeywordDataMap,
     String defaultColorHex = '#ffd4a3',
   }) async {
     final color = getDominantColorFromAttributes(
       attributes: attributes,
       relevancyScore: relevancyScore,
+      profileKeywordDataMap: profileKeywordDataMap,
     );
 
     return loadAndColorSvg(

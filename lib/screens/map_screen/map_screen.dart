@@ -502,6 +502,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       assetPath: assetPath,
       attributes: attributes,
       relevancyScore: poi.matchRelevancyScore,
+      profileKeywordDataMap: poi.profile.profileKeywordDataMap
     );
   }
 
