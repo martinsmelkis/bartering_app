@@ -9,6 +9,7 @@ import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/text_utils.dart';
+import '../../utils/debug_utils.dart';
 import '../../widgets/dialogs/error_dialog.dart';
 import '../../widgets/dialogs/progress_dialog.dart';
 import '../interests_screen/interests_screen.dart';
@@ -63,7 +64,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       final savedKeywords = await userRepository.getProfileKeywordDataMap();
 
       if (savedKeywords != null && savedKeywords.isNotEmpty) {
-        print('@@@@@@@@@ Loaded saved keywords: $savedKeywords');
+        logDebug('@@@@@@@@@ Loaded saved keywords: $savedKeywords');
         setState(() {
           var idx = 0;
           // Convert saved values (0.0-1.0) to slider range (0-100) and store in _answers
@@ -75,13 +76,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _isLoadingData = false;
         });
       } else {
-        print('@@@@@@@@@ No saved keywords found, using defaults');
+        logDebug('@@@@@@@@@ No saved keywords found, using defaults');
         setState(() {
           _isLoadingData = false;
         });
       }
     } catch (e) {
-      print('@@@@@@@@@ Error loading saved keywords: $e');
+      logDebugError('Error loading saved keywords', e);
       setState(() {
         _isLoadingData = false;
       });
@@ -280,7 +281,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     floatingActionButton: isLastPage
                         ? FloatingActionButton.extended(
                       onPressed: () {
-                        print("Onboarding V2 Complete: $_answers");
+                        logDebug("Onboarding V2 Complete: $_answers");
                         final locale = Localizations.localeOf(context);
                         context.read<OnboardingCubit>().completeOnboarding(
                             locale.languageCode);

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:barter_app/models/user/user_registration_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
@@ -27,11 +28,11 @@ class InitializeCubit extends Cubit<InitializeState> {
       var keyWordsFromStorage = await _userRepository.getProfileKeywordDataMap();
       await _userRepository.init();
       if (keyWordsFromStorage != null) {
-        print('@@@@@@@@@ Initialization complete: User ${_userRepository.userId} is authenticated.');
+        logDebug('@@@@@@@@@ Initialization complete: User ${_userRepository.userId} is authenticated.');
         emit(InitializeStateRegistered());
       } else {
         // This case should ideally not happen if init() is implemented correctly
-        print('@@@@@@@@@@@ Initialization error: User onboarding is null after initialization.');
+        logDebug('@@@@@@@@@@@ Initialization error: User onboarding is null after initialization.');
         await _userRepository.resetUserId();
         final String? userId = await _userRepository.getUserId();
         final cryptoService = await CryptoService.create();
@@ -50,7 +51,7 @@ class InitializeCubit extends Cubit<InitializeState> {
         emit(InitializeStateUnregistered());
       }
     } catch (e) {
-      print('Initialization error: $e');
+      logDebugError('Initialization error', e);
       emit(InitializeError('Failed to initialize application: ${e.toString()}'));
     }
   }

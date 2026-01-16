@@ -7,6 +7,7 @@ import '../../services/api_client.dart';
 import '../../services/settings_service.dart';
 import '../../services/secure_storage_service.dart';
 import '../../theme/app_colors.dart';
+import '../../utils/debug_utils.dart';
 import '../pin_input_screen/setup_pin_from_settings_screen.dart';
 import '../security_question_screen/setup_security_question_screen.dart';
 
@@ -605,7 +606,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final userName = await _userRepository.getUserName();
 
       if (userId == null || userName == null) {
-        print('Cannot update profile: userId or userName is null');
+        logDebug('Cannot update profile: userId or userName is null');
         return;
       }
       
@@ -623,9 +624,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       
       // Send to API
       await _apiClient.updateProfileInfo(updatedProfile);
-      print('Profile language updated successfully to: $languageCode');
+      logDebug('Profile language updated successfully to: $languageCode');
     } catch (e) {
-      print('Error updating profile language: $e');
+      logDebugError('Error updating profile language', e);
       // Don't show error to user since local setting is still saved
     }
   }

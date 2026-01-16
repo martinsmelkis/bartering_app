@@ -5,6 +5,7 @@ import 'package:barter_app/data/local/app_database.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/user/user_onboarding_data.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,7 +56,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   Future<void> completeOnboarding(String languageCode) async {
     if (!state.isCompleted) {
-      print("Onboarding not yet complete. Cannot submit.");
+      logDebug("Onboarding not yet complete. Cannot submit.");
       return;
     }
 
@@ -84,17 +85,17 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         userId: drift.Value(userId),
         onboardingData: drift.Value(onboardingJson),
       );
-      print("@@@@@@@@@ User data saved to local database 0.");
+      logDebug("@@@@@@@@@ User data saved to local database 0.");
       final AppDatabase _appDatabase = getIt<AppDatabase>();
-      print("@@@@@@@@@ User data saved to local database 1.");
+      logDebug("@@@@@@@@@ User data saved to local database 1.");
       await _appDatabase.profiles.insertOne(
           userCompanion, mode: drift.InsertMode.insertOrReplace);
-      print("@@@@@@@@@ User data saved to local database.");
+      logDebug("@@@@@@@@@ User data saved to local database.");
 
       final usersData = await _appDatabase.profiles.select().get();
-      print('@@@@@@@@@@ usersData in DB: ${ usersData}');
+      logDebug('@@@@@@@@@@ usersData in DB: ${ usersData}');
 
-      print('@@@@@@@@@@@ Submit onboarding data: $profileData');
+      logDebug('@@@@@@@@@@@ Submit onboarding data: $profileData');
       // --- Call API ---
       UserOnboardingData user = UserOnboardingData(
           userId: userId, onboardingKeyNamesToWeights: profileData);
@@ -103,8 +104,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       final interestsList = await _apiClient.getInterestsFromOnboardingData(
           user, languageCode);
 
-      print('@@@@@@@@@@@ API Result: $interestsList');
-      print('API Result: $interestsList');
+      logDebug('@@@@@@@@@@@ API Result: $interestsList');
+      logDebug('API Result: $interestsList');
 
       updateInterestsList(interestsList);
 
@@ -114,7 +115,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
             interestsKeyList: interestsList));
       }
     } catch (e) {
-      print('@@@@@@@@@ Error completing onboarding: $e');
+      logDebugError('Error completing onboarding', e);
       if (!isClosed) {
         emit(state.copyWith(
           status: OnboardingStatus.error,

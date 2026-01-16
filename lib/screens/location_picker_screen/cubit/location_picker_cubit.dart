@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
@@ -39,12 +40,12 @@ class LocationPickerCubit extends Cubit<LocationPickerState> {
         profileKeywordDataMap: _userRepository.getProfileKeywordData,
         activePostingIds: List.empty(growable: false),
       );
-      print('@@@@@@@@@ profileData: $profileData');
+      logDebug('@@@@@@@@@ profileData: $profileData');
       final userName = await _apiClient.updateProfileInfo(profileData);
       _userRepository.setUserName(userName);
       emit(state.copyWith(status: LocationPickerStatus.success));
     } catch (e) {
-      print(e);
+      logDebugError('Error saving location', e);
       emit(state.copyWith(status: LocationPickerStatus.error, errorMessage: e.toString()));
     }
   }

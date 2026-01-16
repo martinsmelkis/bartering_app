@@ -1,6 +1,7 @@
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/settings_service.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -40,13 +41,13 @@ class SplashView extends StatelessWidget {
 
           if (pinEnabled) {
             // PIN is enabled - navigate to PIN verification screen
-            print('@@@@@@@@@ PIN is enabled - navigating to PIN verification');
+            logDebug('@@@@@@@@@ PIN is enabled - navigating to PIN verification');
             if (context.mounted) {
               context.go('/verify-pin');
             }
           } else {
             // PIN not enabled - go directly to map
-            print('@@@@@@@@@ PIN is disabled - navigating directly to map');
+            logDebug('@@@@@@@@@ PIN is disabled - navigating directly to map');
             if (context.mounted) {
               context.go('/map');
             }

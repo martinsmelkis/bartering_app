@@ -7,6 +7,7 @@ import 'package:barter_app/screens/review_screen/review_screen.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -196,7 +197,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
       otherUserName = userProfile.name;
     } catch (e) {
       // Failed to fetch user profile, will use userId as fallback
-      print('Failed to fetch user profile for $otherUserId: $e');
+      logDebugError('Failed to fetch user profile for $otherUserId', e);
     }
 
     final fallbackUserName = otherUserName ?? otherUserId;
@@ -280,7 +281,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
 
       return eligibility.eligible;
     } catch (e) {
-      print('Error checking review eligibility: $e');
+      logDebugError('Error checking review eligibility', e);
       return false;
     }
   }

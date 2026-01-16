@@ -16,6 +16,7 @@ import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/widgets/online_status_badge.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -205,10 +206,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
     // Only update visuals if map is ready
     if (_isMapReady && _mapController.isAllLayersVisible) {
-      print('@@@@@@@@@@@@ updateVisuals from _processPois');
+      logDebug('@@@@@@@@@@@@ updateVisuals from _processPois');
       _updateMapVisuals();
     } else {
-      print('Map not ready yet, POIs stored. Will display when map is ready.');
+      logDebug('Map not ready yet, POIs stored. Will display when map is ready.');
     }
 
     // If no POIs found, show the special "invite friends" marker
@@ -225,7 +226,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         try {
           _mapController.removeMarker(position);
         } catch (e) {
-          print('@@@@@@@@@@@ Error removing marker at $position: $e');
+          logDebugError('Error removing marker at $position', e);
         }
       }
     }
@@ -241,7 +242,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   bool _isRenderOperationValid(int currentOperation) {
     if (currentOperation != _currentRenderOperation) {
       //_cleanUpMarkers();
-      print('@@@@@@@@ Render operation #$currentOperation cancelled (new operation started)');
+      logDebug('@@@@@@@@ Render operation #$currentOperation cancelled (new operation started)');
       _isUpdatingVisuals = false;
       return false;
     }
@@ -249,16 +250,16 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   Future<void> _updateMapVisuals() async {
-    print('@@@@@@@@@@@ _updateMapVisuals called: mounted=$mounted, '
+    logDebug('@@@@@@@@@@@ _updateMapVisuals called: mounted=$mounted, '
         'allLayersVisible=${_mapController.isAllLayersVisible}');
     if (!mounted || !_mapController.isAllLayersVisible) {
-      print('@@@@@@@@@@@ Skipping visual update - map not ready');
+      logDebug('@@@@@@@@@@@ Skipping visual update - map not ready');
       return;
     }
 
     // Prevent concurrent updates
     if (_isUpdatingVisuals) {
-      print('@@@@@@@@@@@ Already updating visuals, skipping...');
+      logDebug('@@@@@@@@@@@ Already updating visuals, skipping...');
       _isUpdatingVisuals = false;
       //return;
     }
@@ -269,9 +270,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Increment operation counter to invalidate any ongoing operations
     _currentRenderOperation++;
     final currentOperation = _currentRenderOperation;
-    print('@@@@@@@@@@@ Starting render operation #$currentOperation vs ${_currentRenderOperation}');
+    logDebug('@@@@@@@@@@@ Starting render operation #$currentOperation vs ${_currentRenderOperation}');
 
-    print('@@@@@@@@@@@ Updating map visuals with ${_allPois.length} POIs');
+    logDebug('@@@@@@@@@@@ Updating map visuals with ${_allPois.length} POIs');
     final l10n = AppLocalizations.of(context)!;
 
     for (var mainCluster in mapOperationsCubit.mainPoiClusters) {
@@ -279,7 +280,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       if (!_isRenderOperationValid(currentOperation)) return;
 
       if (mainCluster.isExpanded) {
-        print('@@@@@@@@@@@ Main cluster ${mainCluster
+        logDebug('@@@@@@@@@@@ Main cluster ${mainCluster
             .id} EXPANDED with ${mainCluster.subClusters.length} sub-clusters');
         for (var subCluster in mainCluster.subClusters) {
           if (subCluster.isExpanded || subCluster.pois.length <
@@ -288,7 +289,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               // Check if operation is still current before each marker add
               if (!_isRenderOperationValid(currentOperation)) return;
 
-              print('@@@@@@@@@@@ Adding POI marker: ${poi.profile.userId}');
+              logDebug('@@@@@@@@@@@ Adding POI marker: ${poi.profile.userId}');
               final newMarker = await _createPoiMarker(poi, l10n);
               final position = GeoPoint(latitude: poi.profile.latitude ?? 0.0,
                   longitude: poi.profile.longitude ?? 0.0);
@@ -299,7 +300,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               _currentMarkerPositions.add(position);
             }
           } else {
-            print('@@@@@@@@@@@ Sub-cluster ${subCluster
+            logDebug('@@@@@@@@@@@ Sub-cluster ${subCluster
                 .id} COLLAPSED - adding cluster marker');
             if (!_isRenderOperationValid(currentOperation)) return;
             subCluster.isExpanded = false;
@@ -341,13 +342,13 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       }
     }
 
-    print('@@@@@@@@@@@ Processing ${mapOperationsCubit.looseSubClusters.length} loose sub-clusters');
+    logDebug('@@@@@@@@@@@ Processing ${mapOperationsCubit.looseSubClusters.length} loose sub-clusters');
     for (var looseSubCluster in mapOperationsCubit.looseSubClusters) {
       if (looseSubCluster.isExpanded || looseSubCluster.pois.length <
           MapOperationsCubit.MIN_POIS_FOR_SUB_CLUSTER_DISPLAY) {
-        print('@@@@@@@@@@@ Loose sub-cluster ${looseSubCluster}');
+        logDebug('@@@@@@@@@@@ Loose sub-cluster ${looseSubCluster}');
         for (var poi in looseSubCluster.pois) {
-          print('@@@@@@@@@@@ Adding loose POI marker: ${poi.profile.userId}');
+          logDebug('@@@@@@@@@@@ Adding loose POI marker: ${poi.profile.userId}');
           if (!_isRenderOperationValid(currentOperation)) return;
           final svg = await _createPoiMarker(poi, l10n);
           final position = GeoPoint(
@@ -360,7 +361,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           _currentMarkerPositions.add(position);
         }
       } else {
-        print('@@@@@@@@@@@ Loose sub-cluster ${looseSubCluster.id} COLLAPSED - adding cluster marker');
+        logDebug('@@@@@@@@@@@ Loose sub-cluster ${looseSubCluster.id} COLLAPSED - adding cluster marker');
         //looseSubCluster.isExpanded = false;
         if (!_isRenderOperationValid(currentOperation)) return;
         final position = GeoPoint(latitude: looseSubCluster.centroid.latitude,
@@ -376,7 +377,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Calculate which POIs are truly individual (not part of any cluster)
     List<PointOfInterest> trulyIndividualPois = mapOperationsCubit.calculateTrulyIndividualPois(_allPois);
     for (var poi in trulyIndividualPois) {
-      print('@@@@@@@@@@@ Adding truly individual POI marker: ${poi.profile
+      logDebug('@@@@@@@@@@@ Adding truly individual POI marker: ${poi.profile
           .userId}');
       if (!_isRenderOperationValid(currentOperation)) return;
 
@@ -398,7 +399,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   void _onIndividualPoiTap(PointOfInterest poi) {
-    print("Individual POI Tapped: ${poi.profile.userId}");
+    logDebug("Individual POI Tapped: ${poi.profile.userId}");
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -463,7 +464,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       _userOfferings = await userRepository.getOfferings(loadFromStorage: true);
     }
     final userIdHashCode = poi.profile.userId.hashCode;
-    print('@@@@@@@@@@ Creating POI marker for ${poi.profile.userId}, hashCode: $userIdHashCode');
+    logDebug('@@@@@@@@@@ Creating POI marker for ${poi.profile.userId}, hashCode: $userIdHashCode');
     final index = userIdHashCode.abs() % _svgAssetCount;
     final selectedIconPath = _getSvgAsset(index + 1); // 1-based index
 

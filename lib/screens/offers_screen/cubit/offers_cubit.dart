@@ -1,6 +1,7 @@
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/user/user_attributes_data.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/dio_error_handler.dart';
 import 'package:barter_app/utils/text_utils.dart';
 import 'package:dio/dio.dart';
@@ -114,7 +115,7 @@ class OffersCubit extends Cubit<OffersState> {
       final offersData = offersMapToSubmit
           .entries
           .map((entry) {
-        print('@@@@@@@@@@@ offersMap get offersMap ${entry.key} ${offersMap[entry.key]}');
+        logDebug('@@@@@@@@@@@ offersMap get offersMap ${entry.key} ${offersMap[entry.key]}');
         return ParsedAttributeData(
           attribute: entry.key,
           relevancyScore: 1.0 - (entry.value * 0.02),
@@ -132,7 +133,7 @@ class OffersCubit extends Cubit<OffersState> {
       final submitResult = await _apiClient.parseOfferings(
           offersDataToSubmit, languageCode);
 
-      print('@@@@@@@@@@@@ parse offers submitResult $submitResult');
+      logDebug('@@@@@@@@@@@@ parse offers submitResult $submitResult');
 
       emit(state.copyWith(status: OffersStatus.success));
     } on DioException catch (e) {

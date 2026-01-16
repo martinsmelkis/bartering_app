@@ -6,6 +6,7 @@ import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:barter_app/services/file_transfer_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/models/relationships/report_models.dart';
 import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
 import 'package:flutter/foundation.dart';
@@ -78,29 +79,29 @@ class _ChatScreenState extends State<ChatScreen> {
     // Get recipient public key from cubit
     var recipientPublicKey = _chatCubit.recipientPublicKey;
 
-    print(
+    logDebug(
         '@@@@@@@@@ _pickAndSendFile - recipientPublicKey from cubit: ${recipientPublicKey !=
             null ? "${recipientPublicKey.substring(0, 20)}..." : "null"}');
-    print('@@@@@@@@@ _pickAndSendFile - recipientUserId: ${_chatCubit
+    logDebug('@@@@@@@@@ _pickAndSendFile - recipientUserId: ${_chatCubit
         .recipientUserId}');
-    print('@@@@@@@@@ _pickAndSendFile - widget.poiId: ${widget.poiId}');
+    logDebug('@@@@@@@@@ _pickAndSendFile - widget.poiId: ${widget.poiId}');
 
     // If not available from cubit, try loading directly from secure storage
     if (recipientPublicKey == null) {
-      print(
+      logDebug(
           '@@@@@@@@@ Attempting to load recipient public key from storage...');
       final secureStorage = SecureStorageService();
       recipientPublicKey =
       await secureStorage.getContactPublicKey(_chatCubit.recipientUserId);
 
       if (recipientPublicKey != null) {
-        print(
+        logDebug(
             '@@@@@@@@@ ✅ Loaded recipient public key from storage: ${recipientPublicKey
                 .substring(0, 20)}...');
         // Update cubit with the loaded key
         _chatCubit.recipientPublicKey = recipientPublicKey;
       } else {
-        print('@@@@@@@@@ ❌ Recipient public key not found in storage');
+        logDebug('@@@@@@@@@ ❌ Recipient public key not found in storage');
       }
     }
 
@@ -332,7 +333,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 .addPostFrameCallback((_) => _scrollToBottom());
           }
           if (state is ChatKeysExchanged) {
-            print('@@@@@@@@@@ Chat Keys Exchanged');
+            logDebug('@@@@@@@@@@ Chat Keys Exchanged');
             // Public key is already updated in the cubit
             // Force UI refresh if needed
             setState(() {});
@@ -372,7 +373,7 @@ class _ChatScreenState extends State<ChatScreen> {
             );
           }
           if (state is ChatError) {
-            print('@@@@@@@@@@ Chat Error: ${state.message}');
+            logDebugError('Chat Error', state.message);
             var errorText = state.message.contains("chatError_") ?
               Text(context.parseL10n(state.message)) : Text(state.message);
             ScaffoldMessenger.of(context).showSnackBar(
@@ -720,15 +721,15 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _handleFileAttachmentTap(FileAttachment attachment) async {
     if (attachment.isDownloaded && attachment.localPath != null) {
       // File already downloaded, open it
-      print('@@@@@@@@@ File already downloaded, opening: ${attachment
+      logDebug('@@@@@@@@@ File already downloaded, opening: ${attachment
           .localPath}');
       await _openFile(attachment.localPath!);
     } else if (!attachment.isUploading) {
       // Download the file
-      print('@@@@@@@@@ File not downloaded, downloading...');
+      logDebug('@@@@@@@@@ File not downloaded, downloading...');
       await _downloadFile(attachment);
     } else {
-      print('@@@@@@@@@ File is currently uploading, ignoring tap');
+      logDebug('@@@@@@@@@ File is currently uploading, ignoring tap');
     }
   }
 
@@ -771,7 +772,7 @@ class _ChatScreenState extends State<ChatScreen> {
         throw Exception('Sender public key not found. Cannot decrypt file.');
       }
 
-      print(
+      logDebug(
           '@@@@@@@@@ Downloading file with sender public key: ${senderPublicKey
               .substring(0, 20)}...');
 
@@ -812,10 +813,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final l10n = AppLocalizations.of(context)!;
     
     try {
-      print('@@@@@@@@@ Opening file: $filePath');
+      logDebug('@@@@@@@@@ Opening file: $filePath');
       final result = await OpenFilex.open(filePath);
 
-      print('@@@@@@@@@ OpenFilex result: ${result.type} - ${result.message}');
+      logDebug('@@@@@@@@@ OpenFilex result: ${result.type} - ${result.message}');
 
       // Handle the result based on result.type (int code)
       // 0 = done (success)
@@ -826,7 +827,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
       if (result.type == ResultType.done) {
         // File opened successfully
-        print('@@@@@@@@@ File opened successfully');
+        logDebug('@@@@@@@@@ File opened successfully');
       } else if (result.type == ResultType.noAppToOpen) {
         // No app to open this file type
         if (!mounted) return;
@@ -876,7 +877,7 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       }
     } catch (e) {
-      print('@@@@@@@@@ Error opening file: $e');
+      logDebugError('Error opening file', e);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

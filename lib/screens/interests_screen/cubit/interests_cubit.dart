@@ -2,6 +2,7 @@ import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/user/user_attributes_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/text_utils.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -123,7 +124,7 @@ class InterestsCubit extends Cubit<InterestsState> {
         );
       }).toList();
 
-      print('@@@@@@@@@ saved interestsData: $interestsData');
+      logDebug('@@@@@@@@@ saved interestsData: $interestsData');
       _userRepository.interests = interestsData;
 
       final interestsDataForApi = UserAttributesData(

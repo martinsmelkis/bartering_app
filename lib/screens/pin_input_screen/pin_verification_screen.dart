@@ -1,5 +1,6 @@
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/security_utils.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../l10n/app_localizations.dart';
@@ -50,18 +51,18 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
 
       if (mounted) {
         if (verifiedPIN) {
-          print('@@@@@@@@@ PIN verification successful - navigating to map');
+          logDebug('@@@@@@@@@ PIN verification successful - navigating to map');
           // PIN correct - navigate to map
           context.go('/map');
           
           // Handle any pending notification after successful PIN verification
           // Use a delay to ensure map screen is fully mounted and router is ready
           Future.delayed(const Duration(milliseconds: 1000), () {
-            print('🔐 PIN verified, map should be mounted, handling pending messages...');
+            logDebug('🔐 PIN verified, map should be mounted, handling pending messages...');
             FirebaseService().handlePendingInitialMessage();
           });
         } else {
-          print('@@@@@@@@@ PIN verification failed');
+          logDebug('@@@@@@@@@ PIN verification failed');
           final l10n = AppLocalizations.of(context)!;
           
           // Clear PIN
@@ -80,7 +81,7 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
         }
       }
     } catch (e) {
-      print('@@@@@@@@@ PIN verification error: $e');
+      logDebugError('PIN verification error', e);
       if (mounted) {
         setState(() {
           _pin = "";

@@ -5,6 +5,7 @@ import '../../models/postings/posting_data_response.dart';
 import '../../services/api_client.dart';
 import '../../services/secure_storage_service.dart';
 import '../../theme/app_colors.dart';
+import '../../utils/debug_utils.dart';
 import '../user_profile_screen/create_posting_screen.dart';
 import 'package:intl/intl.dart';
 
@@ -61,7 +62,7 @@ class _ManagePostingsScreenState extends State<ManagePostingsScreen> {
             postings.add(posting);
           }
         } catch (e) {
-          print('Error loading posting $id: $e');
+          logDebugError('Error loading posting $id', e);
         }
       }
 
