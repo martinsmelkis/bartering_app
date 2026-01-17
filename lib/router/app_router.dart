@@ -12,6 +12,7 @@ import 'package:barter_app/screens/pin_input_screen/pin_verification_screen.dart
 import 'package:barter_app/screens/settings_screen/settings_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dart';
 import 'package:barter_app/screens/welcome_screen/welcome_screen.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -204,29 +205,29 @@ class AppRouter {
 
   /// Navigate to chat with specific user
   static void navigateToChat(String userId) {
-    print('🧭 AppRouter.navigateToChat called for userId: $userId');
-    print('🧭 Current router location: ${router.routerDelegate.currentConfiguration.uri}');
+    logDebug('🧭 AppRouter.navigateToChat called for userId: $userId');
+    logDebug('🧭 Current router location: ${router.routerDelegate.currentConfiguration.uri}');
     router.go('/chat/$userId');
   }
 
   /// Navigate to match details
   static void navigateToMatch(String matchId) {
-    print('🧭 AppRouter.navigateToMatch called for matchId: $matchId');
-    print('🧭 Current router location: ${router.routerDelegate.currentConfiguration.uri}');
+    logDebug('🧭 AppRouter.navigateToMatch called for matchId: $matchId');
+    logDebug('🧭 Current router location: ${router.routerDelegate.currentConfiguration.uri}');
     router.go('/match/$matchId');
   }
 
   /// Navigate to posting details
   static void navigateToPosting(String postingId) {
-    print('🧭 AppRouter.navigateToPosting called for postingId: $postingId');
-    print('🧭 Current router location: ${router.routerDelegate.currentConfiguration.uri}');
+    logDebug('🧭 AppRouter.navigateToPosting called for postingId: $postingId');
+    logDebug('🧭 Current router location: ${router.routerDelegate.currentConfiguration.uri}');
     router.go('/posting/$postingId');
   }
 
   /// Navigate to home/map
   static void navigateToHome() {
-    print('🧭 AppRouter.navigateToHome called');
-    print('🧭 Current router location: ${router.routerDelegate.currentConfiguration.uri}');
+    logDebug('🧭 AppRouter.navigateToHome called');
+    logDebug('🧭 Current router location: ${router.routerDelegate.currentConfiguration.uri}');
     router.go('/map');
   }
 

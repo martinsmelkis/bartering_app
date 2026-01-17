@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:dio/dio.dart';
 
 /// Utility class for handling DioException errors and extracting error messages
@@ -42,7 +43,7 @@ class DioErrorHandler {
         }
       } catch (parseError) {
         // If parsing fails, use the default error message
-        print('Error parsing error response: $parseError');
+        logDebugError('Error parsing error response', parseError);
       }
     }
 

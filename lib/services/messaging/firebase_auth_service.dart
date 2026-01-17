@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:barter_app/models/notifications/notification_models.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 
 import '../../configure_dependencies.dart';
 import 'firebase_service.dart';
@@ -14,7 +15,7 @@ class FCMTokenService {
     // Get FCM token
     final token = _firebaseService.fcmToken;
     if (token == null) {
-      print('⚠️ FCM token not available');
+      logDebug('⚠️ FCM token not available');
       return;
     }
 
@@ -25,9 +26,9 @@ class FCMTokenService {
     );
 
     if (success.success != false) {
-      print('✅ Push token registered for user: $userId');
+      logDebug('✅ Push token registered for user: $userId');
     } else {
-      print('❌ Failed to register push token');
+      logDebug('❌ Failed to register push token');
     }
 
     // Subscribe to user-specific topics if needed

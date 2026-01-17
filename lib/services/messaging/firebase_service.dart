@@ -6,6 +6,7 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -20,23 +21,23 @@ import 'local_notification_service.dart';
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
     await Firebase.initializeApp();
-    print('Firebase initialized in background handler');
+    logDebug('Firebase initialized in background handler');
   } catch (e) {
-    print('Firebase already initialized (this is normal): $e');
+    logDebug('Firebase already initialized (this is normal): $e');
   }
-  print('📱 Background message received: ${message.messageId}');
-  print('Title: ${message.notification?.title}');
-  print('Body: ${message.notification?.body}');
-  print('Data: ${message.data}');
+  logDebug('📱 Background message received: ${message.messageId}');
+  logDebug('Title: ${message.notification?.title}');
+  logDebug('Body: ${message.notification?.body}');
+  logDebug('Data: ${message.data}');
   
   // Handle chat messages in background
   final type = message.data['type'];
   if (type == 'new_message') {
-    print('💾 Saving chat message from background FCM...');
+    logDebug('💾 Saving chat message from background FCM...');
     // Note: In background handler, we can't easily access dependency injection
     // The message will be saved when the app is opened and syncs
     // Or we could initialize dependencies here if needed
-    print('⚠️ Message will be synced when app opens or via WebSocket');
+    logDebug('⚠️ Message will be synced when app opens or via WebSocket');
   }
 }
 
@@ -56,19 +57,19 @@ class FirebaseService {
   bool _isRouterReady = false;
   
   // Reference to ChatsBadgeCubit for updating badge on FCM messages
-  ChatsBadgeCubit? _chatsBadgeCubit;
+  static ChatsBadgeCubit? _chatsBadgeCubit;
   
   /// Set the ChatsBadgeCubit instance to receive updates
   void setChatsBadgeCubit(ChatsBadgeCubit cubit) {
     _chatsBadgeCubit = cubit;
-    print('✅ ChatsBadgeCubit registered with FirebaseService');
+    logDebug('✅ ChatsBadgeCubit registered with FirebaseService');
   }
 
   /// Initialize Firebase and FCM
   Future<void> initialize() async {
     try {
       // Firebase is already initialized in main(), so we skip this
-      print('✅ Skipping Firebase.initializeApp() (already done in main.dart)');
+      logDebug('✅ Skipping Firebase.initializeApp() (already done in main.dart)');
 
       // Initialize local notifications singleton (only once in app)
       await _localNotifications.initialize();
@@ -86,80 +87,80 @@ class FirebaseService {
       _firebaseMessaging.onTokenRefresh.listen(_onTokenRefresh);
 
       // Handle foreground messages
-      print('🔔 Setting up onMessage listener...');
+      logDebug('🔔 Setting up onMessage listener...');
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        print('📱📱📱 FOREGROUND MESSAGE LISTENER FIRED! 📱📱📱');
+        logDebug('📱📱📱 FOREGROUND MESSAGE LISTENER FIRED! 📱📱📱');
         _handleForegroundMessage(message);
       });
 
       // Handle notification taps (when app is in background)
-      print('🔔 Setting up onMessageOpenedApp listener...');
+      logDebug('🔔 Setting up onMessageOpenedApp listener...');
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        print('📱📱📱 ON MESSAGE OPENED APP FIRED! 📱📱📱');
-        print('Message: ${message.messageId}');
-        print('Data: ${message.data}');
+        logDebug('📱📱📱 ON MESSAGE OPENED APP FIRED! 📱📱📱');
+        logDebug('Message: ${message.messageId}');
+        logDebug('Data: ${message.data}');
         
         // If router is ready, handle immediately
         if (_isRouterReady) {
-          print('Router is ready, handling immediately');
+          logDebug('Router is ready, handling immediately');
           _handleNotificationTap(message);
         } else {
           // Router not ready yet (app is still initializing)
           // Store as pending and handle after router is ready
-          print('⚠️ Router not ready yet, storing as pending message');
+          logDebug('⚠️ Router not ready yet, storing as pending message');
           _pendingInitialMessage = message;
           _hasHandledInitialMessage = false;
         }
       });
 
       // Check if app was opened from a notification (when app was terminated)
-      print('🔔 Checking for initial message...');
+      logDebug('🔔 Checking for initial message...');
       RemoteMessage? initialMessage =
       await _firebaseMessaging.getInitialMessage();
       if (initialMessage != null) {
-        print('📱📱📱 INITIAL MESSAGE FOUND (APP WAS TERMINATED)! 📱📱📱');
-        print('Data: ${initialMessage.data}');
+        logDebug('📱📱📱 INITIAL MESSAGE FOUND (APP WAS TERMINATED)! 📱📱📱');
+        logDebug('Data: ${initialMessage.data}');
         // Store the initial message to handle after router is ready
         _pendingInitialMessage = initialMessage;
       } else {
-        print('No initial message found');
+        logDebug('No initial message found');
       }
 
-      print('✅ FCM initialized successfully');
+      logDebug('✅ FCM initialized successfully');
     } catch (e) {
-      print('❌ Firebase initialization failed: $e');
+      logDebug('❌ Firebase initialization failed: $e');
     }
   }
 
   /// Get FCM token
   Future<String?> _getFCMToken() async {
     try {
-      print('🔄 Attempting to get FCM token...');
+      logDebug('🔄 Attempting to get FCM token...');
       _fcmToken = await _firebaseMessaging.getToken();
       if (_fcmToken != null) {
-        print('✅ FCM Token acquired: $_fcmToken');
+        logDebug('✅ FCM Token acquired: $_fcmToken');
       } else {
-        print('⚠️ FCM Token is null - this might be a transient issue');
+        logDebug('⚠️ FCM Token is null - this might be a transient issue');
       }
       return _fcmToken;
     } catch (e) {
-      print('❌ Failed to get FCM token: $e');
-      print('Error type: ${e.runtimeType}');
+      logDebug('❌ Failed to get FCM token: $e');
+      logDebug('Error type: ${e.runtimeType}');
       
       // Retry logic for transient failures
-      print('🔄 Retrying FCM token acquisition in 3 seconds...');
+      logDebug('🔄 Retrying FCM token acquisition in 3 seconds...');
       await Future.delayed(const Duration(seconds: 3));
       
       try {
         _fcmToken = await _firebaseMessaging.getToken();
         if (_fcmToken != null) {
-          print('✅ FCM Token acquired on retry: $_fcmToken');
+          logDebug('✅ FCM Token acquired on retry: $_fcmToken');
         } else {
-          print('⚠️ FCM Token still null after retry');
+          logDebug('⚠️ FCM Token still null after retry');
         }
         return _fcmToken;
       } catch (retryError) {
-        print('❌ Failed to get FCM token on retry: $retryError');
+        logDebug('❌ Failed to get FCM token on retry: $retryError');
         return null;
       }
     }
@@ -167,7 +168,7 @@ class FirebaseService {
 
   /// Handle token refresh
   Future<void> _onTokenRefresh(String newToken) async {
-    print('📱 FCM Token refreshed: $newToken');
+    logDebug('📱 FCM Token refreshed: $newToken');
     _fcmToken = newToken;
 
     // Send new token to backend
@@ -176,28 +177,28 @@ class FirebaseService {
 
   /// Handle foreground messages
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
-    print('📱 Foreground message received');
-    print('Title: ${message.notification?.title}');
-    print('Body: ${message.notification?.body}');
-    print('Data: ${message.data}');
+    logDebug('📱 Foreground message received');
+    logDebug('Title: ${message.notification?.title}');
+    logDebug('Body: ${message.notification?.body}');
+    logDebug('Data: ${message.data}');
 
     final type = message.data['type'];
     
     // Check if this is a match notification
     if (type == 'match' || type == 'wishlist_match') {
-      print('📱 Match notification received, reloading match history...');
+      logDebug('📱 Match notification received, reloading match history...');
       try {
         final notificationsCubit = getIt<NotificationsCubit>();
         await notificationsCubit.loadMatchHistory();
-        print('✅ Match history reloaded');
+        logDebug('✅ Match history reloaded');
       } catch (e) {
-        print('❌ Failed to reload match history: $e');
+        logDebug('❌ Failed to reload match history: $e');
       }
     }
     
     // Check if this is a chat message notification
     if (type == 'new_message') {
-      print('📱 Chat message notification received via FCM');
+      logDebug('📱 Chat message notification received via FCM');
       
       // Save the message to the database first
       await _saveChatMessageFromFCM(message.data);
@@ -206,12 +207,12 @@ class FirebaseService {
       if (_chatsBadgeCubit != null) {
         try {
           await _chatsBadgeCubit!.refresh();
-          print('✅ Chat badge refreshed after saving FCM message');
+          logDebug('✅ Chat badge refreshed after saving FCM message');
         } catch (e) {
-          print('❌ Failed to refresh chat badge: $e');
+          logDebug('❌ Failed to refresh chat badge: $e');
         }
       } else {
-        print('⚠️ ChatsBadgeCubit not registered with FirebaseService');
+        logDebug('⚠️ ChatsBadgeCubit not registered with FirebaseService');
       }
     }
 
@@ -222,7 +223,7 @@ class FirebaseService {
   /// Save chat message from FCM data to local database
   Future<void> _saveChatMessageFromFCM(Map<String, dynamic> data) async {
     try {
-      print('💾 Attempting to save FCM chat message to database...');
+      logDebug('💾 Attempting to save FCM chat message to database...');
       
       // Extract message data from FCM payload
       final messageId = data['messageId'] as String?;
@@ -233,8 +234,8 @@ class FirebaseService {
       
       // Validate required fields
       if (messageId == null || senderId == null || recipientId == null || encryptedContent == null) {
-        print('⚠️ Missing required fields in FCM message data');
-        print('messageId: $messageId, senderId: $senderId, recipientId: $recipientId, encrypted: ${encryptedContent != null}');
+        logDebug('⚠️ Missing required fields in FCM message data');
+        logDebug('messageId: $messageId, senderId: $senderId, recipientId: $recipientId, encrypted: ${encryptedContent != null}');
         return;
       }
       
@@ -243,7 +244,7 @@ class FirebaseService {
       final currentUserId = await userRepository.getUserId();
       
       if (currentUserId == null) {
-        print('❌ Current user ID not available, cannot save message');
+        logDebug('❌ Current user ID not available, cannot save message');
         return;
       }
       
@@ -280,14 +281,14 @@ class FirebaseService {
       // Save message to database
       await chatRepository.saveMessage(chatMessage, conversation.conversationId);
       
-      print('✅ FCM chat message saved to database successfully');
-      print('   Message ID: $messageId');
-      print('   Conversation ID: ${conversation.conversationId}');
-      print('   Sender: $senderId');
+      logDebug('✅ FCM chat message saved to database successfully');
+      logDebug('   Message ID: $messageId');
+      logDebug('   Conversation ID: ${conversation.conversationId}');
+      logDebug('   Sender: $senderId');
       
     } catch (e) {
-      print('❌ Error saving FCM chat message to database: $e');
-      print('Stack trace: ${StackTrace.current}');
+      logDebug('❌ Error saving FCM chat message to database: $e');
+      logDebug('Stack trace: ${StackTrace.current}');
     }
   }
 
@@ -322,7 +323,7 @@ class FirebaseService {
     );
 
     final payload = _encodePayload(message.data);
-    print('📱 Showing local notification with payload: $payload');
+    logDebug('📱 Showing local notification with payload: $payload');
     
     await _localNotifications.plugin.show(
       message.hashCode,
@@ -332,56 +333,56 @@ class FirebaseService {
       payload: payload,
     );
     
-    print('📱 Local notification displayed successfully');
+    logDebug('📱 Local notification displayed successfully');
   }
 
   /// Mark router as ready and handle any pending messages
   /// Call this from your map screen or main screen after router is fully initialized
   void handlePendingInitialMessage() {
-    print('🔔 Router is now ready, checking for pending messages...');
+    logDebug('🔔 Router is now ready, checking for pending messages...');
     _isRouterReady = true;
     
     if (!_hasHandledInitialMessage && _pendingInitialMessage != null) {
-      print('📱 Handling pending initial message (delayed)');
-      print('Pending message data: ${_pendingInitialMessage!.data}');
+      logDebug('📱 Handling pending initial message (delayed)');
+      logDebug('Pending message data: ${_pendingInitialMessage!.data}');
       _handleNotificationTap(_pendingInitialMessage!);
       _hasHandledInitialMessage = true;
       _pendingInitialMessage = null;
     } else {
-      print('No pending messages to handle');
+      logDebug('No pending messages to handle');
     }
   }
 
   /// Handle notification tap
   void _handleNotificationTap(RemoteMessage message) {
-    print('📱📱📱 _handleNotificationTap CALLED! 📱📱📱');
-    print('Message ID: ${message.messageId}');
-    print('Data: ${message.data}');
-    print('Notification: ${message.notification?.title}');
+    logDebug('📱📱📱 _handleNotificationTap CALLED! 📱📱📱');
+    logDebug('Message ID: ${message.messageId}');
+    logDebug('Data: ${message.data}');
+    logDebug('Notification: ${message.notification?.title}');
 
     final type = message.data['type'];
-    print('Notification type: $type');
+    logDebug('Notification type: $type');
 
     // Navigate based on notification type
     switch (type) {
       case 'new_message':
         final senderId = message.data['senderId'];
-        print('📍 Navigating to chat with sender: $senderId');
+        logDebug('📍 Navigating to chat with sender: $senderId');
         _navigateToChat(senderId);
         break;
       case 'match':
       case 'wishlist_match':
         final matchId = message.data['matchId'];
-        print('📍 Navigating to match: $matchId');
+        logDebug('📍 Navigating to match: $matchId');
         _navigateToMatch(matchId);
         break;
       case 'new_posting':
         final postingId = message.data['postingId'];
-        print('📍 Navigating to posting: $postingId');
+        logDebug('📍 Navigating to posting: $postingId');
         _navigateToPosting(postingId);
         break;
       default:
-        print('📍 Navigating to home (unknown type)');
+        logDebug('📍 Navigating to home (unknown type)');
         _navigateToHome();
     }
   }
@@ -389,53 +390,53 @@ class FirebaseService {
   // Navigation helpers using go_router
   void _navigateToChat(String? userId) {
     if (userId == null) {
-      print('❌ Cannot navigate to chat: userId is null');
+      logDebug('❌ Cannot navigate to chat: userId is null');
       return;
     }
-    print('📍 Attempting to navigate to chat with user: $userId');
+    logDebug('📍 Attempting to navigate to chat with user: $userId');
     try {
       AppRouter.navigateToChat(userId);
-      print('✅ Navigation to chat succeeded');
+      logDebug('✅ Navigation to chat succeeded');
     } catch (e) {
-      print('❌ Navigation to chat failed: $e');
+      logDebug('❌ Navigation to chat failed: $e');
     }
   }
 
   void _navigateToMatch(String? matchId) {
     if (matchId == null) {
-      print('❌ Cannot navigate to match: matchId is null');
+      logDebug('❌ Cannot navigate to match: matchId is null');
       return;
     }
-    print('📍 Attempting to navigate to match: $matchId');
+    logDebug('📍 Attempting to navigate to match: $matchId');
     try {
       AppRouter.navigateToMatch(matchId);
-      print('✅ Navigation to match succeeded');
+      logDebug('✅ Navigation to match succeeded');
     } catch (e) {
-      print('❌ Navigation to match failed: $e');
+      logDebug('❌ Navigation to match failed: $e');
     }
   }
 
   void _navigateToPosting(String? postingId) {
     if (postingId == null) {
-      print('❌ Cannot navigate to posting: postingId is null');
+      logDebug('❌ Cannot navigate to posting: postingId is null');
       return;
     }
-    print('📍 Attempting to navigate to posting: $postingId');
+    logDebug('📍 Attempting to navigate to posting: $postingId');
     try {
       AppRouter.navigateToPosting(postingId);
-      print('✅ Navigation to posting succeeded');
+      logDebug('✅ Navigation to posting succeeded');
     } catch (e) {
-      print('❌ Navigation to posting failed: $e');
+      logDebug('❌ Navigation to posting failed: $e');
     }
   }
 
   void _navigateToHome() {
-    print('📍 Attempting to navigate to home');
+    logDebug('📍 Attempting to navigate to home');
     try {
       AppRouter.navigateToHome();
-      print('✅ Navigation to home succeeded');
+      logDebug('✅ Navigation to home succeeded');
     } catch (e) {
-      print('❌ Navigation to home failed: $e');
+      logDebug('❌ Navigation to home failed: $e');
     }
   }
 
@@ -455,10 +456,10 @@ class FirebaseService {
           AddPushTokenRequest(token: token, platform: platform, deviceId: userId + "_" + platform)
       );
       
-      print('📤 Send token to backend: $token ($platform)');
+      logDebug('📤 Send token to backend: $token ($platform)');
       return response.success; // Replace with actual API call result
     } catch (e) {
-      print('❌ Failed to send token to backend: $e');
+      logDebug('❌ Failed to send token to backend: $e');
       return false;
     }
   }
@@ -467,9 +468,9 @@ class FirebaseService {
   Future<void> subscribeToTopic(String topic) async {
     try {
       await _firebaseMessaging.subscribeToTopic(topic);
-      print('✅ Subscribed to topic: $topic');
+      logDebug('✅ Subscribed to topic: $topic');
     } catch (e) {
-      print('❌ Failed to subscribe to topic: $e');
+      logDebug('❌ Failed to subscribe to topic: $e');
     }
   }
 
@@ -477,9 +478,9 @@ class FirebaseService {
   Future<void> unsubscribeFromTopic(String topic) async {
     try {
       await _firebaseMessaging.unsubscribeFromTopic(topic);
-      print('✅ Unsubscribed from topic: $topic');
+      logDebug('✅ Unsubscribed from topic: $topic');
     } catch (e) {
-      print('❌ Failed to unsubscribe from topic: $e');
+      logDebug('❌ Failed to unsubscribe from topic: $e');
     }
   }
   

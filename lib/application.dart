@@ -9,6 +9,7 @@ import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/messaging/chat_notification_service.dart';
 import 'package:barter_app/services/messaging/firebase_service.dart';
 import 'package:barter_app/theme/app_theme.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
 
   /// Navigate to chat screen with specific user using go_router
   void _navigateToChat(String userId) {
-    print('🔔 Navigating to chat with user: $userId');
+    logDebug('🔔 Navigating to chat with user: $userId');
     AppRouter.navigateToChat(userId);
   }
 
@@ -77,9 +78,9 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         _navigateToChat(userId);
       };
 
-      print('✅ Chat notification service initialized');
+      logDebug('✅ Chat notification service initialized');
     } catch (e) {
-      print('❌ Failed to initialize chat notification service: $e');
+      logDebugError('Failed to initialize chat notification service', e);
     }
   }
 

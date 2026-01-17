@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -30,7 +31,7 @@ class ChatNotificationService with WidgetsBindingObserver {
       // Initialize the singleton (safe to call multiple times)
       await _notificationService.initialize();
       _isInitialized = true;
-      print('✅ Chat notification service initialized');
+      logDebug('✅ Chat notification service initialized');
     }
 
     // Register lifecycle observer

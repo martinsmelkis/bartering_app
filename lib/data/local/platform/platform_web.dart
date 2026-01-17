@@ -1,3 +1,4 @@
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/wasm.dart';
 
@@ -14,10 +15,10 @@ class PlatformInterface {
 
     // Verify the database is working
     if (result.missingFeatures.isNotEmpty) {
-      print('@@@@@@@@@@ WARNING: The browser is missing features: ${result.missingFeatures}');
+      logDebug('@@@@@@@@@@ WARNING: The browser is missing features: ${result.missingFeatures}');
     }
 
-    print('@@@@@@@@@@ WASM database connection created successfully.');
+    logDebug('@@@@@@@@@@ WASM database connection created successfully.');
     return result.resolvedExecutor;
   }
 }

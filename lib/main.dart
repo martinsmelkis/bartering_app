@@ -1,6 +1,7 @@
 import 'package:barter_app/application.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/services/messaging/firebase_service.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -11,38 +12,38 @@ import 'services/security_test_helper.dart';
 
 // The main entry point of the Flutter application.
 void main() async {
-  print('🚀🚀🚀 MAIN() STARTED 🚀🚀🚀');
+  logDebug('🚀🚀🚀 MAIN() STARTED 🚀🚀🚀');
   WidgetsFlutterBinding.ensureInitialized();
-  print('✅ WidgetsFlutterBinding initialized');
+  logDebug('✅ WidgetsFlutterBinding initialized');
 
   // Run security tests
   //if (!kDebugMode) {
   //  await SecurityTestHelper.runAllTests();
   //}
 
-  print('⏳ Configuring dependencies...');
+  logDebug('⏳ Configuring dependencies...');
   await configureDependencies();
-  print('✅ Dependencies configured');
+  logDebug('✅ Dependencies configured');
 
   // Initialize Firebase (safe to call multiple times)
-  print('⏳ Initializing Firebase...');
+  logDebug('⏳ Initializing Firebase...');
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('✅ Firebase initialized in main()');
+    logDebug('✅ Firebase initialized in main()');
   } catch (e) {
-    print('⚠️ Firebase already initialized (probably by background handler): $e');
+    logDebug('⚠️ Firebase already initialized (probably by background handler): $e');
   }
   
   // Initialize Firebase and FCM
-  print('⏳ Initializing FirebaseService...');
+  logDebug('⏳ Initializing FirebaseService...');
   await FirebaseService().initialize();
-  print('✅ FirebaseService initialized');
+  logDebug('✅ FirebaseService initialized');
 
-  print('⏳ Running Application widget...');
+  logDebug('⏳ Running Application widget...');
   runApp(const Application());
-  print('✅ Application widget started');
+  logDebug('✅ Application widget started');
 }
 
 /// The root widget of the application.

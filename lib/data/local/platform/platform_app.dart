@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
@@ -68,7 +69,7 @@ class PlatformInterface {
       if (e.toString().contains('decryption') || 
           e.toString().contains('not a database') ||
           e.toString().contains('hmac check failed')) {
-        print('Database corrupted or key mismatch. Deleting and recreating...');
+        logDebug('Database corrupted or key mismatch. Deleting and recreating...');
         
         // Delete the corrupted database file
         if (await dbFile.exists()) {

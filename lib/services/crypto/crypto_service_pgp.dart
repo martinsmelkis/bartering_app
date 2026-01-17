@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:openpgp/openpgp.dart';
@@ -30,7 +31,7 @@ class CryptoServicePgp {
       debugPrint("@@@@@@@@ public key ${userPublicKey}");
 
       if (_userPrivateKeyArmored != null && userPublicKey != null) {
-        print("User PGP keys loaded from storage.");
+        logDebug("User PGP keys loaded from storage.");
         // We can try to get the KeyPairEntity to "validate" the key with the passphrase
         try {
           // NOTE: get from flutter_secure_storage ?
@@ -41,14 +42,14 @@ class CryptoServicePgp {
           ));
            */
           //await PGPKeyHelper.getKeyPair(_userPrivateKeyArmored!, passphrase);
-          print("Stored private key seems valid with the provided passphrase (or no passphrase if not set).");
+          logDebug("Stored private key seems valid with the provided passphrase (or no passphrase if not set).");
         } catch (e) {
-          print("Warning: Could not validate stored private key with passphrase: $e. Key might be corrupt or passphrase incorrect if it was set during generation.");
+          logDebug("Warning: Could not validate stored private key with passphrase: $e. Key might be corrupt or passphrase incorrect if it was set during generation.");
           // Depending on policy, you might want to clear keys or re-generate here.
           // For now, we'll assume the loaded armored strings are what we'll try to use.
         }
       } else {
-        print("No stored PGP keys found. Generating new key pair...");
+        logDebug("No stored PGP keys found. Generating new key pair...");
         // It takes name, email, and passphrase.
         // The options like rsaBits or curve are often defaults in such helpers or set elsewhere.
         // You might need to check PGPKeyHelper.generate or underlying OpenPGP settings
@@ -61,11 +62,11 @@ class CryptoServicePgp {
 
         await _secureStorage.write(key: _privateKeyStorageKey, value: _userPrivateKeyArmored);
         await _secureStorage.write(key: _publicKeyStorageKey, value: userPublicKey);
-        print("New User PGP key pair generated and stored.");
+        logDebug("New User PGP key pair generated and stored.");
       }
       return isInitialized;
     } catch (e) {
-      print("Error during PGP initialization: $e");
+      logDebugError("Error during PGP initialization", e);
       _userPrivateKeyArmored = null;
       userPublicKey = null;
       return false;
@@ -86,7 +87,7 @@ class CryptoServicePgp {
 
    Future<String?> getMyPublicKeyArmored() async {
     if (!isInitialized) {
-      print("Error: CryptoServicePgp not initialized.");
+      logDebugError("CryptoServicePgp not initialized");
       return null;
     }
     return userPublicKey;
@@ -97,7 +98,7 @@ class CryptoServicePgp {
     await _secureStorage.delete(key: _publicKeyStorageKey);
     _userPrivateKeyArmored = null;
     userPublicKey = null;
-    print("Stored PGP keys cleared.");
+    logDebug("Stored PGP keys cleared.");
   }
 
   // --- Encryption ---
@@ -106,18 +107,18 @@ class CryptoServicePgp {
         String? userPassphrase, // Passphrase for current user's private key (for signing)
       }) async {
     if (!isInitialized) {
-      print("Error: CryptoServicePgp not initialized for encryption.");
+      logDebugError("CryptoServicePgp not initialized for encryption");
       return null;
     }
     if (_userPrivateKeyArmored == null) {
-      print("Error: User private key not available for signing.");
+      logDebugError("User private key not available for signing");
       return null;
     }
 
     try {
       // The encrypt method takes armored keys directly.
       // Signing is done by providing the signer's private key and passphrase.
-      print('"@@@@@@@@@@@@@ pgp key of recipient ${recipientPublicKey}');
+      logDebug('"@@@@@@@@@@@@@ pgp key of recipient ${recipientPublicKey}');
       String encryptedMessage = await OpenPGP.encrypt(
         plainText,
         recipientPublicKey ?? "",
@@ -126,7 +127,7 @@ class CryptoServicePgp {
       return encryptedMessage; // This is already the armored encrypted string
     } catch (e) {
       debugPrintStack();
-      print("PGP Encryption error: $e");
+      logDebugError("PGP Encryption error", e);
       return null;
     }
   }
@@ -138,12 +139,12 @@ class CryptoServicePgp {
         String? userPassphrase, // Passphrase for current user's private key (for decryption)
       }) async {
     if (_userPrivateKeyArmored == null) {
-      print("Error: CryptoServicePgp (User's private key) not initialized for decryption.");
+      logDebugError("CryptoServicePgp (User's private key) not initialized for decryption");
       return null;
     }
     debugPrint('@@@@@@@@@@@@@ pgp key original ${_userPrivateKeyArmored}');
 
-    print('@@@@@@@@@@@ message ${armoredEncryptedMessage}');
+    logDebug('@@@@@@@@@@@ message ${armoredEncryptedMessage}');
 
     //try {
       // The decrypt method handles both decryption and signature verification.
@@ -181,7 +182,7 @@ class CryptoServicePgp {
         String? userPassphrase, // Passphrase for current user's private key (for decryption)
       }) async {
     if (_userPrivateKeyArmored == null) {
-      print("Error: CryptoServicePgp (User's private key) not initialized for decryption.");
+      logDebugError("CryptoServicePgp (User's private key) not initialized for decryption");
       return null;
     }
 
@@ -195,7 +196,7 @@ class CryptoServicePgp {
 
       return decryptedResult; // This should be the plaintext string
     } catch (e) {
-      print("PGP Decryption error: $e");
+      logDebugError("PGP Decryption error", e);
       // The library might throw specific exceptions for incorrect passphrases or other issues.
       // e.g. if (e.toString().toLowerCase().contains("incorrect passphrase")) { ... }
       return null;

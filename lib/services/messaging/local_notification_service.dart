@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:barter_app/router/app_router.dart';
+import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// Singleton service to manage local notifications
@@ -19,11 +21,11 @@ class LocalNotificationService {
   /// Initialize local notifications (call only once in app)
   Future<void> initialize() async {
     if (_isInitialized) {
-      print('⚠️ Local notifications already initialized, skipping...');
+      logDebug('⚠️ Local notifications already initialized, skipping...');
       return;
     }
 
-    print('🔔 Initializing local notifications...');
+      logDebug('🔔 Initializing local notifications...');
 
     const androidSettings = AndroidInitializationSettings('ic_notification');
     const iosSettings = DarwinInitializationSettings(
@@ -37,17 +39,17 @@ class LocalNotificationService {
       iOS: iosSettings,
     );
 
-    print('🔔 Setting up notification tap handler...');
+      logDebug('🔔 Setting up notification tap handler...');
     final bool? initialized = await _notifications.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        print('🔔🔔🔔 NOTIFICATION TAP RECEIVED IN HANDLER! 🔔🔔🔔');
-        print('Response: ${response.payload}');
+        logDebug('🔔🔔🔔 NOTIFICATION TAP RECEIVED IN HANDLER! 🔔🔔🔔');
+        logDebug('Response: ${response.payload}');
         _onNotificationTap(response);
       },
     );
 
-    print('🔔 Notification initialization result: $initialized');
+      logDebug('🔔 Notification initialization result: $initialized');
 
     // Create notification channels for Android
     if (Platform.isAndroid) {
@@ -55,7 +57,7 @@ class LocalNotificationService {
     }
 
     _isInitialized = true;
-    print('✅ Local notifications initialized successfully');
+      logDebug('✅ Local notifications initialized successfully');
   }
 
   /// Create Android notification channels
@@ -96,14 +98,14 @@ class LocalNotificationService {
   void _onNotificationTap(NotificationResponse response) {
     if (response.payload == null) return;
 
-    print('📱 Local notification tapped!');
-    print('Payload: ${response.payload}');
+      logDebug('📱 Local notification tapped!');
+      logDebug('Payload: ${response.payload}');
 
     try {
       // Try to parse as query string (FCM format: type=xxx&senderId=yyy)
       if (response.payload!.contains('=')) {
         final data = _decodeQueryString(response.payload!);
-        print('📱 FCM notification tapped: $data');
+        logDebug('📱 FCM notification tapped: $data');
         _handleFCMNotification(data);
         return;
       }
@@ -111,7 +113,7 @@ class LocalNotificationService {
       // Try to parse as JSON (Chat format: {"userId":"xxx","action":"open_chat"})
       if (response.payload!.startsWith('{')) {
         final Map<String, dynamic> data = json.decode(response.payload!);
-        print('📱 Chat notification tapped: $data');
+        logDebug('📱 Chat notification tapped: $data');
         _handleChatNotification(data);
         return;
       }
@@ -121,15 +123,15 @@ class LocalNotificationService {
         final uri = Uri.parse(response.payload!);
         if (uri.pathSegments.isNotEmpty) {
           final userId = uri.pathSegments.last;
-          print('📱 Deep link notification tapped: userId=$userId');
+          logDebug('📱 Deep link notification tapped: userId=$userId');
           AppRouter.navigateToChat(userId);
         }
         return;
       }
 
-      print('⚠️ Unknown payload format: ${response.payload}');
+      logDebug('⚠️ Unknown payload format: ${response.payload}');
     } catch (e) {
-      print('❌ Error handling notification tap: $e');
+      logDebug('❌ Error handling notification tap: $e');
     }
   }
 
@@ -141,7 +143,7 @@ class LocalNotificationService {
       case 'new_message':
         final senderId = data['senderId'];
         if (senderId != null) {
-          print('📍 Navigating to chat: $senderId');
+          logDebug('📍 Navigating to chat: $senderId');
           AppRouter.navigateToChat(senderId);
         }
         break;
@@ -149,19 +151,19 @@ class LocalNotificationService {
       case 'wishlist_match':
         final matchId = data['matchId'];
         if (matchId != null) {
-          print('📍 Navigating to match: $matchId');
+          logDebug('📍 Navigating to match: $matchId');
           AppRouter.navigateToMatch(matchId);
         }
         break;
       case 'new_posting':
         final postingId = data['postingId'];
         if (postingId != null) {
-          print('📍 Navigating to posting: $postingId');
+          logDebug('📍 Navigating to posting: $postingId');
           AppRouter.navigateToPosting(postingId);
         }
         break;
       default:
-        print('📍 Navigating to home');
+        logDebug('📍 Navigating to home');
         AppRouter.navigateToHome();
     }
   }
@@ -170,7 +172,7 @@ class LocalNotificationService {
   void _handleChatNotification(Map<String, dynamic> data) {
     final userId = data['userId'] as String?;
     if (userId != null) {
-      print('📍 Navigating to chat: $userId');
+      logDebug('📍 Navigating to chat: $userId');
       AppRouter.navigateToChat(userId);
     }
   }

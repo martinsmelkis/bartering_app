@@ -3,6 +3,7 @@ import 'package:barter_app/models/chat/chat_message.dart';
 import 'package:barter_app/models/chat/e_chat_message_status.dart';
 import 'package:barter_app/models/chat/file_attachment.dart';
 import 'package:barter_app/repositories/user_repository.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 
@@ -24,7 +25,7 @@ class ChatRepository {
         .getSingleOrNull();
 
     if (existing == null) {
-      print('📝 Creating profile for user: $userId');
+      logDebug('📝 Creating profile for user: $userId');
       try {
         // Create a minimal profile entry for this user
         await _database.into(_database.profiles).insert(
@@ -33,13 +34,13 @@ class ChatRepository {
             onboardingData: Value('{}'), // Empty JSON for now
           ),
         );
-        print('✅ Profile created for user: $userId');
+        logDebug('✅ Profile created for user: $userId');
       } catch (e) {
-        print('❌ Error creating profile for user $userId: $e');
+        logDebugError('Error creating profile for user $userId', e);
         rethrow;
       }
     } else {
-      print('✅ Profile already exists for user: $userId');
+      logDebug('✅ Profile already exists for user: $userId');
     }
   }
 
@@ -275,11 +276,11 @@ class ChatRepository {
       // Determine if this message is sent by the current user
       final isSentByCurrentUser = message.senderId == currentUserId;
 
-      print('💬 Saving message: ${message.id}, conversation: $conversationId');
+      logDebug('💬 Saving message: ${message.id}, conversation: $conversationId');
       
       // If message has a transactionId, link it to the conversation
       if (message.transactionId != null && message.transactionId!.isNotEmpty) {
-        print('🔗 Message has transactionId: ${message.transactionId}, linking to conversation');
+        logDebug('🔗 Message has transactionId: ${message.transactionId}, linking to conversation');
         final conversation = await (_database.select(_database.conversations)
           ..where((tbl) => tbl.conversationId.equals(conversationId)))
             .getSingleOrNull();
@@ -289,7 +290,7 @@ class ChatRepository {
             conversationId: conversationId,
             transactionId: message.transactionId!,
           );
-          print('✅ Conversation linked to transaction: ${message.transactionId}');
+          logDebug('✅ Conversation linked to transaction: ${message.transactionId}');
         }
       }
 
@@ -299,7 +300,7 @@ class ChatRepository {
           .getSingleOrNull();
 
       if (conversation == null) {
-        print('⚠️ Conversation not found: $conversationId. Recreating...');
+        logDebug('⚠️ Conversation not found: $conversationId. Recreating...');
         try {
           // For direct conversations, there are only two participants: sender and recipient
           // Use the message sender and current user to recreate
@@ -321,9 +322,9 @@ class ChatRepository {
             userId1: currentUserId,
             userId2: otherUserId,
           );
-          print('✅ Conversation recreated successfully with user: $otherUserId');
+          logDebug('✅ Conversation recreated successfully with user: $otherUserId');
         } catch (e) {
-          print('❌ Failed to recreate conversation: $e');
+          logDebugError('Failed to recreate conversation', e);
           throw Exception('Failed to recreate conversation: $e');
         }
       }
@@ -342,7 +343,7 @@ class ChatRepository {
         );
         if (participants.isNotEmpty) {
           recipientId = participants.first;
-          print('🔍 Found recipient from conversation: $recipientId');
+          logDebug('🔍 Found recipient from conversation: $recipientId');
         }
       }
 
@@ -350,7 +351,7 @@ class ChatRepository {
       if (recipientId != null && recipientId.isNotEmpty) {
         await ensureUserProfileExists(recipientId);
       } else {
-        print('⚠️ Warning: Could not determine recipient for message ${message
+        logDebug('⚠️ Warning: Could not determine recipient for message ${message
             .id}');
       }
 
@@ -373,7 +374,7 @@ class ChatRepository {
         }
       }
 
-      print('✅ All profiles verified, inserting message...');
+      logDebug('✅ All profiles verified, inserting message...');
 
       final messageData = UserChatsCompanion(
         messageId: Value(message.id),
@@ -446,7 +447,7 @@ class ChatRepository {
 
       return id;
     } catch (e) {
-      print('❌ Error saving message to database: $e');
+      logDebugError('Error saving message to database', e);
       rethrow;
     }
   }

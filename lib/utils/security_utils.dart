@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:pointycastle/export.dart';
 
 class SecurityUtils {
@@ -71,7 +72,7 @@ class SecurityUtils {
 
     } catch (e) {
       // If any error occurs during parsing or decoding, it's not a match.
-      print('Error verifying hash: $e');
+      logDebugError('Error verifying hash', e);
       return false;
     }
   }

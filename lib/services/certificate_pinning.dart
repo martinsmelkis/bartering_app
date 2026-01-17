@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:crypto/crypto.dart';
@@ -29,8 +30,8 @@ class CertificatePinning {
         final isValid = allowedSHA256Fingerprints.contains(certSHA256);
 
         if (!isValid) {
-          print('❌ Certificate pinning failed! Cert SHA256: $certSHA256');
-          print('   Expected one of: $allowedSHA256Fingerprints');
+          logDebugError('Certificate pinning failed! Cert SHA256: $certSHA256');
+          logDebug('   Expected one of: $allowedSHA256Fingerprints');
         }
 
         return isValid;

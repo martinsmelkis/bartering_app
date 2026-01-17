@@ -1,4 +1,5 @@
 import 'package:barter_app/l10n/app_localizations.mapper.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/cupertino.dart';
 
 class TextUtils {
@@ -36,9 +37,8 @@ class TextUtils {
       }
       parsedAttribute = localizedItem;
     } catch (e) {
-      print('@@@@@@@@@ localize error: $e, item: $attribute');
+      logDebugError('localize error for item: $attribute', e);
       parsedAttribute = TextUtils.normalizeSnakeCase(attribute);
-      print(e);
     }
     return parsedAttribute;
   }
