@@ -100,6 +100,48 @@ abstract class AppLocalizations {
   /// **'Bartering App'**
   String get appTitle;
 
+  /// No description provided for @category_green.
+  ///
+  /// In en, this message translates to:
+  /// **'Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability'**
+  String get category_green;
+
+  /// No description provided for @category_red.
+  ///
+  /// In en, this message translates to:
+  /// **'Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities'**
+  String get category_red;
+
+  /// No description provided for @category_blue.
+  ///
+  /// In en, this message translates to:
+  /// **'Business, entrepreneurship, paid work, making contacts, money matters, finance, career'**
+  String get category_blue;
+
+  /// No description provided for @category_purple.
+  ///
+  /// In en, this message translates to:
+  /// **'Art, spirituality, philosophy, culture, music, crafts, creativity, design, history'**
+  String get category_purple;
+
+  /// No description provided for @category_yellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat, social activities, casual conversation, local events, new contacts, communication'**
+  String get category_yellow;
+
+  /// No description provided for @category_orange.
+  ///
+  /// In en, this message translates to:
+  /// **'Volunteering, support, free items/skills exchange, consulting, assistance, community'**
+  String get category_orange;
+
+  /// No description provided for @category_teal.
+  ///
+  /// In en, this message translates to:
+  /// **'Technology, learning, education, innovation, brainstorming, ideas, science, software'**
+  String get category_teal;
+
   /// No description provided for @tapToChat.
   ///
   /// In en, this message translates to:
@@ -1167,48 +1209,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get done;
-
-  /// No description provided for @category_green.
-  ///
-  /// In en, this message translates to:
-  /// **'Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability'**
-  String get category_green;
-
-  /// No description provided for @category_red.
-  ///
-  /// In en, this message translates to:
-  /// **'Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities'**
-  String get category_red;
-
-  /// No description provided for @category_blue.
-  ///
-  /// In en, this message translates to:
-  /// **'Business, entrepreneurship, paid work, making contacts, money matters, finance, career'**
-  String get category_blue;
-
-  /// No description provided for @category_purple.
-  ///
-  /// In en, this message translates to:
-  /// **'Art, spirituality, philosophy, culture, music, crafts, creativity, design, history'**
-  String get category_purple;
-
-  /// No description provided for @category_yellow.
-  ///
-  /// In en, this message translates to:
-  /// **'Chat, social activities, casual conversation, local events, new contacts, communication'**
-  String get category_yellow;
-
-  /// No description provided for @category_orange.
-  ///
-  /// In en, this message translates to:
-  /// **'Volunteering, open-ended support, free exchange, consulting, non-specific assistance, community'**
-  String get category_orange;
-
-  /// No description provided for @category_teal.
-  ///
-  /// In en, this message translates to:
-  /// **'Technology, learning, education, innovation, brainstorming, ideas, science, software'**
-  String get category_teal;
 
   /// No description provided for @attr_3d_printing.
   ///

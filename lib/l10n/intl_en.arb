@@ -1,6 +1,15 @@
 {
   "@@locale": "en",
   "appTitle": "Bartering App",
+
+  "category_green": "Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability",
+  "category_red": "Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities",
+  "category_blue": "Business, entrepreneurship, paid work, making contacts, money matters, finance, career",
+  "category_purple": "Art, spirituality, philosophy, culture, music, crafts, creativity, design, history",
+  "category_yellow": "Chat, social activities, casual conversation, local events, new contacts, communication",
+  "category_orange": "Volunteering, support, free items/skills exchange, consulting, assistance, community",
+  "category_teal": "Technology, learning, education, innovation, brainstorming, ideas, science, software",
+
   "tapToChat": "Tap to chat",
   "locations": "Locations",
   "tapToExpandMainCluster": "Tap to expand main cluster",
@@ -193,14 +202,6 @@
   "publicKey": "Public Key",
   "privateKey": "Private Key",
   "done": "Done",
-
-  "category_green": "Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability",
-  "category_red": "Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities",
-  "category_blue": "Business, entrepreneurship, paid work, making contacts, money matters, finance, career",
-  "category_purple": "Art, spirituality, philosophy, culture, music, crafts, creativity, design, history",
-  "category_yellow": "Chat, social activities, casual conversation, local events, new contacts, communication",
-  "category_orange": "Volunteering, open-ended support, free exchange, consulting, non-specific assistance, community",
-  "category_teal": "Technology, learning, education, innovation, brainstorming, ideas, science, software",
 
   "attr_3d_printing": "3D printing",
   "attr_artificial_intelligence": "Artificial Intelligence",

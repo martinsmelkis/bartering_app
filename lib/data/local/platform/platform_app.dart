@@ -66,21 +66,28 @@ class PlatformInterface {
       );
     } catch (e) {
       // If database connection fails due to decryption error, delete and recreate
-      if (e.toString().contains('decryption') || 
-          e.toString().contains('not a database') ||
-          e.toString().contains('hmac check failed')) {
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('decryption') || 
+          errorString.contains('not a database') ||
+          errorString.contains('hmac check failed') ||
+          errorString.contains('file is not a database') ||
+          errorString.contains('sqliteexception(26)')) {
         logDebug('Database corrupted or key mismatch. Deleting and recreating...');
+        logDebug('Error details: $e');
         
         // Delete the corrupted database file
         if (await dbFile.exists()) {
           await dbFile.delete();
+          logDebug('✅ Corrupted database file deleted');
         }
         
         // Recursively call to create a fresh database
+        logDebug('🔄 Creating fresh database with new encryption key...');
         return createDatabaseConnection(databaseName);
       }
       
       // Re-throw other errors
+      logDebugError('Unexpected database error', e);
       rethrow;
     }
   }

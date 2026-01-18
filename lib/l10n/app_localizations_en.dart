@@ -12,6 +12,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Bartering App';
 
   @override
+  String get category_green =>
+      'Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability';
+
+  @override
+  String get category_red =>
+      'Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities';
+
+  @override
+  String get category_blue =>
+      'Business, entrepreneurship, paid work, making contacts, money matters, finance, career';
+
+  @override
+  String get category_purple =>
+      'Art, spirituality, philosophy, culture, music, crafts, creativity, design, history';
+
+  @override
+  String get category_yellow =>
+      'Chat, social activities, casual conversation, local events, new contacts, communication';
+
+  @override
+  String get category_orange =>
+      'Volunteering, support, free items/skills exchange, consulting, assistance, community';
+
+  @override
+  String get category_teal =>
+      'Technology, learning, education, innovation, brainstorming, ideas, science, software';
+
+  @override
   String get tapToChat => 'Tap to chat';
 
   @override
@@ -582,34 +610,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get done => 'Done';
-
-  @override
-  String get category_green =>
-      'Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability';
-
-  @override
-  String get category_red =>
-      'Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities';
-
-  @override
-  String get category_blue =>
-      'Business, entrepreneurship, paid work, making contacts, money matters, finance, career';
-
-  @override
-  String get category_purple =>
-      'Art, spirituality, philosophy, culture, music, crafts, creativity, design, history';
-
-  @override
-  String get category_yellow =>
-      'Chat, social activities, casual conversation, local events, new contacts, communication';
-
-  @override
-  String get category_orange =>
-      'Volunteering, open-ended support, free exchange, consulting, non-specific assistance, community';
-
-  @override
-  String get category_teal =>
-      'Technology, learning, education, innovation, brainstorming, ideas, science, software';
 
   @override
   String get attr_3d_printing => '3D printing';

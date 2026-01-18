@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart';
@@ -14,9 +16,12 @@ import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dar
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
@@ -135,67 +140,66 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             SizedBox(height: 16.h),
 
             // Location Section
-            Row(
-              children: [
-                Text(
-                  l10n.userLocation,
-                  style: TextStyle(
-                    fontSize: AppDimensions.headingTextSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                InkWell(
-                  onTap: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const LocationPickerScreenOsm(),
-                      ),
-                    );
-                    // Navigate back to MapScreenV2 after editing
-                    if (mounted) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (_) => const MapScreenV2(),
-                        ),
-                      );
-                    }
-                  },
-                  child: Icon(
-                    Icons.edit,
-                    size: AppDimensions.editIconSize,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.h),
             Card(
               elevation: 1,
-              child: Padding(
-                padding: EdgeInsets.all(12.w),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.location_on,
-                      color: AppColors.primary,
-                      size: 20.sp,
-                    ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: Text(
-                        _userLocation ?? l10n.notSet,
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontFamily: 'Courier',
-                          color: _userLocation != null
-                              ? Colors.black87
-                              : Colors.grey,
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(12.w),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          color: AppColors.primary,
+                          size: 20.sp,
                         ),
-                      ),
+                        SizedBox(width: 8.w),
+                        Expanded(
+                          child: Text(
+                            _userLocation ?? l10n.notSet,
+                            style: TextStyle(
+                              fontSize: 10.sp,
+                              fontFamily: 'Courier',
+                              color: _userLocation != null
+                                  ? Colors.black87
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 40.w), // Space for the edit icon
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  Positioned(
+                    top: 4.h,
+                    right: 4.w,
+                    child: IconButton(
+                      onPressed: () async {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const LocationPickerScreenOsm(),
+                          ),
+                        );
+                        // Navigate back to MapScreenV2 after editing
+                        if (mounted) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (_) => const MapScreenV2(),
+                            ),
+                          );
+                        }
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        size: AppDimensions.editIconSize,
+                        color: AppColors.primary,
+                      ),
+                      padding: EdgeInsets.all(4.w),
+                      constraints: const BoxConstraints(),
+                      tooltip: l10n.editLocation,
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 20.h),
@@ -679,6 +683,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
       // Call the API to delete the user
       await getIt<ApiClient>().deleteUser(widget.userId);
+      
+      // Delete the database file to prevent encryption key mismatch on next registration
+      try {
+        final path = await getApplicationDocumentsDirectory();
+        final dbFile = File(p.join(path.path, 'app.db.enc'));
+        if (await dbFile.exists()) {
+          await dbFile.delete();
+          logDebug('✅ Database file deleted');
+        }
+      } catch (dbError) {
+        logDebug('⚠️ Failed to delete database file: $dbError');
+        // Continue anyway - the error handling in platform_app.dart will handle this
+      }
       
       // Clear all secure storage data
       await SecureStorageService().clearStorage();
