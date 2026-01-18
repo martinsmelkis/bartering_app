@@ -134,6 +134,11 @@ class ChatNotificationService with WidgetsBindingObserver {
           icon: 'ic_notification',
           enableVibration: true,
           playSound: true,
+          // Make notification temporary when app is in foreground
+          autoCancel: true, // Automatically remove when tapped
+          ongoing: false, // Not an ongoing notification
+          onlyAlertOnce: true, // Don't alert for updates
+          //timeoutAfter: _isInForeground ? 5000 : null, // Auto-dismiss after 5s if in foreground
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,

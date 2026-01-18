@@ -1566,6 +1566,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activePostings => 'Active Postings';
 
   @override
+  String get posting => 'posting';
+
+  @override
+  String get postings => 'postings';
+
+  @override
   String get offers => 'Offers';
 
   @override
@@ -2269,6 +2275,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get blockUser => 'Block User';
 
   @override
+  String get unblockUser => 'Unblock User';
+
+  @override
   String get reportUserConfirmation =>
       'Please provide a reason for reporting this user.';
 
@@ -2283,13 +2292,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Are you sure you want to block this user? You will no longer be able to communicate with them.';
 
   @override
+  String get unblockUserConfirmation =>
+      'Are you sure you want to unblock this user? They will be able to communicate with you again.';
+
+  @override
   String get block => 'Block';
+
+  @override
+  String get unblock => 'Unblock';
 
   @override
   String get userBlocked => 'User blocked successfully';
 
   @override
+  String get userUnblocked => 'User unblocked successfully';
+
+  @override
   String get failedToBlockUser => 'Failed to block user';
+
+  @override
+  String get failedToUnblockUser => 'Failed to unblock user';
 
   @override
   String get failedToSubmitReport =>
@@ -2307,6 +2329,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String blockUserConfirmationDetailed(String userName) {
     return 'Blocking $userName will prevent them from:\n• Sending you messages\n• Seeing your profile\n• Commenting on your postings';
+  }
+
+  @override
+  String unblockUserConfirmationDetailed(String userName) {
+    return 'Unblocking $userName will allow them to:\n• Send you messages\n• See your profile\n• Comment on your postings';
   }
 
   @override

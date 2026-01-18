@@ -3112,6 +3112,18 @@ abstract class AppLocalizations {
   /// **'Active Postings'**
   String get activePostings;
 
+  /// No description provided for @posting.
+  ///
+  /// In en, this message translates to:
+  /// **'posting'**
+  String get posting;
+
+  /// No description provided for @postings.
+  ///
+  /// In en, this message translates to:
+  /// **'postings'**
+  String get postings;
+
   /// No description provided for @offers.
   ///
   /// In en, this message translates to:
@@ -4420,6 +4432,12 @@ abstract class AppLocalizations {
   /// **'Block User'**
   String get blockUser;
 
+  /// No description provided for @unblockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock User'**
+  String get unblockUser;
+
   /// No description provided for @reportUserConfirmation.
   ///
   /// In en, this message translates to:
@@ -4444,11 +4462,23 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to block this user? You will no longer be able to communicate with them.'**
   String get blockUserConfirmation;
 
+  /// No description provided for @unblockUserConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to unblock this user? They will be able to communicate with you again.'**
+  String get unblockUserConfirmation;
+
   /// No description provided for @block.
   ///
   /// In en, this message translates to:
   /// **'Block'**
   String get block;
+
+  /// No description provided for @unblock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get unblock;
 
   /// No description provided for @userBlocked.
   ///
@@ -4456,11 +4486,23 @@ abstract class AppLocalizations {
   /// **'User blocked successfully'**
   String get userBlocked;
 
+  /// No description provided for @userUnblocked.
+  ///
+  /// In en, this message translates to:
+  /// **'User unblocked successfully'**
+  String get userUnblocked;
+
   /// No description provided for @failedToBlockUser.
   ///
   /// In en, this message translates to:
   /// **'Failed to block user'**
   String get failedToBlockUser;
+
+  /// No description provided for @failedToUnblockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to unblock user'**
+  String get failedToUnblockUser;
 
   /// No description provided for @failedToSubmitReport.
   ///
@@ -4485,6 +4527,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Blocking {userName} will prevent them from:\n• Sending you messages\n• Seeing your profile\n• Commenting on your postings'**
   String blockUserConfirmationDetailed(String userName);
+
+  /// No description provided for @unblockUserConfirmationDetailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblocking {userName} will allow them to:\n• Send you messages\n• See your profile\n• Comment on your postings'**
+  String unblockUserConfirmationDetailed(String userName);
 
   /// No description provided for @whyReportingUser.
   ///

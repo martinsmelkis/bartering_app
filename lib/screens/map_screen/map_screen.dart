@@ -179,7 +179,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
   }
 
-  void _processPois(List<PointOfInterest> pois) async {
+  void _processPois(List<PointOfInterest> pois, {bool ignoreListViewSetting = false}) async {
     _allPois = List.from(pois);
 
     mapOperationsCubit.reset();
@@ -189,17 +189,19 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       _removeNoUsersMarker();
     }
     
-    // Check if we should show results as list
-    final settingsService = getIt<SettingsService>();
-    final showAsList = await settingsService.getShowSearchResultsAsList();
-    
-    if (showAsList && _allPois.isNotEmpty) {
-      // Show list view instead of map markers
-      setState(() {
-        _searchResults = _allPois;
-        _showSearchResultsList = true;
-      });
-      return;
+    // Check if we should show results as list (unless ignoreListViewSetting is true)
+    if (!ignoreListViewSetting) {
+      final settingsService = getIt<SettingsService>();
+      final showAsList = await settingsService.getShowSearchResultsAsList();
+      
+      if (showAsList && _allPois.isNotEmpty) {
+        // Show list view instead of map markers
+        setState(() {
+          _searchResults = _allPois;
+          _showSearchResultsList = true;
+        });
+        return;
+      }
     }
 
     if (zoomLevelNotifier.value.toDouble() <= 13.5) {
@@ -845,15 +847,31 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                             child: SearchResultsListView(
                               pois: _searchResults,
                               onClose: () {
+                                // Temporarily show POIs on map (setting stays enabled)
                                 setState(() {
                                   _showSearchResultsList = false;
                                   _searchResults = [];
                                 });
+                                
+                                // Re-render POIs on the map with forceMapView
+                                if (_allPois.isNotEmpty) {
+                                  _processPois(_allPois, ignoreListViewSetting: true);
+                                }
                               },
-                              onPoiTap: (poi) {
+                              onPoiTap: (poi) async {
+                                // Temporarily show POIs on map (setting stays enabled)
                                 setState(() {
                                   _showSearchResultsList = false;
                                 });
+                                
+                                // Re-render POIs on the map first with forceMapView
+                                if (_allPois.isNotEmpty) {
+                                  _processPois(_allPois, ignoreListViewSetting: true);
+                                  // Small delay to ensure markers are rendered
+                                  await Future.delayed(const Duration(milliseconds: 100));
+                                }
+                                
+                                // Then show the clicked POI details
                                 _onIndividualPoiTap(poi);
                               },
                               onChatTap: (poi) {

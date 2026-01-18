@@ -49,6 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
+  bool _isUserBlocked = false;
 
   @override
   void dispose() {
@@ -245,6 +246,11 @@ class _ChatScreenState extends State<ChatScreen> {
     // Recipient's public key will be loaded by the cubit
     // We'll get it from secure storage when needed
 
+    // Check if user is blocked
+    if (widget.poiId != null) {
+      _checkBlockedStatus();
+    }
+
     // Set active chat to suppress notifications while in this screen
     try {
       final notificationService = getIt<ChatNotificationService>();
@@ -253,6 +259,17 @@ class _ChatScreenState extends State<ChatScreen> {
       await notificationService.requestNotificationPermission();
     } catch (e) {
       // Service might not be registered yet
+    }
+  }
+
+  Future<void> _checkBlockedStatus() async {
+    if (widget.poiId != null) {
+      final isBlocked = await _chatCubit.isUserBlocked(widget.poiId!);
+      if (mounted) {
+        setState(() {
+          _isUserBlocked = isBlocked;
+        });
+      }
     }
   }
 
@@ -283,6 +300,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 _handleReportUser(context);
               } else if (value == 'block_user') {
                 _handleBlockUser(context);
+              } else if (value == 'unblock_user') {
+                _handleUnblockUser(context);
               }
             },
             itemBuilder: (BuildContext context) => [
@@ -306,16 +325,28 @@ class _ChatScreenState extends State<ChatScreen> {
                   ],
                 ),
               ),
-              PopupMenuItem<String>(
-                value: 'block_user',
-                child: Row(
-                  children: [
-                    const Icon(Icons.block),
-                    SizedBox(width: 8.w),
-                    Text(l10n.blockUser),
-                  ],
+              if (_isUserBlocked)
+                PopupMenuItem<String>(
+                  value: 'unblock_user',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.check_circle),
+                      SizedBox(width: 8.w),
+                      Text(l10n.unblockUser),
+                    ],
+                  ),
+                )
+              else
+                PopupMenuItem<String>(
+                  value: 'block_user',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.block),
+                      SizedBox(width: 8.w),
+                      Text(l10n.blockUser),
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ],
@@ -1026,8 +1057,68 @@ class _ChatScreenState extends State<ChatScreen> {
     if (!mounted) return;
 
     if (success) {
-      // Close chat screen after blocking
+      // Update blocked status and close chat screen
+      setState(() {
+        _isUserBlocked = true;
+      });
       Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> _handleUnblockUser(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (widget.poiId == null) return;
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.unblockUser),
+        content: Text(l10n.unblockUserConfirmationDetailed(widget.poiName ?? l10n.unknownUser)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.unblock),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    // Unblock the user via cubit
+    final success = await context.read<ChatCubit>().unblockUser(widget.poiId!);
+
+    if (!mounted) return;
+
+    if (success) {
+      // Update blocked status and show success message
+      setState(() {
+        _isUserBlocked = false;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.userUnblocked),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.failedToUnblockUser),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

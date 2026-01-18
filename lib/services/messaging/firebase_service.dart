@@ -9,6 +9,7 @@ import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubi
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../configure_dependencies.dart';
@@ -41,7 +42,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
-class FirebaseService {
+class FirebaseService with WidgetsBindingObserver {
   static final FirebaseService _instance = FirebaseService._internal();
   factory FirebaseService() => _instance;
   FirebaseService._internal();
@@ -55,6 +56,7 @@ class FirebaseService {
   RemoteMessage? _pendingInitialMessage;
   bool _hasHandledInitialMessage = false;
   bool _isRouterReady = false;
+  bool _isAppInForeground = true; // Track app lifecycle state
   
   // Reference to ChatsBadgeCubit for updating badge on FCM messages
   static ChatsBadgeCubit? _chatsBadgeCubit;
@@ -70,6 +72,10 @@ class FirebaseService {
     try {
       // Firebase is already initialized in main(), so we skip this
       logDebug('✅ Skipping Firebase.initializeApp() (already done in main.dart)');
+
+      // Register as lifecycle observer
+      WidgetsBinding.instance.addObserver(this);
+      logDebug('✅ FirebaseService registered as lifecycle observer');
 
       // Initialize local notifications singleton (only once in app)
       await _localNotifications.initialize();
@@ -129,6 +135,37 @@ class FirebaseService {
       logDebug('✅ FCM initialized successfully');
     } catch (e) {
       logDebug('❌ Firebase initialization failed: $e');
+    }
+  }
+
+  /// Handle app lifecycle changes
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _isAppInForeground = true;
+        logDebug('📱 App resumed (foreground)');
+        
+        // Refresh chat badge when app comes to foreground
+        // This catches any messages that arrived while in background
+        if (_chatsBadgeCubit != null) {
+          _chatsBadgeCubit!.refresh().then((_) {
+            logDebug('✅ Chat badge refreshed on app resume');
+          }).catchError((error) {
+            logDebug('❌ Failed to refresh chat badge on resume: $error');
+          });
+        }
+        break;
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+        _isAppInForeground = false;
+        logDebug('📱 App paused/inactive (background)');
+        break;
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        _isAppInForeground = false;
+        logDebug('📱 App detached/hidden');
+        break;
     }
   }
 
@@ -203,14 +240,17 @@ class FirebaseService {
       // Save the message to the database first
       await _saveChatMessageFromFCM(message.data);
       
-      // Then refresh the badge (which will read from the database)
-      if (_chatsBadgeCubit != null) {
+      // Then refresh the badge ONLY if app is in foreground
+      // (when in background, badge will be updated when app resumes)
+      if (_isAppInForeground && _chatsBadgeCubit != null) {
         try {
           await _chatsBadgeCubit!.refresh();
-          logDebug('✅ Chat badge refreshed after saving FCM message');
+          logDebug('✅ Chat badge refreshed after saving FCM message (foreground)');
         } catch (e) {
           logDebug('❌ Failed to refresh chat badge: $e');
         }
+      } else if (!_isAppInForeground) {
+        logDebug('ℹ️ App in background, skipping chat badge refresh (will update on resume)');
       } else {
         logDebug('⚠️ ChatsBadgeCubit not registered with FirebaseService');
       }
@@ -299,6 +339,8 @@ class FirebaseService {
 
     final channelId = message.data['channelId'] ?? 'default_channel';
 
+    // Only make notification temporary if app is in foreground
+    // When app goes to background, notification should persist normally
     final androidDetails = AndroidNotificationDetails(
       channelId,
       channelId == 'chat_messages' ? 'Chat Messages' : 'Notifications',
@@ -309,6 +351,11 @@ class FirebaseService {
       largeIcon: notification.android?.imageUrl != null
           ? DrawableResourceAndroidBitmap('@mipmap/ic_launcher')
           : null,
+      // Make notification temporary ONLY when app is in foreground
+      autoCancel: true, // Automatically remove when tapped
+      ongoing: true, // Not an ongoing notification
+      onlyAlertOnce: true, // Don't alert for updates
+      //timeoutAfter: _isAppInForeground ? 5000 : null, // Auto-dismiss after 5s only in foreground
     );
 
     const iosDetails = DarwinNotificationDetails(
@@ -323,7 +370,8 @@ class FirebaseService {
     );
 
     final payload = _encodePayload(message.data);
-    logDebug('📱 Showing local notification with payload: $payload');
+    final notificationType = _isAppInForeground ? 'temporary (5s auto-dismiss)' : 'persistent';
+    logDebug('📱 Showing $notificationType local notification with payload: $payload');
     
     await _localNotifications.plugin.show(
       message.hashCode,
@@ -333,7 +381,7 @@ class FirebaseService {
       payload: payload,
     );
     
-    logDebug('📱 Local notification displayed successfully');
+    logDebug('📱 Local notification displayed: $notificationType');
   }
 
   /// Mark router as ready and handle any pending messages
@@ -482,6 +530,11 @@ class FirebaseService {
     } catch (e) {
       logDebug('❌ Failed to unsubscribe from topic: $e');
     }
+  }
+
+  /// Cleanup
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
   }
   
 }

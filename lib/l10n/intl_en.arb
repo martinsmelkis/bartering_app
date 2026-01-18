@@ -522,6 +522,8 @@
   "errorLoadingPostings": "Error loading postings",
   "errorLoadingAttributes": "Error loading attributes",
   "activePostings": "Active Postings",
+  "posting": "posting",
+  "postings": "postings",
   "offers": "Offers",
   "lookingFor": "Looking For",
   "valuePrefix": "Value",
@@ -823,13 +825,18 @@
   
   "reportUser": "Report User",
   "blockUser": "Block User",
+  "unblockUser": "Unblock User",
   "reportUserConfirmation": "Please provide a reason for reporting this user.",
   "reportReason": "Reason for report (optional)",
   "userReported": "User reported successfully",
   "blockUserConfirmation": "Are you sure you want to block this user? You will no longer be able to communicate with them.",
+  "unblockUserConfirmation": "Are you sure you want to unblock this user? They will be able to communicate with you again.",
   "block": "Block",
+  "unblock": "Unblock",
   "userBlocked": "User blocked successfully",
+  "userUnblocked": "User unblocked successfully",
   "failedToBlockUser": "Failed to block user",
+  "failedToUnblockUser": "Failed to unblock user",
   "failedToSubmitReport": "Failed to submit report. Please try again.",
   "reportSubmittedOfferBlock": "Thank you for helping keep the community safe. Would you also like to block this user?",
   "reportUserTitle": "Report {userName}",
@@ -842,6 +849,14 @@
   },
   "blockUserConfirmationDetailed": "Blocking {userName} will prevent them from:\n• Sending you messages\n• Seeing your profile\n• Commenting on your postings",
   "@blockUserConfirmationDetailed": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "unblockUserConfirmationDetailed": "Unblocking {userName} will allow them to:\n• Send you messages\n• See your profile\n• Comment on your postings",
+  "@unblockUserConfirmationDetailed": {
     "placeholders": {
       "userName": {
         "type": "String"
