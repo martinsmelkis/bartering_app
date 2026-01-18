@@ -15,7 +15,10 @@ class PointOfInterest {
   });
   
   // Helper method to get online status from profile
-  bool get isOnline => profile.isOnline ?? false;
+  bool get isOnline => profile.isOnline;
+
+  // Helper method to get away status from profile
+  bool get isAway => profile.isAway;
 
   // Factory constructor for creating a new PointOfInterest instance from a map.
   // Tell json_serializable to use this for deserialization.

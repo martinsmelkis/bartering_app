@@ -180,6 +180,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                     // Online status badge - positioned closer to the edge
                     PositionedOnlineStatusBadge(
                       isOnline: poi.isOnline,
+                      isAway: poi.isAway,
                       size: 10.0,
                       right: -5,
                       top: -5,

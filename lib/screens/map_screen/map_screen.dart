@@ -489,6 +489,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           // Online status badge - positioned closer to the edge
           PositionedOnlineStatusBadge(
             isOnline: poi.isOnline,
+            isAway: poi.isAway,
             size: 25.0,
             right: 33,
             top: 33,

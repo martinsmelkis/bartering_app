@@ -569,6 +569,8 @@ class AppLocalizationsMapper {
       'errorLoadingPostings': localizations.errorLoadingPostings,
       'errorLoadingAttributes': localizations.errorLoadingAttributes,
       'activePostings': localizations.activePostings,
+      'posting': localizations.posting,
+      'postings': localizations.postings,
       'offers': localizations.offers,
       'lookingFor': localizations.lookingFor,
       'valuePrefix': localizations.valuePrefix,
@@ -783,13 +785,18 @@ class AppLocalizationsMapper {
       'inviteMessageSubject': localizations.inviteMessageSubject,
       'reportUser': localizations.reportUser,
       'blockUser': localizations.blockUser,
+      'unblockUser': localizations.unblockUser,
       'reportUserConfirmation': localizations.reportUserConfirmation,
       'reportReason': localizations.reportReason,
       'userReported': localizations.userReported,
       'blockUserConfirmation': localizations.blockUserConfirmation,
+      'unblockUserConfirmation': localizations.unblockUserConfirmation,
       'block': localizations.block,
+      'unblock': localizations.unblock,
       'userBlocked': localizations.userBlocked,
+      'userUnblocked': localizations.userUnblocked,
       'failedToBlockUser': localizations.failedToBlockUser,
+      'failedToUnblockUser': localizations.failedToUnblockUser,
       'failedToSubmitReport': localizations.failedToSubmitReport,
       'reportSubmittedOfferBlock': localizations.reportSubmittedOfferBlock,
       'whyReportingUser': localizations.whyReportingUser,
@@ -837,6 +844,8 @@ class AppLocalizationsMapper {
       'reportUserTitle': (userName) => localizations.reportUserTitle(userName),
       'blockUserConfirmationDetailed': (userName) =>
           localizations.blockUserConfirmationDetailed(userName),
+      'unblockUserConfirmationDetailed': (userName) =>
+          localizations.unblockUserConfirmationDetailed(userName),
     };
   }
 }

@@ -728,6 +728,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                           // Online status badge - positioned closer to the edge
                           PositionedOnlineStatusBadge(
                             isOnline: widget.poi.isOnline,
+                            isAway: widget.poi.isAway,
                             size: 16.0,
                             right: -5,
                             top: -5,

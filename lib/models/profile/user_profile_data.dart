@@ -16,7 +16,7 @@ class UserProfileData {
   @JsonKey(includeIfNull: false)
   final String? preferredLanguage;
   @JsonKey(includeIfNull: false)
-  final bool? isOnline;
+  final int? lastOnlineAt; // Timestamp in milliseconds when user was last online
 
   const UserProfileData({
     required this.userId,
@@ -27,8 +27,25 @@ class UserProfileData {
     required this.profileKeywordDataMap,
     required this.activePostingIds,
     this.preferredLanguage,
-    this.isOnline,
+    this.lastOnlineAt,
   });
+
+  /// Check if user is currently online (within last 5 minutes)
+  bool get isOnline {
+    if (lastOnlineAt == null) return false;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final fiveMinutesInMs = 5 * 60 * 1000; // 5 minutes in milliseconds
+    return (now - lastOnlineAt!) < fiveMinutesInMs;
+  }
+
+  /// Check if user is away (online within last 24 hours but not in last 5 minutes)
+  bool get isAway {
+    if (lastOnlineAt == null) return false;
+    if (isOnline) return false; // If currently online, not away
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final twentyFourHoursInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    return (now - lastOnlineAt!) < twentyFourHoursInMs;
+  }
 
   // Factory constructor for creating a new UserProfileData instance from a map.
   // Tell json_serializable to use this for deserialization.
@@ -48,7 +65,7 @@ class UserProfileData {
     Map<String, double>? profileKeywordDataMap,
     List<String>? activePostingIds,
     String? preferredLanguage,
-    bool? isOnline,
+    int? lastOnlineAt,
   }) {
     return UserProfileData(
       userId: userId ?? this.userId,
@@ -59,7 +76,7 @@ class UserProfileData {
       profileKeywordDataMap: profileKeywordDataMap ?? this.profileKeywordDataMap,
       activePostingIds: activePostingIds ?? this.activePostingIds,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
-      isOnline: isOnline ?? this.isOnline,
+      lastOnlineAt: lastOnlineAt ?? this.lastOnlineAt,
     );
   }
 }
