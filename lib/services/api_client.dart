@@ -153,11 +153,21 @@ abstract class ApiClient {
   @POST('/api/v1/profile-update')
   Future<String> updateProfileInfo(@Body() UserProfileData user);
 
-  @POST('/api/v1/similar-profiles')
-  Future<List<PointOfInterest>> findSimilarProfiles(@Body() String userId);
+  @GET('/api/v1/similar-profiles')
+  Future<List<PointOfInterest>> findSimilarProfiles(
+      @Query("userId") String userId,
+      @Query("lat") double? latitude,
+      @Query("lon") double? longitude,
+      @Query('radius') double? radius,
+  );
 
-  @POST('/api/v1/complementary-profiles')
-  Future<List<PointOfInterest>> findComplementaryProfiles(@Body() String userId);
+  @GET('/api/v1/complementary-profiles')
+  Future<List<PointOfInterest>> findComplementaryProfiles(
+      @Query("userId") String userId,
+      @Query("lat") double? latitude,
+      @Query("lon") double? longitude,
+      @Query('radius') double? radius,
+  );
 
   @POST('/api/v1/profile-info')
   Future<UserProfileData> getProfileInfo(@Body() String userId);

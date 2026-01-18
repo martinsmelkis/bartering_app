@@ -182,13 +182,24 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<List<PointOfInterest>> findSimilarProfiles(String userId) async {
+  Future<List<PointOfInterest>> findSimilarProfiles(
+    String userId,
+    double? latitude,
+    double? longitude,
+    double? radius,
+  ) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'userId': userId,
+      r'lat': latitude,
+      r'lon': longitude,
+      r'radius': radius,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = userId;
+    const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<List<PointOfInterest>>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+      Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
             '/api/v1/similar-profiles',
@@ -213,13 +224,24 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<List<PointOfInterest>> findComplementaryProfiles(String userId) async {
+  Future<List<PointOfInterest>> findComplementaryProfiles(
+    String userId,
+    double? latitude,
+    double? longitude,
+    double? radius,
+  ) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'userId': userId,
+      r'lat': latitude,
+      r'lon': longitude,
+      r'radius': radius,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = userId;
+    const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<List<PointOfInterest>>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+      Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
             '/api/v1/complementary-profiles',

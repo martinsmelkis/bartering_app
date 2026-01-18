@@ -181,6 +181,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   void _processPois(List<PointOfInterest> pois) async {
     _allPois = List.from(pois);
+
+    mapOperationsCubit.reset();
     
     // Remove the "no users" marker if POIs are now available
     if (_allPois.isNotEmpty && _noUsersMarkerPosition != null) {
@@ -199,7 +201,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       });
       return;
     }
-    
+
     if (zoomLevelNotifier.value.toDouble() <= 13.5) {
       mapOperationsCubit.performMainClustering(_allPois);
     }
@@ -628,7 +630,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           return AdaptiveChatLayout(
           mainContent: Scaffold(
             key: _scaffoldKey, // Use persistent key to prevent rebuilds
-            drawer: PointerInterceptor(child: DrawerMain(poiCubit: poiCubit,)),
+            drawer: PointerInterceptor(child: DrawerMain(poiCubit: poiCubit, mapController: _mapController)),
             body:
             MultiBlocListener(
               listeners: [

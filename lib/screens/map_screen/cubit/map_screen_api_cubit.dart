@@ -110,10 +110,37 @@ class PoiCubit extends Cubit<PoiState> {
     }
   }
 
-  Future<void> getSimilarProfiles(String keyword) async {
+  /// Fetches similar profiles.
+  /// If lat/lon are provided, uses those coordinates (typically from map center when setting is enabled).
+  /// Otherwise, uses user's saved location.
+  Future<void> getSimilarProfiles(String keyword, {double? lat, double? lon, double? radiusMeters}) async {
     try {
       emit(PoiLoading());
-      final poi = await _apiClient.findSimilarProfiles(userId ?? "");
+      
+      userId ??= await userRepository.getOwnUserId();
+      
+      double? latitude;
+      double? longitude;
+      
+      // Check if explicit coordinates are provided (e.g., from map center)
+      if (lat != null && lon != null) {
+        latitude = lat;
+        longitude = lon;
+      } else {
+        // Use user's saved location
+        final location = await userRepository.getOwnLocation();
+        latitude = location?.isNotEmpty == true ?
+            double.tryParse(location?.split(',')[0] ?? "") : null;
+        longitude = location?.isNotEmpty == true ?
+            double.tryParse(location?.split(',')[1] ?? "") : null;
+      }
+      
+      final poi = await _apiClient.findSimilarProfiles(
+        userId ?? "",
+        latitude,
+        longitude,
+        radiusMeters,
+      );
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
@@ -124,10 +151,37 @@ class PoiCubit extends Cubit<PoiState> {
     }
   }
 
-  Future<void> getComplementaryProfiles(String keyword) async {
+  /// Fetches complementary profiles.
+  /// If lat/lon are provided, uses those coordinates (typically from map center when setting is enabled).
+  /// Otherwise, uses user's saved location.
+  Future<void> getComplementaryProfiles(String keyword, {double? lat, double? lon, double? radiusMeters}) async {
     try {
       emit(PoiLoading());
-      final poi = await _apiClient.findComplementaryProfiles(userId ?? "");
+      
+      userId ??= await userRepository.getOwnUserId();
+      
+      double? latitude;
+      double? longitude;
+      
+      // Check if explicit coordinates are provided (e.g., from map center)
+      if (lat != null && lon != null) {
+        latitude = lat;
+        longitude = lon;
+      } else {
+        // Use user's saved location
+        final location = await userRepository.getOwnLocation();
+        latitude = location?.isNotEmpty == true ?
+            double.tryParse(location?.split(',')[0] ?? "") : null;
+        longitude = location?.isNotEmpty == true ?
+            double.tryParse(location?.split(',')[1] ?? "") : null;
+      }
+      
+      final poi = await _apiClient.findComplementaryProfiles(
+        userId ?? "",
+        latitude,
+        longitude,
+        radiusMeters,
+      );
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {

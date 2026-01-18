@@ -1,4 +1,7 @@
+import 'package:barter_app/configure_dependencies.dart';
+import 'package:barter_app/services/settings_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -8,8 +11,9 @@ import '../../settings_screen/settings_screen.dart';
 class DrawerMain extends StatelessWidget {
 
   final PoiCubit poiCubit;
+  final MapController mapController;
 
-  const DrawerMain({super.key, required this.poiCubit});
+  const DrawerMain({super.key, required this.poiCubit, required this.mapController});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,25 @@ class DrawerMain extends StatelessWidget {
                 ListTile(
                   onTap: () async {
                     Scaffold.of(context).closeDrawer();
-                    await poiCubit.getComplementaryProfiles(poiCubit.userId ?? "");
+                    
+                    final settingsService = getIt<SettingsService>();
+                    final useMapCenter = await settingsService.getUseMapCenterForSearch();
+                    final radiusKm = await settingsService.getNearbyUsersRadius();
+                    
+                    if (useMapCenter) {
+                      final mapCenter = await mapController.centerMap;
+                      await poiCubit.getComplementaryProfiles(
+                        poiCubit.userId ?? "",
+                        lat: mapCenter.latitude,
+                        lon: mapCenter.longitude,
+                        radiusMeters: radiusKm * 1000,
+                      );
+                    } else {
+                      await poiCubit.getComplementaryProfiles(
+                        poiCubit.userId ?? "",
+                        radiusMeters: radiusKm * 1000,
+                      );
+                    }
                   },
                   title: Text(l10n?.drawer_menu_complementary_users ?? "Complementary Profiles"),
                 ),
@@ -35,7 +57,25 @@ class DrawerMain extends StatelessWidget {
                   child: ListTile(
                     onTap: () async {
                       Scaffold.of(context).closeDrawer();
-                      await poiCubit.getSimilarProfiles(poiCubit.userId ?? "");
+                      
+                      final settingsService = getIt<SettingsService>();
+                      final useMapCenter = await settingsService.getUseMapCenterForSearch();
+                      final radiusKm = await settingsService.getNearbyUsersRadius();
+                      
+                      if (useMapCenter) {
+                        final mapCenter = await mapController.centerMap;
+                        await poiCubit.getSimilarProfiles(
+                          poiCubit.userId ?? "",
+                          lat: mapCenter.latitude,
+                          lon: mapCenter.longitude,
+                          radiusMeters: radiusKm * 1000,
+                        );
+                      } else {
+                        await poiCubit.getSimilarProfiles(
+                          poiCubit.userId ?? "",
+                          radiusMeters: radiusKm * 1000,
+                        );
+                      }
                     },
                     title: Text(l10n?.drawer_menu_similar_users ?? "Similar Profiles"),
                   ),
