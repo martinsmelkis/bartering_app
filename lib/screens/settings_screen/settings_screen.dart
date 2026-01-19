@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../application.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/profile/user_profile_data.dart';
@@ -569,20 +570,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           // Update user profile via API
                           await _updateUserProfileLanguage(value);
 
+                          // Update the app's locale immediately
+                          localeNotifier.value = Locale(value);
+
                           _showSettingsSaved();
 
-                          // Show restart message
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Please restart the app to apply language changes',
-                                ),
-                                backgroundColor: AppColors.primary,
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
-                          }
                           setState(() {
                             _selectedLanguage = value;
                           });

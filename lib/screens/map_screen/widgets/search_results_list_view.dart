@@ -163,13 +163,13 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                         if (snapshot.hasData) {
                           return SvgPicture.string(
                             snapshot.data!,
-                            width: 32,
-                            height: 32,
+                            width: 56,
+                            height: 56,
                           );
                         }
                         return Container(
-                          width: 32,
-                          height: 32,
+                          width: 56,
+                          height: 56,
                           decoration: BoxDecoration(
                             color: Colors.grey.shade300,
                             shape: BoxShape.circle,

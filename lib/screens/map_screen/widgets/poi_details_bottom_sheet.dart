@@ -184,8 +184,8 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
         setState(() {
           _avatarIcon = SvgPicture.string(
             svgString,
-            width: 56,
-            height: 56,
+            width: 67,
+            height: 67,
           );
           _isLoadingAvatar = false;
         });

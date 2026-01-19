@@ -8,6 +8,7 @@ import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubi
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/messaging/chat_notification_service.dart';
 import 'package:barter_app/services/messaging/firebase_service.dart';
+import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_theme.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
@@ -17,6 +18,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../l10n/app_localizations.dart';
 import 'configure_dependencies.dart';
+
+// Global ValueNotifier for locale changes
+final localeNotifier = ValueNotifier<Locale?>(null);
 
 class Application extends StatefulWidget {
   const Application({super.key});
@@ -59,6 +63,28 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     setupInteractedMessage();
     WidgetsBinding.instance.addObserver(this);
     _initializeServices();
+    _loadSavedLocale();
+    
+    // Listen to locale changes
+    localeNotifier.addListener(_onLocaleChanged);
+  }
+
+  void _onLocaleChanged() {
+    if (mounted) {
+      setState(() {
+        // Trigger rebuild when locale changes
+      });
+    }
+  }
+
+  Future<void> _loadSavedLocale() async {
+    final settingsService = getIt<SettingsService>();
+    final languageCode = await settingsService.getPreferredLanguage();
+    
+    if (languageCode != null && languageCode.isNotEmpty) {
+      localeNotifier.value = Locale(languageCode);
+      logDebug('Loaded saved locale: $languageCode');
+    }
   }
 
   /// Navigate to chat screen with specific user using go_router
@@ -86,6 +112,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    localeNotifier.removeListener(_onLocaleChanged);
     WidgetsBinding.instance.removeObserver(this);
     _chatNotificationService?.dispose();
     super.dispose();
@@ -136,6 +163,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
               title: 'Barter App',
               debugShowCheckedModeBanner: false,
               theme: AppTheme.lightTheme,
+              locale: localeNotifier.value,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               builder: (context, materialAppChild) {

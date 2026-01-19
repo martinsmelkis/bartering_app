@@ -41,6 +41,7 @@ class InitializeCubit extends Cubit<InitializeState> {
         final String? publicKey = cryptoService.ecPublicKeyToString(
             cryptoService.getPublicKey());
 
+        // TODO translate User_ ?
         await _apiClient.createProfile(UserRegistrationData(id: userId ?? "",
             name: "User_${userId?.substring(0, 8)
                 ?? Random.secure().nextInt(100000)}",
