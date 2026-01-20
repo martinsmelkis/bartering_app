@@ -75,10 +75,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorDuringInitialization => 'Error during initialization.';
 
   @override
-  String get selectYourInterests => 'What do you seek/require?';
+  String get selectYourInterests => 'What would be of interest to you?';
 
   @override
-  String get selectYourOffers => 'What do you have/offer?';
+  String get selectYourOffers => 'What do you have to offer?';
 
   @override
   String get userInterestedIn => 'Interested in:';

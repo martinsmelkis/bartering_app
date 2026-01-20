@@ -41,20 +41,13 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   late final List<OnboardingCategory> _categories;
-  final PageController _pageController = PageController();
   final Map<String, double> _answers = {};
-  int _currentPage = 0;
   bool _isLoadingData = true;
 
   @override
   void initState() {
     super.initState();
     _categories = _initializeCategories();
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page?.round() ?? 0;
-      });
-    });
     _loadSavedKeywords();
   }
 
@@ -103,7 +96,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   void dispose() {
-    _pageController.dispose();
     super.dispose();
   }
 
@@ -117,7 +109,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       );
     }
 
-    final isLastPage = _currentPage == _categories.length - 1;
     final l10n = AppLocalizations.of(context);
 
     return BlocProvider(
@@ -222,77 +213,78 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: BlocBuilder<OnboardingCubit, OnboardingState>(
                 builder: (context, state) {
                   return Scaffold(
-                    body: Stack(
-                      children: [
-                        PageView.builder(
-                          controller: _pageController,
-                          itemCount: _categories.length,
-                          itemBuilder: (context, index) {
-                            final category = _categories[index];
-                            // Convert stored value (0.0-1.0) to slider range (0-100)
-                            final savedValue = _answers[category.titleKey];
-                            final sliderValue = savedValue != null
-                                ? savedValue * 100
-                                : 50.0;
-
-                            return _CategoryPage(
-                              category: category,
-                              initialValue: sliderValue,
-                              onChanged: (value) {
-                                setState(() {
-                                  state.questions[index].answer = value / 100;
-                                  _answers[category.titleKey] = value / 100;
-                                });
-                              },
-                            );
-                          },
-                        ),
-                        // --- Page Indicator Dots ---
-                        Positioned(
-                          bottom: 20,
-                          left: 0,
-                          right: 0,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              _categories.length,
-                                  (index) => buildDot(index, context),
+                    body: SafeArea(
+                      child: Column(
+                        children: [
+                          // Title section
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 16.0),
+                            child: Text(
+                              'Share your interests to find the best matches with others!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.orange.shade900,
+                                fontWeight: FontWeight.w500,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.orange.shade200,
+                                    offset: const Offset(1.5, 1.5),
+                                    blurRadius: 3,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        // --- Next Page Button ---
-                        if (!isLastPage)
-                          Positioned(
-                            bottom: 10,
-                            right: 10,
-                            child: IconButton(
-                              icon: const Icon(
-                                  Icons.arrow_forward_ios, color: AppColors.background),
-                              onPressed: () {
-                                _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 400),
-                                  curve: Curves.easeInOut,
+                          Expanded(
+                            child: ListView.builder(
+                              padding: const EdgeInsets.all(16.0),
+                              itemCount: _categories.length,
+                              itemBuilder: (context, index) {
+                                final category = _categories[index];
+                                // Convert stored value (0.0-1.0) to slider range (0-100)
+                                final savedValue = _answers[category.titleKey];
+                                final sliderValue = savedValue != null
+                                    ? savedValue * 100
+                                    : 50.0;
+
+                                return _CategoryCard(
+                                  category: category,
+                                  initialValue: sliderValue,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      state.questions[index].answer = value / 100;
+                                      _answers[category.titleKey] = value / 100;
+                                    });
+                                  },
                                 );
                               },
                             ),
                           ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  logDebug("Onboarding V2 Complete: $_answers");
+                                  final locale = Localizations.localeOf(context);
+                                  context.read<OnboardingCubit>().completeOnboarding(
+                                      locale.languageCode);
+                                },
+                                icon: const Icon(Icons.check),
+                                label: Text(AppLocalizations.of(context)!.finishOnboarding),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    floatingActionButton: isLastPage
-                        ? FloatingActionButton.extended(
-                      onPressed: () {
-                        logDebug("Onboarding V2 Complete: $_answers");
-                        final locale = Localizations.localeOf(context);
-                        context.read<OnboardingCubit>().completeOnboarding(
-                            locale.languageCode);
-                      },
-                      label: Text(AppLocalizations.of(context)!.finishOnboarding),
-                      icon: const Icon(Icons.check),
-                      backgroundColor: AppColors.background,
-                    )
-                        : null,
-                    floatingActionButtonLocation: FloatingActionButtonLocation
-                        .endFloat,
                   );
                 }
               )
@@ -300,40 +292,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget buildDot(int index, BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      height: 8,
-      width: _currentPage == index ? 24 : 8,
-      decoration: BoxDecoration(
-        color: _currentPage == index ? AppColors.background : AppColors.lightGrey,
-        borderRadius: BorderRadius.circular(4),
-      ),
-    );
-  }
 }
 
-// --- Widget for a single page in the PageView ---
-class _CategoryPage extends StatefulWidget {
+// --- Widget for a single category card in the ListView ---
+class _CategoryCard extends StatefulWidget {
   final OnboardingCategory category;
   final double initialValue;
   final ValueChanged<double> onChanged;
 
-  const _CategoryPage({
+  const _CategoryCard({
     required this.category,
     required this.initialValue,
     required this.onChanged,
   });
 
   @override
-  State<_CategoryPage> createState() => _CategoryPageState();
+  State<_CategoryCard> createState() => _CategoryCardState();
 }
 
-class _CategoryPageState extends State<_CategoryPage> {
+class _CategoryCardState extends State<_CategoryCard> {
   late double _currentValue;
-  List<Widget> _backgroundIcons = [];
-  bool _iconsInitialized = false;
 
   @override
   void initState() {
@@ -342,82 +320,69 @@ class _CategoryPageState extends State<_CategoryPage> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_iconsInitialized) {
-      _backgroundIcons = _generateRandomIcons(context);
-      _iconsInitialized = true;
-    }
-  }
-
-  List<Widget> _generateRandomIcons(BuildContext context) {
-    final random = Random();
-    return List.generate(10, (index) {
-      final iconData = widget.category.icons[random.nextInt(widget.category.icons.length)];
-      final size = random.nextDouble() * 40 + 20; // Random size between 20 and 60
-      final isTop = random.nextBool(); // Place above or below slider
-
-      return Positioned(
-        top: isTop ? random.nextDouble() * (MediaQuery.of(context).size.height * 0.3) : null,
-        bottom: !isTop ? random.nextDouble() * (MediaQuery.of(context).size.height * 0.3) : null,
-        left: random.nextDouble() * (MediaQuery.of(context).size.width - size),
-        child: Icon(
-          iconData,
-          size: size,
-          color: AppColors.background.withValues(alpha: 0.5),
-        ),
-      );
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // A simple way to map key to getter, requires a mapper or manual switch
     final categoryText = _getCategoryText(l10n, widget.category.titleKey);
 
-    return Container(
-      color: widget.category.color.withValues(alpha: 0.8),
-      child: Stack(
-        children: [
-          ..._backgroundIcons, // Sprinkle icons in the background
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    categoryText,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 22, color: Colors.grey.shade900, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-                  ),
-                  const SizedBox(height: 40),
-                  Slider(
-                    value: _currentValue,
-                    min: 0,
-                    max: 100,
-                    divisions: 100,
-                    label: _currentValue.round().toString(),
-                    onChanged: (value) {
-                      setState(() {
-                        _currentValue = value;
-                      });
-                      widget.onChanged(value);
-                    },
-                    activeColor: AppColors.background,
-                    inactiveColor: AppColors.background.withValues(alpha: 0.5),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    l10n.onboardingScreenQuestion,
-                    style: TextStyle(fontSize: 16, color: Colors.grey.shade900),
-                  )
-                ],
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: widget.category.color.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Category icons row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: widget.category.icons.map((icon) {
+                  return Icon(
+                    icon,
+                    size: 25.6, // 32 * 0.8 = 25.6
+                    color: Colors.white.withValues(alpha: 0.9),
+                  );
+                }).toList(),
               ),
-            ),
+              const SizedBox(height: 16),
+              // Category title
+              Text(
+                categoryText,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey.shade900,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Slider
+              Slider(
+                value: _currentValue,
+                min: 0,
+                max: 100,
+                divisions: 100,
+                label: _currentValue.round().toString(),
+                onChanged: (value) {
+                  setState(() {
+                    _currentValue = value;
+                  });
+                  widget.onChanged(value);
+                },
+                activeColor: AppColors.background,
+                inactiveColor: AppColors.background.withValues(alpha: 0.5),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

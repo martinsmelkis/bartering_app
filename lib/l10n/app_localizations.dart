@@ -215,13 +215,13 @@ abstract class AppLocalizations {
   /// No description provided for @selectYourInterests.
   ///
   /// In en, this message translates to:
-  /// **'What do you seek/require?'**
+  /// **'What would be of interest to you?'**
   String get selectYourInterests;
 
   /// No description provided for @selectYourOffers.
   ///
   /// In en, this message translates to:
-  /// **'What do you have/offer?'**
+  /// **'What do you have to offer?'**
   String get selectYourOffers;
 
   /// No description provided for @userInterestedIn.
