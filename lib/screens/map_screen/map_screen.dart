@@ -33,6 +33,7 @@ import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/messaging/firebase_service.dart';
 import '../../utils/geo_utils.dart';
 import '../../utils/responsive_breakpoints.dart';
+import '../../utils/text_utils.dart';
 import '../chat_screen/chat_screen.dart';
 import '../chat_screen/adaptive_chat_layout.dart';
 import 'cubit/chat_panel_cubit.dart';
@@ -79,7 +80,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   Region? _previousMapRegion = null;
   GeoPoint? _noUsersMarkerPosition; // Position of the "no users nearby" marker
   // Avatar SVG assets (dynamically generated)
-  static const int _svgAssetCount = 25;
+  static const int _svgAssetCount = 29;
 
   // Generate SVG asset path by index (1-based)
   static String _getSvgAsset(int index) => 'assets/icons/path$index.svg';
@@ -476,6 +477,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Create a local copy of the string to avoid reference issues
     final localSvgCopy = String.fromCharCodes(svgString.runes);
 
+    // Check if there's a match between user interests/offerings and POI offerings/interests
+    final hasMatch = TextUtils.checkForAttributeBarterMatch(poi, _userInterests, _userOfferings);
+
     return MarkerIcon(
       iconWidget: Stack(
         clipBehavior: Clip.none,
@@ -495,6 +499,36 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             top: 33,
             borderWidth: 2.5,
           ),
+          // Match indicator - positioned at bottom right
+          if (hasMatch)
+            Positioned(
+              right: 25,
+              bottom: 25,
+              child: Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.secondary,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.handshake,
+                  size: 30,
+                  color: Colors.white,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -904,8 +938,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Get current map center to place the marker
     final mapCenter = await _mapController.centerMap;
     _noUsersMarkerPosition = mapCenter;
-    // Load and create the special marker with path26.svg
-    final svgString = await rootBundle.loadString('assets/icons/path26.svg');
+    // Load and create the special marker with path333.svg
+    final svgString = await rootBundle.loadString('assets/icons/path333.svg');
     final marker = MarkerIcon(
       iconWidget: SvgPicture.string(
         svgString,

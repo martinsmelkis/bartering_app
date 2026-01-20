@@ -1,6 +1,9 @@
 import 'package:barter_app/l10n/app_localizations.mapper.dart';
+import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/cupertino.dart';
+
+import '../models/map/point_of_interest.dart';
 
 class TextUtils {
 
@@ -41,6 +44,37 @@ class TextUtils {
       parsedAttribute = TextUtils.normalizeSnakeCase(attribute);
     }
     return parsedAttribute;
+  }
+
+  /// Checks if there's a match between current user and POI
+  /// Returns true if:
+  /// - Current user's interests match POI's offerings (type == 1), OR
+  /// - Current user's offerings match POI's interests (type != 1)
+  static bool checkForAttributeBarterMatch(PointOfInterest poi, List<ParsedAttributeData>? interests, List<ParsedAttributeData>? offers) {
+    // Use cached sets if available, otherwise return false
+    if (interests == null && offers == null) {
+      return false;
+    }
+
+    // Get POI's interests (type != 1) and offerings (type == 1)
+    final poiInterests = poi.profile.attributes
+        ?.where((attr) => attr.type != 1)
+        .map((attr) => attr.attributeId.replaceAll("_", " "))
+        .toSet() ?? {};
+    final poiOfferings = poi.profile.attributes
+        ?.where((attr) => attr.type == 1)
+        .map((attr) => attr.attributeId.replaceAll("_", " "))
+        .toSet() ?? {};
+
+    // Check if current user's interests match POI's offerings
+    final userInterestsMatchPoiOfferings = interests!.any((id) =>
+        poiOfferings.contains(id.attribute.toLowerCase()));
+
+    // Check if current user's offerings match POI's interests
+    final userOfferingsMatchPoiInterests = offers!.any((id) =>
+        poiInterests.contains(id.attribute.toLowerCase()));
+
+    return userInterestsMatchPoiOfferings || userOfferingsMatchPoiInterests;
   }
 
 }

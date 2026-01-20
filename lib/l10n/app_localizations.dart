@@ -854,12 +854,6 @@ abstract class AppLocalizations {
   /// **'Posting deleted successfully'**
   String get postingDeleted;
 
-  /// No description provided for @createPosting.
-  ///
-  /// In en, this message translates to:
-  /// **'Create Posting'**
-  String get createPosting;
-
   /// No description provided for @offer.
   ///
   /// In en, this message translates to:
@@ -877,18 +871,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expires'**
   String get expires;
-
-  /// No description provided for @retry.
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get retry;
-
-  /// No description provided for @cancel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancel;
 
   /// No description provided for @editPosting.
   ///
@@ -2996,6 +2978,12 @@ abstract class AppLocalizations {
   /// **'Maximum 3 images allowed'**
   String get maxImagesReached;
 
+  /// No description provided for @createPosting.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Posting'**
+  String get createPosting;
+
   /// No description provided for @postingCreatedSuccess.
   ///
   /// In en, this message translates to:
@@ -3025,6 +3013,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Conversation deleted'**
   String get conversationDeleted;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
 
   /// No description provided for @delete.
   ///
@@ -3859,6 +3853,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notification preferences saved'**
   String get preferencesCreated;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
 
   /// No description provided for @offering.
   ///

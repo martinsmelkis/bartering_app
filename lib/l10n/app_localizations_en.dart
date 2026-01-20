@@ -423,9 +423,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get postingDeleted => 'Posting deleted successfully';
 
   @override
-  String get createPosting => 'Create Posting';
-
-  @override
   String get offer => 'Offer';
 
   @override
@@ -433,12 +430,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get expires => 'Expires';
-
-  @override
-  String get retry => 'Retry';
-
-  @override
-  String get cancel => 'Cancel';
 
   @override
   String get editPosting => 'Edit Posting';
@@ -1505,6 +1496,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get maxImagesReached => 'Maximum 3 images allowed';
 
   @override
+  String get createPosting => 'Create Posting';
+
+  @override
   String get postingCreatedSuccess => 'Posting created successfully!';
 
   @override
@@ -1519,6 +1513,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get conversationDeleted => 'Conversation deleted';
+
+  @override
+  String get cancel => 'Cancel';
 
   @override
   String get delete => 'Delete';
@@ -1950,6 +1947,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get preferencesCreated => 'Notification preferences saved';
+
+  @override
+  String get retry => 'Retry';
 
   @override
   String get offering => 'Offering';

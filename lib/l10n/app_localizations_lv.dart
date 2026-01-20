@@ -432,9 +432,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get postingDeleted => 'Sludinājums veiksmīgi dzēsts';
 
   @override
-  String get createPosting => 'Izveidot sludinājumu';
-
-  @override
   String get offer => 'Piedāvājums';
 
   @override
@@ -442,12 +439,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get expires => 'Derīgs līdz';
-
-  @override
-  String get retry => 'Mēģināt vēlreiz';
-
-  @override
-  String get cancel => 'Atcelt';
 
   @override
   String get editPosting => 'Rediģēt sludinājumu';
@@ -1517,6 +1508,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get maxImagesReached => 'Maksimums 3 attēli atļauti';
 
   @override
+  String get createPosting => 'Izveidot sludinājumu';
+
+  @override
   String get postingCreatedSuccess => 'Sludinājums veiksmīgi izveidots!';
 
   @override
@@ -1531,6 +1525,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get conversationDeleted => 'Saruna dzēsta';
+
+  @override
+  String get cancel => 'Atcelt';
 
   @override
   String get delete => 'Dzēst';
@@ -1965,6 +1962,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get preferencesCreated => 'Paziņojumu preferences saglabātas';
+
+  @override
+  String get retry => 'Mēģināt vēlreiz';
 
   @override
   String get offering => 'Piedāvā';
