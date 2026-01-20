@@ -172,7 +172,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   Future<void> _loadAvatarIcon() async {
     try {
       // Use the same logic as map_screen to select the icon
-      const int svgAssetCount = 25;
+      const int svgAssetCount = 29;
       final userIdHashCode = widget.poi.profile.userId.hashCode;
       final index = userIdHashCode.abs() % svgAssetCount;
       final selectedIconPath = 'assets/icons/path${index + 1}.svg';

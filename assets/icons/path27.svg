@@ -1,0 +1,74 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face (soft heart-shaped, feminine) -->
+    <path d="M 256 390
+          C 228 390, 195 380, 178 360
+          C 163 340, 153 315, 155 285
+          C 148 258, 152 230, 158 205
+          C 160 180, 180 165, 208 160
+          C 220 157, 240 158, 248 160
+          C 252 158, 268 157, 282 160
+          C 310 160, 332 175, 352 205
+          C 358 230, 362 258, 357 285
+          C 359 315, 349 340, 334 360
+          C 317 380, 284 390, 256 390 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - Braided crown / halo braid -->
+    <path d="M 256 152
+          C 205 152, 165 172, 148 210
+          L 148 252
+          C 148 239, 152 227, 165 217
+          C 180 207, 200 202, 220 204
+          C 235 199, 245 197, 256 197
+          C 267 197, 277 199, 292 204
+          C 312 202, 332 207, 347 217
+          C 360 227, 364 239, 364 252
+          L 364 210
+          C 347 172, 307 152, 256 152 Z" fill="#1A1A1A" />
+
+    <!-- Braid crown -->
+    <path d="M 165 217 Q 180 192, 210 185 Q 230 182, 256 182 Q 282 182, 302 185 Q 332 192, 347 217" 
+          fill="none" stroke="#1A1A1A" stroke-width="24" stroke-linecap="round" />
+    
+    <!-- Braid texture -->
+    <path d="M 180 205 L 175 212" fill="none" stroke="#2C2C2C" stroke-width="3" />
+    <path d="M 200 195 L 195 202" fill="none" stroke="#2C2C2C" stroke-width="3" />
+    <path d="M 220 190 L 215 197" fill="none" stroke="#2C2C2C" stroke-width="3" />
+    <path d="M 240 187 L 235 194" fill="none" stroke="#2C2C2C" stroke-width="3" />
+    <path d="M 272 187 L 277 194" fill="none" stroke="#2C2C2C" stroke-width="3" />
+    <path d="M 292 190 L 297 197" fill="none" stroke="#2C2C2C" stroke-width="3" />
+    <path d="M 312 195 L 317 202" fill="none" stroke="#2C2C2C" stroke-width="3" />
+    <path d="M 332 205 L 337 212" fill="none" stroke="#2C2C2C" stroke-width="3" />
+
+    <!-- Hair strands/wisps (straight) -->
+    <path d="M 162 222 L 158 300" fill="none" stroke="#1A1A1A" stroke-width="32" stroke-linecap="round" />
+    <path d="M 349 222 L 354 300" fill="none" stroke="#1A1A1A" stroke-width="32" stroke-linecap="round" />
+
+    <!-- Left eye (expressive) -->
+    <circle cx="215" cy="270" r="12" fill="#1A1A1A" />
+    <circle cx="219" cy="267" r="4" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Right eye (expressive) -->
+    <circle cx="297" cy="270" r="12" fill="#1A1A1A" />
+    <circle cx="301" cy="267" r="4" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Eyelashes (long) -->
+    <path d="M 206 266 Q 200 262, 203 258" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 224 266 Q 230 262, 227 258" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 288 266 Q 282 262, 285 258" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 306 266 Q 312 262, 309 258" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+
+    <!-- Eyebrows (arched, feminine) -->
+    <path d="M 198 253 Q 215 247, 232 253" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" />
+    <path d="M 280 253 Q 297 247, 314 253" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Rosy cheeks -->
+    <ellipse cx="190" cy="290" rx="16" ry="10" fill="#FFB6C1" opacity="0.4" />
+    <ellipse cx="322" cy="290" rx="16" ry="10" fill="#FFB6C1" opacity="0.4" />
+
+    <!-- Nose (petite) -->
+    <circle cx="256" cy="305" r="4.5" fill="#1A1A1A" />
+
+    <!-- Mouth (gentle smile) -->
+    <path d="M 225 340 Q 256 352, 287 340" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+</svg>

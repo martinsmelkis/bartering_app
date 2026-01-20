@@ -31,7 +31,7 @@ class UserAvatarFab extends StatelessWidget {
   });
 
   // Avatar SVG assets (dynamically generated)
-  static const int _svgAssetCount = 25;
+  static const int _svgAssetCount = 29;
 
   // Generate SVG asset path by index (1-based)
   static String _getSvgAsset(int index) => 'assets/icons/path$index.svg';

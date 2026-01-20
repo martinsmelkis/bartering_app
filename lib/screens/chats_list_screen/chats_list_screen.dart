@@ -38,7 +38,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
   String? _currentUserId;
 
   // Avatar SVG assets (dynamically generated)
-  static const int _svgAssetCount = 25;
+  static const int _svgAssetCount = 29;
 
   @override
   void initState() {
