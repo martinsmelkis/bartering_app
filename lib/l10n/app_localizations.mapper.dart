@@ -95,6 +95,7 @@ class AppLocalizationsMapper {
           localizations.drawer_menu_complementary_users,
       'drawer_menu_favorite_users': localizations.drawer_menu_favorite_users,
       'settingsTitle': localizations.settingsTitle,
+      'privacyPolicy': localizations.privacyPolicy,
       'settingsSaved': localizations.settingsSaved,
       'settingsSearchSection': localizations.settingsSearchSection,
       'settingsSearchCenterPointTitle':

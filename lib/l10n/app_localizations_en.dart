@@ -176,6 +176,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
   String get settingsSaved => 'Settings saved successfully';
 
   @override
@@ -2371,4 +2374,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get submitReport => 'Submit Report';
+
+  @override
+  String get privacyPolicyIntroTitle => 'Introduction';
+
+  @override
+  String get privacyPolicyIntroContent =>
+      'This Privacy Policy describes how we collect, use, and protect your personal information when you use our bartering application. We are committed to ensuring your privacy and protecting your data.';
+
+  @override
+  String get privacyPolicyDataCollectionTitle => 'Information We Collect';
+
+  @override
+  String get privacyPolicyDataCollectionContent =>
+      'We collect information you provide directly, including your profile information, interests, offerings, location data, and chat messages. We also collect usage data such as app interactions and device information to improve our service.';
+
+  @override
+  String get privacyPolicyDataUsageTitle => 'How We Use Your Information';
+
+  @override
+  String get privacyPolicyDataUsageContent =>
+      'We use your information to: facilitate bartering connections between users, display your profile to other users in your area, enable chat functionality, improve our services, and send notifications about matches and messages.';
+
+  @override
+  String get privacyPolicyDataSharingTitle => 'Information Sharing';
+
+  @override
+  String get privacyPolicyDataSharingContent =>
+      'Your profile information, interests, and offerings are visible to other users of the app to facilitate bartering. We do not sell your personal information to third parties. We may share data with service providers who assist in operating our app, and we may disclose information if required by law.';
+
+  @override
+  String get privacyPolicyDataSecurityTitle => 'Data Security';
+
+  @override
+  String get privacyPolicyDataSecurityContent =>
+      'We implement appropriate technical and organizational measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.';
+
+  @override
+  String get privacyPolicyUserRightsTitle => 'Your Rights';
+
+  @override
+  String get privacyPolicyUserRightsContent =>
+      'You have the right to access, update, or delete your personal information at any time through the app settings. You can also request a copy of your data or object to certain types of processing.';
+
+  @override
+  String get privacyPolicyThirdPartyTitle => 'Third-Party Services';
+
+  @override
+  String get privacyPolicyThirdPartyContent =>
+      'Our app may use third-party services for analytics, maps, and notifications. These services have their own privacy policies, and we encourage you to review them.';
+
+  @override
+  String get privacyPolicyChangesTitle => 'Changes to This Policy';
+
+  @override
+  String get privacyPolicyChangesContent =>
+      'We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the app. Continued use of the app after changes constitutes acceptance of the updated policy.';
+
+  @override
+  String get privacyPolicyContactTitle => 'Contact Us';
+
+  @override
+  String get privacyPolicyContactContent =>
+      'If you have any questions about this Privacy Policy or our data practices, please contact us at help@firebender.com';
+
+  @override
+  String get privacyPolicyLastUpdated => 'Last updated: January 2025';
 }

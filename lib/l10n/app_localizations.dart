@@ -398,6 +398,12 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTitle;
 
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
   /// No description provided for @settingsSaved.
   ///
   /// In en, this message translates to:
@@ -4609,6 +4615,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submit Report'**
   String get submitReport;
+
+  /// No description provided for @privacyPolicyIntroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Introduction'**
+  String get privacyPolicyIntroTitle;
+
+  /// No description provided for @privacyPolicyIntroContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This Privacy Policy describes how we collect, use, and protect your personal information when you use our bartering application. We are committed to ensuring your privacy and protecting your data.'**
+  String get privacyPolicyIntroContent;
+
+  /// No description provided for @privacyPolicyDataCollectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Information We Collect'**
+  String get privacyPolicyDataCollectionTitle;
+
+  /// No description provided for @privacyPolicyDataCollectionContent.
+  ///
+  /// In en, this message translates to:
+  /// **'We collect information you provide directly, including your profile information, interests, offerings, location data, and chat messages. We also collect usage data such as app interactions and device information to improve our service.'**
+  String get privacyPolicyDataCollectionContent;
+
+  /// No description provided for @privacyPolicyDataUsageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How We Use Your Information'**
+  String get privacyPolicyDataUsageTitle;
+
+  /// No description provided for @privacyPolicyDataUsageContent.
+  ///
+  /// In en, this message translates to:
+  /// **'We use your information to: facilitate bartering connections between users, display your profile to other users in your area, enable chat functionality, improve our services, and send notifications about matches and messages.'**
+  String get privacyPolicyDataUsageContent;
+
+  /// No description provided for @privacyPolicyDataSharingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Information Sharing'**
+  String get privacyPolicyDataSharingTitle;
+
+  /// No description provided for @privacyPolicyDataSharingContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile information, interests, and offerings are visible to other users of the app to facilitate bartering. We do not sell your personal information to third parties. We may share data with service providers who assist in operating our app, and we may disclose information if required by law.'**
+  String get privacyPolicyDataSharingContent;
+
+  /// No description provided for @privacyPolicyDataSecurityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Security'**
+  String get privacyPolicyDataSecurityTitle;
+
+  /// No description provided for @privacyPolicyDataSecurityContent.
+  ///
+  /// In en, this message translates to:
+  /// **'We implement appropriate technical and organizational measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.'**
+  String get privacyPolicyDataSecurityContent;
+
+  /// No description provided for @privacyPolicyUserRightsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Rights'**
+  String get privacyPolicyUserRightsTitle;
+
+  /// No description provided for @privacyPolicyUserRightsContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You have the right to access, update, or delete your personal information at any time through the app settings. You can also request a copy of your data or object to certain types of processing.'**
+  String get privacyPolicyUserRightsContent;
+
+  /// No description provided for @privacyPolicyThirdPartyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Third-Party Services'**
+  String get privacyPolicyThirdPartyTitle;
+
+  /// No description provided for @privacyPolicyThirdPartyContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Our app may use third-party services for analytics, maps, and notifications. These services have their own privacy policies, and we encourage you to review them.'**
+  String get privacyPolicyThirdPartyContent;
+
+  /// No description provided for @privacyPolicyChangesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes to This Policy'**
+  String get privacyPolicyChangesTitle;
+
+  /// No description provided for @privacyPolicyChangesContent.
+  ///
+  /// In en, this message translates to:
+  /// **'We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the app. Continued use of the app after changes constitutes acceptance of the updated policy.'**
+  String get privacyPolicyChangesContent;
+
+  /// No description provided for @privacyPolicyContactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Us'**
+  String get privacyPolicyContactTitle;
+
+  /// No description provided for @privacyPolicyContactContent.
+  ///
+  /// In en, this message translates to:
+  /// **'If you have any questions about this Privacy Policy or our data practices, please contact us at help@firebender.com'**
+  String get privacyPolicyContactContent;
+
+  /// No description provided for @privacyPolicyLastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated: January 2025'**
+  String get privacyPolicyLastUpdated;
 }
 
 class _AppLocalizationsDelegate

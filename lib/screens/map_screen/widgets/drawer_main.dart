@@ -7,6 +7,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import '../../../l10n/app_localizations.dart';
 import '../cubit/map_screen_api_cubit.dart';
 import '../../settings_screen/settings_screen.dart';
+import '../../privacy_policy_screen/privacy_policy_screen.dart';
 
 class DrawerMain extends StatelessWidget {
 
@@ -102,6 +103,20 @@ class DrawerMain extends StatelessWidget {
                       );
                     },
                     title: Text(l10n?.settingsTitle ?? "Settings"),
+                  ),
+                ),
+                PointerInterceptor(
+                  child: ListTile(
+                    leading: const Icon(Icons.privacy_tip_outlined),
+                    onTap: () {
+                      Scaffold.of(context).closeDrawer();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PrivacyPolicyScreen(),
+                        ),
+                      );
+                    },
+                    title: Text(l10n?.privacyPolicy ?? "Privacy Policy"),
                   ),
                 ),
               ],

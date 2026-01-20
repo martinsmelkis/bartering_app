@@ -179,6 +179,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get settingsTitle => 'Iestatījumi';
 
   @override
+  String get privacyPolicy => 'Privātuma politika';
+
+  @override
   String get settingsSaved => 'Iestatījumi veiksmīgi saglabāti';
 
   @override
@@ -2390,4 +2393,73 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get submitReport => 'Iesniegt ziņojumu';
+
+  @override
+  String get privacyPolicyIntroTitle => 'Ievads';
+
+  @override
+  String get privacyPolicyIntroContent =>
+      'Šī Privātuma politika apraksta, kā mēs apkopojam, izmantojam un aizsargājam jūsu personisko informāciju, lietojot mūsu maiņas lietotni. Mēs apņemamies nodrošināt jūsu privātumu un aizsargāt jūsu datus.';
+
+  @override
+  String get privacyPolicyDataCollectionTitle =>
+      'Informācija, ko mēs apkopojam';
+
+  @override
+  String get privacyPolicyDataCollectionContent =>
+      'Mēs apkopojam informāciju, ko jūs sniedzat tieši, tostarp jūsu profila informāciju, intereses, piedāvājumus, atrašanās vietas datus un tērzēšanas ziņojumus. Mēs arī apkopojam lietošanas datus, piemēram, lietotnes mijiedarbību un ierīces informāciju, lai uzlabotu mūsu pakalpojumu.';
+
+  @override
+  String get privacyPolicyDataUsageTitle =>
+      'Kā mēs izmantojam jūsu informāciju';
+
+  @override
+  String get privacyPolicyDataUsageContent =>
+      'Mēs izmantojam jūsu informāciju, lai: veicinātu maiņas savienojumus starp lietotājiem, parādītu jūsu profilu citiem lietotājiem jūsu apkārtnē, nodrošinātu tērzēšanas funkcionalitāti, uzlabotu mūsu pakalpojumus un nosūtītu paziņojumus par atbilstībām un ziņojumiem.';
+
+  @override
+  String get privacyPolicyDataSharingTitle => 'Informācijas kopīgošana';
+
+  @override
+  String get privacyPolicyDataSharingContent =>
+      'Jūsu profila informācija, intereses un piedāvājumi ir redzami citiem lietotnes lietotājiem, lai veicinātu maiņu. Mēs nepārdodam jūsu personisko informāciju trešajām personām. Mēs varam kopīgot datus ar pakalpojumu sniedzējiem, kuri palīdz darbināt mūsu lietotni, un mēs varam atklāt informāciju, ja to prasa likums.';
+
+  @override
+  String get privacyPolicyDataSecurityTitle => 'Datu drošība';
+
+  @override
+  String get privacyPolicyDataSecurityContent =>
+      'Mēs īstenojam atbilstošus tehniskos un organizatoriskos pasākumus, lai aizsargātu jūsu personisko informāciju no nesankcionētas piekļuves, izmaiņām, izpaušanas vai iznīcināšanas. Tomēr neviens pārraides veids internetā nav 100% drošs.';
+
+  @override
+  String get privacyPolicyUserRightsTitle => 'Jūsu tiesības';
+
+  @override
+  String get privacyPolicyUserRightsContent =>
+      'Jums ir tiesības jebkurā laikā piekļūt, atjaunināt vai dzēst savu personisko informāciju, izmantojot lietotnes iestatījumus. Jūs varat arī pieprasīt savu datu kopiju vai iebilst pret noteiktiem apstrādes veidiem.';
+
+  @override
+  String get privacyPolicyThirdPartyTitle => 'Trešo pušu pakalpojumi';
+
+  @override
+  String get privacyPolicyThirdPartyContent =>
+      'Mūsu lietotnē var tikt izmantoti trešo pušu pakalpojumi analītikai, kartēm un paziņojumiem. Šiem pakalpojumiem ir savas privātuma politikas, un mēs iesakām tās pārskatīt.';
+
+  @override
+  String get privacyPolicyChangesTitle => 'Izmaiņas šajā politikā';
+
+  @override
+  String get privacyPolicyChangesContent =>
+      'Mēs varam laiku pa laikam atjaunināt šo Privātuma politiku. Mēs paziņosim jums par jebkādām izmaiņām, publicējot jauno politiku lietotnē. Turpinot lietot lietotni pēc izmaiņām, tas nozīmē atjauninātās politikas pieņemšanu.';
+
+  @override
+  String get privacyPolicyContactTitle => 'Sazinieties ar mums';
+
+  @override
+  String get privacyPolicyContactContent =>
+      'Ja jums ir kādi jautājumi par šo Privātuma politiku vai mūsu datu praksi, lūdzu, sazinieties ar mums uz help@firebender.com';
+
+  @override
+  String get privacyPolicyLastUpdated =>
+      'Pēdējoreiz atjaunots: 2025. gada janvāris';
 }
