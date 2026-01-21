@@ -139,6 +139,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Load interests and offerings
     _userInterests = interests;
     _userOfferings = offerings;
+
+    final tokenService = FCMTokenService();
+    tokenService.onSessionStarted(_currentUserId ?? "");
+
+    if (mounted) setState(() {});
   }
 
   /// Called when user attributes may have changed (e.g., after editing profile/settings)
@@ -149,11 +154,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     });
     // Optionally reload user profile data
     _loadUserProfile();
-
-    final tokenService = FCMTokenService();
-    tokenService.onSessionStarted(_currentUserId ?? "");
-
-    if (mounted) setState(() {});
   }
 
   Future<void> _zoomToSavedLocation() async {

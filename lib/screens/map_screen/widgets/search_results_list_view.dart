@@ -1,8 +1,14 @@
+import 'package:barter_app/widgets/full_screen_image_viewer.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
+import '../../../configure_dependencies.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/map/point_of_interest.dart';
+import '../../../models/postings/posting_data_response.dart';
+import '../../../services/api_client.dart';
 import '../../../theme/app_colors.dart';
 import '../../../utils/attribute_matching_utils.dart';
 import '../../../utils/avatar_color_utils.dart';
@@ -27,6 +33,8 @@ class SearchResultsListView extends StatefulWidget {
   State<SearchResultsListView> createState() => _SearchResultsListViewState();
 }
 
+enum ViewMode { users, postings }
+
 class _SearchResultsListViewState extends State<SearchResultsListView> {
   final Set<String> _expandedUserIds = {};
   
@@ -34,6 +42,17 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   List<String> _currentUserInterestIds = [];
   List<String> _currentUserOfferIds = [];
   bool _isLoadingUserAttributes = true;
+  
+  // View mode toggle
+  ViewMode _viewMode = ViewMode.users;
+  
+  // Postings data
+  final Map<String, UserPostingData> _postingsCache = {};
+  final Map<String, List<UserPostingData>> _userPostingsMap = {};
+  bool _isLoadingPostings = false;
+  
+  // Flattened list of all postings with user info
+  List<PostingWithUser> _allPostings = [];
 
   @override
   void initState() {
@@ -42,6 +61,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _loadCurrentUserAttributes();
+        _loadAllPostings();
       }
     });
   }
@@ -52,6 +72,70 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     // Reload user attributes when widget is updated (e.g., when shown again after profile changes)
     if (widget.pois != oldWidget.pois) {
       _loadCurrentUserAttributes();
+      _loadAllPostings();
+    }
+  }
+  
+  Future<void> _loadAllPostings() async {
+    if (widget.pois.isEmpty) return;
+    
+    setState(() {
+      _isLoadingPostings = true;
+    });
+    
+    try {
+      final apiClient = getIt<ApiClient>();
+      final List<PostingWithUser> allPostings = [];
+      
+      for (final poi in widget.pois) {
+        if (poi.profile.activePostingIds == null || poi.profile.activePostingIds!.isEmpty) {
+          continue;
+        }
+        
+        final postingIds = poi.profile.activePostingIds!;
+        final userPostings = <UserPostingData>[];
+        
+        for (final postingId in postingIds) {
+          // Check cache first
+          if (_postingsCache.containsKey(postingId)) {
+            userPostings.add(_postingsCache[postingId]!);
+          } else {
+            try {
+              final posting = await apiClient.getPostingById(postingId);
+              if (posting != null) {
+                _postingsCache[postingId] = posting;
+                userPostings.add(posting);
+              }
+            } catch (e) {
+              debugPrint('Error fetching posting $postingId: $e');
+            }
+          }
+        }
+        
+        _userPostingsMap[poi.profile.userId] = userPostings;
+        
+        // Add to flattened list with user info
+        for (final posting in userPostings) {
+          allPostings.add(PostingWithUser(
+            posting: posting,
+            poi: poi,
+          ));
+        }
+      }
+      
+      if (mounted) {
+        setState(() {
+          _allPostings = allPostings;
+          _isLoadingPostings = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading postings: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingPostings = false;
+        });
+      }
     }
   }
 
@@ -86,6 +170,44 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     });
   }
 
+  Widget _buildToggleButton({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? Colors.white : Colors.grey[700],
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : Colors.grey[700],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildLegendItem({required Color color, required String label}) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -109,6 +231,315 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildUsersListView(List<PointOfInterest> sortedPois) {
+    if (sortedPois.isEmpty) {
+      return Center(
+        child: Text(
+          'No users found',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: sortedPois.length,
+      separatorBuilder: (context, index) => const Divider(height: 24),
+      itemBuilder: (context, index) {
+        final poi = sortedPois[index];
+        return _buildPoiListItem(context, poi);
+      },
+    );
+  }
+
+  Widget _buildPostingsListView() {
+    if (_isLoadingPostings) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (_allPostings.isEmpty) {
+      return Center(
+        child: Text(
+          'No postings found',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: _allPostings.length,
+      separatorBuilder: (context, index) => const Divider(height: 24),
+      itemBuilder: (context, index) {
+        final postingWithUser = _allPostings[index];
+        return _buildPostingCard(context, postingWithUser);
+      },
+    );
+  }
+
+  Widget _buildPostingCard(BuildContext context, PostingWithUser postingWithUser) {
+    final l10n = AppLocalizations.of(context)!;
+    final posting = postingWithUser.posting;
+    final poi = postingWithUser.poi;
+    final dateFormat = DateFormat('MMM dd, yyyy');
+
+    return Card(
+      margin: EdgeInsets.zero,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // User info header (clickable to view user)
+          InkWell(
+            onTap: () => widget.onPoiTap(poi),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              ),
+              child: Row(
+                children: [
+                  // Small avatar
+                  FutureBuilder<String>(
+                    future: _loadAndModifySvg(poi),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return SvgPicture.string(
+                          snapshot.data!,
+                          width: 32,
+                          height: 32,
+                        );
+                      }
+                      return Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          shape: BoxShape.circle,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          poi.profile.name,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (poi.distanceKm != null)
+                          Text(
+                            '${poi.distanceKm!.toStringAsFixed(1)} km away',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  // Chat button
+                  if (widget.onChatTap != null)
+                    IconButton(
+                      icon: const Icon(Icons.chat_bubble_outline, size: 20),
+                      color: AppColors.primary,
+                      onPressed: () => widget.onChatTap!(poi),
+                      tooltip: l10n.chat,
+                    ),
+                  const Icon(Icons.chevron_right, size: 20, color: Colors.grey),
+                ],
+              ),
+            ),
+          ),
+          // Posting content
+          ExpandablePanel(
+            theme: const ExpandableThemeData(
+              headerAlignment: ExpandablePanelHeaderAlignment.center,
+              tapBodyToCollapse: true,
+              tapHeaderToExpand: true,
+              hasIcon: true,
+            ),
+            header: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Icon(
+                    posting.isOffer ? Icons.add_circle : Icons.add_circle_outline,
+                    color: posting.isOffer ? Colors.green : Colors.blue,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      posting.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            collapsed: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Text(
+                posting.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+            expanded: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    posting.description,
+                    style: TextStyle(color: Colors.grey[800]),
+                  ),
+                  const SizedBox(height: 12),
+                  if (posting.value != null) ...[
+                    Row(
+                      children: [
+                        const Icon(Icons.monetization_on, size: 16, color: Colors.green),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${l10n.valuePrefix}: \$${posting.value!.toStringAsFixed(2)}',
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  if (posting.expiresAt != null) ...[
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_today, size: 16, color: Colors.orange),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${l10n.expiresPrefix}: ${dateFormat.format(posting.expiresAt!)}',
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${l10n.postedPrefix}: ${dateFormat.format(posting.createdAt)}',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  if (posting.imageUrls != null && posting.imageUrls!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: posting.imageUrls!.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: _buildPostingImage(posting, index),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPostingImage(UserPostingData posting, int index) {
+    final baseUrl = getIt<String>(instanceName: 'serviceBaseUrl');
+    final filename = posting.imageUrls![index];
+    final imageUrl = '$baseUrl$filename';
+
+    return GestureDetector(
+      onTap: () {
+        final allImageUrls = posting.imageUrls!
+            .map((file) => '$baseUrl$file')
+            .toList();
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => FullScreenImageViewer(
+              imageUrls: allImageUrls,
+              initialIndex: index,
+              heroTag: 'posting_${posting.id}_image',
+            ),
+          ),
+        );
+      },
+      child: Hero(
+        tag: 'posting_${posting.id}_image_$index',
+        child: Image.network(
+          imageUrl,
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: 100,
+              height: 100,
+              color: Colors.grey[200],
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 100,
+              height: 100,
+              color: Colors.grey[300],
+              child: const Icon(Icons.broken_image),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -155,12 +586,52 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    '${sortedPois.length} ${sortedPois.length == 1 ? 'result' : 'results'} found',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _viewMode == ViewMode.users
+                            ? '${sortedPois.length} ${sortedPois.length == 1 ? 'user' : 'users'} found'
+                            : '${_allPostings.length} ${_allPostings.length == 1 ? 'posting' : 'postings'} found',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      // Toggle buttons
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildToggleButton(
+                              icon: Icons.people,
+                              label: 'Users',
+                              isSelected: _viewMode == ViewMode.users,
+                              onTap: () {
+                                setState(() {
+                                  _viewMode = ViewMode.users;
+                                });
+                              },
+                            ),
+                            _buildToggleButton(
+                              icon: Icons.article,
+                              label: 'Postings',
+                              isSelected: _viewMode == ViewMode.postings,
+                              onTap: () {
+                                setState(() {
+                                  _viewMode = ViewMode.postings;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 IconButton(
@@ -207,25 +678,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           ],
           // List of results
           Expanded(
-            child: sortedPois.isEmpty
-                ? Center(
-                    child: Text(
-                      'No results found',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: sortedPois.length,
-                    separatorBuilder: (context, index) => const Divider(height: 24),
-                    itemBuilder: (context, index) {
-                      final poi = sortedPois[index];
-                      return _buildPoiListItem(context, poi);
-                    },
-                  ),
+            child: _viewMode == ViewMode.users
+                ? _buildUsersListView(sortedPois)
+                : _buildPostingsListView(),
           ),
         ],
       ),
@@ -630,4 +1085,15 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         return AppColors.primary;
     }
   }
+}
+
+/// Helper class to associate a posting with its user
+class PostingWithUser {
+  final UserPostingData posting;
+  final PointOfInterest poi;
+
+  PostingWithUser({
+    required this.posting,
+    required this.poi,
+  });
 }
