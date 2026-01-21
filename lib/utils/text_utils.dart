@@ -50,7 +50,8 @@ class TextUtils {
   /// Returns true if:
   /// - Current user's interests match POI's offerings (type == 1), OR
   /// - Current user's offerings match POI's interests (type != 1)
-  static bool checkForAttributeBarterMatch(PointOfInterest poi, List<ParsedAttributeData>? interests, List<ParsedAttributeData>? offers) {
+  static bool checkForAttributeBarterMatch(PointOfInterest poi,
+      List<ParsedAttributeData>? interests, List<ParsedAttributeData>? offers) {
     // Use cached sets if available, otherwise return false
     if (interests == null && offers == null) {
       return false;

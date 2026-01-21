@@ -13,8 +13,14 @@ class DrawerMain extends StatelessWidget {
 
   final PoiCubit poiCubit;
   final MapController mapController;
+  final VoidCallback? onAttributesChanged;
 
-  const DrawerMain({super.key, required this.poiCubit, required this.mapController});
+  const DrawerMain({
+    super.key, 
+    required this.poiCubit, 
+    required this.mapController,
+    this.onAttributesChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -94,13 +100,15 @@ class DrawerMain extends StatelessWidget {
                 PointerInterceptor(
                   child: ListTile(
                     leading: const Icon(Icons.settings),
-                    onTap: () {
+                    onTap: () async {
                       Scaffold.of(context).closeDrawer();
-                      Navigator.of(context).push(
+                      await Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => const SettingsScreen(),
                         ),
                       );
+                      // Notify that attributes may have changed after returning from settings
+                      onAttributesChanged?.call();
                     },
                     title: Text(l10n?.settingsTitle ?? "Settings"),
                   ),

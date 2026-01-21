@@ -1,9 +1,8 @@
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/models/postings/posting_data_response.dart';
-import 'package:barter_app/models/user/parsed_attribute_data.dart';
-import 'package:barter_app/models/user/user_attribute_entry_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/attribute_matching_utils.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
@@ -18,7 +17,6 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/map/point_of_interest.dart';
 import '../../../theme/app_colors.dart';
-import '../../../utils/text_utils.dart';
 
 class PoiDetailsBottomSheet extends StatefulWidget {
   final PointOfInterest poi;
@@ -299,39 +297,13 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     }
   }
 
-  // Helper to parse color from a string like "underscore:0xAARRGGBB"
-  Color? _parseColorFromHint(String? hint) {
-    if (hint != null) {
-      final hexString =
-      hint == 'GREEN' ? '0xFF00FF00' :
-      hint == 'RED' ? '0xFFFF0000' :
-      hint == 'BLUE' ? '0xFF0044FF' :
-      hint == 'YELLOW' ? '0xFFFFFF40' :
-      hint == 'ORANGE' ? '0xFFFFA500' :
-      hint == 'PURPLE' ? '0xFF800080' :
-      hint == 'TEAL' ? '0xFF00A0A0' :
-      '0xFF1A1A1A';
-      try {
-        return Color(int.parse(hexString));
-      } catch (e) {
-        return null; // Return null if parsing fails
-      }
-    }
-    return null;
-  }
+
 
   // New async method to prepare all spans for the FutureBuilder
   Future<Map<String, List<TextSpan>>> _prepareSpans(
       BuildContext context) async {
-    // 1. Get the current user's attributes for comparison
-    final userRepository = getIt<UserRepository>();
-    final currentUserInterests = await userRepository.getInterests();
-    final currentUserOffers = await userRepository.getOfferings();
-
-    final currentUserAttributeInterestIds = (currentUserInterests as List<
-        ParsedAttributeData>).map((attr) => attr.attribute).toList();
-    final currentUserAttributeOfferIds = (currentUserOffers as List<
-        ParsedAttributeData>).map((attr) => attr.attribute).toList();
+    // 1. Get the current user's attributes for comparison (normalized/translated)
+    final userMatch = await AttributeMatchingUtils.loadUserAttributes(context);
 
     // 2. Filter the POI's attributes into interests and offerings
     final poiInterests = widget.poi.profile.attributes
@@ -341,90 +313,33 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
         ?.where((attr) => attr.type == 1)
         .toList() ?? [];
 
-    // 3. Build the styled text spans with two types of matching:
-    // - POI's interests vs user's OFFERINGS (complementary match - can trade)
-    // - POI's interests vs user's INTERESTS (similar interests - blue color)
-    final interestSpans = _buildAttributeSpans(
-      context,
-      poiInterests,
-      currentUserAttributeOfferIds, // Complementary match
-      currentUserAttributeInterestIds, // Similar match (blue)
+    // 3. Build the styled text spans using the utility
+    final interestSpans = AttributeMatchingUtils.buildAttributeSpans(
+      context: context,
+      attributes: poiInterests,
+      currentUserInterestIds: userMatch.interestIds,
+      currentUserOfferIds: userMatch.offerIds,
+      isPoiInterest: true,
+      complementaryColor: AppColors.secondary,
+      similarColor: Colors.blue,
+      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),
     );
 
-    // - POI's offerings vs user's INTERESTS (complementary match - can trade)
-    // - POI's offerings vs user's OFFERINGS (similar offerings - blue color)
-    final offeringSpans = _buildAttributeSpans(
-      context,
-      poiOfferings,
-      currentUserAttributeInterestIds, // Complementary match
-      currentUserAttributeOfferIds, // Similar match (blue)
+    final offeringSpans = AttributeMatchingUtils.buildAttributeSpans(
+      context: context,
+      attributes: poiOfferings,
+      currentUserInterestIds: userMatch.interestIds,
+      currentUserOfferIds: userMatch.offerIds,
+      isPoiInterest: false,
+      complementaryColor: AppColors.secondary,
+      similarColor: Colors.blue,
+      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),
     );
 
     return {
       'interests': interestSpans,
       'offerings': offeringSpans,
     };
-  }
-
-  // Corrected synchronous helper method to build spans for a given list of attributes
-  List<TextSpan> _buildAttributeSpans(BuildContext context,
-      List<UserAttributeEntryData> attributes,
-      List<String> complementaryMatchIds,
-      // For trade matches (offering meets interest)
-      List<String> similarMatchIds,
-      // For similar interests/offerings (blue color)
-      ) {
-    if (attributes.isEmpty) return [];
-
-    List<TextSpan> spans = [];
-    for (var i = 0; i < attributes.length; i++) {
-      final attribute = attributes[i];
-      final normalizedAttr = TextUtils.getTranslatedOrNormalizedAttribute(
-          attribute.attributeId, context);
-
-      // Check both types of matches
-      final isComplementaryMatch = complementaryMatchIds.contains(
-          normalizedAttr);
-      final isSimilarMatch = similarMatchIds.contains(normalizedAttr);
-      final underscoreColor = _parseColorFromHint(attribute.uiStyleHint);
-
-      Color? textColor;
-      FontWeight fontWeight = FontWeight.normal;
-
-      if (isComplementaryMatch) {
-        // Complementary match (can trade) - use secondary color
-        textColor = AppColors.secondary;
-        fontWeight = FontWeight.bold;
-      } else if (isSimilarMatch) {
-        // Similar match (same type) - use blue color
-        textColor = Colors.blue;
-        fontWeight = FontWeight.bold;
-      }
-
-      spans.add(
-        TextSpan(
-          text: normalizedAttr,
-          style: TextStyle(
-            color: textColor,
-            fontWeight: fontWeight,
-            fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),
-            decoration: (isComplementaryMatch || isSimilarMatch)
-                ? null
-                : underscoreColor != null ? TextDecoration.underline : null,
-            decorationColor: (isComplementaryMatch || isSimilarMatch)
-                ? null
-                : underscoreColor,
-            decorationThickness: 3,
-          ),
-        ),
-      );
-
-      // Add a comma separator if it's not the last item
-      if (i < attributes.length - 1) {
-        spans.add(const TextSpan(text: ', '));
-      }
-    }
-    return spans;
   }
 
   Widget _buildPostingImage(UserPostingData posting, int index) {

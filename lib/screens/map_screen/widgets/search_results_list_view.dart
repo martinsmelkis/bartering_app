@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/map/point_of_interest.dart';
 import '../../../theme/app_colors.dart';
+import '../../../utils/attribute_matching_utils.dart';
 import '../../../utils/avatar_color_utils.dart';
 import '../../../utils/text_utils.dart';
 import '../../../widgets/online_status_badge.dart';
@@ -28,6 +29,52 @@ class SearchResultsListView extends StatefulWidget {
 
 class _SearchResultsListViewState extends State<SearchResultsListView> {
   final Set<String> _expandedUserIds = {};
+  
+  // Current user's attributes for matching (normalized/translated)
+  List<String> _currentUserInterestIds = [];
+  List<String> _currentUserOfferIds = [];
+  bool _isLoadingUserAttributes = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load after first frame to get context for translation
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadCurrentUserAttributes();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(SearchResultsListView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reload user attributes when widget is updated (e.g., when shown again after profile changes)
+    if (widget.pois != oldWidget.pois) {
+      _loadCurrentUserAttributes();
+    }
+  }
+
+  Future<void> _loadCurrentUserAttributes() async {
+    try {
+      final userMatch = await AttributeMatchingUtils.loadUserAttributes(context);
+      
+      if (mounted) {
+        setState(() {
+          _currentUserInterestIds = userMatch.interestIds;
+          _currentUserOfferIds = userMatch.offerIds;
+          _isLoadingUserAttributes = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading current user attributes: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingUserAttributes = false;
+        });
+      }
+    }
+  }
 
   void _toggleExpanded(String userId) {
     setState(() {
@@ -37,6 +84,32 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         _expandedUserIds.add(userId);
       }
     });
+  }
+
+  Widget _buildLegendItem({required Color color, required String label}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(3),
+            border: Border.all(color: color, width: 1),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -98,6 +171,40 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               ],
             ),
           ),
+          // Legend for attribute highlighting
+          if (!_isLoadingUserAttributes) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey.shade200),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 14, color: Colors.grey[600]),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Wrap(
+                      spacing: 12,
+                      runSpacing: 4,
+                      children: [
+                        _buildLegendItem(
+                          color: AppColors.secondary,
+                          label: 'Trade match',
+                        ),
+                        _buildLegendItem(
+                          color: Colors.blue,
+                          label: 'Similar',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           // List of results
           Expanded(
             child: sortedPois.isEmpty
@@ -182,8 +289,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                       isOnline: poi.isOnline,
                       isAway: poi.isAway,
                       size: 10.0,
-                      right: -5,
-                      top: -5,
+                      right: 10,
+                      top: 10,
                       borderWidth: 2.0,
                     ),
                   ],
@@ -241,7 +348,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           ),
           const SizedBox(width: 4),
           Text(
-            'Match: ${(poi.matchRelevancyScore! * 100).toStringAsFixed(0)}%',
+            'Match: ${(poi.matchRelevancyScore! * 100).toStringAsFixed(2)}%',
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[700],
@@ -315,19 +422,43 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             spacing: 6,
             runSpacing: 6,
             children: (isExpanded ? interests : interests.take(3)).map((attr) {
+              final normalizedAttr = TextUtils.getTranslatedOrNormalizedAttribute(
+                  attr.attributeId, context);
+              
+              // Use utility to determine match type
+              final matchType = AttributeMatchingUtils.getMatchType(
+                normalizedAttribute: normalizedAttr,
+                currentUserInterestIds: _currentUserInterestIds,
+                currentUserOfferIds: _currentUserOfferIds,
+                isPoiInterest: true, // This is POI's interest
+              );
+              
+              // Get styling based on match type
+              final style = AttributeMatchingUtils.getAttributeStyle(
+                matchType: matchType,
+                defaultColor: _getColorForAttribute(attr.uiStyleHint),
+                complementaryColor: AppColors.secondary,
+                similarColor: Colors.blue,
+              );
+              
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getColorForAttribute(attr.uiStyleHint).withValues(alpha: 0.2),
+                  color: style.backgroundColor,
                   borderRadius: BorderRadius.circular(12),
+                  border: style.borderColor != null
+                      ? Border.all(
+                          color: style.borderColor!,
+                          width: style.borderWidth!,
+                        )
+                      : null,
                 ),
                 child: Text(
-                  TextUtils.getTranslatedOrNormalizedAttribute(
-                      attr.attributeId, context),
+                  normalizedAttr,
                   style: TextStyle(
                     fontSize: 11,
-                    color: _getColorForAttribute(attr.uiStyleHint),
-                    fontWeight: FontWeight.w500,
+                    color: style.textColor,
+                    fontWeight: style.fontWeight,
                   ),
                 ),
               );
@@ -350,19 +481,43 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             spacing: 6,
             runSpacing: 6,
             children: (isExpanded ? offerings : offerings.take(3)).map((attr) {
+              final normalizedAttr = TextUtils.getTranslatedOrNormalizedAttribute(
+                  attr.attributeId, context);
+              
+              // Use utility to determine match type
+              final matchType = AttributeMatchingUtils.getMatchType(
+                normalizedAttribute: normalizedAttr,
+                currentUserInterestIds: _currentUserInterestIds,
+                currentUserOfferIds: _currentUserOfferIds,
+                isPoiInterest: false, // This is POI's offering
+              );
+              
+              // Get styling based on match type
+              final style = AttributeMatchingUtils.getAttributeStyle(
+                matchType: matchType,
+                defaultColor: _getColorForAttribute(attr.uiStyleHint),
+                complementaryColor: AppColors.secondary,
+                similarColor: Colors.blue,
+              );
+              
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getColorForAttribute(attr.uiStyleHint).withValues(alpha: 0.2),
+                  color: style.backgroundColor,
                   borderRadius: BorderRadius.circular(12),
+                  border: style.borderColor != null
+                      ? Border.all(
+                          color: style.borderColor!,
+                          width: style.borderWidth!,
+                        )
+                      : null,
                 ),
                 child: Text(
-                    TextUtils.getTranslatedOrNormalizedAttribute(
-                        attr.attributeId, context),
+                  normalizedAttr,
                   style: TextStyle(
                     fontSize: 11,
-                    color: _getColorForAttribute(attr.uiStyleHint),
-                    fontWeight: FontWeight.w500,
+                    color: style.textColor,
+                    fontWeight: style.fontWeight,
                   ),
                 ),
               );
@@ -443,7 +598,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
 
   Future<String> _loadAndModifySvg(PointOfInterest poi) async {
     final userIdHashCode = poi.profile.userId.hashCode;
-    final index = userIdHashCode.abs() % 25; // Assuming 25 avatars
+    final index = userIdHashCode.abs() % 29; // Assuming 29 avatars
     final selectedIconPath = 'assets/icons/path${index + 1}.svg';
     
     final attributes = poi.profile.attributes?.map((e) => e.uiStyleHint).whereType<String>().toList();

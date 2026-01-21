@@ -95,12 +95,16 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   String? _currentUserName;
   List<ParsedAttributeData>? _userInterests;
   List<ParsedAttributeData>? _userOfferings;
+  
   // GlobalKey to preserve Scaffold state and prevent map rebuilds
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   
   // Search results list view state
   bool _showSearchResultsList = false;
   List<PointOfInterest> _searchResults = [];
+  
+  // Key to force SearchResultsListView to rebuild when attributes change
+  int _searchResultsKey = 0;
 
   @override
   void initState() {
@@ -135,6 +139,16 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Load interests and offerings
     _userInterests = interests;
     _userOfferings = offerings;
+  }
+
+  /// Called when user attributes may have changed (e.g., after editing profile/settings)
+  void _handleAttributesChanged() {
+    setState(() {
+      // Increment the key to force SearchResultsListView to rebuild
+      _searchResultsKey++;
+    });
+    // Optionally reload user profile data
+    _loadUserProfile();
 
     final tokenService = FCMTokenService();
     tokenService.onSessionStarted(_currentUserId ?? "");
@@ -667,7 +681,13 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           return AdaptiveChatLayout(
           mainContent: Scaffold(
             key: _scaffoldKey, // Use persistent key to prevent rebuilds
-            drawer: PointerInterceptor(child: DrawerMain(poiCubit: poiCubit, mapController: _mapController)),
+            drawer: PointerInterceptor(
+              child: DrawerMain(
+                poiCubit: poiCubit, 
+                mapController: _mapController,
+                onAttributesChanged: _handleAttributesChanged,
+              ),
+            ),
             body:
             MultiBlocListener(
               listeners: [
@@ -880,6 +900,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                             bottom: 0,
                             top: MediaQuery.of(context).size.height * 0.15,
                             child: SearchResultsListView(
+                              key: ValueKey(_searchResultsKey), // Force rebuild when key changes
                               pois: _searchResults,
                               onClose: () {
                                 // Temporarily show POIs on map (setting stays enabled)
