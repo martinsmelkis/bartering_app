@@ -1,10 +1,12 @@
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/services/settings_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../utils/responsive_breakpoints.dart';
 import '../cubit/map_screen_api_cubit.dart';
 import '../../settings_screen/settings_screen.dart';
 import '../../privacy_policy_screen/privacy_policy_screen.dart';
@@ -14,12 +16,14 @@ class DrawerMain extends StatelessWidget {
   final PoiCubit poiCubit;
   final MapController mapController;
   final VoidCallback? onAttributesChanged;
+  final VoidCallback? onOpenSettingsPanel;
 
   const DrawerMain({
     super.key, 
     required this.poiCubit, 
     required this.mapController,
     this.onAttributesChanged,
+    this.onOpenSettingsPanel,
   });
 
   @override
@@ -102,13 +106,21 @@ class DrawerMain extends StatelessWidget {
                     leading: const Icon(Icons.settings),
                     onTap: () async {
                       Scaffold.of(context).closeDrawer();
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const SettingsScreen(),
-                        ),
-                      );
-                      // Notify that attributes may have changed after returning from settings
-                      onAttributesChanged?.call();
+                      
+                      // Use adaptive behavior: panel on web/desktop, full-screen on mobile
+                      if (kIsWeb && context.canShowSideBySide && onOpenSettingsPanel != null) {
+                        // Open as left panel on web
+                        onOpenSettingsPanel!();
+                      } else {
+                        // Navigate to full-screen on mobile
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SettingsScreen(),
+                          ),
+                        );
+                        // Notify that attributes may have changed after returning from settings
+                        onAttributesChanged?.call();
+                      }
                     },
                     title: Text(l10n?.settingsTitle ?? "Settings"),
                   ),

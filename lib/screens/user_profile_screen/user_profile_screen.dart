@@ -13,10 +13,14 @@ import 'package:barter_app/screens/offers_screen/offers_screen.dart';
 import 'package:barter_app/screens/onboarding_screen/onboarding_screen.dart';
 import 'package:barter_app/screens/manage_postings_screen/manage_postings_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dart';
+import 'package:barter_app/screens/user_profile_screen/cubit/nested_panel_cubit.dart';
+import 'package:barter_app/screens/user_profile_screen/adaptive_nested_panel_layout.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -35,6 +39,8 @@ class UserProfileScreen extends StatefulWidget {
   final String userName;
   final List<ParsedAttributeData>? interests;
   final List<ParsedAttributeData>? offerings;
+  final bool showAppBar; // Whether to show the app bar (false for panel mode)
+  final Function(bool)? onNestedPanelChanged; // Callback when nested panel opens/closes
 
   const UserProfileScreen({
     super.key,
@@ -42,6 +48,8 @@ class UserProfileScreen extends StatefulWidget {
     required this.userName,
     this.interests,
     this.offerings,
+    this.showAppBar = true,
+    this.onNestedPanelChanged,
   });
 
   @override
@@ -68,12 +76,30 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.accountSetupSuccess),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
+    // Check if we're in web panel mode
+    final bool isWebPanel = kIsWeb && !widget.showAppBar && context.canShowSideBySide;
+
+    return BlocProvider(
+      create: (context) => NestedPanelCubit(),
+      child: BlocListener<NestedPanelCubit, NestedPanelState>(
+        listener: (context, nestedPanelState) {
+          // Notify parent when nested panel state changes (for panel expansion)
+          widget.onNestedPanelChanged?.call(nestedPanelState.isOpen);
+        },
+        child: BlocBuilder<NestedPanelCubit, NestedPanelState>(
+          builder: (context, nestedPanelState) {
+            return AdaptiveNestedPanelLayout(
+              panelType: nestedPanelState.panelType,
+              userId: nestedPanelState.userId,
+              onClose: () => context.read<NestedPanelCubit>().closePanel(),
+              mainContent: Scaffold(
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: Text(l10n.accountSetupSuccess),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            )
+          : null,
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.w),
         child: Column(
@@ -87,14 +113,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Stack(
                   children: [
                     Padding(
-                      padding: EdgeInsets.all(16.w),
+                      padding: EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             widget.userName,
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -102,7 +128,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           Text(
                             l10n.userId,
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 12,
                               color: Colors.grey[800],
                               fontWeight: FontWeight.w700,
                             ),
@@ -111,7 +137,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           Text(
                             widget.userId,
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 12,
                               fontFamily: 'Courier',
                             ),
                           ),
@@ -126,7 +152,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         icon: Icon(
                           Icons.delete_forever,
                           color: Colors.red,
-                          size: 24.sp,
+                          size: 24,
                         ),
                         padding: EdgeInsets.all(8.w),
                         constraints: const BoxConstraints(),
@@ -145,20 +171,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               child: Stack(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(12.w),
+                    padding: EdgeInsets.all(12),
                     child: Row(
                       children: [
                         Icon(
                           Icons.location_on,
                           color: AppColors.primary,
-                          size: 20.sp,
+                          size: 20,
                         ),
                         SizedBox(width: 8.w),
                         Expanded(
                           child: Text(
                             _userLocation ?? l10n.notSet,
                             style: TextStyle(
-                              fontSize: 10.sp,
+                              fontSize: 10,
                               fontFamily: 'Courier',
                               color: _userLocation != null
                                   ? Colors.black87
@@ -171,7 +197,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   ),
                   Positioned(
-                    top: 4.h,
+                    top: 4,
                     right: 4.w,
                     child: IconButton(
                       onPressed: () async {
@@ -256,14 +282,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       children: [
                         Icon(
                           Icons.add,
-                          size: 18.sp,
+                          size: 18,
                           color: Colors.white,
                         ),
                         SizedBox(width: 4.w),
                         Text(
                           l10n.addNewPosting,
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 12,
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
@@ -360,14 +386,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       children: [
                         Icon(
                           Icons.add,
-                          size: 18.sp,
+                          size: 18,
                           color: Colors.white,
                         ),
                         SizedBox(width: 4.w),
                         Text(
                           l10n.addNewPosting,
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 12,
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
@@ -456,11 +482,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 // Notification Preferences Button
                 InkWell(
                   onTap: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const NotificationsScreen(),
-                      ),
-                    );
+                    // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                    if (isWebPanel) {
+                      // Open as nested panel within profile on web
+                      context.read<NestedPanelCubit>().openNotifications();
+                    } else {
+                      // Navigate to full-screen on mobile
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationsScreen(),
+                        ),
+                      );
+                    }
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
@@ -474,14 +507,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       children: [
                         Icon(
                           Icons.notifications_active,
-                          size: 18.sp,
+                          size: 18,
                           color: Colors.white,
                         ),
                         SizedBox(width: 4.w),
                         Text(
                           l10n.notificationPreferences,
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 12,
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
@@ -490,7 +523,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 12),
                 // Match History Button
                 BlocBuilder<NotificationsCubit, NotificationsState>(
                   bloc: getIt<NotificationsCubit>()..loadMatchHistory(),
@@ -502,11 +535,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       children: [
                         InkWell(
                           onTap: () async {
-                            await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const MatchHistoryScreen(),
-                              ),
-                            );
+                            // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                            if (isWebPanel) {
+                              // Open as nested panel within profile on web
+                              context.read<NestedPanelCubit>().openMatchHistory();
+                            } else {
+                              // Navigate to full-screen on mobile
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const MatchHistoryScreen(),
+                                ),
+                              );
+                            }
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -520,14 +560,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               children: [
                                 Icon(
                                   Icons.history,
-                                  size: 18.sp,
+                                  size: 18,
                                   color: Colors.white,
                                 ),
                                 SizedBox(width: 4.w),
                                 Text(
                                   l10n.matchHistory,
                                   style: TextStyle(
-                                    fontSize: 12.sp,
+                                    fontSize: 12,
                                     color: Colors.white,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -558,7 +598,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 unreadCount > 99 ? '99+' : '$unreadCount',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 10.sp,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 textAlign: TextAlign.center,
@@ -571,14 +611,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 12.w),
+            SizedBox(height: 12),
             InkWell(
               onTap: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ManagePostingsScreen(userId: widget.userId),
-                  ),
-                );
+                // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                if (isWebPanel) {
+                  // Open as nested panel within profile on web
+                  context.read<NestedPanelCubit>().openManagePostings(widget.userId);
+                } else {
+                  // Navigate to full-screen on mobile
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ManagePostingsScreen(userId: widget.userId),
+                    ),
+                  );
+                }
               },
               child: Container(
                 padding: EdgeInsets.symmetric(
@@ -592,14 +639,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   children: [
                     Icon(
                       Icons.manage_accounts,
-                      size: 18.sp,
+                      size: 18,
                       color: Colors.white,
                     ),
                     SizedBox(width: 4.w),
                     Text(
                       l10n.managePostings,
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 12,
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
@@ -609,6 +656,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
             ),
           ],
+        ),
+      ),
+            ),
+          );
+        },
         ),
       ),
     );

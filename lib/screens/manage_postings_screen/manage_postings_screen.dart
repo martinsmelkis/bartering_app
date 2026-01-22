@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
@@ -6,13 +7,19 @@ import '../../services/api_client.dart';
 import '../../services/secure_storage_service.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/debug_utils.dart';
+import '../../utils/responsive_breakpoints.dart';
 import '../user_profile_screen/create_posting_screen.dart';
 import 'package:intl/intl.dart';
 
 class ManagePostingsScreen extends StatefulWidget {
   final String userId;
+  final bool showAppBar; // Whether to show the app bar (false for panel mode)
 
-  const ManagePostingsScreen({super.key, required this.userId});
+  const ManagePostingsScreen({
+    super.key,
+    required this.userId,
+    this.showAppBar = true,
+  });
 
   @override
   State<ManagePostingsScreen> createState() => _ManagePostingsScreenState();
@@ -149,12 +156,17 @@ class _ManagePostingsScreenState extends State<ManagePostingsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    // Check if we're in web panel mode
+    final bool isWebPanel = kIsWeb && !widget.showAppBar && context.canShowSideBySide;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.managePostings),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: Text(l10n.managePostings),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            )
+          : null,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../application.dart';
 import '../../configure_dependencies.dart';
@@ -9,11 +10,14 @@ import '../../services/settings_service.dart';
 import '../../services/secure_storage_service.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/debug_utils.dart';
+import '../../utils/responsive_breakpoints.dart';
 import '../pin_input_screen/setup_pin_from_settings_screen.dart';
 import '../security_question_screen/setup_security_question_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  final bool showAppBar; // Whether to show the app bar (false for panel mode)
+
+  const SettingsScreen({super.key, this.showAppBar = true});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -82,15 +86,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    // Check if we're in web panel mode
+    final bool isWebPanel = kIsWeb && !widget.showAppBar && context.canShowSideBySide;
+    final double sidePadding = isWebPanel ? 12.0 : 16.0;
+    final double verticalPadding = isWebPanel ? 8.0 : 16.0;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsTitle),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: Text(l10n.settingsTitle),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            )
+          : null,
       body: _isLoading ? const Center(child: CircularProgressIndicator()) :
         ListView(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.symmetric(horizontal: sidePadding, vertical: verticalPadding),
           children: [
             // Search Settings Section
             _buildSectionHeader(l10n.settingsSearchSection),

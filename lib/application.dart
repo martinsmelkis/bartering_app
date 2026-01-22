@@ -2,6 +2,8 @@ import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/screens/chat_screen/cubit/chat_cubit.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
 import 'package:barter_app/screens/map_screen/cubit/chat_panel_cubit.dart';
+import 'package:barter_app/screens/map_screen/cubit/settings_panel_cubit.dart';
+import 'package:barter_app/screens/map_screen/cubit/profile_panel_cubit.dart';
 import 'package:barter_app/screens/map_screen/cubit/map_operations_cubit.dart';
 import 'package:barter_app/screens/map_screen/cubit/map_screen_api_cubit.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
@@ -140,6 +142,12 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         ),
         BlocProvider<ChatPanelCubit>(
           create: (context) => ChatPanelCubit(),
+        ),
+        BlocProvider<SettingsPanelCubit>(
+          create: (context) => SettingsPanelCubit(),
+        ),
+        BlocProvider<ProfilePanelCubit>(
+          create: (context) => ProfilePanelCubit(),
         ),
         BlocProvider<ChatsBadgeCubit>(
           create: (context) {

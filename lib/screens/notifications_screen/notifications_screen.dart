@@ -3,14 +3,18 @@ import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubi
 import 'package:barter_app/screens/notifications_screen/tabs/attribute_preferences_tab.dart';
 import 'package:barter_app/screens/notifications_screen/tabs/contacts_tab.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../utils/responsive_breakpoints.dart';
 
 class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
+  final bool showAppBar; // Whether to show the app bar (false for panel mode)
+
+  const NotificationsScreen({super.key, this.showAppBar = true});
 
   @override
   Widget build(BuildContext context) {
@@ -18,43 +22,72 @@ class NotificationsScreen extends StatelessWidget {
       create: (context) => getIt<NotificationsCubit>()
         ..loadContacts()
         ..loadAttributePreferences(),
-      child: const _NotificationsScreenView(),
+      child: _NotificationsScreenView(showAppBar: showAppBar),
     );
   }
 }
 
 class _NotificationsScreenView extends StatelessWidget {
-  const _NotificationsScreenView();
+  final bool showAppBar;
+
+  const _NotificationsScreenView({this.showAppBar = true});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    // Check if we're in web panel mode
+    final bool isWebPanel = kIsWeb && !showAppBar && context.canShowSideBySide;
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.notificationPreferences),
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          bottom: TabBar(
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            tabs: [
-              Tab(
-                icon: const Icon(Icons.label),
-                text: l10n.attributes,
+        appBar: showAppBar
+            ? AppBar(
+                title: Text(l10n.notificationPreferences),
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                bottom: TabBar(
+                  indicatorColor: Colors.white,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white70,
+                  tabs: [
+                    Tab(
+                      icon: const Icon(Icons.label),
+                      text: l10n.attributes,
+                    ),
+                    Tab(
+                      icon: const Icon(Icons.contact_mail),
+                      text: l10n.contacts,
+                    ),
+                  ],
+                ),
+              )
+            : null,
+        body: Column(
+          children: [
+            if (!showAppBar)
+              Material(
+                color: AppColors.primary,
+                child: TabBar(
+                  indicatorColor: Colors.white,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white70,
+                  tabs: [
+                    Tab(
+                      icon: const Icon(Icons.label),
+                      text: l10n.attributes,
+                    ),
+                    Tab(
+                      icon: const Icon(Icons.contact_mail),
+                      text: l10n.contacts,
+                    ),
+                  ],
+                ),
               ),
-              Tab(
-                icon: const Icon(Icons.contact_mail),
-                text: l10n.contacts,
-              ),
-            ],
-          ),
-        ),
-        body: BlocBuilder<NotificationsCubit, NotificationsState>(
-          builder: (context, state) {
+            Expanded(
+              child: BlocBuilder<NotificationsCubit, NotificationsState>(
+                builder: (context, state) {
             if (state.status == NotificationsStatus.loading &&
                 state.contacts == null &&
                 state.attributePreferences.isEmpty) {
@@ -85,13 +118,16 @@ class _NotificationsScreenView extends StatelessWidget {
               );
             }
 
-            return const TabBarView(
-              children: [
-                AttributePreferencesTab(),
-                ContactsTab(),
-              ],
-            );
-          },
+                  return const TabBarView(
+                    children: [
+                      AttributePreferencesTab(),
+                      ContactsTab(),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
