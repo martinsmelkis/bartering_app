@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:barter_app/l10n/app_localizations.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Dialog that appears when user taps the "no users nearby" marker
@@ -53,15 +54,17 @@ class InviteFriendsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+    return PointerInterceptor(
+      child: Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: PointerInterceptor(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
             // Icon
             Container(
               width: 80,
@@ -144,7 +147,9 @@ class InviteFriendsDialog extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(l10n.close),
             ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );

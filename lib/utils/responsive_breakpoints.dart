@@ -276,8 +276,8 @@ class ResponsiveBreakpoints {
       compact: 18.0,
       medium: 20.0,
       expanded: 22.0,
-      large: 24.0,
-      extraLarge: 26.0,
+      large: 18.0,
+      extraLarge: 20.0,
     );
   }
 

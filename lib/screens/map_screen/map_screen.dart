@@ -62,7 +62,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       sourceName: "osmFrance", // for caching | osmDeu, osmFrance
       tileExtension: ".png",
       minZoomLevel: 2,
-      maxZoomLevel: 19,
+      maxZoomLevel: 16,
       urlsServers: [
         TileURLs(url: "https://a.tile.openstreetmap.fr/hot/"),
         TileURLs(url: "https://b.tile.openstreetmap.fr/hot/"),
@@ -72,7 +72,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         TileURLs(url: "https://c.tile.openstreetmap.org"),
         TileURLs(url: "https://tiles.wmflabs.org/osm/"),
       ],
-      tileSize: 512,
+      tileSize: 256,
     ),
   );
 
@@ -512,37 +512,37 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           PositionedOnlineStatusBadge(
             isOnline: poi.isOnline,
             isAway: poi.isAway,
-            size: 25.0,
-            right: 33,
-            top: 33,
+            size: kIsWeb ? 12: 25,
+            right: kIsWeb ? 12: 33,
+            top: kIsWeb ? 12: 33,
             borderWidth: 2.5,
           ),
           // Match indicator - positioned at bottom right
           if (hasMatch)
             Positioned(
-              right: 25,
-              bottom: 25,
+              right: kIsWeb ? 12: 25,
+              bottom: kIsWeb ? 12: 25,
               child: Container(
-                width: 42,
-                height: 42,
+                width: kIsWeb ? 18 : 42,
+                height: kIsWeb ? 18 : 42,
                 decoration: BoxDecoration(
                   color: AppColors.secondary,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white,
-                    width: 2,
+                    width: kIsWeb ? 1 : 2,  // Proportionally smaller border
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+                      blurRadius: kIsWeb ? 1.6 : 4,  // Proportionally smaller shadow
+                      offset: Offset(0, kIsWeb ? 1 : 2),  // Proportionally smaller offset
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.handshake,
-                  size: 30,
+                  size: kIsWeb ? 15 : 30,
                   color: Colors.white,
                 ),
               ),
@@ -741,7 +741,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                     OSMFlutter(
                                       controller: _mapController,
                                       osmOption: OSMOption(
-                                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
+                                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 16),
                                         userTrackingOption: const UserTrackingOption(
                                           enableTracking: true,
                                           unFollowUser: false,

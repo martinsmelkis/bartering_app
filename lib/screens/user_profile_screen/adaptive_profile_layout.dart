@@ -89,7 +89,7 @@ class _ProfilePanelState extends State<_ProfilePanel> {
     // Use local state or prop, whichever is more recent
     final bool isExpanded = widget.hasNestedPanelOpen || _localNestedPanelOpen;
     final double profileWidth = isExpanded
-        ? context.profilePanelWidth * 1.5
+        ? context.profilePanelWidth * 1.65
         : context.profilePanelWidth;
 
     return Container(

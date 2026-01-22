@@ -4,6 +4,7 @@ import 'package:barter_app/models/chat/file_attachment.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
@@ -80,6 +81,65 @@ class FileTransferService {
       }
     } catch (e) {
       print('Error uploading file: $e');
+      rethrow;
+    }
+  }
+
+  /// Upload an encrypted file from bytes (web-compatible)
+  /// 
+  /// This method accepts file bytes directly, making it compatible with web platform
+  /// where file system access is limited.
+  Future<FileAttachment?> uploadFileFromBytes({
+    required String senderId,
+    required String recipientId,
+    required Uint8List fileBytes,
+    required String filename,
+    required String recipientPublicKey,
+    int ttlHours = 24,
+    Function(double)? onProgress,
+  }) async {
+    try {
+      // Get MIME type
+      final mimeType = _getMimeType(filename);
+
+      // Encrypt file bytes with recipient's public key
+      final encryptedBytes = await _cryptoService.encryptBytes(
+        fileBytes,
+        recipientPublicKey,
+      );
+
+      // Create multipart file
+      final multipartFile = MultipartFile.fromBytes(
+        encryptedBytes,
+        filename: filename,
+      );
+
+      // Upload to server
+      final response = await _apiClient.uploadEncryptedFile(
+        senderId,
+        recipientId,
+        filename,
+        mimeType,
+        ttlHours.toString(),
+        multipartFile,
+      );
+
+      // Check if upload was successful
+      if (response.success) {
+        return FileAttachment(
+          fileId: response.fileId,
+          filename: filename,
+          mimeType: mimeType,
+          fileSize: fileBytes.length,
+          expiresAt: response.expiresAt,
+          isUploading: false,
+        );
+      } else {
+        print('File upload failed: ${response.message}');
+        return null;
+      }
+    } catch (e) {
+      print('Error uploading file from bytes: $e');
       rethrow;
     }
   }

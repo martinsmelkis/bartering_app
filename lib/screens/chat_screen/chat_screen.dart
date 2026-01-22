@@ -17,6 +17,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:open_filex/open_filex.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 
@@ -127,20 +128,26 @@ class _ChatScreenState extends State<ChatScreen> {
       final source = await showModalBottomSheet<ImageSource>(
         context: context,
         builder: (context) =>
-            SafeArea(
-              child: Wrap(
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.photo_library),
-                    title: Text(l10n.gallery),
-                    onTap: () => Navigator.pop(context, ImageSource.gallery),
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.camera_alt),
-                    title: Text(l10n.camera),
-                    onTap: () => Navigator.pop(context, ImageSource.camera),
-                  ),
-                ],
+            PointerInterceptor(
+              child: SafeArea(
+                child: Wrap(
+                  children: [
+                    PointerInterceptor(
+                      child: ListTile(
+                        leading: Icon(Icons.photo_library),
+                        title: Text(l10n.gallery),
+                        onTap: () => Navigator.pop(context, ImageSource.gallery),
+                      ),
+                    ),
+                    PointerInterceptor(
+                      child: ListTile(
+                        leading: Icon(Icons.camera_alt),
+                        title: Text(l10n.camera),
+                        onTap: () => Navigator.pop(context, ImageSource.camera),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
       );
@@ -173,12 +180,27 @@ class _ChatScreenState extends State<ChatScreen> {
       final userRepository = getIt<UserRepository>();
       final currentUserId = await userRepository.getUserId();
 
-      final fileAttachment = await fileTransferService.uploadFile(
-        senderId: currentUserId!,
-        recipientId: widget.poiId!,
-        filePath: pickedFile.path,
-        recipientPublicKey: recipientPublicKey,
-      );
+      FileAttachment? fileAttachment;
+      
+      if (kIsWeb) {
+        // On web, read bytes directly since file path doesn't work
+        final fileBytes = await pickedFile.readAsBytes();
+        fileAttachment = await fileTransferService.uploadFileFromBytes(
+          senderId: currentUserId!,
+          recipientId: widget.poiId!,
+          fileBytes: fileBytes,
+          filename: pickedFile.name,
+          recipientPublicKey: recipientPublicKey,
+        );
+      } else {
+        // On mobile, use file path
+        fileAttachment = await fileTransferService.uploadFile(
+          senderId: currentUserId!,
+          recipientId: widget.poiId!,
+          filePath: pickedFile.path,
+          recipientPublicKey: recipientPublicKey,
+        );
+      }
 
       // Dismiss uploading indicator
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
