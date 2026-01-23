@@ -34,7 +34,12 @@ class ChatMessagesLoading extends ChatState {
 }
 
 class ChatMessagesLoaded extends ChatState {
-  ChatMessagesLoaded(super.messages);
+  final DateTime timestamp;
+  
+  ChatMessagesLoaded(super.messages) : timestamp = DateTime.now();
+  
+  @override
+  List<Object> get props => [messages, timestamp];
 }
 
 class ChatMessageSending extends ChatState {

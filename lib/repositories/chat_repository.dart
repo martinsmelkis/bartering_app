@@ -453,14 +453,71 @@ class ChatRepository {
   }
 
   /// Update message status
+  /// Handles both client-generated IDs and server-generated IDs
   Future<void> updateMessageStatus(String messageId,
       EChatMessageStatus status) async {
-    await (_database.update(_database.userChats)
+    logDebug('🔄 Attempting to update message status: messageId=$messageId, status=$status');
+    
+    // Try exact messageId match first
+    final exactMatchCount = await (_database.update(_database.userChats)
       ..where((tbl) => tbl.messageId.equals(messageId)))
         .write(UserChatsCompanion(
       status: Value(_statusToString(status)),
       updatedAt: Value(DateTime.now()),
     ));
+    
+    if (exactMatchCount > 0) {
+      logDebug('✅ Updated $exactMatchCount message(s) with exact ID match');
+      return;
+    }
+    
+    // If no exact match and this looks like a server UUID (contains hyphens),
+    // try to find messages by timestamp proximity (within last 30 seconds)
+    // This is a fallback for when server ID doesn't match client ID
+    if (messageId.contains('-')) {
+      logDebug('⚠️ No exact match for server UUID, trying timestamp-based fallback');
+      final recentTime = DateTime.now().subtract(const Duration(seconds: 30));
+      
+      // Find recent messages that can be updated to this status
+      // For READ status: look for delivered messages
+      // For DELIVERED status: look for sent messages
+      // For SENT status: look for sending messages
+      final query = _database.select(_database.userChats)
+        ..where((tbl) => tbl.timestamp.isBiggerOrEqualValue(recentTime))
+        ..orderBy([(t) => OrderingTerm.desc(t.timestamp)]);
+      
+      final recentMessages = await query.get();
+      
+      // Filter messages that can be updated to the target status
+      final eligibleMessages = recentMessages.where((msg) {
+        final currentStatus = _stringToStatus(msg.status);
+        // Can only progress forward: sending -> sent -> delivered -> read
+        return (status == EChatMessageStatus.sent && currentStatus == EChatMessageStatus.sending) ||
+               (status == EChatMessageStatus.delivered && 
+                (currentStatus == EChatMessageStatus.sent || currentStatus == EChatMessageStatus.sending)) ||
+               (status == EChatMessageStatus.read && 
+                (currentStatus == EChatMessageStatus.delivered || currentStatus == EChatMessageStatus.sent));
+      }).toList();
+      
+      if (eligibleMessages.isNotEmpty) {
+        // Use the most recent eligible message
+        final targetMessage = eligibleMessages.first;
+        logDebug('🎯 Found eligible message ${targetMessage.messageId} with status ${targetMessage.status} -> updating to $status');
+        
+        final fallbackCount = await (_database.update(_database.userChats)
+          ..where((tbl) => tbl.messageId.equals(targetMessage.messageId)))
+            .write(UserChatsCompanion(
+          status: Value(_statusToString(status)),
+          updatedAt: Value(DateTime.now()),
+        ));
+        logDebug('✅ Updated $fallbackCount message(s) using timestamp fallback');
+        return;
+      } else {
+        logDebug('⚠️ No eligible messages found. Recent messages statuses: ${recentMessages.map((m) => m.status).join(", ")}');
+      }
+    }
+    
+    logDebug('⚠️ No messages updated for messageId: $messageId');
   }
 
   /// Update decrypted content for a message
@@ -545,6 +602,8 @@ class ChatRepository {
       );
     }
 
+    final convertedStatus = _stringToStatus(dbMessage.status);
+
     return ChatMessage(
       id: dbMessage.messageId,
       senderId: dbMessage.senderId,
@@ -554,7 +613,7 @@ class ChatRepository {
       plainText: dbMessage.decryptedContent,
       encryptedTextPayload: dbMessage.encryptedContent,
       timestamp: dbMessage.timestamp,
-      status: _stringToStatus(dbMessage.status),
+      status: convertedStatus,
       isSentByCurrentUser: dbMessage.senderId == currentUserId,
       fileAttachment: fileAttachment,
     );

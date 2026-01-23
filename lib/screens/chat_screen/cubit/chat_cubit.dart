@@ -41,6 +41,8 @@ class ChatCubit extends Cubit<ChatState> {
 
   StreamSubscription<ChatMessage>? _messageSubscription;
   StreamSubscription? _dbMessagesSubscription;
+  StreamSubscription? _statusUpdateSubscription;
+  StreamSubscription? _readReceiptSubscription;
 
   ChatCubit({
     required this.currentUserId,
@@ -49,6 +51,50 @@ class ChatCubit extends Cubit<ChatState> {
   }) : super(ChatInitial()) {}
 
   void _listenToMessages() {
+    // Listen to message status updates
+    _statusUpdateSubscription = _webSocketService?.statusUpdates.listen((statusUpdate) async {
+      logDebug('📬 Received status update: ${statusUpdate.messageId} -> ${statusUpdate.status}');
+      
+      // Update message status in database
+      if (_chatRepository != null) {
+        try {
+          await _chatRepository!.updateMessageStatus(
+            statusUpdate.messageId,
+            statusUpdate.status,
+          );
+          logDebug('✅ Updated message ${statusUpdate.messageId} status to ${statusUpdate.status} in DB');
+        } catch (e) {
+          logDebug('❌ Error updating message status: $e');
+        }
+      } else {
+        logDebug('⚠️ ChatRepository is null, cannot update status');
+      }
+    });
+
+    // Listen to read receipt notifications
+    _readReceiptSubscription = _webSocketService?.readReceipts.listen((readReceipt) async {
+      logDebug('📬 Received read receipt: messageId=${readReceipt.messageId}, status=${readReceipt.status}, readerId=${readReceipt.readerId}');
+      
+      // Update message status in database
+      if (_chatRepository != null) {
+        try {
+          await _chatRepository!.updateMessageStatus(
+            readReceipt.messageId,
+            readReceipt.status,
+          );
+          logDebug('✅ Updated message ${readReceipt.messageId} status to ${readReceipt.status} from read receipt in DB');
+          
+          // Emit a state to trigger UI rebuild if needed
+          emit(ChatMessagesLoaded(List.from(messages)));
+        } catch (e) {
+          logDebug('❌ Error updating message status from read receipt: $e');
+          logDebug('Stack trace: ${StackTrace.current}');
+        }
+      } else {
+        logDebug('⚠️ ChatRepository is null, cannot update read receipt status');
+      }
+    });
+
     // Listen to WebSocket messages (but only save to DB, don't add to list)
     _messageSubscription =
         _webSocketService?.messages.listen((chatMessage) async {
@@ -366,20 +412,9 @@ class ChatCubit extends Cubit<ChatState> {
     // 4. Send via WebSocket
     _webSocketService?.sendMessage(text, encryptedPayload, recipientUserId);
 
-    // 5. Update status to "sent" after WebSocket send
-    // (In production, you'd wait for server ACK)
-    if (_chatRepository != null) {
-      Future.delayed(const Duration(milliseconds: 500), () async {
-        try {
-          await _chatRepository!.updateMessageStatus(
-            messageId,
-            EChatMessageStatus.sent,
-          );
-        } catch (e) {
-          logDebug('❌ Error updating message status: $e');
-        }
-      });
-    }
+    // 5. Status will be updated automatically by server via MessageStatusUpdate
+    // Don't hardcode status updates here - let the server notifications handle it
+    logDebug('✅ Message sent via WebSocket, waiting for server status updates');
   }
 
   /// Send a file notification message
@@ -602,10 +637,66 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  /// Mark messages as read and send read receipts to the server
+  Future<void> markMessagesAsRead(List<ChatMessage> messagesToMark) async {
+    logDebug('📖 markMessagesAsRead called with ${messagesToMark.length} messages');
+    
+    for (final message in messagesToMark) {
+      // Only mark messages from other users that haven't been read yet
+      if (!message.isSentByCurrentUser && message.status != EChatMessageStatus.read) {
+        try {
+          logDebug('📤 Sending read receipt for message ${message.id.substring(0, 20)}... to sender ${message.senderId.substring(0, 20)}...');
+          
+          // Send read receipt to server
+          await _webSocketService?.sendReadReceipt(
+            message.id,
+            message.senderId,
+          );
+          
+          // Update local database to READ immediately (optimistic update)
+          if (_chatRepository != null) {
+            await _chatRepository!.updateMessageStatus(
+              message.id,
+              EChatMessageStatus.read,
+            );
+            logDebug('✅ Updated local DB: message ${message.id.substring(0, 20)}... -> READ');
+          }
+        } catch (e) {
+          logDebug('❌ Error marking message ${message.id} as read: $e');
+        }
+      } else {
+        logDebug('⏭️  Skipping message ${message.id.substring(0, 20)}... - isSentByMe: ${message.isSentByCurrentUser}, status: ${message.status}');
+      }
+    }
+  }
+
+  /// Mark a single message as read
+  Future<void> markMessageAsRead(String messageId, String senderId) async {
+    try {
+      // Send read receipt to server
+      await _webSocketService?.sendReadReceipt(messageId, senderId);
+      
+      // Update local database
+      if (_chatRepository != null) {
+        await _chatRepository!.updateMessageStatus(
+          messageId,
+          EChatMessageStatus.read,
+        );
+      }
+      
+      logDebug('✅ Marked message $messageId as read');
+    } catch (e) {
+      logDebug('❌ Error marking message as read: $e');
+    }
+  }
+
   @override
   Future<void> close() {
     _messageSubscription?.cancel();
     _dbMessagesSubscription?.cancel();
+    _statusUpdateSubscription?.cancel();
+    _readReceiptSubscription?.cancel();
+    _webSocketService?.dispose();
     return super.close();
   }
 

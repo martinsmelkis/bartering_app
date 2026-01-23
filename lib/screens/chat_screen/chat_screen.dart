@@ -9,6 +9,7 @@ import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/models/relationships/report_models.dart';
 import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
+import 'package:barter_app/screens/chat_screen/widgets/message_status_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -282,6 +283,36 @@ class _ChatScreenState extends State<ChatScreen> {
     } catch (e) {
       // Service might not be registered yet
     }
+
+    // Mark messages as read when chat screen is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _markVisibleMessagesAsRead();
+    });
+  }
+
+  /// Mark unread messages from the other user as read
+  void _markVisibleMessagesAsRead() {
+    if (!mounted) return;
+    
+    try {
+      // Get unread messages from other users (not sent by me)
+      final unreadMessages = _chatCubit.messages.where(
+        (msg) => !msg.isSentByCurrentUser && 
+                 msg.status != EChatMessageStatus.read
+      ).toList();
+      
+      if (unreadMessages.isNotEmpty) {
+        logDebug('📖 Marking ${unreadMessages.length} unread message(s) as read');
+        for (final msg in unreadMessages) {
+          logDebug('   - Message ${msg.id.substring(0, 20)}... from ${msg.senderId.substring(0, 20)}... status: ${msg.status}');
+        }
+        _chatCubit.markMessagesAsRead(unreadMessages);
+      } else {
+        logDebug('✅ No unread messages to mark as read');
+      }
+    } catch (e) {
+      logDebug('❌ Error marking messages as read: $e');
+    }
   }
 
   Future<void> _checkBlockedStatus() async {
@@ -295,14 +326,11 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  var _messages = List.empty();
+  List<ChatMessage> _messages = [];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    if (_messages.isEmpty) {
-      _messages = context.select((ChatCubit cubit) => cubit.messages);
-    }
 
     return Scaffold(
       appBar: widget.showAppBar
@@ -377,7 +405,11 @@ class _ChatScreenState extends State<ChatScreen> {
       body: BlocConsumer<ChatCubit, ChatState>(
         listener: (context, state) {
           if (state is ChatMessagesLoaded) {
-            _messages = state.messages;
+            logDebug('🔄 ChatMessagesLoaded state received with ${state.messages.length} messages');
+            setState(() {
+              _messages = state.messages;
+              logDebug('✅ UI _messages updated, triggering rebuild');
+            });
           }
           if (state is ChatMessagesLoaded ||
               state is ChatMessageSent ||
@@ -591,13 +623,24 @@ class _ChatScreenState extends State<ChatScreen> {
               )
             ],
             SizedBox(height: spacing),
-            Text(
-              DateFormat('HH:mm').format(message.timestamp), // Example: 14:35
-              style: TextStyle(
-                color: isMe ? AppColors.background : Colors.black54,
-                fontSize: timeFontSize,
+            // Show status indicator for sent messages, simple timestamp for received
+            if (isMe)
+              CompactMessageStatus(
+                status: message.status,
+                timestamp: message.timestamp,
+                timeStyle: TextStyle(
+                  color: AppColors.background,
+                  fontSize: timeFontSize,
+                ),
+              )
+            else
+              Text(
+                DateFormat('HH:mm').format(message.timestamp), // Example: 14:35
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: timeFontSize,
+                ),
               ),
-            ),
           ],
         ),
       ),

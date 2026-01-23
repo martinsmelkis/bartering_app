@@ -9,6 +9,9 @@ import 'package:web_socket_channel/status.dart' as status;
 import '../../../models/chat/chat_message.dart';
 import '../../../models/chat/e_chat_message_status.dart';
 import '../../../models/chat/file_notification_message.dart';
+import '../../../models/chat/message_status_update.dart';
+import '../../../models/chat/read_receipt_notification.dart';
+import '../../../models/chat/read_receipt_request.dart';
 import '../../../services/crypto/crypto_service.dart';
 import '../../../services/messaging/chat_notification_service.dart';
 
@@ -18,6 +21,15 @@ class WebSocketChatService {
   WebSocketChannel? _channel;
   StreamController<ChatMessage> _messageController =
     StreamController<ChatMessage>.broadcast();
+  
+  // Stream for message status updates
+  StreamController<MessageStatusUpdate> _statusUpdateController =
+    StreamController<MessageStatusUpdate>.broadcast();
+  
+  // Stream for read receipt notifications
+  StreamController<ReadReceiptNotification> _readReceiptController =
+    StreamController<ReadReceiptNotification>.broadcast();
+    
   CryptoService _cryptoService;
   SecureStorageService secureStorage = SecureStorageService();
   String _currentUserId;
@@ -28,6 +40,8 @@ class WebSocketChatService {
   final Map<String, String> _publicKeyCache = {};
 
   Stream<ChatMessage> get messages => _messageController.stream;
+  Stream<MessageStatusUpdate> get statusUpdates => _statusUpdateController.stream;
+  Stream<ReadReceiptNotification> get readReceipts => _readReceiptController.stream;
 
   WebSocketChatService(this._cryptoService,
       this._currentUserId,
@@ -127,6 +141,36 @@ class WebSocketChatService {
                 _messageController.add(systemMessage);
               }
               return;
+            }
+
+            // Handle MessageStatusUpdate (SENT/DELIVERED confirmation from server)
+            // Check if messageType contains 'MessageStatusUpdate' (handles full package paths)
+            if (messageJson['messageType']?.toString().contains('MessageStatusUpdate') == true) {
+              try {
+                logDebug('@@@@@@@@@ MessageStatusUpdate received: ${messageJson['messageType']}');
+                final statusUpdate = MessageStatusUpdate.fromJson(messageJson);
+                _statusUpdateController.add(statusUpdate);
+                logDebug('@@@@@@@@@ Message ${statusUpdate.messageId} status: ${statusUpdate.status}');
+                return;
+              } catch (e) {
+                logDebug('@@@@@@@@@ Error processing MessageStatusUpdate: $e');
+              }
+            }
+
+            // Handle ReadReceiptNotification (recipient read/received the message)
+            // Check if messageType contains 'ReadReceiptNotification' (handles full package paths)
+            if (messageJson['messageType']?.toString().contains('ReadReceiptNotification') == true) {
+              try {
+                logDebug('@@@@@@@@@ ReadReceiptNotification received: ${messageJson['messageType']}');
+                logDebug('@@@@@@@@@ Full notification: $messageJson');
+                final readReceipt = ReadReceiptNotification.fromJson(messageJson);
+                _readReceiptController.add(readReceipt);
+                logDebug('@@@@@@@@@ Message ${readReceipt.messageId} status: ${readReceipt.status} by ${readReceipt.readerId}');
+                return;
+              } catch (e) {
+                logDebug('@@@@@@@@@ Error processing ReadReceiptNotification: $e');
+                logDebug('@@@@@@@@@ Stack trace: ${StackTrace.current}');
+              }
             }
 
             // Handle file notifications
@@ -327,10 +371,34 @@ class WebSocketChatService {
     }
   }
 
+  /// Send a read receipt to the server when user reads a message
+  Future<void> sendReadReceipt(String messageId, String originalSenderId) async {
+    if (_channel == null || _channel!.closeCode != null) {
+      logDebug("❌ WebSocket: Not connected. Cannot send read receipt.");
+      return;
+    }
+
+    try {
+      final readReceipt = ReadReceiptRequest(
+        messageId: messageId,
+        senderId: originalSenderId,
+      );
+
+      final jsonPayload = jsonEncode(readReceipt.toJson());
+      _channel!.sink.add(jsonPayload);
+      logDebug("📤 WebSocket: Sent read receipt for message $messageId to sender $originalSenderId");
+      logDebug("📤 Payload: $jsonPayload");
+    } catch (e) {
+      logDebug("❌ WebSocket: Error sending read receipt: $e");
+    }
+  }
+
   void dispose() {
     print("WebSocket: Disposing service and closing connection.");
     _channel?.sink.close(status.goingAway);
     _messageController.close();
+    _statusUpdateController.close();
+    _readReceiptController.close();
   }
 
 }
