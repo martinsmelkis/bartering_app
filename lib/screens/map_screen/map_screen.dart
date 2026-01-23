@@ -746,6 +746,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                           enableTracking: true,
                                           unFollowUser: false,
                                         ),
+                                        showContributorBadgeForOSM: true
                                       ),
                                       onMapIsReady: _onMapReady,
                                       onMapMoved: (event) {

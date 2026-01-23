@@ -210,13 +210,4 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     );
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-
-    } else if (state == AppLifecycleState.paused) {
-
-    }
-  }
-
 }

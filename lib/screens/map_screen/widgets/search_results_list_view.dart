@@ -12,6 +12,7 @@ import '../../../services/api_client.dart';
 import '../../../theme/app_colors.dart';
 import '../../../utils/attribute_matching_utils.dart';
 import '../../../utils/avatar_color_utils.dart';
+import '../../../utils/image_utils.dart';
 import '../../../utils/text_utils.dart';
 import '../../../widgets/online_status_badge.dart';
 
@@ -308,7 +309,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             onTap: () => widget.onPoiTap(poi),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(4, 8, 12, 4),
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
@@ -336,7 +337,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                       );
                     },
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,7 +382,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               hasIcon: true,
             ),
             header: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.fromLTRB(12.0, 0, 12, 4),
               child: Row(
                 children: [
                   Icon(
@@ -488,18 +489,28 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   Widget _buildPostingImage(UserPostingData posting, int index) {
     final baseUrl = getIt<String>(instanceName: 'serviceBaseUrl');
     final filename = posting.imageUrls![index];
-    final imageUrl = '$baseUrl$filename';
+    
+    // Use thumbnail for list view (300x300, ~5-20KB)
+    final thumbnailUrl = ImageUtils.buildThumbnailUrl(
+      baseUrl: baseUrl,
+      imagePath: filename,
+    );
 
     return GestureDetector(
       onTap: () {
-        final allImageUrls = posting.imageUrls!
-            .map((file) => '$baseUrl$file')
+        // Create list of all FULL RESOLUTION image URLs for the viewer
+        final allFullImageUrls = posting.imageUrls!
+            .map((file) => ImageUtils.buildFullImageUrl(
+                  baseUrl: baseUrl,
+                  imagePath: file,
+                ))
             .toList();
 
+        // Open full-screen image viewer with full resolution images
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => FullScreenImageViewer(
-              imageUrls: allImageUrls,
+              imageUrls: allFullImageUrls,
               initialIndex: index,
               heroTag: 'posting_${posting.id}_image',
             ),
@@ -509,7 +520,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       child: Hero(
         tag: 'posting_${posting.id}_image_$index',
         child: Image.network(
-          imageUrl,
+          thumbnailUrl,
           width: 100,
           height: 100,
           fit: BoxFit.cover,
@@ -694,7 +705,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       onTap: () => widget.onPoiTap(poi),
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(12),
@@ -757,12 +768,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
             // Interests and Offerings separated
             if (poi.profile.attributes != null && poi.profile.attributes!.isNotEmpty) ...[
               _buildAttributesSection(context, poi, isExpanded),
             ],
-            const SizedBox(height: 8),
             // Distance, relevancy score, and chat button
             _buildBottomRow(context, poi),
           ],

@@ -4,6 +4,7 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/attribute_matching_utils.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
+import 'package:barter_app/utils/image_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
 import 'package:barter_app/widgets/online_status_badge.dart';
@@ -349,21 +350,27 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     // Extract the filename from the imageUrl (assuming it's stored as just the filename)
     final filename = posting.imageUrls![index];
 
-    // Construct the full URL: {baseUrl}/{userId}/{fileName}
-    final imageUrl = '$baseUrl$filename';
+    // Use thumbnail for list view (300x300, ~5-20KB)
+    final thumbnailUrl = ImageUtils.buildThumbnailUrl(
+      baseUrl: baseUrl,
+      imagePath: filename,
+    );
 
     return GestureDetector(
       onTap: () {
-        // Create list of all image URLs for this posting
-        final allImageUrls = posting.imageUrls!
-            .map((file) => '$baseUrl$file')
+        // Create list of all FULL RESOLUTION image URLs for the viewer
+        final allFullImageUrls = posting.imageUrls!
+            .map((file) => ImageUtils.buildFullImageUrl(
+                  baseUrl: baseUrl,
+                  imagePath: file,
+                ))
             .toList();
 
-        // Open full-screen image viewer
+        // Open full-screen image viewer with full resolution images
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => FullScreenImageViewer(
-              imageUrls: allImageUrls,
+              imageUrls: allFullImageUrls,
               initialIndex: index,
               heroTag: 'posting_${posting.id}_image',
             ),
@@ -373,7 +380,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       child: Hero(
         tag: 'posting_${posting.id}_image_$index',
         child: Image.network(
-          imageUrl,
+          thumbnailUrl,
           width: 100,
           height: 100,
           fit: BoxFit.cover,
