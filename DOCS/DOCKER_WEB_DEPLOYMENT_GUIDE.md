@@ -44,10 +44,7 @@ flutter clean
 flutter pub get
 
 # Build for web (production mode)
-flutter build web --release --web-renderer html
-
-# Or use canvaskit renderer (better performance but larger size)
-# flutter build web --release --web-renderer canvaskit
+flutter flutter build web --release
 ```
 
 This creates optimized files in `build/web/` directory.
@@ -104,7 +101,7 @@ COPY . .
 
 # Get dependencies and build
 RUN flutter pub get
-RUN flutter build web --release --web-renderer html
+RUN flutter build web --release
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine

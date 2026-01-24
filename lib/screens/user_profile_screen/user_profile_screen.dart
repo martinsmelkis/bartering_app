@@ -272,7 +272,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12.w, vertical: 6.h),
+                        horizontal: 12, vertical: 6.h),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(20.r),
@@ -376,7 +376,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12.w, vertical: 6.h),
+                        horizontal: 12, vertical: 6.h),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(20.r),
@@ -497,7 +497,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12.w, vertical: 6.h),
+                        horizontal: 12, vertical: 6.h),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(20.r),
@@ -510,7 +510,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           size: 18,
                           color: Colors.white,
                         ),
-                        SizedBox(width: 4.w),
+                        SizedBox(width: 4),
                         Text(
                           l10n.notificationPreferences,
                           style: TextStyle(
@@ -550,7 +550,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 12.w, vertical: 6.h),
+                                horizontal: 12, vertical: 6.h),
                             decoration: BoxDecoration(
                               color: AppColors.primary,
                               borderRadius: BorderRadius.circular(20.r),
@@ -563,7 +563,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   size: 18,
                                   color: Colors.white,
                                 ),
-                                SizedBox(width: 4.w),
+                                SizedBox(width: 4),
                                 Text(
                                   l10n.matchHistory,
                                   style: TextStyle(
@@ -629,7 +629,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               },
               child: Container(
                 padding: EdgeInsets.symmetric(
-                    horizontal: 12.w, vertical: 6.h),
+                    horizontal: 12, vertical: 6.h),
                 decoration: BoxDecoration(
                   color: AppColors.secondary,
                   borderRadius: BorderRadius.circular(20.r),
