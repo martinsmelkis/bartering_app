@@ -39,6 +39,8 @@ import '../chat_screen/adaptive_chat_layout.dart';
 import '../settings_screen/adaptive_settings_layout.dart';
 import '../user_profile_screen/adaptive_profile_layout.dart';
 import 'cubit/chat_panel_cubit.dart';
+import 'cubit/poi_panel_cubit.dart';
+import 'adaptive_poi_layout.dart';
 import 'cubit/settings_panel_cubit.dart';
 import 'cubit/profile_panel_cubit.dart';
 import 'cubit/map_operations_cubit.dart';
@@ -102,6 +104,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   // GlobalKey to preserve Scaffold state and prevent map rebuilds
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
+  // GlobalKey to preserve map content and prevent rebuilds when panels open
+  final GlobalKey _mapContentKey = GlobalKey();
 
   // Search results list view state
   bool _showSearchResultsList = false;
@@ -209,18 +214,34 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
 
     // Check if we should show results as list (unless ignoreListViewSetting is true)
+    bool shouldShowListOnly = false;
     if (!ignoreListViewSetting) {
       final settingsService = getIt<SettingsService>();
       final showAsList = await settingsService.getShowSearchResultsAsList();
+      final poiPanelCubit = context.read<PoiPanelCubit>();
 
       if (showAsList && _allPois.isNotEmpty) {
-        // Show list view instead of map markers
-        setState(() {
-          _searchResults = _allPois;
-          _showSearchResultsList = true;
-        });
-        return;
+        // Only show search results list if POI panel is NOT currently open
+        // If user clicked on a POI to view details, don't override it with the list
+        if (!poiPanelCubit.state.isOpen) {
+          // Show list view
+          setState(() {
+            _searchResults = _allPois;
+            _showSearchResultsList = true;
+          });
+          
+          // On small screens, return early (list only, no map markers)
+          // On large screens, continue to show markers on map alongside the list
+          if (!context.canShowSideBySide) {
+            shouldShowListOnly = true;
+          }
+        }
       }
+    }
+    
+    // If showing list only (small screens), don't render map markers
+    if (shouldShowListOnly) {
+      return;
     }
 
     if (zoomLevelNotifier.value.toDouble() <= 13.5) {
@@ -423,25 +444,36 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   void _onIndividualPoiTap(PointOfInterest poi) {
     logDebug("Individual POI Tapped: ${poi.profile.userId}");
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      isDismissible: true,
-      enableDrag: true,
-      backgroundColor: Colors.transparent,
-      useRootNavigator: false,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.9,
-      ),
-      builder: (context) =>
-          PoiDetailsBottomSheet(
-            poi: poi,
-            onChatButtonPressed: () {
-              Navigator.of(context).pop(); // Close the bottom sheet
-              _openChat(poi.profile.userId, poi.profile.name);
-            },
-          ),
-    );
+
+    // On large screens, show POI details using cubit
+    if (context.canShowSideBySide) {
+      final poiPanelCubit = context.read<PoiPanelCubit>();
+      poiPanelCubit.openPoiDetails(poi);
+      
+      // If search results list is open, POI will show below it
+      // If not, POI will show as a side panel via AdaptivePoiLayout
+    } else {
+      // On small screens, show as modal bottom sheet
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: true,
+        enableDrag: true,
+        backgroundColor: Colors.transparent,
+        useRootNavigator: false,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
+        builder: (context) =>
+            PoiDetailsBottomSheet(
+              poi: poi,
+              onChatButtonPressed: () {
+                Navigator.of(context).pop(); // Close the bottom sheet
+                _openChat(poi.profile.userId, poi.profile.name);
+              },
+            ),
+      );
+    }
   }
 
   void _onMainClusterTap(PoiClusterOsm tappedCluster) {
@@ -679,26 +711,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.maybeOf(context)?.viewPadding.top;
 
-    // Use BlocBuilders to listen to panel state changes without rebuilding map
-    return BlocBuilder<ProfilePanelCubit, ProfilePanelState>(
-      builder: (context, profileState) {
-        return BlocBuilder<SettingsPanelCubit, SettingsPanelState>(
-          builder: (context, settingsState) {
-            return BlocBuilder<ChatPanelCubit, ChatPanelState>(
-              builder: (context, chatState) {
-                return AdaptiveProfileLayout(
-                  showProfilePanel: profileState.isOpen,
-                  userId: profileState.userId,
-                  userName: profileState.userName,
-                  interests: profileState.interests,
-                  offerings: profileState.offerings,
-                  onClose: () => context.read<ProfilePanelCubit>().closeProfile(),
-                  mainContent: AdaptiveSettingsLayout(
-                    showSettingsPanel: settingsState.isOpen,
-                    onClose: () => context.read<SettingsPanelCubit>().closeSettings(),
-                    mainContent: AdaptiveChatLayout(
-                      mainContent: Scaffold(
-                        key: _scaffoldKey, // Use persistent key to prevent rebuilds
+    // Build map content separately to avoid rebuilds
+    // Using GlobalKey to preserve widget identity across rebuilds
+    final mapContent = KeyedSubtree(
+      key: _mapContentKey,
+      child: Scaffold(
+        key: _scaffoldKey, // Use persistent key to prevent rebuilds
                         drawer: PointerInterceptor(
                           child: DrawerMain(
                             poiCubit: poiCubit,
@@ -707,8 +725,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                             onOpenSettingsPanel: () => context.read<SettingsPanelCubit>().openSettings(),
                           ),
                         ),
-                        body:
-                        MultiBlocListener(
+                        body: MultiBlocListener(
                           listeners: [
                             BlocListener<PoiCubit, PoiState>(
                               listener: (context, state) {
@@ -736,7 +753,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                               if (!isVisible) {
                                 return const SizedBox.shrink();
                               }
-                              return Stack(
+                              
+                              // Build the map Stack
+                              final mapStack = Stack(
                                   children: [
                                     OSMFlutter(
                                       controller: _mapController,
@@ -884,6 +903,13 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                               for (var c in mapOperationsCubit.mainPoiClusters) {
                                                 c.isExpanded = false;
                                               }
+                                              
+                                              // Close POI panel when performing new search
+                                              final poiPanelCubit = context.read<PoiPanelCubit>();
+                                              if (poiPanelCubit.state.isOpen) {
+                                                poiPanelCubit.closePanel();
+                                              }
+                                              
                                               final settingsService = getIt<SettingsService>();
                                               final useMapCenter = await settingsService.getUseMapCenterForSearch();
                                               final radiusKm = await settingsService.getNearbyUsersRadius();
@@ -912,42 +938,35 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                         zoomNotifier: zoomLevelNotifier,
                                       ),
                                     ),
-                                    // Search results list view overlay
-                                    if (_showSearchResultsList)
+                                    // Search results list view overlay (only for small screens)
+                                    if (_showSearchResultsList && !context.canShowSideBySide)
                                       Positioned(
                                         left: 0,
                                         right: 0,
                                         bottom: 0,
                                         top: MediaQuery.of(context).size.height * 0.15,
                                         child: SearchResultsListView(
-                                          key: ValueKey(_searchResultsKey), // Force rebuild when key changes
+                                          key: ValueKey(_searchResultsKey),
                                           pois: _searchResults,
+                                          isLargeScreen: false,
                                           onClose: () {
-                                            // Temporarily show POIs on map (setting stays enabled)
                                             setState(() {
                                               _showSearchResultsList = false;
                                               _searchResults = [];
                                             });
-
-                                            // Re-render POIs on the map with forceMapView
                                             if (_allPois.isNotEmpty) {
                                               _processPois(_allPois, ignoreListViewSetting: true);
                                             }
                                           },
                                           onPoiTap: (poi) async {
-                                            // Temporarily show POIs on map (setting stays enabled)
+                                            // On small screens, close the list when POI is tapped
                                             setState(() {
                                               _showSearchResultsList = false;
                                             });
-
-                                            // Re-render POIs on the map first with forceMapView
                                             if (_allPois.isNotEmpty) {
                                               _processPois(_allPois, ignoreListViewSetting: true);
-                                              // Small delay to ensure markers are rendered
                                               await Future.delayed(const Duration(milliseconds: 100));
                                             }
-
-                                            // Then show the clicked POI details
                                             _onIndividualPoiTap(poi);
                                           },
                                           onChatTap: (poi) {
@@ -957,19 +976,129 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                       ),
                                   ]
                               );
+                              
+                              // On large screens, show map with search results panel
+                              if (context.canShowSideBySide && _showSearchResultsList) {
+                                return Row(
+                                  children: [
+                                    Expanded(child: mapStack),
+                                    Container(
+                                      width: context.panelWidth,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.1),
+                                            blurRadius: 8,
+                                            offset: const Offset(-2, 0),
+                                          ),
+                                        ],
+                                      ),
+                                      child: SearchResultsListView(
+                                        key: ValueKey(_searchResultsKey),
+                                        pois: _searchResults,
+                                        isLargeScreen: true,
+                                        onClose: () {
+                                          setState(() {
+                                            _showSearchResultsList = false;
+                                            _searchResults = [];
+                                          });
+                                          // Clear markers from map when closing list
+                                          if (_allPois.isNotEmpty) {
+                                            mapOperationsCubit.reset();
+                                            _updateMapVisuals();
+                                          }
+                                        },
+                                        onPoiTap: (poi) async {
+                                          // On large screens, open POI panel below the search results list
+                                          context.read<PoiPanelCubit>().openPoiDetails(poi);
+                                          
+                                          // Navigate to the user's location on the map (like match history does)
+                                          if (poi.profile.latitude != null && poi.profile.longitude != null) {
+                                            _mapController.setZoom(zoomLevel: 15.0);
+                                            _mapController.moveTo(
+                                              GeoPoint(
+                                                latitude: poi.profile.latitude!,
+                                                longitude: poi.profile.longitude!,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        onChatTap: (poi) {
+                                          _openChat(poi.profile.userId, poi.profile.name);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }
+                              
+                              return mapStack;
                             },
                           ),
                         ),
                       ),
-                      panelView: chatState.view,
-                      selectedPoiId: chatState.selectedPoiId,
-                      selectedPoiName: chatState.selectedPoiName,
-                      onClose: () => context.read<ChatPanelCubit>().closePanel(),
-                      onChatSelected: (poiId, poiName) {
-                        context.read<ChatPanelCubit>().openChat(poiId, poiName);
-                      },
-                    ),
-                  ),
+    );
+    
+    // Wrap with BlocBuilders for panels
+    return BlocBuilder<PoiPanelCubit, PoiPanelState>(
+      builder: (context, poiPanelState) {
+        return BlocBuilder<ChatPanelCubit, ChatPanelState>(
+          builder: (context, chatState) {
+            return BlocBuilder<SettingsPanelCubit, SettingsPanelState>(
+              builder: (context, settingsState) {
+                return BlocBuilder<ProfilePanelCubit, ProfilePanelState>(
+                  builder: (context, profileState) {
+                    return AdaptiveProfileLayout(
+                      showProfilePanel: profileState.isOpen,
+                      userId: profileState.userId,
+                      userName: profileState.userName,
+                      interests: profileState.interests,
+                      offerings: profileState.offerings,
+                      onClose: () => context.read<ProfilePanelCubit>().closeProfile(),
+                      mainContent: AdaptiveSettingsLayout(
+                        showSettingsPanel: settingsState.isOpen,
+                        onClose: () => context.read<SettingsPanelCubit>().closeSettings(),
+                        mainContent: AdaptiveChatLayout(
+                          // Only suppress chat panel when POI is shown in AdaptivePoiLayout
+                          // (not when shown below search results list)
+                          suppressChatPanel: poiPanelState.isOpen && 
+                                            !_showSearchResultsList &&
+                                            chatState.isChatOpen && 
+                                            chatState.selectedPoiId == poiPanelState.selectedPoi?.profile.userId,
+                          panelView: chatState.view,
+                          selectedPoiId: chatState.selectedPoiId,
+                          selectedPoiName: chatState.selectedPoiName,
+                          onClose: () => context.read<ChatPanelCubit>().closePanel(),
+                          onChatSelected: (poiId, poiName) {
+                            context.read<ChatPanelCubit>().openChat(poiId, poiName);
+                          },
+                          mainContent: AdaptivePoiLayout(
+                            // Only show POI panel here if search results list is NOT open
+                            // (if list is open, POI shows below the list instead)
+                            showPoiPanel: poiPanelState.isOpen && !_showSearchResultsList,
+                            selectedPoi: poiPanelState.selectedPoi,
+                            onClose: () => context.read<PoiPanelCubit>().closePanel(),
+                            onChatButtonPressed: () {
+                              final poi = poiPanelState.selectedPoi;
+                              if (poi != null) {
+                                if (context.canShowSideBySide) {
+                                  context.read<ChatPanelCubit>().openChat(
+                                    poi.profile.userId,
+                                    poi.profile.name,
+                                  );
+                                } else {
+                                  context.read<PoiPanelCubit>().closePanel();
+                                  _openChat(poi.profile.userId, poi.profile.name);
+                                }
+                              }
+                            },
+                            mainContent: mapContent,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             );

@@ -41,13 +41,13 @@ class _ContactsTabState extends State<ContactsTab> {
         return RefreshIndicator(
           onRefresh: () => context.read<NotificationsCubit>().loadContacts(),
           child: ListView(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(16),
             children: [
               // Global Notification Settings Section
               Card(
                 elevation: 2,
                 child: Padding(
-                  padding: EdgeInsets.all(16.w),
+                  padding: EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -55,27 +55,27 @@ class _ContactsTabState extends State<ContactsTab> {
                         children: [
                           Icon(Icons.notifications_active,
                               color: AppColors.primary),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 8),
                           Text(
                             l10n.notificationSettings,
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 16.h),
+                      SizedBox(height: 16),
                       // Notifications Enabled Toggle
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
                           l10n.enableNotifications,
-                          style: TextStyle(fontSize: 14.sp),
+                          style: TextStyle(fontSize: 14),
                         ),
                         subtitle: Text(
                           l10n.enableNotificationsDescription,
-                          style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                         value: contacts.notificationsEnabled,
                         activeColor: AppColors.primary,
@@ -92,14 +92,14 @@ class _ContactsTabState extends State<ContactsTab> {
                       Text(
                         l10n.quietHours,
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       SizedBox(height: 8.h),
                       Text(
                         l10n.quietHoursDescription,
-                        style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       SizedBox(height: 12.h),
                       Row(
@@ -111,7 +111,7 @@ class _ContactsTabState extends State<ContactsTab> {
                                 Text(
                                   l10n.startTime,
                                   style: TextStyle(
-                                    fontSize: 12.sp,
+                                    fontSize: 12,
                                     color: Colors.grey[700],
                                   ),
                                 ),
@@ -134,9 +134,9 @@ class _ContactsTabState extends State<ContactsTab> {
                                               ? _formatHour(
                                                   contacts.quietHoursStart!)
                                               : l10n.notSet,
-                                          style: TextStyle(fontSize: 14.sp),
+                                          style: TextStyle(fontSize: 14),
                                         ),
-                                        Icon(Icons.access_time, size: 20.sp),
+                                        Icon(Icons.access_time, size: 20),
                                       ],
                                     ),
                                   ),
@@ -152,7 +152,7 @@ class _ContactsTabState extends State<ContactsTab> {
                                 Text(
                                   l10n.endTime,
                                   style: TextStyle(
-                                    fontSize: 12.sp,
+                                    fontSize: 12,
                                     color: Colors.grey[700],
                                   ),
                                 ),
@@ -174,9 +174,9 @@ class _ContactsTabState extends State<ContactsTab> {
                                           contacts.quietHoursEnd != null
                                               ? _formatHour(contacts.quietHoursEnd!)
                                               : l10n.notSet,
-                                          style: TextStyle(fontSize: 14.sp),
+                                          style: TextStyle(fontSize: 14),
                                         ),
-                                        Icon(Icons.access_time, size: 20.sp),
+                                        Icon(Icons.access_time, size: 20),
                                       ],
                                     ),
                                   ),
@@ -197,7 +197,7 @@ class _ContactsTabState extends State<ContactsTab> {
                                     quietHoursEnd: -1,
                                   );
                             },
-                            icon: Icon(Icons.clear, size: 16.sp),
+                            icon: Icon(Icons.clear, size: 16),
                             label: Text(l10n.clearQuietHours),
                             style: TextButton.styleFrom(
                               foregroundColor: Colors.red,
@@ -225,7 +225,7 @@ class _ContactsTabState extends State<ContactsTab> {
                           Text(
                             l10n.emailAddress,
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -238,7 +238,7 @@ class _ContactsTabState extends State<ContactsTab> {
                             Expanded(
                               child: Text(
                                 contacts.email!,
-                                style: TextStyle(fontSize: 14.sp),
+                                style: TextStyle(fontSize: 14),
                               ),
                             ),
                             if (contacts.emailVerified)
@@ -246,7 +246,7 @@ class _ContactsTabState extends State<ContactsTab> {
                                 label: Text(
                                   l10n.verified,
                                   style: TextStyle(
-                                    fontSize: 11.sp,
+                                    fontSize: 11,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -259,7 +259,7 @@ class _ContactsTabState extends State<ContactsTab> {
                                 label: Text(
                                   l10n.notVerified,
                                   style: TextStyle(
-                                    fontSize: 11.sp,
+                                    fontSize: 11,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -273,7 +273,7 @@ class _ContactsTabState extends State<ContactsTab> {
                         Text(
                           l10n.notSet,
                           style:
-                              TextStyle(fontSize: 14.sp, color: Colors.grey),
+                              TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                       SizedBox(height: 12.h),
                       ElevatedButton.icon(
@@ -307,7 +307,7 @@ class _ContactsTabState extends State<ContactsTab> {
                           Text(
                             l10n.pushNotifications,
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -318,7 +318,7 @@ class _ContactsTabState extends State<ContactsTab> {
                         Text(
                           l10n.noPushTokens,
                           style:
-                              TextStyle(fontSize: 14.sp, color: Colors.grey),
+                              TextStyle(fontSize: 14, color: Colors.grey),
                         )
                       else
                         ...contacts.pushTokens.map((token) {
@@ -330,12 +330,12 @@ class _ContactsTabState extends State<ContactsTab> {
                             ),
                             title: Text(
                               token.platform.toUpperCase(),
-                              style: TextStyle(fontSize: 14.sp),
+                              style: TextStyle(fontSize: 14),
                             ),
                             subtitle: token.deviceId != null
                                 ? Text(
                                     token.deviceId!,
-                                    style: TextStyle(fontSize: 12.sp),
+                                    style: TextStyle(fontSize: 12),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   )
@@ -540,7 +540,7 @@ class _ContactsTabState extends State<ContactsTab> {
             children: [
               Icon(
                 Icons.email_outlined,
-                size: 80.sp,
+                size: 80,
                 color: AppColors.primary,
               ),
               SizedBox(height: 24.h),
@@ -548,7 +548,7 @@ class _ContactsTabState extends State<ContactsTab> {
                 l10n.setupEmailTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 24.sp,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
                 ),
@@ -558,7 +558,7 @@ class _ContactsTabState extends State<ContactsTab> {
                 l10n.setupEmailDescription,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 14,
                   color: Colors.grey.shade600,
                 ),
               ),
@@ -628,7 +628,7 @@ class _ContactsTabState extends State<ContactsTab> {
                     : Text(
                         l10n.saveEmail,
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

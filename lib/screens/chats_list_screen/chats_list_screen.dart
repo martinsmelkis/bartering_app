@@ -89,7 +89,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48.sp, color: Colors.red),
+                  Icon(Icons.error_outline, size: 48, color: Colors.red),
                   SizedBox(height: 16.h),
                   Text('${l10n.errorLoadingChats}: ${snapshot.error}'),
                 ],
@@ -106,14 +106,14 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                 children: [
                   Icon(
                     Icons.chat_bubble_outline,
-                    size: 64.sp,
+                    size: 64,
                     color: Colors.grey.shade400,
                   ),
                   SizedBox(height: 16.h),
                   Text(
                     l10n.noChatsYet,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 18,
                       color: Colors.grey.shade600,
                       fontWeight: FontWeight.w500,
                     ),
@@ -122,7 +122,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                   Text(
                     l10n.startConversationFromMap,
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 14,
                       color: Colors.grey.shade500,
                     ),
                   ),
@@ -151,7 +151,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                   child: Icon(
                     Icons.delete,
                     color: Colors.white,
-                    size: 28.sp,
+                    size: 28,
                   ),
                 ),
                 confirmDismiss: (direction) =>
@@ -411,11 +411,11 @@ class _ConversationTile extends StatelessWidget {
     final double horizontalPadding = isWebSideBySide ? 8 : 8.w;
     final double verticalPadding = isWebSideBySide ? 2 : 4.h;
     final double spacing = isWebSideBySide ? 6 : 8.w;
-    final double nameFontSize = isWebSideBySide ? 12 : 16.sp;
-    final double timestampFontSize = isWebSideBySide ? 9 : 12.sp;
-    final double messageFontSize = isWebSideBySide ? 10 : 14.sp;
-    final double iconSize = isWebSideBySide ? 10 : 14.sp;
-    final double badgeFontSize = isWebSideBySide ? 8 : 11.sp;
+    final double nameFontSize = isWebSideBySide ? 12 : 16;
+    final double timestampFontSize = isWebSideBySide ? 9 : 12;
+    final double messageFontSize = isWebSideBySide ? 10 : 14;
+    final double iconSize = isWebSideBySide ? 10 : 14;
+    final double badgeFontSize = isWebSideBySide ? 8 : 11;
     final double badgeHorizontalPadding = isWebSideBySide ? 5 : 8.w;
     final double badgeVerticalPadding = isWebSideBySide ? 2 : 4.h;
     final double badgeRadius = isWebSideBySide ? 8 : 12.r;

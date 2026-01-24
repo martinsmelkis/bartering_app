@@ -19,42 +19,7 @@ class AttributePreferencesTab extends StatelessWidget {
 
     return BlocBuilder<NotificationsCubit, NotificationsState>(
       builder: (context, state) {
-        //if (state.attributePreferences.isEmpty) {
-          return _AttributeSetupView();
-        //}
-
-        /*return Stack(
-          children: [
-            RefreshIndicator(
-              onRefresh: () =>
-                  context.read<NotificationsCubit>().loadAttributePreferences(),
-              child: ListView.builder(
-                padding: EdgeInsets.only(
-                  left: 16.w,
-                  right: 16.w,
-                  top: 16.h,
-                  bottom: 80.h, // Extra padding for FAB
-                ),
-                itemCount: state.attributePreferences.length,
-                itemBuilder: (context, index) {
-                  final pref = state.attributePreferences[index];
-                  return _AttributePreferenceCard(preference: pref);
-                },
-              ),
-            ),
-            // Floating Action Button to add more attributes
-            Positioned(
-              right: 16.w,
-              bottom: 16.h,
-              child: FloatingActionButton.extended(
-                onPressed: () => _showAddAttributesDialog(context, state),
-                backgroundColor: AppColors.primary,
-                icon: const Icon(Icons.add),
-                label: Text(l10n.addAttributes),
-              ),
-            ),
-          ],
-        );*/
+        return _AttributeSetupView();
       },
     );
   }
@@ -74,10 +39,10 @@ class _AttributePreferenceCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Card(
-      margin: EdgeInsets.only(bottom: 12.h),
+      margin: EdgeInsets.only(bottom: 12),
       elevation: 2,
       child: Padding(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -87,7 +52,7 @@ class _AttributePreferenceCard extends StatelessWidget {
                   child: Text(
                     preference.attributeId,
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -113,7 +78,7 @@ class _AttributePreferenceCard extends StatelessWidget {
                       child: Row(
                         children: [
                           const Icon(Icons.edit),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 8),
                           Text(l10n.edit),
                         ],
                       ),
@@ -124,7 +89,7 @@ class _AttributePreferenceCard extends StatelessWidget {
                       child: Row(
                         children: [
                           const Icon(Icons.delete, color: Colors.red),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 8),
                           Text(
                             l10n.delete,
                             style: const TextStyle(color: Colors.red),
@@ -136,27 +101,27 @@ class _AttributePreferenceCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12),
             _buildInfoRow(
               Icons.schedule,
               l10n.frequency,
               _getFrequencyLabel(l10n, preference.notificationFrequency),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 8),
             _buildInfoRow(
               Icons.score,
               l10n.minMatchScore,
               '${(preference.minMatchScore * 100).toStringAsFixed(0)}%',
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 8),
             Wrap(
-              spacing: 8.w,
+              spacing: 8,
               children: [
                 if (preference.notifyOnNewPostings)
                   Chip(
                     label: Text(
                       l10n.newPostings,
-                      style: TextStyle(fontSize: 11.sp),
+                      style: TextStyle(fontSize: 11),
                     ),
                     backgroundColor: Colors.blue.shade100,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -165,7 +130,7 @@ class _AttributePreferenceCard extends StatelessWidget {
                   Chip(
                     label: Text(
                       l10n.newUsers,
-                      style: TextStyle(fontSize: 11.sp),
+                      style: TextStyle(fontSize: 11),
                     ),
                     backgroundColor: Colors.green.shade100,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -181,19 +146,19 @@ class _AttributePreferenceCard extends StatelessWidget {
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 16.sp, color: Colors.grey.shade600),
-        SizedBox(width: 8.w),
+        Icon(icon, size: 16, color: Colors.grey.shade600),
+        SizedBox(width: 8),
         Text(
           '$label: ',
           style: TextStyle(
-            fontSize: 13.sp,
+            fontSize: 13,
             color: Colors.grey.shade700,
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            fontSize: 13.sp,
+            fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -459,10 +424,10 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error, size: 64.sp, color: Colors.red),
-            SizedBox(height: 16.h),
+            Icon(Icons.error, size: 64, color: Colors.red),
+            SizedBox(height: 16),
             Text('Error: $_error'),
-            SizedBox(height: 16.h),
+            SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadUserAttributes,
               child: Text(l10n.retry),
@@ -482,26 +447,26 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
           children: [
             Icon(
               Icons.notifications_off,
-              size: 64.sp,
+              size: 64,
               color: Colors.grey.shade400,
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 16),
             Text(
               l10n.noAttributePreferences,
               style: TextStyle(
-                fontSize: 18.sp,
+                fontSize: 18,
                 color: Colors.grey.shade600,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 8),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32.w),
+              padding: EdgeInsets.symmetric(horizontal: 32),
               child: Text(
                 l10n.noAttributesInProfile,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 14,
                   color: Colors.grey.shade500,
                 ),
               ),
@@ -520,7 +485,7 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
             children: [
               // Header with instructions
               Container(
-                padding: EdgeInsets.all(16.w),
+                padding: EdgeInsets.all(16),
                 color: AppColors.primary.withValues(alpha: 0.1),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -528,12 +493,12 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
                     Row(
                       children: [
                         Icon(Icons.info_outline, color: AppColors.primary),
-                        SizedBox(width: 8.w),
+                        SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             l10n.setupAttributeNotifications,
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,
                             ),
@@ -544,7 +509,7 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
                     SizedBox(height: 8.h),
                     Text(
                       l10n.setupAttributeNotificationsHint,
-                      style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade700),
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
                     ),
                   ],
                 ),
@@ -552,22 +517,22 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
 
               // Global settings
               Padding(
-                padding: EdgeInsets.all(16.w),
+                padding: EdgeInsets.all(16),
                 child: Card(
                   elevation: 2,
                   child: Padding(
-                    padding: EdgeInsets.all(16.w),
+                    padding: EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           l10n.defaultSettings,
                           style: TextStyle(
-                            fontSize: 16.sp,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 16),
                         DropdownButtonFormField<NotificationFrequency>(
                           value: _frequency,
                           decoration: InputDecoration(
@@ -586,10 +551,10 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
                             }
                           },
                         ),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 16),
                         Text(
                           '${l10n.minMatchScore}: ${(_minMatchScore * 100).toStringAsFixed(0)}%',
-                          style: TextStyle(fontSize: 14.sp),
+                          style: TextStyle(fontSize: 14),
                         ),
                         Slider(
                           value: _minMatchScore,
@@ -625,41 +590,41 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
 
               // Attribute selection section header
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   l10n.selectAttributes,
                   style: TextStyle(
-                    fontSize: 16.sp,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 12),
 
               // Attribute selection list
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: allAttributes.map((attr) {
                     final isSelected = _selectedAttributes.contains(attr.attribute);
                     final isOffering = _offerings.contains(attr);
 
                     return Card(
-                      margin: EdgeInsets.only(bottom: 8.h),
+                      margin: EdgeInsets.only(bottom: 8),
                       child: CheckboxListTile(
                         title: Row(
                           children: [
                             Expanded(
                               child: Text(
                                 attr.attribute,
-                                style: TextStyle(fontSize: 14.sp),
+                                style: TextStyle(fontSize: 14),
                               ),
                             ),
                             // Badge to indicate type
                             Container(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 8.w,
-                                vertical: 2.h,
+                                horizontal: 8,
+                                vertical: 2,
                               ),
                               decoration: BoxDecoration(
                                 color: isOffering
@@ -670,7 +635,7 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
                               child: Text(
                                 isOffering ? l10n.offering : l10n.interest,
                                 style: TextStyle(
-                                  fontSize: 10.sp,
+                                  fontSize: 10,
                                   color: isOffering
                                       ? Colors.green.shade800
                                       : Colors.blue.shade800,
@@ -682,7 +647,7 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
                         ),
                         subtitle: Text(
                           '${l10n.category}: ${attr.uiStyleHint} • ${l10n.relevancy}: ${(attr.relevancyScore * 100).toStringAsFixed(0)}%',
-                          style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600),
+                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                         ),
                         value: isSelected,
                         onChanged: (value) {
@@ -700,14 +665,14 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
                 ),
               ),
               // Add bottom padding for the fixed action bar
-              SizedBox(height: 80.h),
+              SizedBox(height: 80),
             ],
           ),
         ),
 
         // Bottom action bar (fixed at bottom)
         Container(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -723,7 +688,7 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
               Expanded(
                 child: Text(
                   '${_selectedAttributes.length} ${l10n.attributesSelected}',
-                  style: TextStyle(fontSize: 14.sp),
+                  style: TextStyle(fontSize: 14),
                 ),
               ),
               ElevatedButton.icon(

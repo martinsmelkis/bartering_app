@@ -16,6 +16,7 @@ class AdaptiveChatLayout extends StatelessWidget {
   final String? selectedPoiName;
   final VoidCallback? onClose;
   final Function(String poiId, String poiName)? onChatSelected;
+  final bool suppressChatPanel;
 
   const AdaptiveChatLayout({
     super.key,
@@ -25,12 +26,13 @@ class AdaptiveChatLayout extends StatelessWidget {
     this.selectedPoiName,
     this.onClose,
     this.onChatSelected,
+    this.suppressChatPanel = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // On large screens, show side-by-side
-    if (context.canShowSideBySide && panelView != PanelView.none) {
+    // On large screens, show side-by-side (unless suppressed)
+    if (context.canShowSideBySide && panelView != PanelView.none && !suppressChatPanel) {
       return Row(
         children: [
           // Main content takes remaining space

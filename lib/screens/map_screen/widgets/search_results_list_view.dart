@@ -1,5 +1,6 @@
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
 import 'package:expandable/expandable.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -15,12 +16,20 @@ import '../../../utils/avatar_color_utils.dart';
 import '../../../utils/image_utils.dart';
 import '../../../utils/text_utils.dart';
 import '../../../widgets/online_status_badge.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/poi_panel_cubit.dart';
+import '../cubit/chat_panel_cubit.dart';
+import 'poi_details_bottom_sheet.dart';
 
 class SearchResultsListView extends StatefulWidget {
   final List<PointOfInterest> pois;
   final VoidCallback onClose;
   final Function(PointOfInterest) onPoiTap;
   final Function(PointOfInterest)? onChatTap;
+  final bool isLargeScreen;
+  final PointOfInterest? selectedPoi;
+  final VoidCallback? onClosePoiPanel;
+  final VoidCallback? onChatWithSelectedPoi;
 
   const SearchResultsListView({
     super.key,
@@ -28,6 +37,10 @@ class SearchResultsListView extends StatefulWidget {
     required this.onClose,
     required this.onPoiTap,
     this.onChatTap,
+    this.isLargeScreen = false,
+    this.selectedPoi,
+    this.onClosePoiPanel,
+    this.onChatWithSelectedPoi,
   });
 
   @override
@@ -248,14 +261,32 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       );
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: sortedPois.length,
-      separatorBuilder: (context, index) => const Divider(height: 24),
-      itemBuilder: (context, index) {
-        final poi = sortedPois[index];
-        return _buildPoiListItem(context, poi);
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        // Return true to prevent scroll notifications from bubbling up to parent widgets
+        return true;
       },
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          scrollbars: true,
+          // Ensure pointer scrolling works on web
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.stylus,
+            PointerDeviceKind.trackpad,
+          },
+        ),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: sortedPois.length,
+          separatorBuilder: (context, index) => const Divider(height: 24),
+          itemBuilder: (context, index) {
+            final poi = sortedPois[index];
+            return _buildPoiListItem(context, poi);
+          },
+        ),
+      ),
     );
   }
 
@@ -278,14 +309,32 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       );
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: _allPostings.length,
-      separatorBuilder: (context, index) => const Divider(height: 24),
-      itemBuilder: (context, index) {
-        final postingWithUser = _allPostings[index];
-        return _buildPostingCard(context, postingWithUser);
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        // Return true to prevent scroll notifications from bubbling up to parent widgets
+        return true;
       },
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          scrollbars: true,
+          // Ensure pointer scrolling works on web
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.stylus,
+            PointerDeviceKind.trackpad,
+          },
+        ),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: _allPostings.length,
+          separatorBuilder: (context, index) => const Divider(height: 24),
+          itemBuilder: (context, index) {
+            final postingWithUser = _allPostings[index];
+            return _buildPostingCard(context, postingWithUser);
+          },
+        ),
+      ),
     );
   }
 
@@ -569,24 +618,29 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       return bScore.compareTo(aScore);
     });
     
-    return Container(
+    // Build the main search results container
+    final searchResultsContainer = Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        borderRadius: widget.isLargeScreen
+            ? null
+            : const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+        boxShadow: widget.isLargeScreen
+            ? null  // Shadow handled by parent container in Row layout
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2), // Shadow on top for bottom panel
+                ),
+              ],
       ),
       child: Column(
-        children: [
-          // Header
+          children: [
+            // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
@@ -696,6 +750,57 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         ],
       ),
     );
+    
+    // For large screens, use BlocBuilder to show POI details below the search results
+    if (widget.isLargeScreen) {
+      return BlocBuilder<PoiPanelCubit, PoiPanelState>(
+        builder: (context, poiPanelState) {
+          if (poiPanelState.isOpen && poiPanelState.selectedPoi != null) {
+            // Show search results and POI details in a vertical split
+            return Column(
+              children: [
+                // Search results list - takes 50% of height
+                Expanded(
+                  flex: 1,
+                  child: searchResultsContainer,
+                ),
+                // Divider
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey.shade300,
+                ),
+                // POI details panel - takes 50% of height
+                Expanded(
+                  flex: 1,
+                  child: PoiDetailsBottomSheet(
+                    poi: poiPanelState.selectedPoi!,
+                    isLargeScreen: true,
+                    showChatButton: true,
+                    onClose: () {
+                      context.read<PoiPanelCubit>().closePanel();
+                    },
+                    onChatButtonPressed: () {
+                      // Open chat on the right side using ChatPanelCubit
+                      final poi = poiPanelState.selectedPoi!;
+                      context.read<ChatPanelCubit>().openChat(
+                        poi.profile.userId,
+                        poi.profile.name,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          }
+          // POI panel closed - show only search results
+          return searchResultsContainer;
+        },
+      );
+    }
+    
+    // For small screens, return the search results container directly
+    return searchResultsContainer;
   }
 
   Widget _buildPoiListItem(BuildContext context, PointOfInterest poi) {

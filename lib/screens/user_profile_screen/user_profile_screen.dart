@@ -179,7 +179,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           color: AppColors.primary,
                           size: 20,
                         ),
-                        SizedBox(width: 8.w),
+                        SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             _userLocation ?? l10n.notSet,
@@ -192,13 +192,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 40.w), // Space for the edit icon
+                        SizedBox(width: 40), // Space for the edit icon
                       ],
                     ),
                   ),
                   Positioned(
-                    top: 4,
-                    right: 4.w,
+                    top: kIsWeb ? 6 : -2,
+                    right: kIsWeb ? 6 : -2,
                     child: IconButton(
                       onPressed: () async {
                         await Navigator.of(context).push(
@@ -220,7 +220,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         size: AppDimensions.editIconSize,
                         color: AppColors.primary,
                       ),
-                      padding: EdgeInsets.all(4.w),
+                      padding: EdgeInsets.all(4),
                       constraints: const BoxConstraints(),
                       tooltip: l10n.editLocation,
                     ),
@@ -241,7 +241,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(width: 8.w),
+                SizedBox(width: 8),
                 InkWell(
                   onTap: () async {
                     final locale = Localizations.localeOf(context);
@@ -306,7 +306,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               child: Card(
                 elevation: 1,
                 child: Padding(
-                  padding: EdgeInsets.all(12.w),
+                  padding: EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -344,7 +344,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(width: 8.w),
+                SizedBox(width: 8),
                 InkWell(
                   onTap: () async {
                     final locale = Localizations.localeOf(context);
@@ -410,7 +410,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               child: Card(
                 elevation: 1,
                 child: Padding(
-                  padding: EdgeInsets.all(12.w),
+                  padding: EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -449,7 +449,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(width: 8.w),
+                SizedBox(width: 8),
                 InkWell(
                   onTap: () async {
                     await Navigator.of(context).push(

@@ -158,7 +158,7 @@ class AttributeMatchingUtils {
             decorationColor: (matchType != AttributeMatchType.none)
                 ? null
                 : underscoreColor,
-            decorationThickness: 3,
+            decorationThickness: 3.0,
           ),
         ),
       );
@@ -175,14 +175,14 @@ class AttributeMatchingUtils {
   static Color? _parseColorFromHint(String? hint) {
     if (hint != null) {
       final hexString =
-          hint == 'GREEN' ? '0xFF00FF00' :
-          hint == 'RED' ? '0xFFFF0000' :
-          hint == 'BLUE' ? '0xFF0044FF' :
-          hint == 'YELLOW' ? '0xFFFFFF40' :
-          hint == 'ORANGE' ? '0xFFFFA500' :
-          hint == 'PURPLE' ? '0xFF800080' :
-          hint == 'TEAL' ? '0xFF00A0A0' :
-          '0xFF1A1A1A';
+          hint == 'GREEN' ? '0xFF4CAF50' :  // More muted green
+          hint == 'RED' ? '0xFFE57373' :     // Softer red
+          hint == 'BLUE' ? '0xFF42A5F5' :    // Softer blue
+          hint == 'YELLOW' ? '0xFFFFF59D' :  // Softer yellow
+          hint == 'ORANGE' ? '0xFFFFB74D' :  // Softer orange
+          hint == 'PURPLE' ? '0xFFBA68C8' :  // Softer purple
+          hint == 'TEAL' ? '0xFF4DB6AC' :    // Softer teal
+          '0xFF757575';  // Gray instead of black
       try {
         return Color(int.parse(hexString));
       } catch (e) {

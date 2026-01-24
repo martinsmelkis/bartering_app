@@ -264,7 +264,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
       builder: (context) {
         return SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -309,7 +309,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
@@ -341,7 +341,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16.h),
+              SizedBox(height: 16),
 
               // Description Field
               TextFormField(
@@ -370,7 +370,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16.h),
+              SizedBox(height: 16),
 
               // Value Field (Optional)
               TextFormField(
@@ -395,7 +395,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16.h),
+              SizedBox(height: 16),
 
               // Expiration Date
               Card(
@@ -404,15 +404,15 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                   onTap: _selectExpirationDate,
                   borderRadius: BorderRadius.circular(8.r),
                   child: Padding(
-                    padding: EdgeInsets.all(16.w),
+                    padding: EdgeInsets.all(16),
                     child: Row(
                       children: [
                         Icon(
                           Icons.calendar_today,
                           color: AppColors.primary,
-                          size: 24.sp,
+                          size: 24,
                         ),
-                        SizedBox(width: 16.w),
+                        SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -420,7 +420,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                               Text(
                                 l10n.expirationDate,
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 14,
                                   color: Colors.grey[600],
                                 ),
                               ),
@@ -432,7 +432,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                                     .month}/${_selectedExpirationDate!.year}'
                                     : l10n.tapToSelectDate,
                                 style: TextStyle(
-                                  fontSize: 16.sp,
+                                  fontSize: 16,
                                   fontWeight: _selectedExpirationDate != null
                                       ? FontWeight.w600
                                       : FontWeight.normal,
@@ -446,7 +446,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                         ),
                         Icon(
                           Icons.arrow_forward_ios,
-                          size: 16.sp,
+                          size: 16,
                           color: Colors.grey,
                         ),
                       ],
@@ -454,13 +454,13 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: 20),
 
               // Images Section
               Text(
                 l10n.postingImages,
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -468,11 +468,11 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
               Text(
                 l10n.postingImagesHint,
                 style: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 12,
                   color: Colors.grey[600],
                 ),
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 12),
 
               // Image Grid
               if (_selectedImages.isNotEmpty)
@@ -526,7 +526,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                               child: Icon(
                                 Icons.close,
                                 color: Colors.white,
-                                size: 16.sp,
+                                size: 16,
                               ),
                             ),
                           ),
@@ -535,7 +535,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                     );
                   },
                 ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 12),
 
               // Add Image Button
               if (_selectedImages.length < 3)
@@ -546,10 +546,10 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primary,
                     side: BorderSide(color: AppColors.primary),
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    padding: EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
-              SizedBox(height: 24.h),
+              SizedBox(height: 24),
 
               // Submit Button
               ElevatedButton(
@@ -557,15 +557,15 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  padding: EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                 ),
                 child: _isSubmitting
                     ? SizedBox(
-                  height: 20.h,
-                  width: 20.w,
+                  height: 20,
+                  width: 20,
                   child: const CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
@@ -574,7 +574,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                     : Text(
                   _isEditing ? l10n.updatePosting : l10n.createPosting,
                   style: TextStyle(
-                    fontSize: 16.sp,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

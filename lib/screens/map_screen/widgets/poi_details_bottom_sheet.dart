@@ -21,12 +21,18 @@ import '../../../theme/app_colors.dart';
 
 class PoiDetailsBottomSheet extends StatefulWidget {
   final PointOfInterest poi;
-  final VoidCallback onChatButtonPressed;
+  final VoidCallback? onChatButtonPressed;
+  final bool isLargeScreen;
+  final VoidCallback? onClose;
+  final bool showChatButton;
 
   const PoiDetailsBottomSheet({
     super.key,
     required this.poi,
-    required this.onChatButtonPressed,
+    this.onChatButtonPressed,
+    this.isLargeScreen = false,
+    this.onClose,
+    this.showChatButton = true,
   });
 
   @override
@@ -297,8 +303,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       }
     }
   }
-
-
 
   // New async method to prepare all spans for the FutureBuilder
   Future<Map<String, List<TextSpan>>> _prepareSpans(
@@ -606,216 +610,260 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      padding: const EdgeInsets.all(20.0),
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
+    return DefaultTextStyle(
+      style: TextStyle(
+        color: Colors.grey[900],
+        decoration: TextDecoration.none,
+        fontFamily: null,
       ),
-      child: PointerInterceptor(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Avatar/POI icon on the left with rating circle and online badge
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          RatingCircleAvatar(
-                            size: 56,
-                            rating: _averageRating,
-                            isLoading: _isLoadingRating,
-                            child: _isLoadingAvatar
-                                ? const Center(
-                                    child: SizedBox(
-                                      width: 26,
-                                      height: 26,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
-                                  )
-                                : _avatarIcon ?? const Icon(Icons.person, size: 32),
-                          ),
-                          // Online status badge - positioned closer to the edge
-                          PositionedOnlineStatusBadge(
-                            isOnline: widget.poi.isOnline,
-                            isAway: widget.poi.isAway,
-                            size: 16.0,
-                            right: -5,
-                            top: -5,
-                            borderWidth: 2.5,
-                          ),
-                        ],
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: widget.isLargeScreen
+              ? null
+              : const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+        ),
+        child: PointerInterceptor(
+        child: Column(
+          mainAxisSize: widget.isLargeScreen ? MainAxisSize.max : MainAxisSize.min,
+          children: [
+            // Close button for large screen panel
+            if (widget.isLargeScreen && widget.onClose != null)
+              Container(
+                padding: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade300),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'User Details',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[900],
+                        decoration: TextDecoration.none,
                       ),
-                      const SizedBox(width: 8),
-                      // Name in the center
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: widget.onClose,
+                      tooltip: l10n.close,
+                    ),
+                  ],
+                ),
+              ),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Avatar/POI icon on the left with rating circle and online badge
+                        Stack(
+                          clipBehavior: Clip.none,
                           children: [
-                            const SizedBox(height: 8),
-                            Text(
-                              widget.poi.profile.name +
-                                  (((widget.poi.matchRelevancyScore ?? 0) > 0
-                                  && (widget.poi.matchRelevancyScore ?? 1) < 1)
-                                  ? " (" + (((widget.poi.matchRelevancyScore ?? 0) * 100))
-                                  .toStringAsFixed(1) + "% ${l10n.match})" : ""),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: context.subheadingFontSize,
-                                color: Colors.grey[900],
-                                fontFamily: 'Courier',
-                                fontWeight: FontWeight.bold,
-                              ),
+                            RatingCircleAvatar(
+                              size: 56,
+                              rating: _averageRating,
+                              isLoading: _isLoadingRating,
+                              child: _isLoadingAvatar
+                                  ? const Center(
+                                      child: SizedBox(
+                                        width: 26,
+                                        height: 26,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    )
+                                  : _avatarIcon ?? const Icon(Icons.person, size: 32),
+                            ),
+                            // Online status badge - positioned closer to the edge
+                            PositionedOnlineStatusBadge(
+                              isOnline: widget.poi.isOnline,
+                              isAway: widget.poi.isAway,
+                              size: 16.0,
+                              right: -5,
+                              top: -5,
+                              borderWidth: 2.5,
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Favorite icon button on the right
-                      SizedBox(
-                        width: 42,
-                        height: 42,
-                        child: _isLoadingFavorite
-                            ? const Padding(
-                                padding: EdgeInsets.all(11.0),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                        const SizedBox(width: 8),
+                        // Name in the center
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 8),
+                              Text(
+                                widget.poi.profile.name +
+                                    (((widget.poi.matchRelevancyScore ?? 0) > 0
+                                    && (widget.poi.matchRelevancyScore ?? 1) < 1)
+                                    ? " (" + (((widget.poi.matchRelevancyScore ?? 0) * 100))
+                                    .toStringAsFixed(1) + "% ${l10n.match})" : ""),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: context.subheadingFontSize,
+                                  color: Colors.grey[900],
+                                  fontFamily: 'Courier',
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.none,
                                 ),
-                              )
-                            : IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: Icon(
-                                  _isFavorite ? Icons.star : Icons.star_border,
-                                  color: _isFavorite ? AppColors.primary : Colors.grey,
-                                ),
-                                onPressed: _isTogglingFavorite ? null : _toggleFavorite,
                               ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  const Divider(),
-                  // Use a FutureBuilder with cached future to avoid recalculating on every rebuild
-                  FutureBuilder<Map<String, List<TextSpan>>>(
-                    future: _spansFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting ||
-                          snapshot.data == null) {
-                        // Show simple text while loading for faster initial render
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Favorite icon button on the right
+                        SizedBox(
+                          width: 42,
+                          height: 42,
+                          child: _isLoadingFavorite
+                              ? const Padding(
+                                  padding: EdgeInsets.all(11.0),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Icon(
+                                    _isFavorite ? Icons.star : Icons.star_border,
+                                    color: _isFavorite ? AppColors.primary : Colors.grey,
+                                  ),
+                                  onPressed: _isTogglingFavorite ? null : _toggleFavorite,
+                                ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    const Divider(),
+                    // Use a FutureBuilder with cached future to avoid recalculating on every rebuild
+                    FutureBuilder<Map<String, List<TextSpan>>>(
+                      future: _spansFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting ||
+                            snapshot.data == null) {
+                          // Show simple text while loading for faster initial render
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${l10n.userInterestedIn} ${widget.poi.profile
+                                    .attributes?.where((a) => a.type != 1).map((
+                                    a) => a.attributeId).join(", ") ?? ""}',
+                                style: TextStyle(color: Colors.grey,
+                                  fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${l10n.userOffers} ${widget.poi.profile
+                                    .attributes?.where((a) => a.type == 1).map((
+                                    a) => a.attributeId).join(", ") ?? ""}',
+                                style: TextStyle(color: Colors.grey,
+                                  fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),),
+                              ),
+                            ],
+                          );
+                        }
+                        if (snapshot.hasError) {
+                          return Text(
+                              '${l10n.errorLoadingAttributes}: ${snapshot
+                                  .error}');
+                        }
+
+                        // Cache the result for potential future use
+                        _cachedSpans ??= snapshot.data;
+
+                        final interestSpans = snapshot.data!['interests']!;
+                        final offeringSpans = snapshot.data!['offerings']!;
+
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              '${l10n.userInterestedIn} ${widget.poi.profile
-                                  .attributes?.where((a) => a.type != 1).map((
-                                  a) => a.attributeId).join(", ") ?? ""}',
-                              style: TextStyle(color: Colors.grey,
-                                fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),),
+                            RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  color: Colors.grey[800],
+                                  fontSize: context.bodyFontSize,
+                                  decoration: TextDecoration.none,
+                                ),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                    text: '${l10n.userInterestedIn} ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[900],
+                                      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),
+                                    ),
+                                  ),
+                                  ...interestSpans,
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 8),
-                            Text(
-                              '${l10n.userOffers} ${widget.poi.profile
-                                  .attributes?.where((a) => a.type == 1).map((
-                                  a) => a.attributeId).join(", ") ?? ""}',
-                              style: TextStyle(color: Colors.grey,
-                                fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),),
+                            RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  color: Colors.grey[800],
+                                  fontSize: context.bodyFontSize,
+                                  decoration: TextDecoration.none,
+                                ),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                    text: '${l10n.userOffers} ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[900],
+                                      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),
+                                    ),
+                                  ),
+                                  ...offeringSpans,
+                                ],
+                              ),
                             ),
                           ],
                         );
-                      }
-                      if (snapshot.hasError) {
-                        return Text(
-                            '${l10n.errorLoadingAttributes}: ${snapshot
-                                .error}');
-                      }
-
-                      // Cache the result for potential future use
-                      _cachedSpans ??= snapshot.data;
-
-                      final interestSpans = snapshot.data!['interests']!;
-                      final offeringSpans = snapshot.data!['offerings']!;
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          RichText(
-                            text: TextSpan(
-                              style: DefaultTextStyle
-                                  .of(context)
-                                  .style
-                                  .copyWith(fontSize: context.bodyFontSize),
-                              // Responsive font size
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: '${l10n.userInterestedIn} ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context)),
-                                ),
-                                ...interestSpans,
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          RichText(
-                            text: TextSpan(
-                              style: DefaultTextStyle
-                                  .of(context)
-                                  .style
-                                  .copyWith(fontSize: context.bodyFontSize),
-                              // Responsive font size
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: '${l10n.userOffers} ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context)),
-                                ),
-                                ...offeringSpans,
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  // Postings section
-                  _buildPostingsSection(l10n),
-                ],
-              ),
-            ),
-          ),
-          // Chat button always at the bottom
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.chat_bubble_outline),
-                label: Text(l10n.chat),
-                onPressed: widget.onChatButtonPressed,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                      },
+                    ),
+                    // Postings section
+                    _buildPostingsSection(l10n),
+                  ],
                 ),
               ),
             ),
+            // Chat button always at the bottom (unless hidden)
+            if (widget.showChatButton && widget.onChatButtonPressed != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    label: Text(l10n.chat),
+                    onPressed: widget.onChatButtonPressed!,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
         ),
       ),
     );

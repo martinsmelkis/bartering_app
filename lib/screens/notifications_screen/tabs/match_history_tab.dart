@@ -55,7 +55,7 @@ class _MatchHistoryTabState extends State<MatchHistoryTab> {
                           ? '${matchHistory.matches.length} ${l10n.matches} (${matchHistory.unviewedCount} ${l10n.unviewed})'
                           : l10n.matches,
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -86,7 +86,7 @@ class _MatchHistoryTabState extends State<MatchHistoryTab> {
                             children: [
                               Icon(
                                 Icons.search_off,
-                                size: 64.sp,
+                                size: 64,
                                 color: Colors.grey.shade400,
                               ),
                               SizedBox(height: 16.h),
@@ -95,7 +95,7 @@ class _MatchHistoryTabState extends State<MatchHistoryTab> {
                                     ? l10n.noUnviewedMatches
                                     : l10n.noMatchesYet,
                                 style: TextStyle(
-                                  fontSize: 18.sp,
+                                  fontSize: 18,
                                   color: Colors.grey.shade600,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -151,14 +151,14 @@ class _MatchHistoryCard extends StatelessWidget {
                   Icon(
                     _getMatchTypeIcon(match.matchType),
                     color: AppColors.primary,
-                    size: 20.sp,
+                    size: 20,
                   ),
                   SizedBox(width: 8.w),
                   Expanded(
                     child: Text(
                       _getMatchTypeLabel(l10n, match.matchType),
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -176,7 +176,7 @@ class _MatchHistoryCard extends StatelessWidget {
                       child: Text(
                         l10n.newBadge,
                         style: TextStyle(
-                          fontSize: 11.sp,
+                          fontSize: 11,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -226,14 +226,14 @@ class _MatchHistoryCard extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.score,
-                    size: 16.sp,
+                    size: 16,
                     color: Colors.grey.shade600,
                   ),
                   SizedBox(width: 4.w),
                   Text(
                     '${l10n.matchScore}: ${(match.matchScore * 100).toStringAsFixed(0)}%',
                     style: TextStyle(
-                      fontSize: 13.sp,
+                      fontSize: 13,
                       color: Colors.grey.shade700,
                       fontWeight: FontWeight.w600,
                     ),
@@ -256,7 +256,7 @@ class _MatchHistoryCard extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.info_outline,
-                        size: 16.sp,
+                        size: 16,
                         color: AppColors.primary,
                       ),
                       SizedBox(width: 8.w),
@@ -264,7 +264,7 @@ class _MatchHistoryCard extends StatelessWidget {
                         child: Text(
                           match.matchReason!,
                           style: TextStyle(
-                            fontSize: 13.sp,
+                            fontSize: 13,
                             color: Colors.grey.shade800,
                             fontStyle: FontStyle.italic,
                           ),
@@ -279,14 +279,14 @@ class _MatchHistoryCard extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.access_time,
-                    size: 16.sp,
+                    size: 16,
                     color: Colors.grey.shade600,
                   ),
                   SizedBox(width: 4.w),
                   Text(
                     DateFormat('MMM d, yyyy HH:mm').format(match.matchedAt),
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 12,
                       color: Colors.grey.shade600,
                     ),
                   ),
@@ -297,7 +297,7 @@ class _MatchHistoryCard extends StatelessWidget {
                 Chip(
                   label: Text(
                     l10n.dismissed,
-                    style: TextStyle(fontSize: 11.sp, color: Colors.white),
+                    style: TextStyle(fontSize: 11, color: Colors.white),
                   ),
                   backgroundColor: Colors.orange,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
