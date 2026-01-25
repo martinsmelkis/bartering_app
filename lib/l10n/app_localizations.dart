@@ -113,7 +113,7 @@ abstract class AppLocalizations {
   /// No description provided for @category_red.
   ///
   /// In en, this message translates to:
-  /// **'Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities'**
+  /// **'Sports, exercise, hands-on, active lifestyle, physical work, mechanisms, tools'**
   String get category_red;
 
   /// No description provided for @category_blue.
@@ -923,7 +923,7 @@ abstract class AppLocalizations {
   /// No description provided for @categoryActiveDescription.
   ///
   /// In en, this message translates to:
-  /// **'Sports, partying, dancing, running, physical, mechanical'**
+  /// **'Sports, partying, dancing, active lifestyle, physical work, mechanisms'**
   String get categoryActiveDescription;
 
   /// No description provided for @categoryBusinessTitle.
@@ -935,7 +935,7 @@ abstract class AppLocalizations {
   /// No description provided for @categoryBusinessDescription.
   ///
   /// In en, this message translates to:
-  /// **'Strictly business, paid work, networking, money matters'**
+  /// **'Strictly business, paid work, networking, money matters, networking'**
   String get categoryBusinessDescription;
 
   /// No description provided for @categoryArtsTitle.
@@ -4721,7 +4721,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicyContactContent.
   ///
   /// In en, this message translates to:
-  /// **'If you have any questions about this Privacy Policy or our data practices, please contact us at help@firebender.com'**
+  /// **'If you have any questions about this Privacy Policy or our data practices, please contact us at help@barters.lv'**
   String get privacyPolicyContactContent;
 
   /// No description provided for @privacyPolicyLastUpdated.

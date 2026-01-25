@@ -3,7 +3,7 @@
   "appTitle": "Bartering App",
 
   "category_green": "Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability",
-  "category_red": "Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities",
+  "category_red": "Sports, exercise, hands-on, active lifestyle, physical work, mechanisms, tools",
   "category_blue": "Business, entrepreneurship, paid work, making contacts, money matters, finance, career",
   "category_purple": "Art, spirituality, philosophy, culture, music, crafts, creativity, design, history",
   "category_yellow": "Chat, social activities, casual conversation, local events, new contacts, communication",
@@ -153,9 +153,9 @@
   "categoryNatureTitle": "Nature & Outdoors",
   "categoryNatureDescription": "Gardening, outdoors, forests, camping, environmentalism, cleanup, animals",
   "categoryActiveTitle": "Active & Social",
-  "categoryActiveDescription": "Sports, partying, dancing, running, physical, mechanical",
+  "categoryActiveDescription": "Sports, partying, dancing, active lifestyle, physical work, mechanisms",
   "categoryBusinessTitle": "Business & Finance",
-  "categoryBusinessDescription": "Strictly business, paid work, networking, money matters",
+  "categoryBusinessDescription": "Strictly business, paid work, networking, money matters, networking",
   "categoryArtsTitle": "Arts & Philosophy",
   "categoryArtsDescription": "Art, spirituality, philosophy",
   "categoryCommTitle": "Communication & Chat",
@@ -890,7 +890,7 @@
   "privacyPolicyChangesTitle": "Changes to This Policy",
   "privacyPolicyChangesContent": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the app. Continued use of the app after changes constitutes acceptance of the updated policy.",
   "privacyPolicyContactTitle": "Contact Us",
-  "privacyPolicyContactContent": "If you have any questions about this Privacy Policy or our data practices, please contact us at help@firebender.com",
+  "privacyPolicyContactContent": "If you have any questions about this Privacy Policy or our data practices, please contact us at help@barters.lv",
   "privacyPolicyLastUpdated": "Last updated: January 2025"
 
 }

@@ -17,7 +17,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get category_red =>
-      'Sports, fiziskās aktivitātes, ballītes, dejas, fizisks darbs, mehānismi, instrumenti, praktiski darbi';
+      'Sports, fiziskās aktivitātes, aktīvs dzīvesstils, dejas, mehānismi, instrumenti, praktiski darbi';
 
   @override
   String get category_blue =>
@@ -467,7 +467,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get categoryActiveDescription =>
-      'Sports, ballītes, dejas, skriešana, fizisks, mehānisks';
+      'Sports, aktivitātes, dejas, skriešana, fizisk darbs, mehānismi';
 
   @override
   String get categoryBusinessTitle => 'Bizness un finanses';
@@ -2457,7 +2457,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get privacyPolicyContactContent =>
-      'Ja jums ir kādi jautājumi par šo Privātuma politiku vai mūsu datu praksi, lūdzu, sazinieties ar mums uz help@firebender.com';
+      'Ja jums ir kādi jautājumi par šo Privātuma politiku vai mūsu datu praksi, lūdzu, sazinieties ar mums uz help@barters.lv';
 
   @override
   String get privacyPolicyLastUpdated =>

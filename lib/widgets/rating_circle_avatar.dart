@@ -17,10 +17,15 @@ class RatingCircleAvatar extends StatelessWidget {
   });
 
   Color _getRatingColor() {
-    if (rating == null) return Colors.grey.shade300;
+    if (rating == null || rating == 0.0) return Colors.grey.shade400;
     if (rating! >= 4.0) return Colors.green;
     if (rating! > 3.0) return Colors.amber;
     return Colors.red;
+  }
+
+  String _getRatingText() {
+    if (rating == null) return 'N/A';
+    return rating!.toStringAsFixed(1);
   }
 
   @override
@@ -30,13 +35,14 @@ class RatingCircleAvatar extends StatelessWidget {
       height: size,
       child: Stack(
         alignment: Alignment.center,
+        clipBehavior: Clip.none,
         children: [
-          // Rating circle indicator
-          if (!isLoading && rating != null)
+          // Rating circle indicator (show gray circle for null/0.0, colored for actual ratings)
+          if (!isLoading)
             CustomPaint(
               size: Size(size, size),
               painter: RatingCirclePainter(
-                rating: rating!,
+                rating: rating ?? 0.0,
                 color: _getRatingColor(),
                 strokeWidth: 3.0,
               ),
@@ -53,6 +59,38 @@ class RatingCircleAvatar extends StatelessWidget {
               child: child,
             ),
           ),
+          // Rating number badge on top right (always show when not loading)
+          if (!isLoading)
+            Positioned(
+              top: -4,
+              right: -4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: _getRatingColor(),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  _getRatingText(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -102,6 +140,13 @@ class RatingCirclePainter extends CustomPainter {
         false,
         paint,
       );
+    } else {
+      // For rating 0 or null, show a full gray circle
+      final paint = Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth;
+      canvas.drawCircle(center, radius, paint);
     }
   }
 

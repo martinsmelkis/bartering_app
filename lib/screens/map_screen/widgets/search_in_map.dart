@@ -69,7 +69,7 @@ class _SearchInMapState extends State<SearchInMap> {
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.zero,
+                contentPadding: const EdgeInsets.only(right: 3),
                 filled: false,
                 isDense: true,
                 hintText: l10n.searchForAKeyword,

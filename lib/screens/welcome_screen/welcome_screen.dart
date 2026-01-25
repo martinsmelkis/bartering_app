@@ -238,7 +238,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           foregroundColor: AppColors.primary,
                           padding: EdgeInsets.symmetric(
                             horizontal: 32.w,
-                            vertical: 32,
+                            vertical: 24,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.r),

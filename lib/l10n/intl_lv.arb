@@ -3,7 +3,7 @@
   "appTitle": "Bartera Lietotne",
 
   "category_green": "Daba, brīvdabas aktivitātes, dārzkopība, dzīvnieki, vide, pārgājieni, augi, ilgtspēja",
-  "category_red": "Sports, fiziskās aktivitātes, ballītes, dejas, fizisks darbs, mehānismi, instrumenti, praktiski darbi",
+  "category_red": "Sports, fiziskās aktivitātes, aktīvs dzīvesstils, dejas, mehānismi, instrumenti, praktiski darbi",
   "category_blue": "Bizness, uzņēmējdarbība, algots darbs, kontaktu veidošana, naudas lietas, finanses, karjera",
   "category_purple": "Māksla, garīgums, filozofija, kultūra, mūzika, amatniecība, radošums, dizains, vēsture",
   "category_yellow": "Saruna, sabiedriskas aktivitātes, ikdienas sarunas, vietējie pasākumi, jauni kontakti, komunikācija",
@@ -156,7 +156,7 @@
   "categoryNatureTitle": "Daba un brīvdabas",
   "categoryNatureDescription": "Dārzkopība, brīvdabas, meži, kempings, vides aizsardzība, uzkopšana, dzīvnieki",
   "categoryActiveTitle": "Aktīvs un sabiedrisks",
-  "categoryActiveDescription": "Sports, ballītes, dejas, skriešana, fizisks, mehānisks",
+  "categoryActiveDescription": "Sports, aktivitātes, dejas, skriešana, fizisk darbs, mehānismi",
   "categoryBusinessTitle": "Bizness un finanses",
   "categoryBusinessDescription": "Tikai bizness, algots darbs, tīklošanās, naudas lietas",
   "categoryArtsTitle": "Māksla un filozofija",
@@ -894,7 +894,7 @@
   "privacyPolicyChangesTitle": "Izmaiņas šajā politikā",
   "privacyPolicyChangesContent": "Mēs varam laiku pa laikam atjaunināt šo Privātuma politiku. Mēs paziņosim jums par jebkādām izmaiņām, publicējot jauno politiku lietotnē. Turpinot lietot lietotni pēc izmaiņām, tas nozīmē atjauninātās politikas pieņemšanu.",
   "privacyPolicyContactTitle": "Sazinieties ar mums",
-  "privacyPolicyContactContent": "Ja jums ir kādi jautājumi par šo Privātuma politiku vai mūsu datu praksi, lūdzu, sazinieties ar mums uz help@firebender.com",
+  "privacyPolicyContactContent": "Ja jums ir kādi jautājumi par šo Privātuma politiku vai mūsu datu praksi, lūdzu, sazinieties ar mums uz help@barters.lv",
   "privacyPolicyLastUpdated": "Pēdējoreiz atjaunots: 2025. gada janvāris"
 
 }

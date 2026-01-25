@@ -73,6 +73,39 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   @override
   void initState() {
     super.initState();
+    _initializeData();
+  }
+
+  @override
+  void didUpdateWidget(PoiDetailsBottomSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check if the POI has changed (different user)
+    if (oldWidget.poi.profile.userId != widget.poi.profile.userId) {
+      // Reset all state and reload data for the new POI
+      _resetState();
+      _initializeData();
+    }
+  }
+
+  void _resetState() {
+    setState(() {
+      _postings = [];
+      _isLoadingPostings = true;
+      _postingsError = null;
+      _isFavorite = false;
+      _isLoadingFavorite = true;
+      _isTogglingFavorite = false;
+      _cachedSpans = null;
+      _spansFuture = null;
+      _favoriteStatusFuture = null;
+      _avatarIcon = null;
+      _isLoadingAvatar = true;
+      _averageRating = null;
+      _isLoadingRating = true;
+    });
+  }
+
+  void _initializeData() {
     // Initialize spans immediately but render simple placeholder first
     _spansFuture = _prepareSpans(context);
 

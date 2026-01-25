@@ -65,7 +65,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       sourceName: "osmDeu", // for caching | osmDeu, osmFrance
       tileExtension: ".png",
       minZoomLevel: 2,
-      maxZoomLevel: 16,
+      maxZoomLevel: 19,
       urlsServers: [
         //TileURLs(url: "https://a.tile.openstreetmap.fr/hot/"),
         //TileURLs(url: "https://b.tile.openstreetmap.fr/hot/"),
@@ -785,7 +785,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     OSMFlutter(
                       controller: _mapController,
                       osmOption: OSMOption(
-                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 16),
+                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
                         userTrackingOption: const UserTrackingOption(
                           enableTracking: true,
                           unFollowUser: false,

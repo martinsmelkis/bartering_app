@@ -17,7 +17,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get category_red =>
-      'Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities';
+      'Sports, exercise, hands-on, active lifestyle, physical work, mechanisms, tools';
 
   @override
   String get category_blue =>
@@ -458,14 +458,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryActiveDescription =>
-      'Sports, partying, dancing, running, physical, mechanical';
+      'Sports, partying, dancing, active lifestyle, physical work, mechanisms';
 
   @override
   String get categoryBusinessTitle => 'Business & Finance';
 
   @override
   String get categoryBusinessDescription =>
-      'Strictly business, paid work, networking, money matters';
+      'Strictly business, paid work, networking, money matters, networking';
 
   @override
   String get categoryArtsTitle => 'Arts & Philosophy';
@@ -2436,7 +2436,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicyContactContent =>
-      'If you have any questions about this Privacy Policy or our data practices, please contact us at help@firebender.com';
+      'If you have any questions about this Privacy Policy or our data practices, please contact us at help@barters.lv';
 
   @override
   String get privacyPolicyLastUpdated => 'Last updated: January 2025';

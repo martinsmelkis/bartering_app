@@ -6,6 +6,13 @@ import 'package:barter_app/screens/map_screen/cubit/chat_panel_cubit.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
+import 'package:barter_app/screens/chat_screen/cubit/chat_cubit.dart';
+import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
+import 'package:barter_app/models/relationships/report_models.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:barter_app/l10n/app_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Adaptive chat layout that shows chat or chats list as a side panel on large screens
 /// and as a full screen on small screens
@@ -138,6 +145,8 @@ class _ChatPanel extends StatelessWidget {
           _PanelHeader(
             title: poiName ?? 'Chat',
             onClose: onClose,
+            showMenu: true,
+            poiId: poiId,
           ),
           // Chat screen content
           Expanded(
@@ -154,23 +163,260 @@ class _ChatPanel extends StatelessWidget {
 }
 
 /// Header for the panel (used for both chat and chats list)
-class _PanelHeader extends StatelessWidget {
+class _PanelHeader extends StatefulWidget {
   final String title;
   final VoidCallback? onClose;
+  final bool showMenu;
+  final String? poiId;
 
   const _PanelHeader({
     required this.title,
     this.onClose,
+    this.showMenu = false,
+    this.poiId,
   });
 
   @override
+  State<_PanelHeader> createState() => _PanelHeaderState();
+}
+
+class _PanelHeaderState extends State<_PanelHeader> {
+  bool _isUserBlocked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.showMenu && widget.poiId != null) {
+      _checkIfUserBlocked();
+    }
+  }
+
+  Future<void> _checkIfUserBlocked() async {
+    // Get the blocked status from the chat cubit if available
+    if (mounted) {
+      final chatCubit = context.read<ChatCubit>();
+      final blocked = await chatCubit.isUserBlocked(widget.poiId!);
+      if (mounted) {
+        setState(() {
+          _isUserBlocked = blocked;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleFinishTransaction(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.finishTransaction),
+          content: Text(l10n.finishTransactionConfirmation),
+          actions: [
+            PointerInterceptor(
+              child: TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: Text(l10n.cancel),
+              ),
+            ),
+            PointerInterceptor(
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(l10n.finishTransaction),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    // Call cubit to handle transaction
+    context.read<ChatCubit>().finishTransaction();
+  }
+
+  Future<void> _handleReportUser(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    if (widget.poiId == null) return;
+
+    // Show report dialog with reason selection
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (dialogContext) => PointerInterceptor(
+        child: ReportUserDialog(
+          targetUserName: widget.title,
+        ),
+      ),
+    );
+
+    if (result == null || !mounted) return;
+
+    final ReportReason reason = result['reason'];
+    final String? description = result['description'];
+
+    // Report the user via cubit
+    final reportId = await context.read<ChatCubit>().reportUser(
+      reportedUserId: widget.poiId!,
+      reason: reason,
+      description: description,
+      contextType: ReportContextType.chat,
+      contextId: widget.poiId,
+    );
+
+    if (!mounted) return;
+
+    if (reportId != null) {
+      // Show success and offer to block
+      final shouldBlock = await showDialog<bool>(
+        context: context,
+        builder: (context) => PointerInterceptor(
+          child: AlertDialog(
+            title: Text(l10n.userReported),
+            content: Text(l10n.reportSubmittedOfferBlock),
+            actions: [
+              PointerInterceptor(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l10n.cancel),
+                ),
+              ),
+              PointerInterceptor(
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text(l10n.blockUser),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      if (shouldBlock == true && mounted) {
+        await _handleBlockUser(context);
+      }
+    }
+  }
+
+  Future<void> _handleBlockUser(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    if (widget.poiId == null) return;
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.blockUser),
+          content: Text(l10n.blockUserConfirmation),
+          actions: [
+            PointerInterceptor(
+              child: TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: Text(l10n.cancel),
+              ),
+            ),
+            PointerInterceptor(
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(l10n.block),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    // Block the user via cubit
+    final success = await context.read<ChatCubit>().blockUser(widget.poiId!);
+
+    if (!mounted) return;
+
+    if (success) {
+      setState(() {
+        _isUserBlocked = true;
+      });
+    }
+  }
+
+  Future<void> _handleUnblockUser(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    if (widget.poiId == null) return;
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.unblockUser),
+          content: Text(l10n.unblockUserConfirmation),
+          actions: [
+            PointerInterceptor(
+              child: TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: Text(l10n.cancel),
+              ),
+            ),
+            PointerInterceptor(
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(l10n.unblock),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    // Unblock the user via cubit
+    final success = await context.read<ChatCubit>().unblockUser(widget.poiId!);
+
+    if (!mounted) return;
+
+    if (success) {
+      setState(() {
+        _isUserBlocked = false;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.userUnblocked)),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Theme
-            .of(context)
-            .primaryColor,
+        color: Theme.of(context).primaryColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -183,7 +429,7 @@ class _PanelHeader extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              title,
+              widget.title,
               style: const TextStyle(
                 color: AppColors.background,
                 fontSize: 14,
@@ -193,13 +439,75 @@ class _PanelHeader extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (onClose != null)
-            IconButton(
-              icon: const Icon(
-                  Icons.close, color: AppColors.background, size: 18),
-              onPressed: onClose,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+          if (widget.showMenu)
+            PointerInterceptor(
+              child: PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, color: AppColors.background, size: 18),
+                onSelected: (value) {
+                  if (value == 'finish_transaction') {
+                    _handleFinishTransaction(context);
+                  } else if (value == 'report_user') {
+                    _handleReportUser(context);
+                  } else if (value == 'block_user') {
+                    _handleBlockUser(context);
+                  } else if (value == 'unblock_user') {
+                    _handleUnblockUser(context);
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  PopupMenuItem<String>(
+                    value: 'finish_transaction',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.check_circle_outline),
+                        SizedBox(width: 8.w),
+                        Text(l10n.finishTransaction),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'report_user',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.report_outlined),
+                        SizedBox(width: 8.w),
+                        Text(l10n.reportUser),
+                      ],
+                    ),
+                  ),
+                  if (_isUserBlocked)
+                    PopupMenuItem<String>(
+                      value: 'unblock_user',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.check_circle),
+                          SizedBox(width: 8.w),
+                          Text(l10n.unblockUser),
+                        ],
+                      ),
+                    )
+                  else
+                    PopupMenuItem<String>(
+                      value: 'block_user',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.block),
+                          SizedBox(width: 8.w),
+                          Text(l10n.blockUser),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          if (widget.onClose != null)
+            PointerInterceptor(
+              child: IconButton(
+                icon: const Icon(Icons.close, color: AppColors.background, size: 18),
+                onPressed: widget.onClose,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
             ),
         ],
       ),

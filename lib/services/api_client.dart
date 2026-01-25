@@ -431,14 +431,14 @@ abstract class ApiClient {
   @POST('/api/v1/notifications/matches/{matchId}/dismiss')
   Future<NotificationPreferencesResponse> dismissMatch(@Path('matchId') String matchId);
 
-  ///////////// MISC ///////////////
-
-  @GET('/public-api/v1/healthCheck')
-  Future<void> healthCheck();
-
   ///////////// AUTHENTICATION ///////////////
 
   @DELETE('/api/v1/authentication/user/{userId}')
   Future<void> deleteUser(@Path('userId') String userId);
+
+  ///////////// MISC ///////////////
+
+  @GET('/public-api/v1/healthCheck')
+  Future<void> healthCheck();
 
 }
