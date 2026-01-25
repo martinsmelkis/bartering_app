@@ -90,7 +90,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
             const SizedBox(height: 16),
             Text(
               l10n.falseReportsWarning,
-              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+              style: TextStyle(color: Colors.red, fontSize: 12),
             ),
           ],
         ),
@@ -264,13 +264,13 @@ class _ReviewScreenState extends State<ReviewScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildRatingSection(),
-                SizedBox(height: 16.h),
+                SizedBox(height: 16),
                 _buildStatusSection(),
-                SizedBox(height: 16.h),
+                SizedBox(height: 16),
                 _buildReviewTextSection(),
-                SizedBox(height: 16.h),
+                SizedBox(height: 16),
                 _buildGuidelinesSection(),
-                SizedBox(height: 24.h),
+                SizedBox(height: 24),
                 _buildActionButtons(),
               ],
             ),
@@ -290,7 +290,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
           children: [
             Text(
               l10n.ratingRequired,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 12.h),
             Row(
@@ -307,7 +307,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                     child: Icon(
                       index < _reviewCubit.rating ? Icons.star : Icons.star_border,
                       color: Colors.amber,
-                      size: 48.sp,
+                      size: 48,
                     ),
                   ),
                 );
@@ -317,7 +317,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
             Center(
               child: Text(
                 _getRatingDescription(_reviewCubit.rating),
-                style: TextStyle(color: Colors.grey[600], fontSize: 14.sp),
+                style: TextStyle(color: Colors.grey[600], fontSize: 14),
               ),
             ),
           ],
@@ -355,7 +355,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
           children: [
             Text(
               l10n.howDidItGo,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             //SizedBox(height: 4.h),
             ...TransactionStatus.values.map((status) {
@@ -372,9 +372,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
                     Icon(
                       _getStatusIcon(status),
                       color: _getStatusColor(status),
-                      size: 20.sp,
+                      size: 20,
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 8),
                     Text(_getStatusLabel(status)),
                   ],
                 ),
@@ -433,7 +433,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
       children: [
         Text(
           l10n.tellUsMore,
-          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: 8.h),
         TextField(
@@ -465,7 +465,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
         },
         children: [
           Padding(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -488,9 +488,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.check, size: 16.sp, color: Colors.green),
-          SizedBox(width: 8.w),
-          Expanded(child: Text(text, style: TextStyle(fontSize: 14.sp))),
+          Icon(Icons.check, size: 16, color: Colors.green),
+          SizedBox(width: 8),
+          Expanded(child: Text(text, style: TextStyle(fontSize: 14))),
         ],
       ),
     );
@@ -508,7 +508,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
             ElevatedButton(
               onPressed: _reviewCubit.isFormValid && !isSubmitting ? _submitReview : null,
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 42.h),
+                minimumSize: Size(double.infinity, 42),
                 backgroundColor: AppColors.primary,
                 disabledBackgroundColor: Colors.grey,
               ),

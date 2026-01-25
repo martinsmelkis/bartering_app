@@ -9,17 +9,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
-import '../../../configure_dependencies.dart';
-import '../../../l10n/app_localizations.dart';
+import '../../configure_dependencies.dart';
+import '../../l10n/app_localizations.dart';
 
-class MatchHistoryTab extends StatefulWidget {
-  const MatchHistoryTab({super.key});
+class MatchHistoryScreenContent extends StatefulWidget {
+  const MatchHistoryScreenContent({super.key});
 
   @override
-  State<MatchHistoryTab> createState() => _MatchHistoryTabState();
+  State<MatchHistoryScreenContent> createState() => _MatchHistoryScreenContentState();
 }
 
-class _MatchHistoryTabState extends State<MatchHistoryTab> {
+class _MatchHistoryScreenContentState extends State<MatchHistoryScreenContent> {
   bool _unviewedOnly = false;
 
   @override
@@ -45,7 +45,7 @@ class _MatchHistoryTabState extends State<MatchHistoryTab> {
           children: [
             // Filter controls
             Container(
-              padding: EdgeInsets.all(12.w),
+              padding: EdgeInsets.all(12),
               color: Colors.grey.shade100,
               child: Row(
                 children: [
@@ -89,7 +89,7 @@ class _MatchHistoryTabState extends State<MatchHistoryTab> {
                                 size: 64,
                                 color: Colors.grey.shade400,
                               ),
-                              SizedBox(height: 16.h),
+                              SizedBox(height: 16),
                               Text(
                                 _unviewedOnly
                                     ? l10n.noUnviewedMatches
@@ -108,7 +108,7 @@ class _MatchHistoryTabState extends State<MatchHistoryTab> {
                               .read<NotificationsCubit>()
                               .loadMatchHistory(unviewedOnly: _unviewedOnly),
                           child: ListView.builder(
-                            padding: EdgeInsets.all(16.w),
+                            padding: EdgeInsets.all(16),
                             itemCount: matchHistory.matches.length,
                             itemBuilder: (context, index) {
                               final match = matchHistory.matches[index];
@@ -134,7 +134,7 @@ class _MatchHistoryCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Card(
-      margin: EdgeInsets.only(bottom: 12.h),
+      margin: EdgeInsets.only(bottom: 12),
       elevation: match.viewed ? 1 : 3,
       color: match.viewed
           ? Colors.white
@@ -142,7 +142,7 @@ class _MatchHistoryCard extends StatelessWidget {
       child: InkWell(
         onTap: () => _viewMatch(context, match),
         child: Padding(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -153,7 +153,7 @@ class _MatchHistoryCard extends StatelessWidget {
                     color: AppColors.primary,
                     size: 20,
                   ),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       _getMatchTypeLabel(l10n, match.matchType),
@@ -167,7 +167,7 @@ class _MatchHistoryCard extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 8.w,
-                        vertical: 4.h,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.red,
@@ -198,7 +198,7 @@ class _MatchHistoryCard extends StatelessWidget {
                           child: Row(
                             children: [
                               const Icon(Icons.visibility),
-                              SizedBox(width: 8.w),
+                              SizedBox(width: 8),
                               Text(l10n.markAsViewed),
                             ],
                           ),
@@ -209,7 +209,7 @@ class _MatchHistoryCard extends StatelessWidget {
                           child: Row(
                             children: [
                               const Icon(Icons.close, color: Colors.orange),
-                              SizedBox(width: 8.w),
+                              SizedBox(width: 8),
                               Text(
                                 l10n.dismiss,
                                 style: const TextStyle(color: Colors.orange),
@@ -221,7 +221,7 @@ class _MatchHistoryCard extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 12),
               Row(
                 children: [
                   Icon(
@@ -229,7 +229,7 @@ class _MatchHistoryCard extends StatelessWidget {
                     size: 16,
                     color: Colors.grey.shade600,
                   ),
-                  SizedBox(width: 4.w),
+                  SizedBox(width: 4),
                   Text(
                     '${l10n.matchScore}: ${(match.matchScore * 100).toStringAsFixed(0)}%',
                     style: TextStyle(
@@ -241,7 +241,7 @@ class _MatchHistoryCard extends StatelessWidget {
                 ],
               ),
               if (match.matchReason != null && match.matchReason!.isNotEmpty) ...[
-                SizedBox(height: 8.h),
+                SizedBox(height: 8),
                 Container(
                   padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(
@@ -259,7 +259,7 @@ class _MatchHistoryCard extends StatelessWidget {
                         size: 16,
                         color: AppColors.primary,
                       ),
-                      SizedBox(width: 8.w),
+                      SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           match.matchReason!,
@@ -274,7 +274,7 @@ class _MatchHistoryCard extends StatelessWidget {
                   ),
                 ),
               ],
-              SizedBox(height: 8.h),
+              SizedBox(height: 8),
               Row(
                 children: [
                   Icon(
@@ -282,7 +282,7 @@ class _MatchHistoryCard extends StatelessWidget {
                     size: 16,
                     color: Colors.grey.shade600,
                   ),
-                  SizedBox(width: 4.w),
+                  SizedBox(width: 4),
                   Text(
                     DateFormat('MMM d, yyyy HH:mm').format(match.matchedAt),
                     style: TextStyle(
@@ -293,7 +293,7 @@ class _MatchHistoryCard extends StatelessWidget {
                 ],
               ),
               if (match.dismissed) ...[
-                SizedBox(height: 8.h),
+                SizedBox(height: 8),
                 Chip(
                   label: Text(
                     l10n.dismissed,

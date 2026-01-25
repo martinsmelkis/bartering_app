@@ -5,6 +5,8 @@ import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart'
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/theme/app_colors.dart';
 
+const String _kProfilePanelTitle = 'Profile';
+
 /// Adaptive profile layout that shows profile as a left side panel on large screens
 /// and as a full screen on small screens
 class AdaptiveProfileLayout extends StatelessWidget {
@@ -108,7 +110,7 @@ class _ProfilePanelState extends State<_ProfilePanel> {
         children: [
           // Custom header for the panel
           _PanelHeader(
-            title: 'Profile',
+            title: _kProfilePanelTitle,
             onClose: widget.onClose,
           ),
           // Profile screen content

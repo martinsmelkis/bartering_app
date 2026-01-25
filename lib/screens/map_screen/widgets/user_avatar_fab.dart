@@ -173,8 +173,8 @@ class UserAvatarFab extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 1,
-                      offset: const Offset(1, 1),
+                      blurRadius: kIsWeb ? 1.3 : 1,
+                      offset: Offset(kIsWeb ? 1.3 : 1, kIsWeb ? 1.3 : 1),
                     ),
                   ],
                 ),
@@ -200,8 +200,8 @@ class UserAvatarFab extends StatelessWidget {
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                                blurRadius: kIsWeb ? 5.2 : 4,
+                                offset: Offset(0, kIsWeb ? 2.6 : 2),
                               ),
                             ],
                           ),
@@ -213,30 +213,30 @@ class UserAvatarFab extends StatelessWidget {
                         ),
                         if (unreadCount > 0)
                           Positioned(
-                            top: -4,
-                            right: -4,
+                            top: kIsWeb ? -5.2 : -4,
+                            right: kIsWeb ? -5.2 : -4,
                             child: Container(
-                              padding: const EdgeInsets.all(4),
+                              padding: EdgeInsets.all(kIsWeb ? 5.2 : 4),
                               decoration: BoxDecoration(
                                 color: Colors.red,
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: AppColors.background,
-                                  width: 1.5,
+                                  width: kIsWeb ? 2.0 : 1.5,
                                 ),
                               ),
-                              constraints: const BoxConstraints(
-                                minWidth: 33,
-                                minHeight: 33,
+                              constraints: BoxConstraints(
+                                minWidth: kIsWeb ? 42.9 : 33,
+                                minHeight: kIsWeb ? 42.9 : 33,
                               ),
                               child: Center(
                                 child: Text(
                                   unreadCount > 99
                                       ? '99+'
                                       : unreadCount.toString(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 11,
+                                    fontSize: kIsWeb ? 14.3 : 11,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

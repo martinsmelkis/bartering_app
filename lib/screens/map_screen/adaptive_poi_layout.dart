@@ -132,7 +132,7 @@ class _PoiDetailsPanel extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                'Chat: ${chatPoiName ?? "User"}',
+                                'Chat: ${chatPoiName ?? 'User'}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,

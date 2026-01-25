@@ -13,16 +13,16 @@ class AppDimensions {
   // ============================================================================
 
   /// Size for POI markers on the map
-  static double get poiMarkerSize => kIsWeb ? 68.0 : 140.w;
+  static double get poiMarkerSize => kIsWeb ? 80 : 140.w;
 
   /// Size for user avatar FAB
-  static double get userAvatarSize => kIsWeb ? 68.0 : 90.0;
+  static double get userAvatarSize => kIsWeb ? 88.4 : 90.0;
 
   /// Size for edit icon overlay on avatar
-  static double get avatarEditIconSize => kIsWeb ? 20.0 : 28.0;
+  static double get avatarEditIconSize => kIsWeb ? 26.0 : 28.0;
 
   /// Size for icon inside the edit icon overlay
-  static double get avatarEditIconInnerSize => kIsWeb ? 12.0 : 14.sp;
+  static double get avatarEditIconInnerSize => kIsWeb ? 15.6 : 14.sp;
 
   // ============================================================================
   // CLUSTER MARKER SIZES

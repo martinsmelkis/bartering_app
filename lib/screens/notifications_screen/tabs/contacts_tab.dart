@@ -120,7 +120,7 @@ class _ContactsTabState extends State<ContactsTab> {
                                   onTap: () => _showQuietHoursStartPicker(context, contacts),
                                   child: Container(
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: 12.w, vertical: 8.h),
+                                        horizontal: 12, vertical: 8.h),
                                     decoration: BoxDecoration(
                                       border: Border.all(color: Colors.grey),
                                       borderRadius: BorderRadius.circular(8.r),
@@ -144,7 +144,7 @@ class _ContactsTabState extends State<ContactsTab> {
                               ],
                             ),
                           ),
-                          SizedBox(width: 16.w),
+                          SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +161,7 @@ class _ContactsTabState extends State<ContactsTab> {
                                   onTap: () => _showQuietHoursEndPicker(context, contacts),
                                   child: Container(
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: 12.w, vertical: 8.h),
+                                        horizontal: 12, vertical: 8.h),
                                     decoration: BoxDecoration(
                                       border: Border.all(color: Colors.grey),
                                       borderRadius: BorderRadius.circular(8.r),
@@ -214,14 +214,14 @@ class _ContactsTabState extends State<ContactsTab> {
               Card(
                 elevation: 2,
                 child: Padding(
-                  padding: EdgeInsets.all(16.w),
+                  padding: EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
                           Icon(Icons.email, color: AppColors.primary),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 8),
                           Text(
                             l10n.emailAddress,
                             style: TextStyle(
@@ -295,7 +295,7 @@ class _ContactsTabState extends State<ContactsTab> {
               Card(
                 elevation: 2,
                 child: Padding(
-                  padding: EdgeInsets.all(16.w),
+                  padding: EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -303,7 +303,7 @@ class _ContactsTabState extends State<ContactsTab> {
                         children: [
                           Icon(Icons.notifications_active,
                               color: AppColors.primary),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 8),
                           Text(
                             l10n.pushNotifications,
                             style: TextStyle(
@@ -531,7 +531,7 @@ class _ContactsTabState extends State<ContactsTab> {
   Widget _buildEmailInputForm(BuildContext context, AppLocalizations l10n) {
     return Center(
       child: SingleChildScrollView(
-        padding: EdgeInsets.all(24.w),
+        padding: EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: Column(
@@ -562,7 +562,7 @@ class _ContactsTabState extends State<ContactsTab> {
                   color: Colors.grey.shade600,
                 ),
               ),
-              SizedBox(height: 32.h),
+              SizedBox(height: 32),
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -618,8 +618,8 @@ class _ContactsTabState extends State<ContactsTab> {
                 ),
                 child: _isSubmitting
                     ? SizedBox(
-                        height: 20.h,
-                        width: 20.w,
+                        height: 20,
+                        width: 20,
                         child: const CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),

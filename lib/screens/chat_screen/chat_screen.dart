@@ -565,14 +565,14 @@ class _ChatScreenState extends State<ChatScreen> {
     // Use much smaller sizes for web side-by-side view
     final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
         context.canShowSideBySide;
-    final double messageFontSize = isWebSideBySide ? 14 : 15.sp;
-    final double timeFontSize = isWebSideBySide ? 9 : 10.sp;
-    final double verticalMargin = isWebSideBySide ? 4 : 4.h;
-    final double horizontalMargin = isWebSideBySide ? 8 : 8.w;
-    final double verticalPadding = isWebSideBySide ? 8 : 8.h;
-    final double horizontalPadding = isWebSideBySide ? 6 : 8.w;
-    final double borderRadius = isWebSideBySide ? 8 : 16.r;
-    final double spacing = isWebSideBySide ? 4 : 4.h;
+    final double messageFontSize = isWebSideBySide ? 18.2 : 15.sp;
+    final double timeFontSize = isWebSideBySide ? 11.7 : 10.sp;
+    final double verticalMargin = isWebSideBySide ? 5.2 : 4.h;
+    final double horizontalMargin = isWebSideBySide ? 10.4 : 8.w;
+    final double verticalPadding = isWebSideBySide ? 10.4 : 8.h;
+    final double horizontalPadding = isWebSideBySide ? 7.8 : 8.w;
+    final double borderRadius = isWebSideBySide ? 10.4 : 16.r;
+    final double spacing = isWebSideBySide ? 5.2 : 4.h;
 
     return Align(
       alignment: alignment,
@@ -599,7 +599,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 offset: const Offset(0, 1),
               )
             ]),
-        constraints: BoxConstraints(maxWidth: isWebSideBySide ? 250 : 0.75.sw),
+        constraints: BoxConstraints(maxWidth: isWebSideBySide ? 325 : 0.75.sw),
         child: Column(
           crossAxisAlignment:
           isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -651,19 +651,19 @@ class _ChatScreenState extends State<ChatScreen> {
     // Use much smaller sizes for web side-by-side view
     final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
         context.canShowSideBySide;
-    final double messageFontSize = isWebSideBySide ? 12 : 13.sp;
-    final double verticalMargin = isWebSideBySide ? 8 : 12.h;
+    final double messageFontSize = isWebSideBySide ? 15.6 : 13.sp;
+    final double verticalMargin = isWebSideBySide ? 10.4 : 12.h;
 
     return Center(
       child: Container(
         margin: EdgeInsets.symmetric(vertical: verticalMargin),
         padding: EdgeInsets.symmetric(
-          vertical: isWebSideBySide ? 6 : 8.h,
-          horizontal: isWebSideBySide ? 12 : 16.w,
+          vertical: isWebSideBySide ? 7.8 : 8.h,
+          horizontal: isWebSideBySide ? 15.6 : 16.w,
         ),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(isWebSideBySide ? 12 : 16.r),
+          borderRadius: BorderRadius.circular(isWebSideBySide ? 15.6 : 16.r),
         ),
         child: Text(
           message.plainText ?? '',
@@ -680,14 +680,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildFileAttachment(FileAttachment attachment, bool isMe,
       bool isWebSideBySide) {
-    final iconSize = isWebSideBySide ? 32.0 : 40.0;
-    final fontSize = isWebSideBySide ? 10.0 : 12.0;
+    final iconSize = isWebSideBySide ? 41.6 : 40.0;
+    final fontSize = isWebSideBySide ? 13.0 : 12.0;
 
     return GestureDetector(
       onTap: () => _handleFileAttachmentTap(attachment),
       child: Container(
         constraints: BoxConstraints(
-          maxWidth: isWebSideBySide ? 200 : 0.6.sw,
+          maxWidth: isWebSideBySide ? 260 : 0.6.sw,
         ),
         decoration: BoxDecoration(
           color: isMe
@@ -705,19 +705,19 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Image.file(
                   File(attachment.localPath!),
                   width: double.infinity,
-                  height: isWebSideBySide ? 150 : 200,
+                  height: isWebSideBySide ? 195 : 200,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                    return _buildFileIcon(attachment, iconSize, fontSize, isMe);
+                    return _buildFileIcon(attachment, iconSize, fontSize, isMe, isWebSideBySide);
                   },
                 ),
               )
             else
-              _buildFileIcon(attachment, iconSize, fontSize, isMe),
+              _buildFileIcon(attachment, iconSize, fontSize, isMe, isWebSideBySide),
 
             // File info
             Padding(
-              padding: EdgeInsets.all(isWebSideBySide ? 6 : 8.0),
+              padding: EdgeInsets.all(isWebSideBySide ? 7.8 : 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -783,7 +783,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildFileIcon(FileAttachment attachment, double iconSize,
-      double fontSize, bool isMe) {
+      double fontSize, bool isMe, bool isWebSideBySide) {
     IconData icon;
     Color iconColor;
 
@@ -805,7 +805,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(isWebSideBySide ? 20.8 : 16),
       child: Icon(
         icon,
         size: iconSize,
@@ -1193,14 +1193,14 @@ class _ChatScreenState extends State<ChatScreen> {
     // Use much smaller sizes for web side-by-side view
     final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
         context.canShowSideBySide;
-    final double horizontalPadding = isWebSideBySide ? 6 : 12.w;
-    final double verticalPadding = isWebSideBySide ? 4 : 8.h;
-    final double borderRadius = isWebSideBySide ? 12 : 25.r;
-    final double contentHorizontalPadding = isWebSideBySide ? 8 : 16.w;
-    final double contentVerticalPadding = isWebSideBySide ? 5 : 10.h;
-    final double iconSize = isWebSideBySide ? 16 : 25.w;
-    final double spacing = isWebSideBySide ? 4 : 8.w;
-    final double fontSize = isWebSideBySide ? 11 : 14;
+    final double horizontalPadding = isWebSideBySide ? 7.8 : 12.w;
+    final double verticalPadding = isWebSideBySide ? 5.2 : 8.h;
+    final double borderRadius = isWebSideBySide ? 15.6 : 25.r;
+    final double contentHorizontalPadding = isWebSideBySide ? 10.4 : 16.w;
+    final double contentVerticalPadding = isWebSideBySide ? 6.5 : 10.h;
+    final double iconSize = isWebSideBySide ? 20.8 : 25.w;
+    final double spacing = isWebSideBySide ? 5.2 : 8.w;
+    final double fontSize = isWebSideBySide ? 14.3 : 14;
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -1251,7 +1251,7 @@ class _ChatScreenState extends State<ChatScreen> {
               //onSubmitted: (_) => _sendMessage(),
               textInputAction: TextInputAction.send,
               minLines: 1,
-              maxLines: isWebSideBySide ? 3 : 5,
+              maxLines: isWebSideBySide ? 4 : 5,
             ),
           ),
           SizedBox(width: spacing),

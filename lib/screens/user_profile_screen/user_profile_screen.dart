@@ -22,10 +22,12 @@ import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
@@ -101,7 +103,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             )
           : null,
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -145,18 +147,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                     ),
                     Positioned(
-                      top: 8.h,
-                      right: 8.w,
-                      child: IconButton(
-                        onPressed: () => _showDeleteProfileDialog(context),
-                        icon: Icon(
-                          Icons.delete_forever,
-                          color: Colors.red,
-                          size: 24,
+                      top: 8,
+                      right: 8,
+                      child: PointerInterceptor(
+                        child: IconButton(
+                          onPressed: () => _showDeleteProfileDialog(context),
+                          icon: Icon(
+                            Icons.delete_forever,
+                            color: Colors.red,
+                            size: 24,
+                          ),
+                          padding: EdgeInsets.all(8),
+                          constraints: const BoxConstraints(),
+                          tooltip: l10n.deleteProfile,
                         ),
-                        padding: EdgeInsets.all(8.w),
-                        constraints: const BoxConstraints(),
-                        tooltip: l10n.deleteProfile,
                       ),
                     ),
                   ],
@@ -199,30 +203,32 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   Positioned(
                     top: kIsWeb ? 6 : -2,
                     right: kIsWeb ? 6 : -2,
-                    child: IconButton(
-                      onPressed: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const LocationPickerScreenOsm(),
-                          ),
-                        );
-                        // Navigate back to MapScreenV2 after editing
-                        if (mounted) {
-                          Navigator.of(context).pushReplacement(
+                    child: PointerInterceptor(
+                      child: IconButton(
+                        onPressed: () async {
+                          await Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => const MapScreenV2(),
+                              builder: (_) => const LocationPickerScreenOsm(),
                             ),
                           );
-                        }
-                      },
-                      icon: Icon(
-                        Icons.edit,
-                        size: AppDimensions.editIconSize,
-                        color: AppColors.primary,
+                          // Navigate back to MapScreenV2 after editing
+                          if (mounted) {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (_) => const MapScreenV2(),
+                              ),
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          Icons.edit,
+                          size: AppDimensions.editIconSize,
+                          color: AppColors.primary,
+                        ),
+                        padding: EdgeInsets.all(4),
+                        constraints: const BoxConstraints(),
+                        tooltip: l10n.editLocation,
                       ),
-                      padding: EdgeInsets.all(4),
-                      constraints: const BoxConstraints(),
-                      tooltip: l10n.editLocation,
                     ),
                   ),
                 ],
@@ -237,7 +243,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 Text(
                   l10n.userInterestedIn,
                   style: TextStyle(
-                    fontSize: AppDimensions.headingTextSize,
+                    fontSize: isWebPanel 
+                        ? AppDimensions.headingTextSize * 1.1 
+                        : AppDimensions.headingTextSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -331,7 +339,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: isWebPanel ? 24.h : 12.h),
             //SizedBox(height: 20.h),
 
             // Offerings Section
@@ -340,7 +348,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 Text(
                   l10n.userOffers,
                   style: TextStyle(
-                    fontSize: AppDimensions.headingTextSize,
+                    fontSize: isWebPanel 
+                        ? AppDimensions.headingTextSize * 1.1 
+                        : AppDimensions.headingTextSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -685,29 +695,46 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     
     showDialog(
       context: context,
+      useRootNavigator: kIsWeb,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(l10n.deleteProfile),
-          content: Text(l10n.deleteProfileConfirmation),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                l10n.cancel,
-                style: const TextStyle(color: AppColors.primary),
+        return PointerInterceptor(
+          child: AlertDialog(
+            title: Text(l10n.deleteProfile),
+            content: Text(l10n.deleteProfileConfirmation),
+            actions: [
+              PointerInterceptor(
+                child: TextButton(
+                  onPressed: () {
+                    if (kIsWeb) {
+                      Navigator.of(dialogContext, rootNavigator: true).pop();
+                    } else {
+                      Navigator.of(dialogContext).pop();
+                    }
+                  },
+                  child: Text(
+                    l10n.cancel,
+                    style: const TextStyle(color: AppColors.primary),
+                  ),
+                ),
               ),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(dialogContext).pop();
-                await _deleteProfile(context);
-              },
-              child: Text(
-                l10n.delete,
-                style: const TextStyle(color: Colors.red),
+              PointerInterceptor(
+                child: TextButton(
+                  onPressed: () async {
+                    if (kIsWeb) {
+                      Navigator.of(dialogContext, rootNavigator: true).pop();
+                    } else {
+                      Navigator.of(dialogContext).pop();
+                    }
+                    await _deleteProfile(context);
+                  },
+                  child: Text(
+                    l10n.delete,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -722,9 +749,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
+        useRootNavigator: kIsWeb,
         builder: (BuildContext context) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return PointerInterceptor(
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         },
       );
@@ -754,7 +784,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       
       // Dismiss loading dialog
       if (!mounted) return;
-      Navigator.of(context).pop();
+      if (kIsWeb) {
+        Navigator.of(context, rootNavigator: true).pop();
+      } else {
+        Navigator.of(context).pop();
+      }
       
       // Show success message
       if (!mounted) return;
@@ -767,16 +801,33 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       
       // Navigate to welcome screen and clear navigation stack
       if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => const InitializeScreen(),
-        ),
-        (route) => false,
-      );
+      
+      // Use addPostFrameCallback to avoid navigator lock issues
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          if (kIsWeb) {
+            // On web with page-based navigation, use SystemNavigator to exit
+            // and let the app restart, which will show InitializeScreen
+            SystemNavigator.pop();
+          } else {
+            // On mobile, use standard navigation
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (_) => const InitializeScreen(),
+              ),
+              (route) => false,
+            );
+          }
+        }
+      });
     } catch (e) {
       // Dismiss loading dialog
       if (!mounted) return;
-      Navigator.of(context).pop();
+      if (kIsWeb) {
+        Navigator.of(context, rootNavigator: true).pop();
+      } else {
+        Navigator.of(context).pop();
+      }
       
       // Show error message
       if (!mounted) return;

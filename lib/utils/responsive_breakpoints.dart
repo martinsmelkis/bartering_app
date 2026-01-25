@@ -215,9 +215,9 @@ class ResponsiveBreakpoints {
     return getPanelWidth(context) * 1.2;
   }
 
-  /// Get panel width for profile panel (20% wider than settings panel)
+  /// Get panel width for profile panel (slightly narrower than settings panel)
   static double getProfilePanelWidth(BuildContext context) {
-    return getSettingsPanelWidth(context) * 1.2;
+    return getSettingsPanelWidth(context);
   }
 
   /// Get whether to show navigation rail vs bottom nav
@@ -362,7 +362,7 @@ extension ResponsiveExtensions on BuildContext {
   /// Get settings panel width (20% wider than chat panel)
   double get settingsPanelWidth => ResponsiveBreakpoints.getSettingsPanelWidth(this);
 
-  /// Get profile panel width (20% wider than settings panel)
+  /// Get profile panel width (slightly narrower than settings panel)
   double get profilePanelWidth => ResponsiveBreakpoints.getProfilePanelWidth(this);
 
   // Font size getters

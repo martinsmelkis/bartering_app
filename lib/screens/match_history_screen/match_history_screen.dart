@@ -1,6 +1,6 @@
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
-import 'package:barter_app/screens/notifications_screen/tabs/match_history_tab.dart';
+import 'package:barter_app/screens/match_history_screen/match_history_screen_content.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +31,7 @@ class MatchHistoryScreen extends StatelessWidget {
                 foregroundColor: Colors.white,
               )
             : null,
-        body: const MatchHistoryTab(),
+        body: const MatchHistoryScreenContent(),
       ),
     );
   }

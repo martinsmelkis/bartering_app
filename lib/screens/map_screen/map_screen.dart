@@ -38,6 +38,7 @@ import '../chat_screen/chat_screen.dart';
 import '../chat_screen/adaptive_chat_layout.dart';
 import '../settings_screen/adaptive_settings_layout.dart';
 import '../user_profile_screen/adaptive_profile_layout.dart';
+import '../initialize_screen/initialize_screen.dart';
 import 'cubit/chat_panel_cubit.dart';
 import 'cubit/poi_panel_cubit.dart';
 import 'adaptive_poi_layout.dart';
@@ -61,14 +62,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   final MapController _mapController = MapController.customLayer(
     initPosition: GeoPoint(latitude: 48.8584, longitude: 2.2945), // Paris
     customTile: CustomTile(
-      sourceName: "osmFrance", // for caching | osmDeu, osmFrance
+      sourceName: "osmDeu", // for caching | osmDeu, osmFrance
       tileExtension: ".png",
       minZoomLevel: 2,
       maxZoomLevel: 16,
       urlsServers: [
-        TileURLs(url: "https://a.tile.openstreetmap.fr/hot/"),
-        TileURLs(url: "https://b.tile.openstreetmap.fr/hot/"),
-        TileURLs(url: "https://c.tile.openstreetmap.fr/hot/"),
+        //TileURLs(url: "https://a.tile.openstreetmap.fr/hot/"),
+        //TileURLs(url: "https://b.tile.openstreetmap.fr/hot/"),
+        //TileURLs(url: "https://c.tile.openstreetmap.fr/hot/"),
         TileURLs(url: "https://tile.openstreetmap.de/"),
         TileURLs(url: "https://b.tile.openstreetmap.org"),
         TileURLs(url: "https://c.tile.openstreetmap.org"),
@@ -717,327 +718,351 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       key: _mapContentKey,
       child: Scaffold(
         key: _scaffoldKey, // Use persistent key to prevent rebuilds
-                        drawer: PointerInterceptor(
-                          child: DrawerMain(
-                            poiCubit: poiCubit,
-                            mapController: _mapController,
-                            onAttributesChanged: _handleAttributesChanged,
-                            onOpenSettingsPanel: () => context.read<SettingsPanelCubit>().openSettings(),
+        drawer: PointerInterceptor(
+          child: DrawerMain(
+            poiCubit: poiCubit,
+            mapController: _mapController,
+            onAttributesChanged: _handleAttributesChanged,
+            onOpenSettingsPanel: () => context.read<SettingsPanelCubit>().openSettings(),
+          ),
+        ),
+        body: MultiBlocListener(
+          listeners: [
+            BlocListener<PoiCubit, PoiState>(
+              listener: (context, state) async {
+                if (state is PoiAuthenticationError) {
+                  // Clear all keys
+                  await SecureStorageService().clearStorage();
+                  
+                  // Use addPostFrameCallback to avoid navigator lock issues
+                  if (context.mounted) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!context.mounted) return;
+                      
+                      if (kIsWeb) {
+                        // On web with page-based navigation, use SystemNavigator to exit
+                        // and let the app restart, which will show InitializeScreen
+                        SystemNavigator.pop();
+                      } else {
+                        // On mobile, use standard navigation
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (_) => const InitializeScreen(),
                           ),
-                        ),
-                        body: MultiBlocListener(
-                          listeners: [
-                            BlocListener<PoiCubit, PoiState>(
-                              listener: (context, state) {
-                                if (state is PoiError) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(state.message), backgroundColor: Colors.red),
-                                  );
-                                } else if (state is PoiLoaded) {
-                                  _processPois(state.pois);
-                                }
-                              },
-                            ),
-                            BlocListener<MapOperationsCubit, MapOperationsState>(
-                              listener: (context, state) async {
-                                if (state is MapOperationsClusterUpdateSuccess && mounted && !_isUpdatingVisuals) {
-                                  await _updateMapVisuals();
-                                }
-                              },
-                            ),
-                          ],
-                          child: ValueListenableBuilder(
-                            valueListenable: showFab,
-                            builder: (context, isVisible, child) {
-                              if (!isVisible) {
-                                return const SizedBox.shrink();
-                              }
-                              
-                              // Build the map Stack
-                              final mapStack = Stack(
-                                  children: [
-                                    OSMFlutter(
-                                      controller: _mapController,
-                                      osmOption: OSMOption(
-                                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 16),
-                                        userTrackingOption: const UserTrackingOption(
-                                          enableTracking: true,
-                                          unFollowUser: false,
-                                        ),
-                                        showContributorBadgeForOSM: true
-                                      ),
-                                      onMapIsReady: _onMapReady,
-                                      onMapMoved: (event) {
-                                        if (((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs() > 0.0004
-                                            || ((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs() > 0.0004) {
-                                          _mapController.getZoom().then((v) {
-                                            print('@@@@@@@@@@ MAP MOVED: ${((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs()} '
-                                                '${((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs()}');
-                                            zoomLevelNotifier.value = v.toInt();
-                                            mapOperationsCubit.currentZoom = zoomLevelNotifier.value.toDouble();
-                                            mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
-                                          });
-                                        }
-                                        _previousMapRegion = event;
-                                      },
-                                      onGeoPointClicked: _onGeoPointTapped,
-                                    ),
-                                    Positioned(
-                                      top: kIsWeb ? 26 : topPadding ?? 26.0,
-                                      left: 12,
-                                      child: PointerInterceptor(child: const MainNavigation()),
-                                    ),
-                                    Positioned(
-                                      bottom: 32,
-                                      right: 16,
-                                      child: PointerInterceptor(
-                                        child: UserAvatarFab(
-                                          userId: _currentUserId,
-                                          userName: _currentUserName,
-                                          userInterests: _userInterests,
-                                          userOfferings: _userOfferings,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: kIsWeb ? 26 : topPadding,
-                                      left: 64,
-                                      right: 100,
-                                      child: PointerInterceptor(
-                                        child: SearchInMap(
-                                          controller: _mapController, poiCubit: poiCubit,),
-                                      ),
-                                    ),
-                                    // Chats button in top right
-                                    Positioned(
-                                      top: kIsWeb ? 26 : topPadding ?? 26.0,
-                                      right: 12,
-                                      child: PointerInterceptor(
-                                        child: BlocBuilder<ChatsBadgeCubit, ChatsBadgeState>(
-                                          builder: (context, badgeState) {
-                                            return Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                FloatingActionButton(
-                                                  onPressed: () {
-                                                    final chatCubit = context.read<ChatPanelCubit>();
-                                                    if (context.canShowSideBySide) {
-                                                      chatCubit.openChatsList();
-                                                    } else {
-                                                      Navigator.of(context).push(
-                                                        MaterialPageRoute(
-                                                          builder: (_) => const ChatsListScreen(),
-                                                        ),
-                                                      );
-                                                    }
-                                                  },
-                                                  heroTag: "ChatsFab",
-                                                  mini: true,
-                                                  backgroundColor: AppColors.background,
-                                                  child: const Icon(Icons.chat_bubble_outline),
-                                                ),
-                                                if (badgeState.unreadCount > 0)
-                                                  Positioned(
-                                                    top: -4,
-                                                    right: -4,
-                                                    child: Container(
-                                                      padding: const EdgeInsets.all(6),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.red,
-                                                        shape: BoxShape.circle,
-                                                        border: Border.all(
-                                                          color: AppColors.background,
-                                                          width: 2,
-                                                        ),
-                                                      ),
-                                                      constraints: const BoxConstraints(
-                                                        minWidth: 20,
-                                                        minHeight: 20,
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          badgeState.unreadCount > 99 ?
-                                                          '99+' : badgeState.unreadCount.toString(),
-                                                          style: const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 10,
-                                                            fontWeight: FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    // Search nearby users button
-                                    Positioned(
-                                      top: kIsWeb ? 20 : (topPadding ?? 20.0),
-                                      right: 56,
-                                      child: PointerInterceptor(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.transparent,
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey.shade50.withValues(alpha: 0.1),
-                                                blurRadius: 4,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ],
-                                          ),
-                                          child: IconButton(
-                                            icon: SvgPicture.asset(
-                                              'assets/icons/search_nearby_users.svg',
-                                              width: 28,
-                                              height: 28,
-                                              // Removed colorFilter to preserve SVG's original colors
-                                            ),
-                                            onPressed: () async {
-                                              mapOperationsCubit.reset();
-                                              for (var c in mapOperationsCubit.mainPoiClusters) {
-                                                c.isExpanded = false;
-                                              }
-                                              
-                                              // Close POI panel when performing new search
-                                              final poiPanelCubit = context.read<PoiPanelCubit>();
-                                              if (poiPanelCubit.state.isOpen) {
-                                                poiPanelCubit.closePanel();
-                                              }
-                                              
-                                              final settingsService = getIt<SettingsService>();
-                                              final useMapCenter = await settingsService.getUseMapCenterForSearch();
-                                              final radiusKm = await settingsService.getNearbyUsersRadius();
+                          (route) => false,
+                        );
+                      }
+                    });
+                  }
+                } else if (state is PoiError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(state.message), backgroundColor: Colors.red),
+                  );
+                } else if (state is PoiLoaded) {
+                  _processPois(state.pois);
+                }
+              },
+            ),
+            BlocListener<MapOperationsCubit, MapOperationsState>(
+              listener: (context, state) async {
+                if (state is MapOperationsClusterUpdateSuccess && mounted && !_isUpdatingVisuals) {
+                  await _updateMapVisuals();
+                }
+              },
+            ),
+          ],
+          child: ValueListenableBuilder(
+            valueListenable: showFab,
+            builder: (context, isVisible, child) {
+              if (!isVisible) {
+                return const SizedBox.shrink();
+              }
 
-                                              if (useMapCenter) {
-                                                final mapCenter = await _mapController.centerMap;
-                                                await poiCubit.fetchPois(
-                                                  lat: mapCenter.latitude,
-                                                  lon: mapCenter.longitude,
-                                                  radius: radiusKm * 1000, // Convert km to meters
-                                                );
-                                              } else {
-                                                // Use user location (default)
-                                                await poiCubit.fetchPois(radius: radiusKm * 1000); // Convert km to meters
-                                              }
-                                            },
-                                          ),
+              // Build the map Stack
+              final mapStack = Stack(
+                  children: [
+                    OSMFlutter(
+                      controller: _mapController,
+                      osmOption: OSMOption(
+                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 16),
+                        userTrackingOption: const UserTrackingOption(
+                          enableTracking: true,
+                          unFollowUser: false,
+                        ),
+                        showContributorBadgeForOSM: true
+                      ),
+                      onMapIsReady: _onMapReady,
+                      onMapMoved: (event) {
+                        if (((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs() > 0.0004
+                            || ((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs() > 0.0004) {
+                          _mapController.getZoom().then((v) {
+                            print('@@@@@@@@@@ MAP MOVED: ${((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs()} '
+                                '${((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs()}');
+                            zoomLevelNotifier.value = v.toInt();
+                            mapOperationsCubit.currentZoom = zoomLevelNotifier.value.toDouble();
+                            mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
+                          });
+                        }
+                        _previousMapRegion = event;
+                      },
+                      onGeoPointClicked: _onGeoPointTapped,
+                    ),
+                    Positioned(
+                      top: kIsWeb ? 26 : topPadding ?? 26.0,
+                      left: 12,
+                      child: PointerInterceptor(child: const MainNavigation()),
+                    ),
+                    Positioned(
+                      bottom: 32,
+                      right: 16,
+                      child: PointerInterceptor(
+                        child: UserAvatarFab(
+                          userId: _currentUserId,
+                          userName: _currentUserName,
+                          userInterests: _userInterests,
+                          userOfferings: _userOfferings,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: kIsWeb ? 26 : topPadding,
+                      left: 64,
+                      right: 100,
+                      child: PointerInterceptor(
+                        child: SearchInMap(
+                          controller: _mapController, poiCubit: poiCubit,),
+                      ),
+                    ),
+                    // Chats button in top right
+                    Positioned(
+                      top: kIsWeb ? 26 : topPadding ?? 26.0,
+                      right: 12,
+                      child: PointerInterceptor(
+                        child: BlocBuilder<ChatsBadgeCubit, ChatsBadgeState>(
+                          builder: (context, badgeState) {
+                            return Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                FloatingActionButton(
+                                  onPressed: () {
+                                    final chatCubit = context.read<ChatPanelCubit>();
+                                    if (context.canShowSideBySide) {
+                                      chatCubit.openChatsList();
+                                    } else {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => const ChatsListScreen(),
                                         ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      bottom: 23.0,
-                                      left: 15,
-                                      child: ZoomNavigation(
-                                        controller: _mapController,
-                                        zoomNotifier: zoomLevelNotifier,
-                                      ),
-                                    ),
-                                    // Search results list view overlay (only for small screens)
-                                    if (_showSearchResultsList && !context.canShowSideBySide)
-                                      Positioned(
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                        top: MediaQuery.of(context).size.height * 0.15,
-                                        child: SearchResultsListView(
-                                          key: ValueKey(_searchResultsKey),
-                                          pois: _searchResults,
-                                          isLargeScreen: false,
-                                          onClose: () {
-                                            setState(() {
-                                              _showSearchResultsList = false;
-                                              _searchResults = [];
-                                            });
-                                            if (_allPois.isNotEmpty) {
-                                              _processPois(_allPois, ignoreListViewSetting: true);
-                                            }
-                                          },
-                                          onPoiTap: (poi) async {
-                                            // On small screens, close the list when POI is tapped
-                                            setState(() {
-                                              _showSearchResultsList = false;
-                                            });
-                                            if (_allPois.isNotEmpty) {
-                                              _processPois(_allPois, ignoreListViewSetting: true);
-                                              await Future.delayed(const Duration(milliseconds: 100));
-                                            }
-                                            _onIndividualPoiTap(poi);
-                                          },
-                                          onChatTap: (poi) {
-                                            _openChat(poi.profile.userId, poi.profile.name);
-                                          },
-                                        ),
-                                      ),
-                                  ]
-                              );
-                              
-                              // On large screens, show map with search results panel
-                              if (context.canShowSideBySide && _showSearchResultsList) {
-                                return Row(
-                                  children: [
-                                    Expanded(child: mapStack),
-                                    Container(
-                                      width: context.panelWidth,
+                                      );
+                                    }
+                                  },
+                                  heroTag: "ChatsFab",
+                                  mini: true,
+                                  backgroundColor: AppColors.background,
+                                  child: const Icon(Icons.chat_bubble_outline),
+                                ),
+                                if (badgeState.unreadCount > 0)
+                                  Positioned(
+                                    top: -4,
+                                    right: -4,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.1),
-                                            blurRadius: 8,
-                                            offset: const Offset(-2, 0),
-                                          ),
-                                        ],
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppColors.background,
+                                          width: 2,
+                                        ),
                                       ),
-                                      child: SearchResultsListView(
-                                        key: ValueKey(_searchResultsKey),
-                                        pois: _searchResults,
-                                        isLargeScreen: true,
-                                        onClose: () {
-                                          setState(() {
-                                            _showSearchResultsList = false;
-                                            _searchResults = [];
-                                          });
-                                          // Clear markers from map when closing list
-                                          if (_allPois.isNotEmpty) {
-                                            mapOperationsCubit.reset();
-                                            _updateMapVisuals();
-                                          }
-                                        },
-                                        onPoiTap: (poi) async {
-                                          // On large screens, open POI panel below the search results list
-                                          context.read<PoiPanelCubit>().openPoiDetails(poi);
-                                          
-                                          // Navigate to the user's location on the map (like match history does)
-                                          if (poi.profile.latitude != null && poi.profile.longitude != null) {
-                                            _mapController.setZoom(zoomLevel: 15.0);
-                                            _mapController.moveTo(
-                                              GeoPoint(
-                                                latitude: poi.profile.latitude!,
-                                                longitude: poi.profile.longitude!,
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        onChatTap: (poi) {
-                                          _openChat(poi.profile.userId, poi.profile.name);
-                                        },
+                                      constraints: const BoxConstraints(
+                                        minWidth: 20,
+                                        minHeight: 20,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          badgeState.unreadCount > 99 ?
+                                          '99+' : badgeState.unreadCount.toString(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ],
-                                );
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    // Search nearby users button
+                    Positioned(
+                      top: kIsWeb ? 20 : (topPadding ?? 20.0),
+                      right: 56,
+                      child: PointerInterceptor(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.shade50.withValues(alpha: 0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            icon: SvgPicture.asset(
+                              'assets/icons/search_nearby_users.svg',
+                              width: 28,
+                              height: 28,
+                              // Removed colorFilter to preserve SVG's original colors
+                            ),
+                            onPressed: () async {
+                              mapOperationsCubit.reset();
+                              for (var c in mapOperationsCubit.mainPoiClusters) {
+                                c.isExpanded = false;
                               }
-                              
-                              return mapStack;
+
+                              // Close POI panel when performing new search
+                              final poiPanelCubit = context.read<PoiPanelCubit>();
+                              if (poiPanelCubit.state.isOpen) {
+                                poiPanelCubit.closePanel();
+                              }
+
+                              final settingsService = getIt<SettingsService>();
+                              final useMapCenter = await settingsService.getUseMapCenterForSearch();
+                              final radiusKm = await settingsService.getNearbyUsersRadius();
+
+                              if (useMapCenter) {
+                                final mapCenter = await _mapController.centerMap;
+                                await poiCubit.fetchPois(
+                                  lat: mapCenter.latitude,
+                                  lon: mapCenter.longitude,
+                                  radius: radiusKm * 1000, // Convert km to meters
+                                );
+                              } else {
+                                // Use user location (default)
+                                await poiCubit.fetchPois(radius: radiusKm * 1000); // Convert km to meters
+                              }
                             },
                           ),
                         ),
                       ),
+                    ),
+                    Positioned(
+                      bottom: 23.0,
+                      left: 15,
+                      child: ZoomNavigation(
+                        controller: _mapController,
+                        zoomNotifier: zoomLevelNotifier,
+                      ),
+                    ),
+                    // Search results list view overlay (only for small screens)
+                    if (_showSearchResultsList && !context.canShowSideBySide)
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        top: MediaQuery.of(context).size.height * 0.15,
+                        child: SearchResultsListView(
+                          key: ValueKey(_searchResultsKey),
+                          pois: _searchResults,
+                          isLargeScreen: false,
+                          onClose: () {
+                            setState(() {
+                              _showSearchResultsList = false;
+                              _searchResults = [];
+                            });
+                            if (_allPois.isNotEmpty) {
+                              _processPois(_allPois, ignoreListViewSetting: true);
+                            }
+                          },
+                          onPoiTap: (poi) async {
+                            // On small screens, close the list when POI is tapped
+                            setState(() {
+                              _showSearchResultsList = false;
+                            });
+                            if (_allPois.isNotEmpty) {
+                              _processPois(_allPois, ignoreListViewSetting: true);
+                              await Future.delayed(const Duration(milliseconds: 100));
+                            }
+                            _onIndividualPoiTap(poi);
+                          },
+                          onChatTap: (poi) {
+                            _openChat(poi.profile.userId, poi.profile.name);
+                          },
+                        ),
+                      ),
+                  ]
+              );
+
+              // On large screens, show map with search results panel
+              if (context.canShowSideBySide && _showSearchResultsList) {
+                return Row(
+                  children: [
+                    Expanded(child: mapStack),
+                    Container(
+                      width: context.panelWidth,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8,
+                            offset: const Offset(-2, 0),
+                          ),
+                        ],
+                      ),
+                      child: SearchResultsListView(
+                        key: ValueKey(_searchResultsKey),
+                        pois: _searchResults,
+                        isLargeScreen: true,
+                        onClose: () {
+                          setState(() {
+                            _showSearchResultsList = false;
+                            _searchResults = [];
+                          });
+                          // Clear markers from map when closing list
+                          if (_allPois.isNotEmpty) {
+                            mapOperationsCubit.reset();
+                            _updateMapVisuals();
+                          }
+                        },
+                        onPoiTap: (poi) async {
+                          // On large screens, open POI panel below the search results list
+                          context.read<PoiPanelCubit>().openPoiDetails(poi);
+
+                          // Navigate to the user's location on the map (like match history does)
+                          if (poi.profile.latitude != null && poi.profile.longitude != null) {
+                            _mapController.setZoom(zoomLevel: 15.0);
+                            _mapController.moveTo(
+                              GeoPoint(
+                                latitude: poi.profile.latitude!,
+                                longitude: poi.profile.longitude!,
+                              ),
+                            );
+                          }
+                        },
+                        onChatTap: (poi) {
+                          _openChat(poi.profile.userId, poi.profile.name);
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return mapStack;
+            },
+          ),
+        ),
+      ),
     );
     
     // Wrap with BlocBuilders for panels

@@ -73,6 +73,14 @@ class PoiCubit extends Cubit<PoiState> {
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch POIs");
       log("Failed to fetch POIs: $errorMessage");
+      
+      // Check for authentication errors
+      if (_isAuthenticationError(e)) {
+        log("Authentication error detected - clearing keys and navigating to welcome screen");
+        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        return;
+      }
+      
       emit(PoiError(errorMessage));
     } catch (e) {
       log("Failed to fetch POIs: ${e.toString()}");
@@ -104,6 +112,14 @@ class PoiCubit extends Cubit<PoiState> {
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch POI with keyword $keyword");
+      
+      // Check for authentication errors
+      if (_isAuthenticationError(e)) {
+        log("Authentication error detected - clearing keys and navigating to welcome screen");
+        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        return;
+      }
+      
       emit(PoiError(errorMessage));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
@@ -145,6 +161,14 @@ class PoiCubit extends Cubit<PoiState> {
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch similar profiles");
+      
+      // Check for authentication errors
+      if (_isAuthenticationError(e)) {
+        log("Authentication error detected - clearing keys and navigating to welcome screen");
+        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        return;
+      }
+      
       emit(PoiError(errorMessage));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
@@ -186,6 +210,14 @@ class PoiCubit extends Cubit<PoiState> {
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch complementary profiles");
+      
+      // Check for authentication errors
+      if (_isAuthenticationError(e)) {
+        log("Authentication error detected - clearing keys and navigating to welcome screen");
+        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        return;
+      }
+      
       emit(PoiError(errorMessage));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
@@ -201,6 +233,14 @@ class PoiCubit extends Cubit<PoiState> {
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch favorite profiles");
+      
+      // Check for authentication errors
+      if (_isAuthenticationError(e)) {
+        log("Authentication error detected - clearing keys and navigating to welcome screen");
+        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        return;
+      }
+      
       emit(PoiError(errorMessage));
     } catch (e) {
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
@@ -217,11 +257,27 @@ class PoiCubit extends Cubit<PoiState> {
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch user profile");
       log("Failed to fetch user profile: $errorMessage");
+      
+      // Check for authentication errors
+      if (_isAuthenticationError(e)) {
+        log("Authentication error detected - clearing keys and navigating to welcome screen");
+        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        return;
+      }
+      
       emit(PoiError(errorMessage));
     } catch (e) {
       log("Failed to fetch user profile: ${e.toString()}");
       emit(PoiError("Failed to fetch user profile: ${e.toString()}"));
     }
+  }
+
+  /// Checks if the DioException is an authentication error
+  bool _isAuthenticationError(DioException e) {
+    final errorString = e.error?.toString() ?? '';
+    return errorString.contains('Authentication error') ||
+        errorString.contains('Private key') ||
+        errorString.contains('User ID not available');
   }
 
 }

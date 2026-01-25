@@ -37,3 +37,12 @@ class PoiError extends PoiState {
   @override
   List<Object?> get props => [message];
 }
+
+class PoiAuthenticationError extends PoiState {
+  final String message;
+
+  const PoiAuthenticationError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

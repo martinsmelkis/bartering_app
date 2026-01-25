@@ -6,6 +6,7 @@ import 'package:barter_app/screens/manage_postings_screen/manage_postings_screen
 import 'package:barter_app/screens/user_profile_screen/cubit/nested_panel_cubit.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:barter_app/l10n/app_localizations.dart';
 
 /// Adaptive nested panel layout that shows nested panels within profile screen
 /// on large screens and as full screens on small screens
@@ -63,6 +64,8 @@ class _NestedPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     // Nested panel is 60% of profile panel width
     final double nestedPanelWidth = context.profilePanelWidth * 0.6;
 
@@ -72,18 +75,18 @@ class _NestedPanel extends StatelessWidget {
     switch (panelType) {
       case NestedPanelType.notifications:
         panelContent = const NotificationsScreen(showAppBar: false);
-        panelTitle = 'Notifications';
+        panelTitle = l10n.notificationPreferences;
         break;
       case NestedPanelType.matchHistory:
         panelContent = const MatchHistoryScreen(showAppBar: false);
-        panelTitle = 'Match History';
+        panelTitle = l10n.matchHistory;
         break;
       case NestedPanelType.managePostings:
         panelContent = ManagePostingsScreen(
           userId: userId ?? '',
           showAppBar: false,
         );
-        panelTitle = 'Manage Postings';
+        panelTitle = l10n.managePostings;
         break;
       case NestedPanelType.none:
         return const SizedBox.shrink();

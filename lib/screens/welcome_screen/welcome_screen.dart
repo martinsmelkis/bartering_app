@@ -184,7 +184,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 child: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(
                     horizontal: ResponsiveBreakpoints.getPadding(context),
-                    vertical: 40.h,
+                    vertical: 40,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -207,7 +207,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 20),
                       // Tagline
                       Text(
                         l10n.welcomeTagline,
@@ -225,7 +225,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 24),
                       // Get Started Button
                       ElevatedButton(
                         onPressed: () {
@@ -237,8 +237,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           backgroundColor: AppColors.background,
                           foregroundColor: AppColors.primary,
                           padding: EdgeInsets.symmetric(
-                            horizontal: 48.w,
-                            vertical: 16.h,
+                            horizontal: 32.w,
+                            vertical: 32,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.r),
@@ -256,14 +256,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                         ),
                       ),
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 24),
                       // How it works section
                       Container(
                         constraints: BoxConstraints(
                           maxWidth: ResponsiveBreakpoints.getMaxContentWidth(
                               context),
                         ),
-                        padding: EdgeInsets.all(24.w),
+                        padding: EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20.r),
@@ -352,7 +352,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           child: Icon(
             icon,
             color: AppColors.primary,
-            size: 24.sp / iconScale,
+            size: 16.sp / iconScale,
           ),
         ),
         SizedBox(width: 12.w / iconScale),
