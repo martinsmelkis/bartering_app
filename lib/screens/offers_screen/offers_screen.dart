@@ -56,35 +56,23 @@ class _OffersScreenState extends State<OffersScreenWidget> {
         // Dismiss any existing dialog first
         //Navigator.of(context).popUntil((route) => route is! PageRoute || route.isFirst);
 
-        if (state.status == OffersStatus.loading) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return ProgressDialog(
-                  message: AppLocalizations.of(context)!.submittingOffers);
-            },
-          );
-        } else if (state.status == OffersStatus.error) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return ErrorDialog(
-                title: AppLocalizations.of(context)!.error,
-                content: state.errorMessage ??
-                    AppLocalizations.of(context)!.anUnknownErrorOccurred,
-              );
-            },
+        if (state.status == OffersStatus.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? 
+                  AppLocalizations.of(context)!.anUnknownErrorOccurred),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
           );
         } else if (state.status == OffersStatus.success) {
           if (this.widget.isInitialOnboarding == false) {
-            Navigator.of(context).pop();
-            final canPop = await Navigator.of(context).canPop();
-            if (canPop) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => MapScreenV2()),
-              );
+            // Not in onboarding, pop back to caller (UserProfileScreen will handle navigation)
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
             }
           } else {
+            // In onboarding, continue to location picker
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (_) => const LocationPickerScreenOsm()),
             );
@@ -92,12 +80,16 @@ class _OffersScreenState extends State<OffersScreenWidget> {
         }
 
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.selectYourOffers),
-        ),
-        body: BlocBuilder<OffersCubit, OffersState>(
-          builder: (context, state) {
+      child: BlocBuilder<OffersCubit, OffersState>(
+        builder: (context, state) {
+          return Stack(
+            children: [
+              Scaffold(
+                appBar: AppBar(
+                  title: Text(l10n.selectYourOffers),
+                ),
+                body: BlocBuilder<OffersCubit, OffersState>(
+                  builder: (context, innerState) {
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -211,6 +203,33 @@ class _OffersScreenState extends State<OffersScreenWidget> {
             );
           },
         ),
+              ),
+              // Loading overlay when submitting
+              if (state.status == OffersStatus.loading)
+                Container(
+                  color: Colors.black54,
+                  child: Center(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: 16),
+                            Text(
+                              AppLocalizations.of(context)!.submittingOffers,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       )
     );
   }

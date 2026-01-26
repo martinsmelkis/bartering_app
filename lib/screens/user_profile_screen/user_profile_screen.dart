@@ -223,8 +223,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               builder: (_) => const LocationPickerScreenOsm(),
                             ),
                           );
-                          // Navigate back to MapScreenV2 after editing
-                          if (mounted) {
+                          // Navigate back to MapScreenV2 after editing (only in full-screen mode)
+                          // In panel mode, just stay on the current screen
+                          if (mounted && widget.showAppBar) {
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder: (_) => const MapScreenV2(),
@@ -264,15 +265,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 SizedBox(width: 8),
                 InkWell(
                   onTap: () async {
-                    final locale = Localizations.localeOf(context);
-                    await getIt<OnboardingCubit>().completeOnboarding(
-                        locale.languageCode);
-                    Navigator.of(context).pushReplacement(
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) =>
                             InterestsScreen(isInitialOnboarding: false),
                       ),
                     );
+                    
+                    // Reload data after returning from interests screen
+                    if (mounted) {
+                      await _loadProfileKeywordData();
+                      
+                      // If in full-screen mode, navigate back to map after editing
+                      // In panel mode, just stay on the current screen
+                      if (mounted && widget.showAppBar) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => const MapScreenV2(),
+                          ),
+                        );
+                      }
+                    }
                   },
                   child: Icon(
                     Icons.edit,
@@ -369,15 +382,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 SizedBox(width: 8),
                 InkWell(
                   onTap: () async {
-                    final locale = Localizations.localeOf(context);
-                    (await getIt<InterestsCubit>().submitInterests(
-                        locale.languageCode));
-                    Navigator.of(context).pushReplacement(
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) =>
                             OffersScreen(isInitialOnboarding: false),
                       ),
                     );
+                    
+                    // Reload data after returning from offers screen
+                    if (mounted) {
+                      await _loadProfileKeywordData();
+                      
+                      // If in full-screen mode, navigate back to map after editing
+                      // In panel mode, just stay on the current screen
+                      if (mounted && widget.showAppBar) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => const MapScreenV2(),
+                          ),
+                        );
+                      }
+                    }
                   },
                   child: Icon(
                     Icons.edit,
@@ -478,13 +503,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             OnboardingScreen(isInitialOnboarding: false),
                       ),
                     );
-                    // Navigate back to MapScreenV2 after editing
+                    
+                    // Reload data after returning from onboarding screen
                     if (mounted) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (_) => const MapScreenV2(),
-                        ),
-                      );
+                      await _loadProfileKeywordData();
+                      
+                      // Navigate back to MapScreenV2 after editing (only in full-screen mode)
+                      // In panel mode, just stay on the current screen
+                      if (mounted && widget.showAppBar) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => const MapScreenV2(),
+                          ),
+                        );
+                      }
                     }
                   },
                   child: Icon(

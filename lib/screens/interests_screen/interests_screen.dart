@@ -48,30 +48,21 @@ class _InterestsViewState extends State<InterestsView> {
     final l10n = AppLocalizations.of(context)!;
     return BlocListener<InterestsCubit, InterestsState>(
       listener: (context, state) async {
-        //Navigator.of(context)
-        //    .popUntil((route) => route is! PageRoute || route.isFirst);
-
-        if (state.status == InterestsStatus.loading) {
-          showDialog(
-            context: context,
-            builder: (context) =>
-                ProgressDialog(
-                    message: AppLocalizations.of(context)!.submitting),
-          );
-        } else if (state.status == InterestsStatus.error) {
-          showDialog(
-            context: context,
-            builder: (context) =>
-                ErrorDialog(
-                  title: AppLocalizations.of(context)!.error,
-                  content: state.errorMessage ??
-                      AppLocalizations.of(context)!.anUnknownErrorOccurred,
+        if (state.status == InterestsStatus.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? 
+                  AppLocalizations.of(context)!.anUnknownErrorOccurred),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
             ),
           );
         } else if (state.status == InterestsStatus.success) {
           if (this.widget.isInitialOnboarding == false) {
-            // Not in onboarding, go back to map
-            context.pushReplacement('/map');
+            // Not in onboarding, pop back to caller (UserProfileScreen will handle navigation)
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
           } else {
             // Save the full ParsedAttributeData with all metadata
             List<ParsedAttributeData> finalList = List.empty(growable: true);
@@ -86,12 +77,16 @@ class _InterestsViewState extends State<InterestsView> {
           }
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.selectYourInterests),
-        ),
-        body: BlocBuilder<InterestsCubit, InterestsState>(
-          builder: (context, state) {
+      child: BlocBuilder<InterestsCubit, InterestsState>(
+        builder: (context, state) {
+          return Stack(
+            children: [
+              Scaffold(
+                appBar: AppBar(
+                  title: Text(l10n.selectYourInterests),
+                ),
+                body: BlocBuilder<InterestsCubit, InterestsState>(
+                  builder: (context, innerState) {
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -208,6 +203,33 @@ class _InterestsViewState extends State<InterestsView> {
             );
           },
         ),
+              ),
+              // Loading overlay when submitting
+              if (state.status == InterestsStatus.loading)
+                Container(
+                  color: Colors.black54,
+                  child: Center(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: 16),
+                            Text(
+                              AppLocalizations.of(context)!.submitting,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

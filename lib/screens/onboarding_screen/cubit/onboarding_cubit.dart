@@ -39,11 +39,19 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   }
 
   void initQuestions(List<OnboardingQuestion>? initialQuestions) {
+    logDebug('@@@@@@@@@@@ initQuestions called, setting status to initial');
     emit(state.copyWith(
       questions: initialQuestions,
       isCompleted: true,
       status: OnboardingStatus.initial,
     ));
+  }
+
+  void reset() {
+    logDebug('@@@@@@@@@@@ Resetting cubit to initial state');
+    if (!isClosed) {
+      emit(OnboardingState.initial());
+    }
   }
 
   Map<String, double> getProfileSummary() {
@@ -110,9 +118,13 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       updateInterestsList(interestsList);
 
       // Check if cubit is still active before emitting
+      logDebug('@@@@@@@@@@@ About to emit success state. isClosed: $isClosed');
       if (!isClosed) {
         emit(state.copyWith(status: OnboardingStatus.success,
             interestsKeyList: interestsList));
+        logDebug('@@@@@@@@@@@ Success state emitted');
+      } else {
+        logDebug('@@@@@@@@@@@ Cubit was closed, cannot emit success state');
       }
     } catch (e) {
       logDebugError('Error completing onboarding', e);

@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/map_screen/map_screen.dart';
+import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -43,11 +45,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late final List<OnboardingCategory> _categories;
   final Map<String, double> _answers = {};
   bool _isLoadingData = true;
+  bool _cubitInitialized = false;
+  late final OnboardingCubit _cubit;
 
   @override
   void initState() {
     super.initState();
     _categories = _initializeCategories();
+    _cubit = getIt<OnboardingCubit>();
     _loadSavedKeywords();
   }
 
@@ -96,6 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   void dispose() {
+    _cubitInitialized = false;
     super.dispose();
   }
 
@@ -111,81 +117,86 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     final l10n = AppLocalizations.of(context);
 
-    return BlocProvider(
-      create: (_) {
-        final cubit = getIt<OnboardingCubit>();
-        final List<OnboardingQuestion> initialQuestions = [
-          OnboardingQuestion(
-            id: 2,
-            text: l10n!.category_green,
-            answer: _answers['category_green'] ?? 0.5,
-          ),
-          OnboardingQuestion(
-            id: 3,
-            text: l10n.category_red,
-            answer: _answers['category_red'] ?? 0.5,
-          ),
-          OnboardingQuestion(
-            id: 4,
-            text: l10n.category_blue,
-            answer: _answers['category_blue'] ?? 0.5,
-          ),
-          OnboardingQuestion(
-            id: 5,
-            text: l10n.category_purple,
-            answer: _answers['category_purple'] ?? 0.5,
-          ),
-          OnboardingQuestion(
-            id: 1,
-            text: l10n.category_yellow,
-            answer: _answers['category_yellow'] ?? 0.5,
-          ),
-          OnboardingQuestion(
-            id: 6,
-            text: l10n.category_orange,
-            answer: _answers['category_orange'] ?? 0.5,
-          ),
-          OnboardingQuestion(
-            id: 7,
-            text: l10n.category_teal,
-            answer: _answers['category_teal'] ?? 0.5,
-          ),
-        ];
-        cubit.initQuestions(initialQuestions);
-        return cubit;
-      },
-      child: BlocListener<OnboardingCubit, OnboardingState>(
+    // Initialize cubit only once to avoid multiple state emissions during rebuilds
+    if (!_cubitInitialized) {
+      debugPrint('@@@@@@@@@@@ Initializing cubit for the first time');
+      
+      // Reset cubit to initial state to ensure clean slate
+      debugPrint('@@@@@@@@@@@ Resetting cubit to initial state');
+      _cubit.reset();
+      
+      final List<OnboardingQuestion> initialQuestions = [
+        OnboardingQuestion(
+          id: 2,
+          text: l10n!.category_green,
+          answer: _answers['category_green'] ?? 0.5,
+        ),
+        OnboardingQuestion(
+          id: 3,
+          text: l10n.category_red,
+          answer: _answers['category_red'] ?? 0.5,
+        ),
+        OnboardingQuestion(
+          id: 4,
+          text: l10n.category_blue,
+          answer: _answers['category_blue'] ?? 0.5,
+        ),
+        OnboardingQuestion(
+          id: 5,
+          text: l10n.category_purple,
+          answer: _answers['category_purple'] ?? 0.5,
+        ),
+        OnboardingQuestion(
+          id: 1,
+          text: l10n.category_yellow,
+          answer: _answers['category_yellow'] ?? 0.5,
+        ),
+        OnboardingQuestion(
+          id: 6,
+          text: l10n.category_orange,
+          answer: _answers['category_orange'] ?? 0.5,
+        ),
+        OnboardingQuestion(
+          id: 7,
+          text: l10n.category_teal,
+          answer: _answers['category_teal'] ?? 0.5,
+        ),
+      ];
+      _cubit.initQuestions(initialQuestions);
+      
+      debugPrint('@@@@@@@@@@@ Current cubit state after init: ${_cubit.state.status}');
+      
+      _cubitInitialized = true;
+    }
+    
+    return BlocProvider.value(
+      value: _cubit,
+      child: BlocConsumer<OnboardingCubit, OnboardingState>(
+          bloc: _cubit,
+          listenWhen: (previous, current) {
+            final shouldListen = previous.status != current.status;
+            debugPrint('@@@@@@@@@@@ BlocConsumer listenWhen called!');
+            debugPrint('@@@@@@@@@@@ Previous: ${previous.status}, Current: ${current.status}, Should listen: $shouldListen');
+            return shouldListen;
+          },
+          buildWhen: (previous, current) {
+            debugPrint('@@@@@@@@@@@ BlocConsumer buildWhen - previous: ${previous.status}, current: ${current.status}');
+            return previous.status != current.status || previous.questions != current.questions;
+          },
           listener: (context, state) {
-            if (state.status == OnboardingStatus.submitting) {
-              // Dismiss any existing dialog first
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).popUntil((route) =>
-                route.settings.name != null || route.isFirst);
-              }
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (BuildContext context) {
-                  return ProgressDialog(
-                      message: AppLocalizations.of(context)!.submitting);
-                },
-              );
-            } else if (state.status == OnboardingStatus.error) {
-              // Dismiss progress dialog
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              }
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return ErrorDialog(
-                    title: AppLocalizations.of(context)!.error,
-                    content: state.errorMessage ??
-                        AppLocalizations.of(context)!.anUnknownErrorOccurred,
-                  );
-                },
+            debugPrint('@@@@@@@@@@@ OnboardingScreen BlocConsumer listener - Status: ${state.status}');
+            if (state.status == OnboardingStatus.error) {
+              debugPrint('@@@@@@@@@@@ Handling error status');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage ?? 
+                      AppLocalizations.of(context)!.anUnknownErrorOccurred),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 5),
+                ),
               );
             } else if (state.status == OnboardingStatus.success) {
+              debugPrint('@@@@@@@@@@@ Handling success status');
               // Save the full ParsedAttributeData with all metadata
               List<ParsedAttributeData> finalList = List.empty(growable: true);
               state.interestsKeyList?.forEach((e) =>
@@ -198,21 +209,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               );
               context.read<OnboardingCubit>().updateInterestsList(finalList);
 
-              // Use a post-frame callback to ensure dialog is dismissed before navigation
+              // Use a post-frame callback to ensure clean navigation
               WidgetsBinding.instance.addPostFrameCallback((_) {
+                debugPrint('@@@@@@@@@@@ Post-frame callback executing');
                 if (context.mounted) {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) =>
-                      widget.isInitialOnboarding == true ? InterestsScreen()
-                          : MapScreenV2()),
-                  );
+                  if (widget.isInitialOnboarding == true) {
+                    debugPrint('@@@@@@@@@@@ Navigating to InterestsScreen');
+                    // Initial onboarding: navigate to interests screen
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => InterestsScreen()),
+                    );
+                  } else {
+                    debugPrint('@@@@@@@@@@@ Editing mode - checking screen size');
+                    // Editing mode: on large screens/web, navigate to map; on mobile, pop back
+                    if (kIsWeb || context.canShowSideBySide) {
+                      debugPrint('@@@@@@@@@@@ Large screen/web - navigating to MapScreen');
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (_) => const MapScreenV2()),
+                      );
+                    } else {
+                      debugPrint('@@@@@@@@@@@ Mobile - popping back to caller');
+                      Navigator.of(context).pop();
+                    }
+                  }
+                } else {
+                  debugPrint('@@@@@@@@@@@ Context not mounted, cannot navigate');
                 }
               });
             }
           },
-            child: BlocBuilder<OnboardingCubit, OnboardingState>(
-                builder: (context, state) {
-                  return Scaffold(
+            builder: (context, state) {
+              debugPrint('@@@@@@@@@@@ BlocConsumer builder called - Status: ${state.status}');
+              return Stack(
+                children: [
+                  Scaffold(
                     body: SafeArea(
                       child: Column(
                         children: [
@@ -285,9 +315,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ],
                       ),
                     ),
-                  );
-                }
-              )
+                  ),
+                  // Loading overlay when submitting
+                  if (state.status == OnboardingStatus.submitting)
+                    Container(
+                      color: Colors.black54,
+                      child: Center(
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const CircularProgressIndicator(),
+                                const SizedBox(height: 16),
+                                Text(
+                                  AppLocalizations.of(context)!.submitting,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
       )
     );
   }
