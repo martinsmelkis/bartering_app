@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 class AvatarColorUtils {
   /// Determines the dominant color from a list of UI style hints
   /// Returns a color based on the most common color hint and an optional relevancy score
-  /// 
+  ///
   /// Parameters:
   /// - [profileKeywordDataMap]: Optional map of keywords to relevancy scores.
   ///   Keys matching color categories (GREEN, RED, YELLOW, ORANGE, TEAL, PURPLE, BLUE)
@@ -38,7 +38,7 @@ class AvatarColorUtils {
       int idx = 0;
       profileKeywordDataMap.forEach((keyword, score) {
         int boost = 0;
-        
+
         if (score >= 0.9) {
           boost = 2;
         } else if (score >= 0.7) {

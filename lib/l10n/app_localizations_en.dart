@@ -2436,7 +2436,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicyContactContent =>
-      'If you have any questions about this Privacy Policy or our data practices, please contact us at help@barters.lv';
+      'If you have any questions about this Privacy Policy or our data practices, please contact us at info@bartering.app';
 
   @override
   String get privacyPolicyLastUpdated => 'Last updated: January 2025';

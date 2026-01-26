@@ -4721,7 +4721,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicyContactContent.
   ///
   /// In en, this message translates to:
-  /// **'If you have any questions about this Privacy Policy or our data practices, please contact us at help@barters.lv'**
+  /// **'If you have any questions about this Privacy Policy or our data practices, please contact us at info@bartering.app'**
   String get privacyPolicyContactContent;
 
   /// No description provided for @privacyPolicyLastUpdated.

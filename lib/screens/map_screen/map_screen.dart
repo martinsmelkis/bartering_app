@@ -153,7 +153,29 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     final tokenService = FCMTokenService();
     tokenService.onSessionStarted(_currentUserId ?? "");
 
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+      // Auto-open profile panel after user data is loaded
+      _autoOpenProfileOnWebLargeScreen();
+    }
+  }
+
+  /// Auto-open user profile panel on web/large screens for better UX
+  void _autoOpenProfileOnWebLargeScreen() {
+    if (!mounted) return;
+    
+    // Check if we're on web/large screen (can show side-by-side)
+    if (kIsWeb && context.canShowSideBySide) {
+      // Wait for user profile to be loaded
+      if (_currentUserId != null && _currentUserName != null) {
+        context.read<ProfilePanelCubit>().openProfile(
+          userId: _currentUserId!,
+          userName: _currentUserName!,
+          interests: _userInterests,
+          offerings: _userOfferings,
+        );
+      }
+    }
   }
 
   /// Called when user attributes may have changed (e.g., after editing profile/settings)
@@ -1040,7 +1062,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
                           // Navigate to the user's location on the map (like match history does)
                           if (poi.profile.latitude != null && poi.profile.longitude != null) {
-                            _mapController.setZoom(zoomLevel: 15.0);
+                            //_mapController.setZoom(zoomLevel: 15.0);
                             _mapController.moveTo(
                               GeoPoint(
                                 latitude: poi.profile.latitude!,

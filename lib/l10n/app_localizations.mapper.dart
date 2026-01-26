@@ -190,12 +190,9 @@ class AppLocalizationsMapper {
       'deletePosting': localizations.deletePosting,
       'deletePostingConfirmation': localizations.deletePostingConfirmation,
       'postingDeleted': localizations.postingDeleted,
-      'createPosting': localizations.createPosting,
       'offer': localizations.offer,
       'need': localizations.need,
       'expires': localizations.expires,
-      'retry': localizations.retry,
-      'cancel': localizations.cancel,
       'editPosting': localizations.editPosting,
       'postingUpdatedSuccess': localizations.postingUpdatedSuccess,
       'updatePosting': localizations.updatePosting,
@@ -549,12 +546,14 @@ class AppLocalizationsMapper {
       'takePhoto': localizations.takePhoto,
       'chooseFromGallery': localizations.chooseFromGallery,
       'maxImagesReached': localizations.maxImagesReached,
+      'createPosting': localizations.createPosting,
       'postingCreatedSuccess': localizations.postingCreatedSuccess,
       'addNewPosting': localizations.addNewPosting,
       'deleteConversation': localizations.deleteConversation,
       'deleteConversationConfirmation':
           localizations.deleteConversationConfirmation,
       'conversationDeleted': localizations.conversationDeleted,
+      'cancel': localizations.cancel,
       'delete': localizations.delete,
       'errorLoadingChats': localizations.errorLoadingChats,
       'couldNotFindChatParticipant': localizations.couldNotFindChatParticipant,
@@ -698,6 +697,7 @@ class AppLocalizationsMapper {
       'attributesSelected': localizations.attributesSelected,
       'createPreferences': localizations.createPreferences,
       'preferencesCreated': localizations.preferencesCreated,
+      'retry': localizations.retry,
       'offering': localizations.offering,
       'interest': localizations.interest,
       'category': localizations.category,
@@ -814,6 +814,36 @@ class AppLocalizationsMapper {
       'additionalDetails': localizations.additionalDetails,
       'provideMoreContext': localizations.provideMoreContext,
       'submitReport': localizations.submitReport,
+      'privacyPolicyIntroTitle': localizations.privacyPolicyIntroTitle,
+      'privacyPolicyIntroContent': localizations.privacyPolicyIntroContent,
+      'privacyPolicyDataCollectionTitle':
+          localizations.privacyPolicyDataCollectionTitle,
+      'privacyPolicyDataCollectionContent':
+          localizations.privacyPolicyDataCollectionContent,
+      'privacyPolicyDataUsageTitle': localizations.privacyPolicyDataUsageTitle,
+      'privacyPolicyDataUsageContent':
+          localizations.privacyPolicyDataUsageContent,
+      'privacyPolicyDataSharingTitle':
+          localizations.privacyPolicyDataSharingTitle,
+      'privacyPolicyDataSharingContent':
+          localizations.privacyPolicyDataSharingContent,
+      'privacyPolicyDataSecurityTitle':
+          localizations.privacyPolicyDataSecurityTitle,
+      'privacyPolicyDataSecurityContent':
+          localizations.privacyPolicyDataSecurityContent,
+      'privacyPolicyUserRightsTitle':
+          localizations.privacyPolicyUserRightsTitle,
+      'privacyPolicyUserRightsContent':
+          localizations.privacyPolicyUserRightsContent,
+      'privacyPolicyThirdPartyTitle':
+          localizations.privacyPolicyThirdPartyTitle,
+      'privacyPolicyThirdPartyContent':
+          localizations.privacyPolicyThirdPartyContent,
+      'privacyPolicyChangesTitle': localizations.privacyPolicyChangesTitle,
+      'privacyPolicyChangesContent': localizations.privacyPolicyChangesContent,
+      'privacyPolicyContactTitle': localizations.privacyPolicyContactTitle,
+      'privacyPolicyContactContent': localizations.privacyPolicyContactContent,
+      'privacyPolicyLastUpdated': localizations.privacyPolicyLastUpdated,
       'errorWithMessage': (errorMessage) =>
           localizations.errorWithMessage(errorMessage),
       'questionsAnswered': (count) => localizations.questionsAnswered(count),

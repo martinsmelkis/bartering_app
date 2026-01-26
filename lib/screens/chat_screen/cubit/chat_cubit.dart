@@ -13,6 +13,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../models/chat/auth_request.dart';
 import '../../../models/chat/chat_message.dart';
@@ -277,11 +278,18 @@ class ChatCubit extends Cubit<ChatState> {
           logDebug('⚠️ ChatNotificationService not available: $e');
       }
 
+      // Get WebSocket URL from environment variables based on platform
+      final wsUrl = kIsWeb 
+          ? (dotenv.env['WSS_URL_WEB'] ?? 'ws://localhost:8081/chat')
+          : (dotenv.env['WSS_URL_MOBILE'] ?? 'ws://10.0.2.2/chat');
+      
+      logDebug('🔌 Connecting to WebSocket: $wsUrl');
+      
       _webSocketService = WebSocketChatService(
           cryptoService!,
           userId,
           currentUserName,
-          kIsWeb ? "ws://localhost:8081/chat" : "ws://10.0.2.2:8081/chat",
+          wsUrl,
           notificationService: notificationService
       );
 

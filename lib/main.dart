@@ -1,9 +1,11 @@
 import 'package:barter_app/application.dart';
+import 'package:barter_app/flavor_config.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/services/messaging/firebase_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'configure_dependencies.dart';
 import 'firebase_options.dart';
@@ -15,6 +17,14 @@ void main() async {
   logDebug('🚀🚀🚀 MAIN() STARTED 🚀🚀🚀');
   WidgetsFlutterBinding.ensureInitialized();
   logDebug('✅ WidgetsFlutterBinding initialized');
+
+  // Get flavor from --dart-define=FLAVOR (defaults to dev)
+  final flavor = FlavorConfig.flavor;
+
+  // Load environment variables based on flavor
+  logDebug('⏳ Loading environment variables from: ${flavor.envFileName}');
+  await dotenv.load(fileName: flavor.envFileName);
+  logDebug('✅ Environment variables loaded');
 
   // Run security tests
   //if (!kDebugMode) {
@@ -62,4 +72,3 @@ class BarterApp extends StatelessWidget {
     );
   }
 }
-

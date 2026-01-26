@@ -26,6 +26,8 @@ UserProfileData _$UserProfileDataFromJson(Map<String, dynamic> json) =>
           .toList(),
       preferredLanguage: json['preferredLanguage'] as String?,
       lastOnlineAt: (json['lastOnlineAt'] as num?)?.toInt(),
+      averageRating: (json['averageRating'] as num?)?.toDouble(),
+      totalReviews: (json['totalReviews'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$UserProfileDataToJson(UserProfileData instance) =>
@@ -39,4 +41,6 @@ Map<String, dynamic> _$UserProfileDataToJson(UserProfileData instance) =>
       'activePostingIds': instance.activePostingIds,
       'preferredLanguage': ?instance.preferredLanguage,
       'lastOnlineAt': ?instance.lastOnlineAt,
+      'averageRating': ?instance.averageRating,
+      'totalReviews': ?instance.totalReviews,
     };

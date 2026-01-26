@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:barter_app/l10n/app_localizations.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -12,8 +13,9 @@ import 'package:share_plus/share_plus.dart';
 class InviteFriendsDialog extends StatelessWidget {
   const InviteFriendsDialog({super.key});
 
-  // Mock app link - replace with actual deep link when available
-  static const String appShareLink = 'https://bartering.app';
+  // Get app share link from environment variables
+  static String get appShareLink => 
+      dotenv.env['SERVICE_BASE_URL_WEB'] ?? 'https://barters.lv';
 
   void _shareApp(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
@@ -39,7 +41,7 @@ class InviteFriendsDialog extends StatelessWidget {
 
   void _copyLink(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    Clipboard.setData(const ClipboardData(text: appShareLink));
+    Clipboard.setData(ClipboardData(text: appShareLink));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.linkCopiedToClipboard),

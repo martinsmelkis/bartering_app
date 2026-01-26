@@ -2,37 +2,31 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Dev Flavor",
+      "name": "Development",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--flavor",
-        "dev"
-      ],
-      "preLaunchTask": "Setup Flavor: Dev"
+        "--dart-define=FLAVOR=dev"
+      ]
     },
     {
-      "name": "Staging Flavor",
+      "name": "Staging",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--flavor",
-        "staging"
-      ],
-      "preLaunchTask": "Setup Flavor: Staging"
+        "--dart-define=FLAVOR=staging"
+      ]
     },
     {
-      "name": "Prod Flavor",
+      "name": "Production",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--flavor",
-        "prod"
-      ],
-      "preLaunchTask": "Setup Flavor: Prod"
+        "--dart-define=FLAVOR=prod"
+      ]
     }
   ]
 }

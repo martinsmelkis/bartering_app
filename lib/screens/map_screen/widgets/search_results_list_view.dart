@@ -19,7 +19,14 @@ import '../../../widgets/online_status_badge.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/poi_panel_cubit.dart';
 import '../cubit/chat_panel_cubit.dart';
+import '../../chat_screen/widgets/chat_panel_header.dart';
 import 'poi_details_bottom_sheet.dart';
+import '../../chat_screen/chat_screen.dart';
+import '../../chat_screen/cubit/chat_cubit.dart';
+import '../../chat_screen/widgets/report_user_dialog.dart';
+import '../../../models/relationships/report_models.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 class SearchResultsListView extends StatefulWidget {
   final List<PointOfInterest> pois;
@@ -67,6 +74,13 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   
   // Flattened list of all postings with user info
   List<PostingWithUser> _allPostings = [];
+  
+  // Controllers for expandable postings (auto-expanded by default)
+  final Map<String, ExpandableController> _postingControllers = {};
+  
+  // Chat panel state
+  bool _showChatPanel = false;
+  PointOfInterest? _chatWithPoi;
 
   @override
   void initState() {
@@ -85,6 +99,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     super.didUpdateWidget(oldWidget);
     // Reload user attributes when widget is updated (e.g., when shown again after profile changes)
     if (widget.pois != oldWidget.pois) {
+      // Reset to users view when search results change
+      setState(() {
+        _viewMode = ViewMode.users;
+      });
       _loadCurrentUserAttributes();
       _loadAllPostings();
     }
@@ -141,6 +159,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         setState(() {
           _allPostings = allPostings;
           _isLoadingPostings = false;
+          // Switch to Postings tab by default if there are more than 2 postings
+          if (_allPostings.length > 2 && _viewMode == ViewMode.users) {
+            _viewMode = ViewMode.postings;
+          }
         });
       }
     } catch (e) {
@@ -181,6 +203,44 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       } else {
         _expandedUserIds.add(userId);
       }
+    });
+  }
+  
+  ExpandableController _getPostingController(String postingId) {
+    if (!_postingControllers.containsKey(postingId)) {
+      _postingControllers[postingId] = ExpandableController(initialExpanded: true);
+    }
+    return _postingControllers[postingId]!;
+  }
+  
+  @override
+  void dispose() {
+    // Dispose all controllers
+    for (var controller in _postingControllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+  
+  /// Open chat panel below search results (for large screens)
+  void _openChatPanel(PointOfInterest poi) {
+    if (widget.isLargeScreen) {
+      // On large screens, show chat panel below the list
+      setState(() {
+        _showChatPanel = true;
+        _chatWithPoi = poi;
+      });
+    } else {
+      // On small screens, use the default behavior (callback)
+      widget.onChatTap?.call(poi);
+    }
+  }
+  
+  /// Close the inline chat panel
+  void _closeChatPanel() {
+    setState(() {
+      _showChatPanel = false;
+      _chatWithPoi = null;
     });
   }
 
@@ -409,12 +469,15 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                       ],
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  // User rating display
+                  _buildCompactRatingDisplay(poi),
                   // Chat button
                   if (widget.onChatTap != null)
                     IconButton(
                       icon: const Icon(Icons.chat_bubble_outline, size: 20),
                       color: AppColors.primary,
-                      onPressed: () => widget.onChatTap!(poi),
+                      onPressed: () => _openChatPanel(poi),
                       tooltip: l10n.chat,
                     ),
                   const Icon(Icons.chevron_right, size: 20, color: Colors.grey),
@@ -424,6 +487,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           ),
           // Posting content
           ExpandablePanel(
+            controller: _getPostingController(posting.id ?? '${poi.profile.userId}_${posting.title}'),
             theme: const ExpandableThemeData(
               headerAlignment: ExpandablePanelHeaderAlignment.center,
               tapBodyToCollapse: true,
@@ -751,8 +815,32 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       ),
     );
     
-    // For large screens, use BlocBuilder to show POI details below the search results
+    // For large screens, use BlocBuilder to show POI details or chat below the search results
     if (widget.isLargeScreen) {
+      // If chat panel is open, show chat below search results
+      if (_showChatPanel && _chatWithPoi != null) {
+        return Column(
+          children: [
+            // Search results list - takes 60% of height
+            Expanded(
+              flex: 6,
+              child: searchResultsContainer,
+            ),
+            // Divider
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: Colors.grey.shade300,
+            ),
+            // Chat panel - takes 40% of height
+            Expanded(
+              flex: 4,
+              child: _buildInlineChatPanel(),
+            ),
+          ],
+        );
+      }
+      
       return BlocBuilder<PoiPanelCubit, PoiPanelState>(
         builder: (context, poiPanelState) {
           if (poiPanelState.isOpen && poiPanelState.selectedPoi != null) {
@@ -866,6 +954,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                     ),
                   ],
                 ),
+                const SizedBox(width: 8),
+                // User rating display
+                _buildRatingDisplay(poi),
                 const SizedBox(width: 4),
                 const Icon(
                   Icons.chevron_right,
@@ -932,7 +1023,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             color: AppColors.primary,
             borderRadius: BorderRadius.circular(8),
             child: InkWell(
-              onTap: () => widget.onChatTap!(poi),
+              onTap: () => _openChatPanel(poi),
               borderRadius: BorderRadius.circular(8),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1162,6 +1253,109 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           ),
         ],
       ],
+    );
+  }
+
+  /// Build rating display widget
+  Widget _buildRatingDisplay(PointOfInterest poi) {
+    // Use actual rating data from profile, default to 0.0 and 0 if not available
+    final rating = poi.profile.averageRating ?? 0.0;
+    final reviewCount = poi.profile.totalReviews ?? 0;
+    
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.star,
+              size: 14,
+              color: Colors.amber[700],
+            ),
+            const SizedBox(width: 2),
+            Text(
+              rating.toStringAsFixed(1),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[800],
+              ),
+            ),
+          ],
+        ),
+        Text(
+          '($reviewCount)',
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build compact rating display widget for posting cards (horizontal layout)
+  Widget _buildCompactRatingDisplay(PointOfInterest poi) {
+    // Use actual rating data from profile, default to 0.0 and 0 if not available
+    final rating = poi.profile.averageRating ?? 0.0;
+    final reviewCount = poi.profile.totalReviews ?? 0;
+    
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.star,
+          size: 12,
+          color: Colors.amber[700],
+        ),
+        const SizedBox(width: 2),
+        Text(
+          rating.toStringAsFixed(1),
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[800],
+          ),
+        ),
+        const SizedBox(width: 2),
+        Text(
+          '($reviewCount)',
+          style: TextStyle(
+            fontSize: 9,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build inline chat panel that appears below search results
+  Widget _buildInlineChatPanel() {
+    if (_chatWithPoi == null) return const SizedBox.shrink();
+    
+    final poi = _chatWithPoi!;
+    
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          // Chat header with 3-point menu
+          ChatPanelHeader(
+            chatPoiName: poi.profile.name,
+            chatPoiId: poi.profile.userId,
+            onClose: _closeChatPanel,
+          ),
+          // Chat content
+          Expanded(
+            child: ChatScreen(
+              poiId: poi.profile.userId,
+              poiName: poi.profile.name,
+              showAppBar: false,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -321,8 +321,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       widget.interests == null
                           ? const SizedBox()
                           : Wrap(
-                        spacing: 8.w,
-                        runSpacing: 8.h,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: widget.interests!.map((interest) {
                           return Chip(
                             label: Text(
@@ -427,8 +427,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       widget.offerings == null
                           ? const SizedBox()
                           : Wrap(
-                        spacing: 8.w,
-                        runSpacing: 8.h,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: widget.offerings!.map((offering) {
                           return Chip(
                             label:
@@ -446,8 +446,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
             ),
             SizedBox(height: 12.h),
-            //SizedBox(height: 20.h),
-            //SizedBox(height: 20.h),
 
             // Keywords Section
             Row(

@@ -215,9 +215,9 @@ class ResponsiveBreakpoints {
     return getPanelWidth(context) * 1.2;
   }
 
-  /// Get panel width for profile panel (slightly narrower than settings panel)
+  /// Get panel width for profile panel (15% narrower than settings panel for better layout on web/large screens)
   static double getProfilePanelWidth(BuildContext context) {
-    return getSettingsPanelWidth(context);
+    return getSettingsPanelWidth(context) * 0.85;
   }
 
   /// Get whether to show navigation rail vs bottom nav

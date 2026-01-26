@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:injectable/injectable.dart';
 
@@ -154,14 +155,16 @@ class SettingsService {
   }
 
   /// Get whether to show search results as list
+  /// Defaults to true on web/large screens, false on mobile
   Future<bool> getShowSearchResultsAsList() async {
     final prefs = await _preferences;
-    return prefs.getBool(_showSearchResultsAsListKey) ?? false;
+    return prefs.getBool(_showSearchResultsAsListKey) ?? kIsWeb;
   }
 
   /// Get synchronously if already initialized
+  /// Defaults to true on web/large screens, false on mobile
   bool getShowSearchResultsAsListSync() {
-    return _prefs?.getBool(_showSearchResultsAsListKey) ?? false;
+    return _prefs?.getBool(_showSearchResultsAsListKey) ?? kIsWeb;
   }
 
   // --- Language Settings ---

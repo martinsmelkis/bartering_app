@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/postings/posting_data_response.dart';
@@ -90,20 +91,26 @@ class _ManagePostingsScreenState extends State<ManagePostingsScreen> {
     
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.deletePosting),
-        content: Text(l10n.deletePostingConfirmation),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(l10n.delete),
-          ),
-        ],
+      builder: (context) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.deletePosting),
+          content: Text(l10n.deletePostingConfirmation),
+          actions: [
+            PointerInterceptor(
+              child: TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(l10n.cancel),
+              ),
+            ),
+            PointerInterceptor(
+              child: TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: Text(l10n.delete),
+              ),
+            ),
+          ],
+        ),
       ),
     );
 

@@ -17,6 +17,10 @@ class UserProfileData {
   final String? preferredLanguage;
   @JsonKey(includeIfNull: false)
   final int? lastOnlineAt; // Timestamp in milliseconds when user was last online
+  @JsonKey(includeIfNull: false)
+  final double? averageRating; // Average rating score (0.0 to 5.0)
+  @JsonKey(includeIfNull: false)
+  final int? totalReviews; // Total number of reviews received
 
   const UserProfileData({
     required this.userId,
@@ -28,6 +32,8 @@ class UserProfileData {
     required this.activePostingIds,
     this.preferredLanguage,
     this.lastOnlineAt,
+    this.averageRating,
+    this.totalReviews,
   });
 
   /// Check if user is currently online (within last 5 minutes)
@@ -66,6 +72,8 @@ class UserProfileData {
     List<String>? activePostingIds,
     String? preferredLanguage,
     int? lastOnlineAt,
+    double? averageRating,
+    int? totalReviews,
   }) {
     return UserProfileData(
       userId: userId ?? this.userId,
@@ -77,6 +85,8 @@ class UserProfileData {
       activePostingIds: activePostingIds ?? this.activePostingIds,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       lastOnlineAt: lastOnlineAt ?? this.lastOnlineAt,
+      averageRating: averageRating ?? this.averageRating,
+      totalReviews: totalReviews ?? this.totalReviews,
     );
   }
 }
