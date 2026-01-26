@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
+import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart';
 import 'package:barter_app/screens/interests_screen/interests_screen.dart';
@@ -18,6 +19,7 @@ import 'package:barter_app/screens/user_profile_screen/adaptive_nested_panel_lay
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
+import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:flutter/foundation.dart';
@@ -60,17 +62,27 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   String? _userLocation;
+  Map<String, double>? _profileKeywordDataMap;
 
   @override
   void initState() {
     super.initState();
     _loadUserLocation();
+    _loadProfileKeywordData();
   }
 
   Future<void> _loadUserLocation() async {
     final location = await SecureStorageService().getOwnLocation();
     setState(() {
       _userLocation = location;
+    });
+  }
+
+  Future<void> _loadProfileKeywordData() async {
+    final userRepository = getIt<UserRepository>();
+    final keywordData = await userRepository.getProfileKeywordDataMap();
+    setState(() {
+      _profileKeywordDataMap = keywordData;
     });
   }
 
@@ -483,7 +495,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               ],
             ),
+            SizedBox(height: 12.h),
+
+            // Category Stats Bar
+            CategoryStatsUtils.buildCategoryStatsBar(
+              keywordMap: _profileKeywordDataMap,
+            ),
             SizedBox(height: 20.h),
+
             // Notification Preferences and Match History Buttons
             Row(
               children: [

@@ -4,6 +4,7 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/attribute_matching_utils.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
+import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/image_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
@@ -781,7 +782,10 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    const Divider(),
+                    CategoryStatsUtils.buildCategoryStatsBar(
+                      keywordMap: widget.poi.profile.profileKeywordDataMap,
+                    ),
+                    const SizedBox(height: 12),
                     // Use a FutureBuilder with cached future to avoid recalculating on every rebuild
                     FutureBuilder<Map<String, List<TextSpan>>>(
                       future: _spansFuture,

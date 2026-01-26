@@ -178,7 +178,8 @@ class PoiCubit extends Cubit<PoiState> {
   /// Fetches complementary profiles.
   /// If lat/lon are provided, uses those coordinates (typically from map center when setting is enabled).
   /// Otherwise, uses user's saved location.
-  Future<void> getComplementaryProfiles(String keyword, {double? lat, double? lon, double? radiusMeters}) async {
+  /// Falls back to nearby search if no complementary profiles are found.
+  Future<void> getComplementaryProfiles(String keyword, {double? lat, double? lon, double? radiusMeters, bool fallbackToNearby = true}) async {
     try {
       emit(PoiLoading());
       
@@ -206,6 +207,14 @@ class PoiCubit extends Cubit<PoiState> {
         longitude,
         radiusMeters,
       );
+      
+      // If no results and fallback is enabled, try nearby search
+      if (poi.isEmpty && fallbackToNearby) {
+        log("No complementary profiles found, falling back to nearby search");
+        await fetchPois(lat: latitude, lon: longitude, radius: radiusMeters);
+        return;
+      }
+      
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
@@ -218,8 +227,30 @@ class PoiCubit extends Cubit<PoiState> {
         return;
       }
       
+      // If fallback is enabled, try nearby search
+      if (fallbackToNearby) {
+        log("Error fetching complementary profiles, falling back to nearby search: $errorMessage");
+        try {
+          await fetchPois(lat: lat, lon: lon, radius: radiusMeters);
+        } catch (fallbackError) {
+          emit(PoiError(errorMessage)); // If fallback also fails, emit original error
+        }
+        return;
+      }
+      
       emit(PoiError(errorMessage));
     } catch (e) {
+      // If fallback is enabled, try nearby search
+      if (fallbackToNearby) {
+        log("Error fetching complementary profiles, falling back to nearby search: ${e.toString()}");
+        try {
+          await fetchPois(lat: lat, lon: lon, radius: radiusMeters);
+        } catch (fallbackError) {
+          emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
+        }
+        return;
+      }
+      
       emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
     }
   }

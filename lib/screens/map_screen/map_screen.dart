@@ -178,6 +178,68 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
   }
 
+  /// Perform default search based on settings
+  Future<void> _performDefaultSearch() async {
+    if (!mounted) return;
+    
+    // Ensure user profile is loaded before searching
+    if (_currentUserId == null) {
+      // Wait a bit and try again
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (_currentUserId == null) return; // Give up if still not loaded
+    }
+    
+    final settingsService = getIt<SettingsService>();
+    final searchType = await settingsService.getDefaultSearchType();
+    final useMapCenter = await settingsService.getUseMapCenterForSearch();
+    final radiusKm = await settingsService.getNearbyUsersRadius();
+    
+    double? lat;
+    double? lon;
+    
+    // Get coordinates based on settings
+    if (useMapCenter && _isMapReady) {
+      try {
+        final mapCenter = await _mapController.centerMap;
+        lat = mapCenter.latitude;
+        lon = mapCenter.longitude;
+      } catch (e) {
+        // If getting map center fails, continue without it (will use user location)
+        debugPrint('Error getting map center: $e');
+      }
+    }
+    // If not using map center, lat/lon will be null and methods will use user's saved location
+    
+    // Perform search based on default type
+    switch (searchType) {
+      case 'complementary':
+        await poiCubit.getComplementaryProfiles(
+          _currentUserId ?? "",
+          lat: lat,
+          lon: lon,
+          radiusMeters: radiusKm * 1000,
+          fallbackToNearby: true, // Enable fallback to nearby
+        );
+        break;
+      case 'similar':
+        await poiCubit.getSimilarProfiles(
+          _currentUserId ?? "",
+          lat: lat,
+          lon: lon,
+          radiusMeters: radiusKm * 1000,
+        );
+        break;
+      case 'nearby':
+      default:
+        await poiCubit.fetchPois(
+          lat: lat,
+          lon: lon,
+          radius: radiusKm * 1000,
+        );
+        break;
+    }
+  }
+
   /// Called when user attributes may have changed (e.g., after editing profile/settings)
   void _handleAttributesChanged() {
     setState(() {
@@ -216,9 +278,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       );
       _processPois(widget.initialPois!);
     } else {
-      // Default behavior: zoom to saved location and fetch nearby POIs
+      // Default behavior: zoom to saved location and perform default search
       _zoomToSavedLocation();
-      poiCubit.fetchPois(radius: 65000);
+      // Trigger default search now that map is ready
+      _performDefaultSearch();
       // If POIs were already loaded before map was ready, process them now
       if (_allPois.isNotEmpty) {
         _processPois(_allPois);
@@ -921,7 +984,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         ),
                       ),
                     ),
-                    // Search nearby users button
+                    // Search complementary users button (with fallback to nearby)
                     Positioned(
                       top: kIsWeb ? 20 : (topPadding ?? 20.0),
                       right: 56,
@@ -963,14 +1026,20 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
                               if (useMapCenter) {
                                 final mapCenter = await _mapController.centerMap;
-                                await poiCubit.fetchPois(
+                                await poiCubit.getComplementaryProfiles(
+                                  _currentUserId ?? "",
                                   lat: mapCenter.latitude,
                                   lon: mapCenter.longitude,
-                                  radius: radiusKm * 1000, // Convert km to meters
+                                  radiusMeters: radiusKm * 1000, // Convert km to meters
+                                  fallbackToNearby: true, // Enable fallback to nearby
                                 );
                               } else {
                                 // Use user location (default)
-                                await poiCubit.fetchPois(radius: radiusKm * 1000); // Convert km to meters
+                                await poiCubit.getComplementaryProfiles(
+                                  _currentUserId ?? "",
+                                  radiusMeters: radiusKm * 1000, // Convert km to meters
+                                  fallbackToNearby: true, // Enable fallback to nearby
+                                );
                               }
                             },
                           ),

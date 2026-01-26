@@ -15,11 +15,13 @@ class SettingsService {
   static const String _pinSetupCompletedKey = 'pin_setup_completed';
   static const String _showSearchResultsAsListKey = 'show_search_results_as_list';
   static const String _preferredLanguageKey = 'preferred_language';
+  static const String _defaultSearchTypeKey = 'default_search_type';
 
   // Default values
   static const double defaultNearbyUsersRadius = 50.0; // km
   static const double defaultKeywordSearchRadius = 100.0; // km
   static const int defaultKeywordSearchWeight = 50; // 10-100 range
+  static const String defaultSearchType = 'complementary'; // 'complementary', 'similar', 'nearby'
 
   SharedPreferences? _prefs;
 
@@ -37,22 +39,22 @@ class SettingsService {
   }
 
   /// Save whether to use map center for search
-  /// false = User Location (default), true = Map Center
+  /// false = User Location, true = Map Center (default)
   Future<bool> setUseMapCenterForSearch(bool value) async {
     final prefs = await _preferences;
     return await prefs.setBool(_useMapCenterKey, value);
   }
 
   /// Get whether to use map center for search
-  /// Returns false (user location) by default
+  /// Returns true (map center) by default
   Future<bool> getUseMapCenterForSearch() async {
     final prefs = await _preferences;
-    return prefs.getBool(_useMapCenterKey) ?? false;
+    return prefs.getBool(_useMapCenterKey) ?? true;
   }
 
   /// Get synchronously if already initialized (useful for performance)
   bool getUseMapCenterForSearchSync() {
-    return _prefs?.getBool(_useMapCenterKey) ?? false;
+    return _prefs?.getBool(_useMapCenterKey) ?? true;
   }
 
   // --- Nearby Users Radius Settings ---
@@ -185,5 +187,26 @@ class SettingsService {
   /// Get preferred language synchronously
   String? getPreferredLanguageSync() {
     return _prefs?.getString(_preferredLanguageKey);
+  }
+
+  // --- Default Search Type Settings ---
+
+  /// Save the default search type
+  /// Options: 'complementary', 'similar', 'nearby'
+  Future<bool> setDefaultSearchType(String searchType) async {
+    final prefs = await _preferences;
+    return await prefs.setString(_defaultSearchTypeKey, searchType);
+  }
+
+  /// Get the default search type
+  /// Returns 'complementary' by default
+  Future<String> getDefaultSearchType() async {
+    final prefs = await _preferences;
+    return prefs.getString(_defaultSearchTypeKey) ?? defaultSearchType;
+  }
+
+  /// Get default search type synchronously
+  String getDefaultSearchTypeSync() {
+    return _prefs?.getString(_defaultSearchTypeKey) ?? defaultSearchType;
   }
 }
