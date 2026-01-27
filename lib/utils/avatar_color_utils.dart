@@ -70,12 +70,12 @@ class AvatarColorUtils {
 
     // Determine color shade based on relevancy score
     // Top 5% = shade300, Top 30% = shade200, Rest = shade100
-    int colorShade = 100;
+    int colorShade = 50;
     if (relevancyScore != null && relevancyScore != 1.0) {
       if (relevancyScore >= 0.95) {
-        colorShade = 300;
-      } else if (relevancyScore >= 0.70) {
         colorShade = 200;
+      } else if (relevancyScore >= 0.70) {
+        colorShade = 100;
       }
     }
 
