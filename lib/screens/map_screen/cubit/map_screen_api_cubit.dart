@@ -63,6 +63,13 @@ class PoiCubit extends Cubit<PoiState> {
           double.tryParse(location?.split(',')[0] ?? "") ?? 0.0 : 0.0;
         longitude = location?.isNotEmpty == true ?
           double.tryParse(location?.split(',')[1] ?? "") ?? 0.0 : 0.0;
+        
+        // Check if location is not set (0.0, 0.0)
+        if (latitude == 0.0 && longitude == 0.0) {
+          log("⚠️ No valid location available - skipping POI fetch");
+          emit(const PoiError("Please set your location in settings to find nearby users"));
+          return;
+        }
       }
 
       final pois = await _apiClient.getPointsOfInterest(
@@ -97,6 +104,14 @@ class PoiCubit extends Cubit<PoiState> {
       double.tryParse(location?.split(',')[0] ?? "") ?? 0.0 : 0.0;
       double longitude = location?.isNotEmpty == true ?
       double.tryParse(location?.split(',')[1] ?? "") ?? 0.0 : 0.0;
+      
+      // Check if location is not set (0.0, 0.0)
+      if (latitude == 0.0 && longitude == 0.0) {
+        log("⚠️ No valid location available - skipping keyword search");
+        emit(const PoiError("Please set your location in settings to search for users"));
+        return;
+      }
+      
       final poi = await _apiClient.getProfilesByKeyword(
         userId ?? "", 
         keyword,
@@ -151,6 +166,13 @@ class PoiCubit extends Cubit<PoiState> {
             double.tryParse(location?.split(',')[1] ?? "") : null;
       }
       
+      // Check if location is not set (0.0, 0.0) or null
+      if ((latitude == null || longitude == null) || (latitude == 0.0 && longitude == 0.0)) {
+        log("⚠️ No valid location available - skipping similar profiles fetch");
+        emit(const PoiError("Please set your location in settings to find similar users"));
+        return;
+      }
+      
       final poi = await _apiClient.findSimilarProfiles(
         userId ?? "",
         latitude,
@@ -199,6 +221,13 @@ class PoiCubit extends Cubit<PoiState> {
             double.tryParse(location?.split(',')[0] ?? "") : null;
         longitude = location?.isNotEmpty == true ?
             double.tryParse(location?.split(',')[1] ?? "") : null;
+      }
+      
+      // Check if location is not set (0.0, 0.0) or null
+      if ((latitude == null || longitude == null) || (latitude == 0.0 && longitude == 0.0)) {
+        log("⚠️ No valid location available - skipping complementary profiles fetch");
+        emit(const PoiError("Please set your location in settings to find matching users"));
+        return;
       }
       
       final poi = await _apiClient.findComplementaryProfiles(

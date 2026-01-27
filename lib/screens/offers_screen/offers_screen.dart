@@ -1,17 +1,12 @@
-import 'package:barter_app/screens/location_picker_screen/location_picker_osm_screen.dart';
-import 'package:barter_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
-import '../../models/user/parsed_attribute_data.dart';
 import '../../repositories/user_repository.dart';
 import '../../services/api_client.dart';
 import '../../utils/attribute_style_helper.dart';
 import '../../utils/text_utils.dart';
-import '../../widgets/dialogs/error_dialog.dart';
-import '../../widgets/dialogs/progress_dialog.dart';
-import '../map_screen/map_screen.dart';
 import 'cubit/offers_cubit.dart';
 
 class OffersScreen extends StatelessWidget {
@@ -68,14 +63,12 @@ class _OffersScreenState extends State<OffersScreenWidget> {
         } else if (state.status == OffersStatus.success) {
           if (this.widget.isInitialOnboarding == false) {
             // Not in onboarding, pop back to caller (UserProfileScreen will handle navigation)
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
+            if (context.canPop()) {
+              context.pop();
             }
           } else {
             // In onboarding, continue to location picker
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const LocationPickerScreenOsm()),
-            );
+            context.pushReplacement('/location-picker');
           }
         }
 

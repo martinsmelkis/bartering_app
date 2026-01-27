@@ -265,7 +265,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
   }
 
-  void _onMapReady(bool isReady) {
+  void _onMapReady(bool isReady) async {
     _isMapReady = true;
     // If initial POIs were provided (e.g., from match history), use them instead of fetching
     if (widget.initialPois != null && widget.initialPois!.isNotEmpty) {
@@ -279,9 +279,18 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       _processPois(widget.initialPois!);
     } else {
       // Default behavior: zoom to saved location and perform default search
-      _zoomToSavedLocation();
-      // Trigger default search now that map is ready
-      _performDefaultSearch();
+      await _zoomToSavedLocation();
+      
+      // Check if user has a saved location before performing search
+      final locationString = await SecureStorageService().getOwnLocation();
+      if (locationString != null && locationString.isNotEmpty) {
+        // User has a location set, trigger default search now that map is ready
+        _performDefaultSearch();
+      } else {
+        debugPrint('⚠️ No user location set yet - skipping initial search');
+        // Optionally show a message to the user that they need to set their location
+      }
+      
       // If POIs were already loaded before map was ready, process them now
       if (_allPois.isNotEmpty) {
         _processPois(_allPois);

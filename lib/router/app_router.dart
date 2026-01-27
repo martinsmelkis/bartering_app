@@ -3,6 +3,7 @@ import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
 import 'package:barter_app/screens/forgot_password_screen/forgot_password_screen.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/screens/interests_screen/interests_screen.dart';
+import 'package:barter_app/screens/location_picker_screen/location_picker_osm_screen.dart';
 import 'package:barter_app/screens/map_screen/map_screen.dart';
 import 'package:barter_app/screens/match_history_screen/match_history_screen.dart';
 import 'package:barter_app/screens/notifications_screen/notifications_screen.dart';
@@ -76,6 +77,13 @@ class AppRouter {
         path: '/offers',
         name: 'offers',
         builder: (context, state) => OffersScreen(),
+      ),
+
+      // Location Picker Screen
+      GoRoute(
+        path: '/location-picker',
+        name: 'location-picker',
+        builder: (context, state) => const LocationPickerScreenOsm(),
       ),
 
       // Map Screen (Main Screen)

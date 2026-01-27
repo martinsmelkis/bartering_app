@@ -42,6 +42,30 @@ android {
         versionName = "0.0.1"
     }
 
+    flavorDimensions += "environment"
+    
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            // No applicationIdSuffix for dev - matches Firebase config
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "Barter (Dev)")
+        }
+        
+        create("staging") {
+            dimension = "environment"
+            // No applicationIdSuffix for staging - shares Firebase config with dev
+            versionNameSuffix = "-staging"
+            resValue("string", "app_name", "Barter (Staging)")
+        }
+        
+        create("prod") {
+            dimension = "environment"
+            // No suffix for production
+            resValue("string", "app_name", "Barter")
+        }
+    }
+
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")

@@ -720,8 +720,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                     children: [
                       Text(
                         _viewMode == ViewMode.users
-                            ? '${sortedPois.length} ${sortedPois.length == 1 ? 'user' : 'users'} found'
-                            : '${_allPostings.length} ${_allPostings.length == 1 ? 'posting' : 'postings'} found',
+                            ? '${sortedPois.length} matching ${sortedPois.length == 1 ? 'user' : 'users'} found'
+                            : '${_allPostings.length} matching ${_allPostings.length == 1 ? 'posting' : 'postings'} found',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,

@@ -1,7 +1,7 @@
-import 'package:barter_app/screens/map_screen/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../configure_dependencies.dart';
@@ -13,7 +13,6 @@ import '../../theme/app_colors.dart';
 import '../../widgets/dialogs/error_dialog.dart';
 import '../../widgets/dialogs/progress_dialog.dart';
 import '../map_screen/widgets/top_search_widget.dart';
-import '../map_screen/widgets/user_location.dart';
 import 'cubit/location_picker_cubit.dart';
 
 class LocationPickerScreenOsm extends StatelessWidget {
@@ -176,9 +175,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
                   ),
             );
           } else if (state.status == LocationPickerStatus.success) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const MapScreenV2()),
-            );
+            context.go('/map');
           }
         },
       child: CustomPickerLocation(
@@ -194,7 +191,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
                   PointerInterceptor(
                     child: TextButton(
                       style: TextButton.styleFrom(),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => context.pop(),
                       child: const Icon(Icons.arrow_back_ios),
                     ),
                   ),

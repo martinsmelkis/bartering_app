@@ -5,7 +5,6 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart';
 import 'package:barter_app/screens/interests_screen/interests_screen.dart';
-import 'package:barter_app/screens/location_picker_screen/location_picker_osm_screen.dart';
 import 'package:barter_app/screens/map_screen/map_screen.dart';
 import 'package:barter_app/screens/match_history_screen/match_history_screen.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
@@ -27,6 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -218,19 +218,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     child: PointerInterceptor(
                       child: IconButton(
                         onPressed: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const LocationPickerScreenOsm(),
-                            ),
-                          );
-                          // Navigate back to MapScreenV2 after editing (only in full-screen mode)
-                          // In panel mode, just stay on the current screen
-                          if (mounted && widget.showAppBar) {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (_) => const MapScreenV2(),
-                              ),
-                            );
+                          // Navigate to location picker
+                          // If in full-screen mode, the location picker will handle navigation back
+                          // If in panel mode, just reload data when done
+                          if (widget.showAppBar) {
+                            // Full-screen mode: use go navigation
+                            context.push('/location-picker');
+                          } else {
+                            // Panel mode: use push and reload on return
+                            await context.push('/location-picker');
+                            if (mounted) {
+                              await _loadProfileKeywordData();
+                            }
                           }
                         },
                         icon: Icon(
@@ -265,6 +264,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 SizedBox(width: 8),
                 InkWell(
                   onTap: () async {
+                    final locale = Localizations.localeOf(context);
+                    await getIt<OnboardingCubit>().completeOnboarding(
+                        locale.languageCode);
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) =>
@@ -273,18 +275,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     );
                     
                     // Reload data after returning from interests screen
+                    // The InterestsScreen will pop back when done, so we just reload
                     if (mounted) {
                       await _loadProfileKeywordData();
-                      
-                      // If in full-screen mode, navigate back to map after editing
-                      // In panel mode, just stay on the current screen
-                      if (mounted && widget.showAppBar) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (_) => const MapScreenV2(),
-                          ),
-                        );
-                      }
                     }
                   },
                   child: Icon(
@@ -382,6 +375,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 SizedBox(width: 8),
                 InkWell(
                   onTap: () async {
+                    final locale = Localizations.localeOf(context);
+                    (await getIt<InterestsCubit>().submitInterests(
+                        locale.languageCode));
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) =>
@@ -390,18 +386,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     );
                     
                     // Reload data after returning from offers screen
+                    // The OffersScreen will pop back when done, so we just reload
                     if (mounted) {
                       await _loadProfileKeywordData();
-                      
-                      // If in full-screen mode, navigate back to map after editing
-                      // In panel mode, just stay on the current screen
-                      if (mounted && widget.showAppBar) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (_) => const MapScreenV2(),
-                          ),
-                        );
-                      }
                     }
                   },
                   child: Icon(

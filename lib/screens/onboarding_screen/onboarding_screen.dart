@@ -1,20 +1,14 @@
-import 'dart:math';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
-import 'package:barter_app/screens/map_screen/map_screen.dart';
-import 'package:barter_app/utils/responsive_breakpoints.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/text_utils.dart';
 import '../../utils/debug_utils.dart';
-import '../../widgets/dialogs/error_dialog.dart';
-import '../../widgets/dialogs/progress_dialog.dart';
-import '../interests_screen/interests_screen.dart';
 import 'cubit/onboarding_cubit.dart';
 
 // --- Data Models for the new Onboarding Screen ---
@@ -215,22 +209,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 if (context.mounted) {
                   if (widget.isInitialOnboarding == true) {
                     debugPrint('@@@@@@@@@@@ Navigating to InterestsScreen');
-                    // Initial onboarding: navigate to interests screen
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => InterestsScreen()),
-                    );
+                    // Initial onboarding: navigate to interests screen using go_router
+                    context.go('/interests');
                   } else {
-                    debugPrint('@@@@@@@@@@@ Editing mode - checking screen size');
-                    // Editing mode: on large screens/web, navigate to map; on mobile, pop back
-                    if (kIsWeb || context.canShowSideBySide) {
-                      debugPrint('@@@@@@@@@@@ Large screen/web - navigating to MapScreen');
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => const MapScreenV2()),
-                      );
-                    } else {
-                      debugPrint('@@@@@@@@@@@ Mobile - popping back to caller');
-                      Navigator.of(context).pop();
-                    }
+                    debugPrint('@@@@@@@@@@@ Editing mode - popping back to caller');
+                    // Editing mode: pop back to previous screen (works for both mobile and web)
+                    // On web, this returns to the profile panel on map screen
+                    // On mobile, this returns to the profile screen
+                    context.pop();
                   }
                 } else {
                   debugPrint('@@@@@@@@@@@ Context not mounted, cannot navigate');

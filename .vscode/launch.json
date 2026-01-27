@@ -7,7 +7,8 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--dart-define=FLAVOR=dev"
+        "--dart-define=FLAVOR=dev",
+        "--flavor=dev"
       ]
     },
     {
@@ -16,7 +17,8 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--dart-define=FLAVOR=staging"
+        "--dart-define=FLAVOR=staging",
+        "--flavor=staging"
       ]
     },
     {
@@ -25,7 +27,8 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--dart-define=FLAVOR=prod"
+        "--dart-define=FLAVOR=prod",
+        "--flavor=prod"
       ]
     }
   ]
