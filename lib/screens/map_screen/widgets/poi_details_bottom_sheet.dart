@@ -722,13 +722,13 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                     )
                                   : _avatarIcon ?? const Icon(Icons.person, size: 32),
                             ),
-                            // Online status badge - positioned closer to the edge
+                            // Online status badge - positioned at bottom-right to avoid overlapping rating badge
                             PositionedOnlineStatusBadge(
                               isOnline: widget.poi.isOnline,
                               isAway: widget.poi.isAway,
                               size: 16.0,
                               right: -5,
-                              top: -5,
+                              bottom: -5,
                               borderWidth: 2.5,
                             ),
                           ],
