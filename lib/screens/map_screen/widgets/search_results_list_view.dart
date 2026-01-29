@@ -2,6 +2,7 @@ import 'package:barter_app/widgets/full_screen_image_viewer.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
@@ -13,6 +14,7 @@ import '../../../services/api_client.dart';
 import '../../../theme/app_colors.dart';
 import '../../../utils/attribute_matching_utils.dart';
 import '../../../utils/avatar_color_utils.dart';
+import '../../../utils/category_stats_utils.dart';
 import '../../../utils/image_utils.dart';
 import '../../../utils/text_utils.dart';
 import '../../../widgets/online_status_badge.dart';
@@ -99,6 +101,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     super.didUpdateWidget(oldWidget);
     // Reload user attributes when widget is updated (e.g., when shown again after profile changes)
     if (widget.pois != oldWidget.pois) {
+      // Clear stale postings data when search results change
+      _userPostingsMap.clear();
+      _allPostings.clear();
+      
       // Reset to users view when search results change
       setState(() {
         _viewMode = ViewMode.users;
@@ -425,15 +431,24 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               ),
               child: Row(
                 children: [
-                  // Small avatar
+                  // Small avatar with category color circle
                   FutureBuilder<String>(
-                    future: _loadAndModifySvg(poi),
+                    future: _loadSvg(poi),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return SvgPicture.string(
-                          snapshot.data!,
-                          width: 32,
-                          height: 32,
+                        return CategoryStatsUtils.buildCategoryStatsCircle(
+                          keywordMap: poi.profile.profileKeywordDataMap,
+                          size: 32,
+                          strokeWidth: 2.0,
+                          gapWidth: 0.5,
+                          child: ClipOval(
+                            child: SvgPicture.string(
+                              snapshot.data!,
+                              width: 32,
+                              height: 32,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
                         );
                       }
                       return Container(
@@ -924,13 +939,22 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                   clipBehavior: Clip.none,
                   children: [
                     FutureBuilder<String>(
-                      future: _loadAndModifySvg(poi),
+                      future: _loadSvg(poi),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          return SvgPicture.string(
-                            snapshot.data!,
-                            width: 56,
-                            height: 56,
+                          return CategoryStatsUtils.buildCategoryStatsCircle(
+                            keywordMap: poi.profile.profileKeywordDataMap,
+                            size: 56,
+                            strokeWidth: 3.0,
+                            gapWidth: 1.0,
+                            child: ClipOval(
+                              child: SvgPicture.string(
+                                snapshot.data!,
+                                width: 56,
+                                height: 56,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
                           );
                         }
                         return Container(
@@ -1359,18 +1383,13 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     );
   }
 
-  Future<String> _loadAndModifySvg(PointOfInterest poi) async {
+  Future<String> _loadSvg(PointOfInterest poi) async {
     final userIdHashCode = poi.profile.userId.hashCode;
     final index = userIdHashCode.abs() % 29; // Assuming 29 avatars
     final selectedIconPath = 'assets/icons/path${index + 1}.svg';
     
-    final attributes = poi.profile.attributes?.map((e) => e.uiStyleHint).whereType<String>().toList();
-    
-    return AvatarColorUtils.loadAndColorSvgFromAttributes(
-      assetPath: selectedIconPath,
-      attributes: attributes,
-      relevancyScore: poi.matchRelevancyScore,
-    );
+    // Load SVG without color modification
+    return await rootBundle.loadString(selectedIconPath);
   }
 
   Color _getColorForAttribute(String? uiStyleHint) {

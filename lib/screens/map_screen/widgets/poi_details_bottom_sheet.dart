@@ -12,6 +12,7 @@ import 'package:barter_app/widgets/online_status_badge.dart';
 import 'package:barter_app/widgets/rating_circle_avatar.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -129,15 +130,37 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       final currentUserId = userRepository.userId;
 
       if (currentUserId == null) {
+        if (mounted) {
+          setState(() {
+            _isLoadingFavorite = false;
+          });
+        }
         return false;
       }
 
-      // Get relationships for the current user
-      final relationships = await apiClient.getRelationships(currentUserId);
+      // Check if cache is valid
+      final now = DateTime.now();
+      final cacheIsValid = _favoritesCacheTime != null &&
+          now.difference(_favoritesCacheTime!) < _cacheValidityDuration &&
+          _favoritesCache.containsKey(currentUserId);
 
-      // Check if the POI user is in the current user's favorites list
-      final isFavorite = relationships.favorites.contains(
-          widget.poi.profile.userId);
+      Set<String> favorites;
+      
+      if (cacheIsValid) {
+        // Use cached data
+        favorites = _favoritesCache[currentUserId]!;
+      } else {
+        // Fetch fresh data and update cache
+        final relationships = await apiClient.getRelationships(currentUserId);
+        favorites = relationships.favorites.toSet();
+        
+        // Update cache
+        _favoritesCache[currentUserId] = favorites;
+        _favoritesCacheTime = now;
+      }
+
+      // Check if the POI user is in the favorites list
+      final isFavorite = favorites.contains(widget.poi.profile.userId);
 
       if (mounted) {
         setState(() {
@@ -148,6 +171,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
 
       return isFavorite;
     } catch (e) {
+      debugPrint('Error loading favorite status: $e');
       if (mounted) {
         setState(() {
           _isLoadingFavorite = false;
@@ -182,21 +206,29 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       if (_isFavorite) {
         // Remove favorite
         await apiClient.removeRelationship(relationshipRequest);
+        // Update cache
+        _favoritesCache[currentUserId]?.remove(widget.poi.profile.userId);
       } else {
         // Add favorite
         await apiClient.createRelationship(relationshipRequest);
+        // Update cache
+        if (_favoritesCache.containsKey(currentUserId)) {
+          _favoritesCache[currentUserId]!.add(widget.poi.profile.userId);
+        }
       }
 
-      setState(() {
-        _isFavorite = !_isFavorite;
-        _isTogglingFavorite = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isTogglingFavorite = false;
-      });
-
       if (mounted) {
+        setState(() {
+          _isFavorite = !_isFavorite;
+          _isTogglingFavorite = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isTogglingFavorite = false;
+        });
+
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -216,15 +248,18 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       final index = userIdHashCode.abs() % svgAssetCount;
       final selectedIconPath = 'assets/icons/path${index + 1}.svg';
 
-      // Load and modify the SVG
-      final svgString = await _loadAndModifySvg(selectedIconPath);
+      // Load SVG without color modification
+      final svgString = await _loadSvg(selectedIconPath);
 
       if (mounted) {
         setState(() {
-          _avatarIcon = SvgPicture.string(
-            svgString,
-            width: 67,
-            height: 67,
+          _avatarIcon = ClipOval(
+            child: SvgPicture.string(
+              svgString,
+              width: 67,
+              height: 67,
+              fit: BoxFit.contain,
+            ),
           );
           _isLoadingAvatar = false;
         });
@@ -261,14 +296,9 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     }
   }
 
-  Future<String> _loadAndModifySvg(String assetPath) async {
-    final attributes = widget.poi.profile.attributes?.map((e) => e.uiStyleHint).whereType<String>().toList();
-    
-    return AvatarColorUtils.loadAndColorSvgFromAttributes(
-      assetPath: assetPath,
-      attributes: attributes,
-      relevancyScore: widget.poi.matchRelevancyScore,
-    );
+  Future<String> _loadSvg(String assetPath) async {
+    // Load SVG without color modification
+    return await rootBundle.loadString(assetPath);
   }
 
   Future<void> _loadPostings() async {

@@ -10,8 +10,10 @@ import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart'
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
+import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
@@ -39,7 +41,7 @@ class UserAvatarFab extends StatelessWidget {
   // Generate SVG asset path by index (1-based)
   static String _getSvgAsset(int index) => 'assets/icons/path$index.svg';
 
-  Future<MarkerIcon> _createUserAvatar(BuildContext context) async {
+  Future<Widget> _createUserAvatar(BuildContext context) async {
     final userRepository = getIt<UserRepository>();
     final interests = userInterests?.isEmpty == true 
         ? userRepository.userInterests 
@@ -77,7 +79,7 @@ class UserAvatarFab extends StatelessWidget {
         latitude: 0,
         longitude: 0,
         attributes: attrList,
-        profileKeywordDataMap: null,
+        profileKeywordDataMap: await userRepository.getProfileKeywordDataMap(),
         activePostingIds: List.empty(growable: false),
       ),
       distanceKm: 0,
@@ -88,26 +90,31 @@ class UserAvatarFab extends StatelessWidget {
     final index = userIdHashCode.abs() % _svgAssetCount;
     final selectedIconPath = _getSvgAsset(index + 1); // 1-based index
 
-    final attributes = userPoi.profile.attributes
-        ?.map((e) => e.uiStyleHint)
-        .whereType<String>()
-        .toList();
-
-    final svgString = await AvatarColorUtils.loadAndColorSvgFromAttributes(
-      assetPath: selectedIconPath,
-      attributes: attributes,
-      relevancyScore: userPoi.matchRelevancyScore,
-    );
-
-    // Create a local copy of the string to avoid reference issues
+    // Load SVG without color modification
+    final svgString = await rootBundle.loadString(selectedIconPath);
     final localSvgCopy = String.fromCharCodes(svgString.runes);
 
-    return MarkerIcon(
-      iconWidget: SvgPicture.string(
-        localSvgCopy,
-        width: AppDimensions.poiMarkerSize,
-        height: AppDimensions.poiMarkerSize,
-        key: ValueKey('poi_marker_${userPoi.profile.userId}'),
+    return RepaintBoundary(
+      child: CategoryStatsUtils.buildCategoryStatsCircle(
+        keywordMap: userPoi.profile.profileKeywordDataMap,
+        size: AppDimensions.poiMarkerSize,
+        strokeWidth: kIsWeb ? 3.0 : 6.0,
+        gapWidth: kIsWeb ? 1.0 : 2.0,
+        child: ClipOval(
+          child: SvgPicture.string(
+            localSvgCopy,
+            width: AppDimensions.poiMarkerSize,
+            height: AppDimensions.poiMarkerSize,
+            fit: BoxFit.contain,
+            allowDrawingOutsideViewBox: false,
+            placeholderBuilder: (context) => Container(
+              width: AppDimensions.poiMarkerSize,
+              height: AppDimensions.poiMarkerSize,
+              color: Colors.grey.shade200,
+            ),
+            key: ValueKey('poi_marker_${userPoi.profile.userId}'),
+          ),
+        ),
       ),
     );
   }
@@ -126,13 +133,13 @@ class UserAvatarFab extends StatelessWidget {
         ? userRepository.userOfferings 
         : userOfferings;
 
-    return FutureBuilder<MarkerIcon>(
+    return FutureBuilder<Widget>(
       future: _createUserAvatar(context),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const CircularProgressIndicator();
         }
-        final markerWidget = snapshot.data!.iconWidget!;
+        final avatarWidget = snapshot.data!;
 
         return GestureDetector(
           onTap: () async {
@@ -178,7 +185,7 @@ class UserAvatarFab extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: markerWidget,
+                child: avatarWidget,
               ),
               Positioned(
                 top: 0,

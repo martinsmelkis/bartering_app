@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 /// Utility class for calculating and displaying category statistics
@@ -97,5 +99,119 @@ class CategoryStatsUtils {
         ),
       ),
     );
+  }
+
+  /// Builds a widget displaying a colored circular border around an avatar
+  /// Each segment's arc length is proportional to its category's weight/relevancy
+  /// Always displays all 7 categories, even if keywordMap is null or empty
+  static Widget buildCategoryStatsCircle({
+    required Map<String, double>? keywordMap,
+    required Widget child,
+    double size = 80.0,
+    double strokeWidth = 4.0,
+    double gapWidth = 2.0,
+  }) {
+    final colorWeights = calculateColorWeights(keywordMap);
+
+    // Calculate total weight for normalization
+    final totalWeight = colorWeights.fold<double>(
+      0.0,
+      (sum, entry) => sum + entry.value,
+    );
+
+    // If total weight is 0 or invalid, show child without border
+    if (totalWeight <= 0) {
+      return SizedBox(
+        width: size,
+        height: size,
+        child: child,
+      );
+    }
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Circular border with colored segments
+          CustomPaint(
+            size: Size(size/2 + 5, size/2 + 5),
+            painter: _CategoryCirclePainter(
+              colorWeights: colorWeights,
+              totalWeight: totalWeight,
+              strokeWidth: strokeWidth,
+              gapWidth: gapWidth,
+            ),
+          ),
+          // Avatar/child centered inside
+          SizedBox(
+            width: size - (strokeWidth * 2) - 4,
+            height: size - (strokeWidth * 2) - 4,
+            child: child,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Custom painter for drawing the circular category border
+class _CategoryCirclePainter extends CustomPainter {
+  final List<MapEntry<Color, double>> colorWeights;
+  final double totalWeight;
+  final double strokeWidth;
+  final double gapWidth;
+
+  _CategoryCirclePainter({
+    required this.colorWeights,
+    required this.totalWeight,
+    required this.strokeWidth,
+    required this.gapWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width / 2) - (strokeWidth / 2);
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    // Start from the top (-90 degrees in radians)
+    double startAngle = -math.pi / 2;
+    
+    // Calculate total gap angle to subtract from full circle
+    final gapAngle = (gapWidth / (2 * math.pi * radius)) * 2 * math.pi;
+    final totalGapAngle = gapAngle * colorWeights.length;
+    final effectiveCircleAngle = 2 * math.pi - totalGapAngle;
+
+    for (final entry in colorWeights) {
+      final percentage = entry.value / totalWeight;
+      final sweepAngle = effectiveCircleAngle * percentage;
+
+      final paint = Paint()
+        ..color = entry.key
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawArc(
+        rect,
+        startAngle,
+        sweepAngle,
+        false,
+        paint,
+      );
+
+      // Move to next segment (including gap)
+      startAngle += sweepAngle + gapAngle;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _CategoryCirclePainter oldDelegate) {
+    return oldDelegate.colorWeights != colorWeights ||
+        oldDelegate.totalWeight != totalWeight ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.gapWidth != gapWidth;
   }
 }

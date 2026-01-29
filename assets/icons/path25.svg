@@ -1,46 +1,46 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 
     <!-- Face (soft, feminine oval) -->
-    <ellipse cx="256" cy="295" rx="105" ry="112" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+    <ellipse cx="256" cy="259" rx="105" ry="112" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
 
     <!-- Hair - Long straight -->
-    <path d="M 256 174
-          C 202 174, 162 190, 148 226
-          L 148 281
-          C 148 269, 152 257, 165 248
-          C 178 239, 195 234, 215 236
-          C 230 229, 243 227, 256 227
-          C 269 227, 282 229, 297 236
-          C 317 234, 334 239, 347 248
-          C 360 257, 364 269, 364 281
-          L 364 226
-          C 350 190, 310 174, 256 174 Z" fill="#1A1A1A" />
+    <path d="M 256 138
+          C 202 138, 162 154, 148 190
+          L 148 245
+          C 148 233, 152 221, 165 212
+          C 178 203, 195 198, 215 200
+          C 230 193, 243 191, 256 191
+          C 269 191, 282 193, 297 200
+          C 317 198, 334 203, 347 212
+          C 360 221, 364 233, 364 245
+          L 364 190
+          C 350 154, 310 138, 256 138 Z" fill="#1A1A1A" />
 
     <!-- Long straight hair sides -->
-    <path d="M 166 239 L 158 380" fill="none" stroke="#1A1A1A" stroke-width="36" stroke-linecap="butt" />
-    <path d="M 346 239 L 354 380" fill="none" stroke="#1A1A1A" stroke-width="36" stroke-linecap="butt" />
+    <path d="M 166 203 L 158 344" fill="none" stroke="#1A1A1A" stroke-width="36" stroke-linecap="butt" />
+    <path d="M 346 203 L 354 344" fill="none" stroke="#1A1A1A" stroke-width="36" stroke-linecap="butt" />
     
     <!-- Left eye (cheerful, large) -->
-    <circle cx="218" cy="285" r="13" fill="#1A1A1A" />
-    <circle cx="222" cy="281" r="4.5" fill="#FFFFFF" opacity="0.95" />
+    <circle cx="218" cy="249" r="13" fill="#1A1A1A" />
+    <circle cx="222" cy="245" r="4.5" fill="#FFFFFF" opacity="0.95" />
 
     <!-- Right eye (cheerful, large) -->
-    <circle cx="294" cy="285" r="13" fill="#1A1A1A" />
-    <circle cx="298" cy="281" r="4.5" fill="#FFFFFF" opacity="0.95" />
+    <circle cx="294" cy="249" r="13" fill="#1A1A1A" />
+    <circle cx="298" cy="245" r="4.5" fill="#FFFFFF" opacity="0.95" />
 
     <!-- Eyelashes -->
-    <path d="M 208 280 Q 203 276, 206 273" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
-    <path d="M 228 280 Q 233 276, 230 273" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
-    <path d="M 284 280 Q 279 276, 282 273" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
-    <path d="M 304 280 Q 309 276, 306 273" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 208 244 Q 203 240, 206 237" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 228 244 Q 233 240, 230 237" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 284 244 Q 279 240, 282 237" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
+    <path d="M 304 244 Q 309 240, 306 237" fill="none" stroke="#1A1A1A" stroke-width="2.5" />
 
     <!-- Eyebrows (delicate, curved) -->
-    <path d="M 203 268 Q 218 263, 233 268" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" />
-    <path d="M 279 268 Q 294 263, 309 268" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" />
+    <path d="M 203 232 Q 218 227, 233 232" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" />
+    <path d="M 279 232 Q 294 227, 309 232" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" />
 
     <!-- Nose (small) -->
-    <circle cx="256" cy="318" r="5" fill="#1A1A1A" />
+    <circle cx="256" cy="282" r="5" fill="#1A1A1A" />
 
     <!-- Mouth (bright smile) -->
-    <path d="M 228 355 Q 256 368, 284 355" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+    <path d="M 228 319 Q 256 332, 284 319" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
 </svg>

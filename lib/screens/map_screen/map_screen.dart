@@ -15,7 +15,7 @@ import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
-import 'package:barter_app/utils/avatar_color_utils.dart';
+import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/widgets/online_status_badge.dart';
 import 'package:flutter/foundation.dart';
@@ -136,6 +136,37 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         }
       });
     });
+  }
+
+  @override
+  void didUpdateWidget(MapScreenV2 oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // Handle when new initialPois are provided via navigation
+    // This happens when using context.go() to navigate to an already-mounted map
+    if (widget.initialPois != null && 
+        widget.initialPois!.isNotEmpty &&
+        widget.initialPois != oldWidget.initialPois) {
+      logDebug('@@@@@@@@@ didUpdateWidget - New initialPois detected: ${widget.initialPois!.length}');
+      
+      // If map is ready, process immediately
+      if (_isMapReady && _mapController.isAllLayersVisible) {
+        final firstPoi = widget.initialPois!.first;
+        logDebug('@@@@@@@@@ didUpdateWidget - Centering map on POI: ${firstPoi.profile.userId}');
+        
+        _mapController.setZoom(zoomLevel: 15.0);
+        _mapController.moveTo(
+          GeoPoint(
+            latitude: firstPoi.profile.latitude ?? 0.0,
+            longitude: firstPoi.profile.longitude ?? 0.0,
+          ),
+        );
+        _processPois(widget.initialPois!);
+      } else {
+        // Map not ready yet, will be handled in _onMapReady
+        logDebug('@@@@@@@@@ didUpdateWidget - Map not ready, will process in _onMapReady');
+      }
+    }
   }
 
   Future<void> _loadUserProfile() async {
@@ -267,10 +298,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   void _onMapReady(bool isReady) async {
     _isMapReady = true;
+    logDebug('@@@@@@@@@ _onMapReady called with initialPois: ${widget.initialPois?.length ?? 0}');
     // If initial POIs were provided (e.g., from match history), use them instead of fetching
     if (widget.initialPois != null && widget.initialPois!.isNotEmpty) {
       // Center map on the first POI
       final firstPoi = widget.initialPois!.first;
+      logDebug('@@@@@@@@@ Centering map on POI: ${firstPoi.profile.userId} at ${firstPoi.profile.latitude}, ${firstPoi.profile.longitude}');
       _mapController.setZoom(zoomLevel: 15.0);
       _mapController.moveTo(
         GeoPoint(latitude: firstPoi.profile.latitude ?? 0.0,
@@ -299,6 +332,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   void _processPois(List<PointOfInterest> pois, {bool ignoreListViewSetting = false}) async {
+    logDebug('@@@@@@@@@ _processPois called with ${pois.length} POIs');
     _allPois = List.from(pois);
 
     mapOperationsCubit.reset();
@@ -450,7 +484,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               position,
               markerIcon: subClusterMarker,
             );
-            _currentMarkerPositions.add(position);
+                          _currentMarkerPositions.add(position);
           }
         }
         for (var poi in mainCluster.individualPoisWithinExpandedCluster) {
@@ -465,7 +499,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             position,
             markerIcon: poiMarker,
           );
-          _currentMarkerPositions.add(position);
+                        _currentMarkerPositions.add(position);
         }
       } else {
         if (!_isRenderOperationValid(currentOperation)) return;
@@ -477,7 +511,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           markerIcon: mainClusterMarker,
         );
         mainCluster.isExpanded = false;
-        _currentMarkerPositions.add(position);
+                      _currentMarkerPositions.add(position);
       }
     }
 
@@ -497,7 +531,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             position,
             markerIcon: svg,
           );
-          _currentMarkerPositions.add(position);
+                        _currentMarkerPositions.add(position);
         }
       } else {
         logDebug('@@@@@@@@@@@ Loose sub-cluster ${looseSubCluster.id} COLLAPSED - adding cluster marker');
@@ -509,7 +543,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           position,
           markerIcon: _createSubClusterMarker(looseSubCluster, l10n),
         );
-        _currentMarkerPositions.add(position);
+                      _currentMarkerPositions.add(position);
       }
     }
 
@@ -527,7 +561,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         position,
         markerIcon: svg,
       );
-      _currentMarkerPositions.add(position);
+                    _currentMarkerPositions.add(position);
     }
 
     if (zoomLevelNotifier.value.toDouble() <= 13.5) {
@@ -618,22 +652,45 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     final index = userIdHashCode.abs() % _svgAssetCount;
     final selectedIconPath = _getSvgAsset(index + 1); // 1-based index
 
-    final svgString = await _loadAndModifySvg(selectedIconPath, poi);
-    // Create a local copy of the string to avoid reference issues
+    // Load SVG without color modification
+    final svgString = await rootBundle.loadString(selectedIconPath);
     final localSvgCopy = String.fromCharCodes(svgString.runes);
 
     // Check if there's a match between user interests/offerings and POI offerings/interests
     final hasMatch = TextUtils.checkForAttributeBarterMatch(poi, _userInterests, _userOfferings);
 
+    // Calculate sizes for circle 30% closer to SVG with 2x thicker stroke
+    final strokeWidth = kIsWeb ? 6.0 : 11.0;
+    final circleSize = AppDimensions.poiMarkerSize;
+    final gap = strokeWidth + 2;
+    final svgSize = circleSize - gap;
+
     return MarkerIcon(
-      iconWidget: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          SvgPicture.string(
-            localSvgCopy,
-            width: AppDimensions.poiMarkerSize,
-            height: AppDimensions.poiMarkerSize,
-            key: ValueKey('poi_marker_${poi.profile.userId}'),
+      iconWidget: RepaintBoundary(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+          // Circular colored border around avatar based on profileKeywordDataMap
+          CategoryStatsUtils.buildCategoryStatsCircle(
+            keywordMap: poi.profile.profileKeywordDataMap,
+            size: circleSize,
+            strokeWidth: strokeWidth,
+            gapWidth: kIsWeb ? 1.0 : 1.0,
+            child: ClipOval(
+              child: SvgPicture.string(
+                localSvgCopy,
+                width: svgSize,
+                height: svgSize,
+                fit: BoxFit.contain,
+                allowDrawingOutsideViewBox: false,
+                placeholderBuilder: (context) => Container(
+                  width: svgSize,
+                  height: svgSize,
+                  color: Colors.grey.shade200,
+                ),
+                key: ValueKey('poi_marker_${poi.profile.userId}'),
+              ),
+            ),
           ),
           // Online status badge - positioned closer to the edge
           PositionedOnlineStatusBadge(
@@ -674,20 +731,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                 ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
-    );
-  }
-
-  /// Loads an SVG asset and replaces the default color with a color based on POI attributes
-  Future<String> _loadAndModifySvg(String assetPath, PointOfInterest poi) async {
-    final attributes = poi.profile.attributes?.map((e) => e.uiStyleHint).whereType<String>().toList();
-
-    return AvatarColorUtils.loadAndColorSvgFromAttributes(
-        assetPath: assetPath,
-        attributes: attributes,
-        relevancyScore: poi.matchRelevancyScore,
-        profileKeywordDataMap: poi.profile.profileKeywordDataMap
     );
   }
 
@@ -1255,6 +1301,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       markerIcon: marker,
     );
     _currentMarkerPositions.add(mapCenter);
+    // On web, give DOM time to process the marker iframe creation
+    if (kIsWeb) {
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
   }
 
   void _removeNoUsersMarker() {

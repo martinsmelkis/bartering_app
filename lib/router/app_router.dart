@@ -90,7 +90,18 @@ class AppRouter {
       GoRoute(
         path: '/map',
         name: 'map',
-        builder: (context, state) => const MapScreenV2(),
+        builder: (context, state) {
+          // Support passing initialPois via extra parameter
+          final extra = state.extra;
+          logDebug('@@@@@@@@@ Map route builder - extra type: ${extra.runtimeType}, content: $extra');
+          if (extra is Map<String, dynamic> && extra['initialPois'] != null) {
+            final initialPois = extra['initialPois'];
+            logDebug('@@@@@@@@@ Map route - initialPois type: ${initialPois.runtimeType}, length: ${initialPois is List ? initialPois.length : "N/A"}');
+            return MapScreenV2(initialPois: initialPois);
+          }
+          logDebug('@@@@@@@@@ Map route - No initialPois, using default MapScreenV2');
+          return const MapScreenV2();
+        },
       ),
 
       // Home (redirect to map)
@@ -252,5 +263,13 @@ class AppRouter {
   /// Navigate to settings
   static void navigateToSettings() {
     router.go('/settings');
+  }
+
+  /// Navigate to map with initial POIs (e.g., from match history)
+  static void navigateToMapWithPois(List<dynamic> initialPois) {
+    logDebug('🧭 AppRouter.navigateToMapWithPois called with ${initialPois.length} POIs');
+    router.go('/map', extra: {
+      'initialPois': initialPois,
+    });
   }
 }

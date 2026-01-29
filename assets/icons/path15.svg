@@ -1,50 +1,50 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 
     <!-- Face (square jaw, masculine) -->
-    <path d="M 256 405
-           C 185 405, 148 365, 148 335
-           L 148 235
-           C 148 195, 193 160, 256 160
-           C 319 160, 364 195, 364 235
-           L 364 335
-           C 364 365, 327 405, 256 405 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+    <path d="M 256 374
+          C 185 374, 148 334, 148 304
+          L 148 204
+          C 148 164, 193 129, 256 129
+          C 319 129, 364 164, 364 204
+          L 364 304
+          C 364 334, 327 374, 256 374 Z" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
 
     <!-- Hair - Buzz cut/military style -->
-    <path d="M 256 155
-           C 200 155, 160 175, 145 220
-           L 145 240
-           C 145 225, 150 210, 165 200
-           C 180 190, 200 185, 225 185
-           C 235 182, 245 180, 256 180
-           C 267 180, 277 182, 287 185
-           C 312 185, 332 190, 347 200
-           C 362 210, 367 225, 367 240
-           L 367 220
-           C 352 175, 312 155, 256 155 Z" fill="#1A1A1A" />
+    <path d="M 256 124
+          C 200 124, 160 144, 145 189
+          L 145 209
+          C 145 194, 150 179, 165 169
+          C 180 159, 200 154, 225 154
+          C 235 151, 245 149, 256 149
+          C 267 149, 277 151, 287 154
+          C 312 154, 332 159, 347 169
+          C 362 179, 367 194, 367 209
+          L 367 189
+          C 352 144, 312 124, 256 124 Z" fill="#1A1A1A" />
 
     <!-- Short hair texture -->
-    <path d="M 170 195 L 172 200 M 185 190 L 187 195 M 200 187 L 202 192" fill="none" stroke="#1A1A1A" stroke-width="2" />
-    <path d="M 312 187 L 310 192 M 327 190 L 325 195 M 342 195 L 340 200" fill="none" stroke="#1A1A1A" stroke-width="2" />
+    <path d="M 170 164 L 172 169 M 185 159 L 187 164 M 200 156 L 202 161" fill="none" stroke="#1A1A1A" stroke-width="2" />
+    <path d="M 312 156 L 310 161 M 327 159 L 325 164 M 342 164 L 340 169" fill="none" stroke="#1A1A1A" stroke-width="2" />
 
     <!-- Left eye (narrow, focused) -->
-    <circle cx="213" cy="270" r="11" fill="#1A1A1A" />
-    <circle cx="216" cy="267" r="3" fill="#FFFFFF" opacity="0.7" />
+    <circle cx="213" cy="239" r="11" fill="#1A1A1A" />
+    <circle cx="216" cy="236" r="3" fill="#FFFFFF" opacity="0.7" />
 
     <!-- Right eye (narrow, focused) -->
-    <circle cx="299" cy="270" r="11" fill="#1A1A1A" />
-    <circle cx="302" cy="267" r="3" fill="#FFFFFF" opacity="0.7" />
+    <circle cx="299" cy="239" r="11" fill="#1A1A1A" />
+    <circle cx="302" cy="236" r="3" fill="#FFFFFF" opacity="0.7" />
 
     <!-- Strong eyebrows -->
-    <path d="M 195 252 Q 213 245, 230 251" fill="none" stroke="#1A1A1A" stroke-width="7"
+    <path d="M 195 221 Q 213 214, 230 220" fill="none" stroke="#1A1A1A" stroke-width="7"
         stroke-linecap="round" />
-    <path d="M 282 252 Q 299 245, 317 251" fill="none" stroke="#1A1A1A" stroke-width="7"
+    <path d="M 282 221 Q 299 214, 317 220" fill="none" stroke="#1A1A1A" stroke-width="7"
         stroke-linecap="round" />
 
     <!-- Nose (defined) -->
-    <path d="M 256 295 L 256 325 M 248 325 Q 256 330, 264 325" fill="none" stroke="#1A1A1A"
+    <path d="M 256 264 L 256 294 M 248 294 Q 256 299, 264 294" fill="none" stroke="#1A1A1A"
         stroke-width="7" stroke-linecap="round" />
 
-	<path d="M 220 360 Q 256 367, 292 360" fill="none" stroke="#1A1A1A" stroke-width="5"
+	<path d="M 220 329 Q 256 336, 292 329" fill="none" stroke="#1A1A1A" stroke-width="5"
         stroke-linecap="round" />
 		
 </svg>
