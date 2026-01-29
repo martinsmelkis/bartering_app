@@ -373,8 +373,15 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       return;
     }
 
+    // Only perform main clustering if zoom level requires it and POIs have changed
     if (zoomLevelNotifier.value.toDouble() <= 13.5) {
-      mapOperationsCubit.performMainClustering(_allPois);
+      if (mapOperationsCubit.shouldPerformMainClustering(_allPois, zoomLevelNotifier.value.toDouble())) {
+        logDebug('@@@@@@@@@ Performing main clustering for ${_allPois.length} POIs at zoom ${zoomLevelNotifier.value}');
+        mapOperationsCubit.performMainClustering(_allPois);
+        mapOperationsCubit.updateClusteringTracking(_allPois, zoomLevelNotifier.value.toDouble());
+      } else {
+        logDebug('@@@@@@@@@ Skipping main clustering - POIs and zoom unchanged');
+      }
     }
 
     // Only update visuals if map is ready
@@ -391,6 +398,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       return;
     }
   }
+
+
 
   void _cleanUpMarkers() {
     // Remove all existing markers from previous render
@@ -484,7 +493,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               position,
               markerIcon: subClusterMarker,
             );
-                          _currentMarkerPositions.add(position);
+            _currentMarkerPositions.add(position);
           }
         }
         for (var poi in mainCluster.individualPoisWithinExpandedCluster) {
@@ -499,7 +508,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             position,
             markerIcon: poiMarker,
           );
-                        _currentMarkerPositions.add(position);
+          _currentMarkerPositions.add(position);
         }
       } else {
         if (!_isRenderOperationValid(currentOperation)) return;
@@ -511,7 +520,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           markerIcon: mainClusterMarker,
         );
         mainCluster.isExpanded = false;
-                      _currentMarkerPositions.add(position);
+        _currentMarkerPositions.add(position);
       }
     }
 
@@ -531,7 +540,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             position,
             markerIcon: svg,
           );
-                        _currentMarkerPositions.add(position);
+          _currentMarkerPositions.add(position);
         }
       } else {
         logDebug('@@@@@@@@@@@ Loose sub-cluster ${looseSubCluster.id} COLLAPSED - adding cluster marker');
@@ -543,7 +552,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           position,
           markerIcon: _createSubClusterMarker(looseSubCluster, l10n),
         );
-                      _currentMarkerPositions.add(position);
+        _currentMarkerPositions.add(position);
       }
     }
 
@@ -561,13 +570,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         position,
         markerIcon: svg,
       );
-                    _currentMarkerPositions.add(position);
+      _currentMarkerPositions.add(position);
     }
-
-    if (zoomLevelNotifier.value.toDouble() <= 13.5) {
-      mapOperationsCubit.performMainClustering(_allPois);
-    }
-
     _isUpdatingVisuals = false;
   }
 
@@ -939,8 +943,24 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                           _mapController.getZoom().then((v) {
                             print('@@@@@@@@@@ MAP MOVED: ${((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs()} '
                                 '${((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs()}');
+                            final newZoom = v.toDouble();
                             zoomLevelNotifier.value = v.toInt();
-                            mapOperationsCubit.currentZoom = zoomLevelNotifier.value.toDouble();
+                            mapOperationsCubit.currentZoom = newZoom;
+                            
+                            // Check if main clustering is needed due to zoom change
+                            // Only perform if we have POIs and zoom is in clustering range
+                            if (_allPois.isNotEmpty && newZoom <= 13.5) {
+                              if (mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom)) {
+                                logDebug('@@@@@@@@@ Zoom changed to $newZoom - performing main clustering');
+                                mapOperationsCubit.performMainClustering(_allPois);
+                                mapOperationsCubit.updateClusteringTracking(_allPois, newZoom);
+                              }
+                            } else if (newZoom > 13.5) {
+                              // Zoomed in past clustering threshold - reset tracking
+                              logDebug('@@@@@@@@@ Zoomed past clustering threshold - resetting tracking');
+                              mapOperationsCubit.resetClusteringTracking();
+                            }
+                            
                             mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
                           });
                         }

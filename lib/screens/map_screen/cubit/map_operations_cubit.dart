@@ -1,3 +1,4 @@
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/geo_utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -32,6 +33,10 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
 
   String? lastAutoCollapsedMainClusterId;
   Set<String> lastAutoCollapsedSubClusterIds = {};
+
+  // Track POIs and zoom level used for last clustering to avoid redundant operations
+  List<String> _lastClusteredPoiIds = [];
+  double _lastClusteringZoom = -1.0;
 
   MapOperationsCubit() : super(MapOperationsInitial());
 
@@ -348,6 +353,56 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     expandedSubClusterIds.clear();
     lastAutoCollapsedMainClusterId = null;
     lastAutoCollapsedSubClusterIds.clear();
+    // Reset clustering tracking
+    _lastClusteredPoiIds = [];
+    _lastClusteringZoom = -1.0;
+  }
+
+  /// Check if main clustering should be performed based on POI changes and zoom level
+  bool shouldPerformMainClustering(List<PointOfInterest> pois, double currentZoom) {
+    // If never clustered before, do it now
+    if (_lastClusteredPoiIds.isEmpty) {
+      return true;
+    }
+    
+    // Get current POI IDs
+    final currentPoiIds = pois.map((poi) => poi.profile.userId).toList()..sort();
+    
+    // Check if POIs have changed (different set or different count)
+    if (currentPoiIds.length != _lastClusteredPoiIds.length) {
+      logDebug('@@@@@@@@@ POI count changed: ${_lastClusteredPoiIds.length} -> ${currentPoiIds.length}');
+      return true;
+    }
+
+    // Check if any POI IDs are different
+    for (int i = 0; i < currentPoiIds.length; i++) {
+      if (currentPoiIds[i] != _lastClusteredPoiIds[i]) {
+        logDebug('@@@@@@@@@ POI set changed');
+        return true;
+      }
+    }
+
+    // Check if zoom level has changed significantly (more than 1.0 level)
+    // Increased threshold to avoid re-clustering on small zoom changes
+    if ((_lastClusteringZoom - currentZoom).abs() > 1.0) {
+      logDebug('@@@@@@@@@ Zoom changed significantly: $_lastClusteringZoom -> $currentZoom');
+      return true;
+    }
+    
+    // POIs and zoom are essentially the same, skip clustering
+    return false;
+  }
+
+  /// Update tracking variables after performing main clustering
+  void updateClusteringTracking(List<PointOfInterest> pois, double zoom) {
+    _lastClusteredPoiIds = pois.map((poi) => poi.profile.userId).toList()..sort();
+    _lastClusteringZoom = zoom;
+  }
+
+  /// Reset clustering tracking (e.g., when zooming past clustering threshold)
+  void resetClusteringTracking() {
+    _lastClusteredPoiIds = [];
+    _lastClusteringZoom = -1.0;
   }
 
   /// Calculates which POIs are truly individual (not part of any cluster)
