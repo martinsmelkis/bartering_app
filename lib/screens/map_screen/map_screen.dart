@@ -343,20 +343,22 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       final poiPanelCubit = context.read<PoiPanelCubit>();
 
       if (showAsList && _allPois.isNotEmpty) {
-        // Only show search results list if POI panel is NOT currently open
-        // If user clicked on a POI to view details, don't override it with the list
-        if (!poiPanelCubit.state.isOpen) {
-          // Show list view
+        // Update search results if list is already showing OR if POI panel is not open
+        if (_showSearchResultsList || !poiPanelCubit.state.isOpen) {
+          logDebug('@@@@@@@@@ Updating search results list with ${_allPois.length} POIs (key: $_searchResultsKey)');
+          // Show/update list view
           setState(() {
-            _searchResults = _allPois;
+            _searchResults = List.from(_allPois); // Create new list to trigger update
             _showSearchResultsList = true;
+            _searchResultsKey++; // Force rebuild of list view widget
           });
 
-          // On small screens, return early (list only, no map markers)
-          // On large screens, continue to show markers on map alongside the list
-          if (!context.canShowSideBySide) {
+          // On small screens, return early (list only, no map markers) only if POI panel is closed
+          if (!context.canShowSideBySide && !poiPanelCubit.state.isOpen) {
             shouldShowListOnly = true;
           }
+        } else {
+          logDebug('@@@@@@@@@ NOT updating search results list - list not showing and POI panel is open');
         }
       }
     }
@@ -366,15 +368,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       return;
     }
 
-    // Only perform main clustering if zoom level requires it and POIs have changed
-    if (zoomLevelNotifier.value.toDouble() <= 13.5) {
-      if (mapOperationsCubit.shouldPerformMainClustering(_allPois, zoomLevelNotifier.value.toDouble())) {
-        logDebug('@@@@@@@@@ Performing main clustering for ${_allPois.length} POIs at zoom ${zoomLevelNotifier.value}');
-        mapOperationsCubit.performMainClustering(_allPois);
-        mapOperationsCubit.updateClusteringTracking(_allPois, zoomLevelNotifier.value.toDouble());
-      } else {
-        logDebug('@@@@@@@@@ Skipping main clustering - POIs and zoom unchanged');
-      }
+    // Force cluster refresh to clear old markers from previous search
+    if (zoomLevelNotifier.value.toDouble() <= 14) {
+      logDebug('@@@@@@@@@ Force performing main clustering for ${_allPois.length} POIs at zoom ${zoomLevelNotifier.value}');
+      mapOperationsCubit.performMainClustering(_allPois);
+      mapOperationsCubit.updateClusteringTracking(_allPois, zoomLevelNotifier.value.toDouble());
     }
 
     // Only update visuals if map is ready
@@ -395,6 +393,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
 
   void _cleanUpMarkers() {
+    logDebug('@@@@@@@@@ _cleanUpMarkers: Removing ${_currentMarkerPositions.length} markers');
     // Remove all existing markers from previous render
     if (_currentMarkerPositions.isNotEmpty) {
       for (var position in _currentMarkerPositions.toList()) {
@@ -410,6 +409,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
     // Clear the tracking set and rebuild it
     _currentMarkerPositions.clear();
+    logDebug('@@@@@@@@@ _cleanUpMarkers: Complete, tracking set cleared');
   }
 
   /// Checks if the current render operation is still valid
@@ -435,7 +435,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Prevent concurrent updates
     if (_isUpdatingVisuals) {
       logDebug('@@@@@@@@@@@ Already updating visuals, skipping...');
-      _isUpdatingVisuals = false;
       //return;
     }
     _cleanUpMarkers();
