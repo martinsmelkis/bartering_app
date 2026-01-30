@@ -10,6 +10,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/user/parsed_attribute_data.dart';
 import '../../utils/attribute_style_helper.dart';
 import '../../utils/text_utils.dart';
+import '../../widgets/responsive_center_container.dart';
 
 class InterestsScreen extends StatelessWidget {
   bool? isInitialOnboarding = true;
@@ -83,20 +84,17 @@ class _InterestsViewState extends State<InterestsView> {
                 appBar: AppBar(
                   title: Text(l10n.selectYourInterests),
                 ),
-                body: BlocBuilder<InterestsCubit, InterestsState>(
-                  builder: (context, innerState) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Scrollable content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Pre-defined interests
+                body: ResponsiveCenterContainer(
+                  maxWidth: 700.0,
+                  child: BlocBuilder<InterestsCubit, InterestsState>(
+                    builder: (context, innerState) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Pre-defined interests
                           Wrap(
                             spacing: 8.0,
                             runSpacing: 8.0,
@@ -179,13 +177,9 @@ class _InterestsViewState extends State<InterestsView> {
                               );
                             }).toList(),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Submit button - stays at bottom
-                  Center(
+                    const SizedBox(height: 16),
+                    // Submit button
+                    Center(
                     child: ElevatedButton(
                       onPressed: () {
                         final locale = Localizations.localeOf(context);
@@ -201,7 +195,8 @@ class _InterestsViewState extends State<InterestsView> {
             );
           },
         ),
-              ),
+                  ),
+                ),
               // Loading overlay when submitting
               if (state.status == InterestsStatus.loading)
                 Container(

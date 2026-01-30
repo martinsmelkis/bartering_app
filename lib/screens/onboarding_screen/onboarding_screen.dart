@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/text_utils.dart';
 import '../../utils/debug_utils.dart';
+import '../../widgets/responsive_center_container.dart';
 import 'cubit/onboarding_cubit.dart';
 
 // --- Data Models for the new Onboarding Screen ---
@@ -230,12 +231,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   Scaffold(
                     body: SafeArea(
-                      child: Column(
-                        children: [
-                          // Title section
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 16.0),
-                            child: Text(
+                      child: ResponsiveCenterContainer(
+                        maxWidth: 700.0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Title section
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 16.0),
+                              child: Text(
                               'Share your interests to find the best matches with others!',
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -252,12 +256,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ),
                             ),
                           ),
-                          Expanded(
-                            child: ListView.builder(
-                              padding: const EdgeInsets.all(16.0),
-                              itemCount: _categories.length,
-                              itemBuilder: (context, index) {
-                                final category = _categories[index];
+                          // Category cards
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: _categories.asMap().entries.map((entry) {
+                                final index = entry.key;
+                                final category = entry.value;
                                 // Convert stored value (0.0-1.0) to slider range (0-100)
                                 final savedValue = _answers[category.titleKey];
                                 final sliderValue = savedValue != null
@@ -274,7 +280,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     });
                                   },
                                 );
-                              },
+                              }).toList(),
                             ),
                           ),
                           Padding(
@@ -299,6 +305,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                         ],
+                      ),
                       ),
                     ),
                   ),

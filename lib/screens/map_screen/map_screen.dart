@@ -973,7 +973,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
                     // Search complementary users button (with fallback to nearby)
                     Positioned(
-                      top: kIsWeb ? 24 : (topPadding ?? 20.0),
+                      top: kIsWeb ? 28 : (topPadding ?? 20.0),
                       right: 56,
                       child: PointerInterceptor(
                         child: Container(
