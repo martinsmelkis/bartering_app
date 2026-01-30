@@ -13,7 +13,7 @@ class AppDimensions {
   // ============================================================================
 
   /// Size for POI markers on the map
-  static double get poiMarkerSize => kIsWeb ? 75 : 174;
+  static double get poiMarkerSize => kIsWeb ? 90 : 174;
 
   /// Size for user avatar FAB
   static double get userAvatarSize => kIsWeb ? 88.4 : 90.0;

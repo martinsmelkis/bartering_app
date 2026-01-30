@@ -6,6 +6,7 @@ import 'package:barter_app/screens/map_screen/widgets/drawer_main.dart';
 import 'package:barter_app/screens/map_screen/widgets/invite_friends_dialog.dart';
 import 'package:barter_app/screens/map_screen/widgets/main_navigation.dart';
 import 'package:barter_app/screens/map_screen/widgets/poi_details_bottom_sheet.dart';
+import 'package:barter_app/screens/map_screen/widgets/poi_marker_widget.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_in_map.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_results_list_view.dart';
 import 'package:barter_app/screens/map_screen/widgets/user_avatar_fab.dart';
@@ -15,9 +16,7 @@ import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
-import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
-import 'package:barter_app/widgets/online_status_badge.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,7 +32,6 @@ import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/messaging/firebase_service.dart';
 import '../../utils/geo_utils.dart';
 import '../../utils/responsive_breakpoints.dart';
-import '../../utils/text_utils.dart';
 import '../chat_screen/chat_screen.dart';
 import '../chat_screen/adaptive_chat_layout.dart';
 import '../settings_screen/adaptive_settings_layout.dart';
@@ -86,11 +84,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   bool _isUpdatingVisuals = false; // Prevent concurrent updates
   Region? _previousMapRegion = null;
   GeoPoint? _noUsersMarkerPosition; // Position of the "no users nearby" marker
-  // Avatar SVG assets (dynamically generated)
-  static const int _svgAssetCount = 29;
-
-  // Generate SVG asset path by index (1-based)
-  static String _getSvgAsset(int index) => 'assets/icons/path$index.svg';
 
   late PoiCubit poiCubit;
   late MapOperationsCubit mapOperationsCubit;
@@ -105,7 +98,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   // GlobalKey to preserve Scaffold state and prevent map rebuilds
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  
+
   // GlobalKey to preserve map content and prevent rebuilds when panels open
   final GlobalKey _mapContentKey = GlobalKey();
 
@@ -141,19 +134,19 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   @override
   void didUpdateWidget(MapScreenV2 oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Handle when new initialPois are provided via navigation
     // This happens when using context.go() to navigate to an already-mounted map
-    if (widget.initialPois != null && 
+    if (widget.initialPois != null &&
         widget.initialPois!.isNotEmpty &&
         widget.initialPois != oldWidget.initialPois) {
       logDebug('@@@@@@@@@ didUpdateWidget - New initialPois detected: ${widget.initialPois!.length}');
-      
+
       // If map is ready, process immediately
       if (_isMapReady && _mapController.isAllLayersVisible) {
         final firstPoi = widget.initialPois!.first;
         logDebug('@@@@@@@@@ didUpdateWidget - Centering map on POI: ${firstPoi.profile.userId}');
-        
+
         _mapController.setZoom(zoomLevel: 15.0);
         _mapController.moveTo(
           GeoPoint(
@@ -194,7 +187,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   /// Auto-open user profile panel on web/large screens for better UX
   void _autoOpenProfileOnWebLargeScreen() {
     if (!mounted) return;
-    
+
     // Check if we're on web/large screen (can show side-by-side)
     if (kIsWeb && context.canShowSideBySide) {
       // Wait for user profile to be loaded
@@ -212,22 +205,22 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   /// Perform default search based on settings
   Future<void> _performDefaultSearch() async {
     if (!mounted) return;
-    
+
     // Ensure user profile is loaded before searching
     if (_currentUserId == null) {
       // Wait a bit and try again
       await Future.delayed(const Duration(milliseconds: 100));
       if (_currentUserId == null) return; // Give up if still not loaded
     }
-    
+
     final settingsService = getIt<SettingsService>();
     final searchType = await settingsService.getDefaultSearchType();
     final useMapCenter = await settingsService.getUseMapCenterForSearch();
     final radiusKm = await settingsService.getNearbyUsersRadius();
-    
+
     double? lat;
     double? lon;
-    
+
     // Get coordinates based on settings
     if (useMapCenter && _isMapReady) {
       try {
@@ -240,7 +233,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       }
     }
     // If not using map center, lat/lon will be null and methods will use user's saved location
-    
+
     // Perform search based on default type
     switch (searchType) {
       case 'complementary':
@@ -313,7 +306,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     } else {
       // Default behavior: zoom to saved location and perform default search
       await _zoomToSavedLocation();
-      
+
       // Check if user has a saved location before performing search
       final locationString = await SecureStorageService().getOwnLocation();
       if (locationString != null && locationString.isNotEmpty) {
@@ -323,7 +316,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         debugPrint('⚠️ No user location set yet - skipping initial search');
         // Optionally show a message to the user that they need to set their location
       }
-      
+
       // If POIs were already loaded before map was ready, process them now
       if (_allPois.isNotEmpty) {
         _processPois(_allPois);
@@ -358,7 +351,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             _searchResults = _allPois;
             _showSearchResultsList = true;
           });
-          
+
           // On small screens, return early (list only, no map markers)
           // On large screens, continue to show markers on map alongside the list
           if (!context.canShowSideBySide) {
@@ -367,7 +360,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         }
       }
     }
-    
+
     // If showing list only (small screens), don't render map markers
     if (shouldShowListOnly) {
       return;
@@ -582,7 +575,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     if (context.canShowSideBySide) {
       final poiPanelCubit = context.read<PoiPanelCubit>();
       poiPanelCubit.openPoiDetails(poi);
-      
+
       // If search results list is open, POI will show below it
       // If not, POI will show as a side panel via AdaptivePoiLayout
     } else {
@@ -645,99 +638,18 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   Future<MarkerIcon> _createPoiMarker(PointOfInterest poi, AppLocalizations l10n, {bool isSelfAvatar = false}) async {
-    // Use the POI's userId to get a consistent random icon
+    // Load user interests/offerings if needed
     if (isSelfAvatar) {
       final userRepository = getIt<UserRepository>();
       _userInterests = await userRepository.getInterests(loadFromStorage: true);
       _userOfferings = await userRepository.getOfferings(loadFromStorage: true);
     }
-    final userIdHashCode = poi.profile.userId.hashCode;
-    logDebug('@@@@@@@@@@ Creating POI marker for ${poi.profile.userId}, hashCode: $userIdHashCode');
-    final index = userIdHashCode.abs() % _svgAssetCount;
-    final selectedIconPath = _getSvgAsset(index + 1); // 1-based index
 
-    // Load SVG without color modification
-    final svgString = await rootBundle.loadString(selectedIconPath);
-    final localSvgCopy = String.fromCharCodes(svgString.runes);
-
-    // Check if there's a match between user interests/offerings and POI offerings/interests
-    final hasMatch = TextUtils.checkForAttributeBarterMatch(poi, _userInterests, _userOfferings);
-
-    // Calculate sizes for circle 30% closer to SVG with 2x thicker stroke
-    final strokeWidth = kIsWeb ? 6.0 : 11.0;
-    final circleSize = AppDimensions.poiMarkerSize;
-    final gap = strokeWidth + 2;
-    final svgSize = circleSize - gap;
-
-    return MarkerIcon(
-      iconWidget: RepaintBoundary(
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-          // Circular colored border around avatar based on profileKeywordDataMap
-          CategoryStatsUtils.buildCategoryStatsCircle(
-            keywordMap: poi.profile.profileKeywordDataMap,
-            size: circleSize,
-            strokeWidth: strokeWidth,
-            gapWidth: kIsWeb ? 1.0 : 1.0,
-            child: ClipOval(
-              child: SvgPicture.string(
-                localSvgCopy,
-                width: svgSize,
-                height: svgSize,
-                fit: BoxFit.contain,
-                allowDrawingOutsideViewBox: false,
-                placeholderBuilder: (context) => Container(
-                  width: svgSize,
-                  height: svgSize,
-                  color: Colors.grey.shade200,
-                ),
-                key: ValueKey('poi_marker_${poi.profile.userId}'),
-              ),
-            ),
-          ),
-          // Online status badge - positioned closer to the edge
-          PositionedOnlineStatusBadge(
-            isOnline: poi.isOnline,
-            isAway: poi.isAway,
-            size: kIsWeb ? 12: 25,
-            right: kIsWeb ? 12: 33,
-            top: kIsWeb ? 12: 33,
-            borderWidth: 2.5,
-          ),
-          // Match indicator - positioned at bottom right
-          if (hasMatch)
-            Positioned(
-              right: kIsWeb ? 12: 25,
-              bottom: kIsWeb ? 12: 25,
-              child: Container(
-                width: kIsWeb ? 18 : 42,
-                height: kIsWeb ? 18 : 42,
-                decoration: BoxDecoration(
-                  color: AppColors.secondary,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: kIsWeb ? 1 : 2,  // Proportionally smaller border
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: kIsWeb ? 1.6 : 4,  // Proportionally smaller shadow
-                      offset: Offset(0, kIsWeb ? 1 : 2),  // Proportionally smaller offset
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.handshake,
-                  size: kIsWeb ? 15 : 30,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    // Delegate to the refactored widget class
+    return await PoiMarkerWidget.createMarker(
+      poi: poi,
+      userInterests: _userInterests,
+      userOfferings: _userOfferings,
     );
   }
 
@@ -877,12 +789,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                 if (state is PoiAuthenticationError) {
                   // Clear all keys
                   await SecureStorageService().clearStorage();
-                  
+
                   // Use addPostFrameCallback to avoid navigator lock issues
                   if (context.mounted) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (!context.mounted) return;
-                      
+
                       if (kIsWeb) {
                         // On web with page-based navigation, use SystemNavigator to exit
                         // and let the app restart, which will show InitializeScreen
@@ -893,7 +805,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                           MaterialPageRoute(
                             builder: (_) => const InitializeScreen(),
                           ),
-                          (route) => false,
+                              (route) => false,
                         );
                       }
                     });
@@ -929,12 +841,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     OSMFlutter(
                       controller: _mapController,
                       osmOption: OSMOption(
-                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
-                        userTrackingOption: const UserTrackingOption(
-                          enableTracking: true,
-                          unFollowUser: false,
-                        ),
-                        showContributorBadgeForOSM: true
+                          zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
+                          userTrackingOption: const UserTrackingOption(
+                            enableTracking: true,
+                            unFollowUser: false,
+                          ),
+                          showContributorBadgeForOSM: true
                       ),
                       onMapIsReady: _onMapReady,
                       onMapMoved: (event) {
@@ -946,7 +858,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                             final newZoom = v.toDouble();
                             zoomLevelNotifier.value = v.toInt();
                             mapOperationsCubit.currentZoom = newZoom;
-                            
+
                             // Check if main clustering is needed due to zoom change
                             // Only perform if we have POIs and zoom is in clustering range
                             if (_allPois.isNotEmpty && newZoom <= 13.5) {
@@ -960,7 +872,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                               logDebug('@@@@@@@@@ Zoomed past clustering threshold - resetting tracking');
                               mapOperationsCubit.resetClusteringTracking();
                             }
-                            
+
                             mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
                           });
                         }
@@ -1061,7 +973,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
                     // Search complementary users button (with fallback to nearby)
                     Positioned(
-                      top: kIsWeb ? 20 : (topPadding ?? 20.0),
+                      top: kIsWeb ? 24 : (topPadding ?? 20.0),
                       right: 56,
                       child: PointerInterceptor(
                         child: Container(
@@ -1230,7 +1142,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         ),
       ),
     );
-    
+
     // Wrap with BlocBuilders for panels
     return BlocBuilder<PoiPanelCubit, PoiPanelState>(
       builder: (context, poiPanelState) {
@@ -1253,10 +1165,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         mainContent: AdaptiveChatLayout(
                           // Only suppress chat panel when POI is shown in AdaptivePoiLayout
                           // (not when shown below search results list)
-                          suppressChatPanel: poiPanelState.isOpen && 
-                                            !_showSearchResultsList &&
-                                            chatState.isChatOpen && 
-                                            chatState.selectedPoiId == poiPanelState.selectedPoi?.profile.userId,
+                          suppressChatPanel: poiPanelState.isOpen &&
+                              !_showSearchResultsList &&
+                              chatState.isChatOpen &&
+                              chatState.selectedPoiId == poiPanelState.selectedPoi?.profile.userId,
                           panelView: chatState.view,
                           selectedPoiId: chatState.selectedPoiId,
                           selectedPoiName: chatState.selectedPoiName,

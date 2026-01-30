@@ -98,8 +98,8 @@ class UserAvatarFab extends StatelessWidget {
       child: CategoryStatsUtils.buildCategoryStatsCircle(
         keywordMap: userPoi.profile.profileKeywordDataMap,
         size: AppDimensions.poiMarkerSize,
-        strokeWidth: kIsWeb ? 3.0 : 6.0,
-        gapWidth: kIsWeb ? 1.0 : 2.0,
+        strokeWidth: kIsWeb ? 3.6 : 6.0,
+        gapWidth: kIsWeb ? 1.2 : 2.0,
         child: ClipOval(
           child: SvgPicture.string(
             localSvgCopy,
