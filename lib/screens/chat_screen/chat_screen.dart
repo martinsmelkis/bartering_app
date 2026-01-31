@@ -444,6 +444,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 duration: const Duration(seconds: 3),
               ),
             );
+            // Navigate back on web after showing snackbar
+            if (kIsWeb && !widget.showAppBar) {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (context.mounted && Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              });
+            }
           }
           if (state is ChatTransactionError) {
             // Close loading dialog
@@ -486,6 +494,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 backgroundColor: Colors.green,
               ),
             );
+            // Navigate back on web after showing snackbar
+            if (kIsWeb && !widget.showAppBar) {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (context.mounted && Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              });
+            }
           }
           if (state is ChatUserBlockError) {
             Navigator.of(context).pop(); // Close loading dialog
@@ -508,6 +524,14 @@ class _ChatScreenState extends State<ChatScreen> {
           }
           if (state is ChatUserReportSuccess) {
             Navigator.of(context).pop(); // Close loading dialog
+            // Navigate back on web after closing dialog
+            if (kIsWeb && !widget.showAppBar) {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (context.mounted && Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              });
+            }
           }
           if (state is ChatUserReportError) {
             Navigator.of(context).pop(); // Close loading dialog

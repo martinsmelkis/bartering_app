@@ -80,16 +80,7 @@ class _PoiDetailsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: context.panelWidth,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(-2, 0),
-          ),
-        ],
-      ),
+      color: Colors.transparent,
       child: showChatBelow && chatPoiId != null
           ? Column(
               children: [

@@ -66,8 +66,8 @@ class _NestedPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     
-    // Nested panel is 60% of profile panel width
-    final double nestedPanelWidth = context.profilePanelWidth * 0.6;
+    // Nested panel is 75% of profile panel width (25% wider than before)
+    final double nestedPanelWidth = context.profilePanelWidth * 0.75;
 
     Widget panelContent;
     String panelTitle;
@@ -94,16 +94,7 @@ class _NestedPanel extends StatelessWidget {
 
     return Container(
       width: nestedPanelWidth,
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(-2, 0), // Shadow to the left
-          ),
-        ],
-      ),
+      color: AppColors.background,
       child: Column(
         children: [
           // Custom header for the nested panel
@@ -135,25 +126,17 @@ class _PanelHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      color: Theme.of(context).primaryColor,
       child: Row(
         children: [
           Expanded(
             child: Text(
               title,
               style: const TextStyle(
-                color: AppColors.background,
+                color: Colors.white,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
+                decoration: TextDecoration.none,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -161,7 +144,7 @@ class _PanelHeader extends StatelessWidget {
           ),
           if (onClose != null)
             IconButton(
-              icon: const Icon(Icons.close, color: AppColors.background, size: 16),
+              icon: const Icon(Icons.close, color: Colors.white, size: 16),
               onPressed: onClose,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),

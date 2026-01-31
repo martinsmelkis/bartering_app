@@ -41,15 +41,14 @@ class PoiMarkerWidget {
 
     // Determine relevance tier based on matchRelevancyScore
     final relevancyScore = poi.matchRelevancyScore ?? 0.0;
-    final isTopMatch = relevancyScore >= 0.9;
     final isHighRelevance = relevancyScore >= 0.70;
 
     // Debug: Always log relevancy score to diagnose issues
     logDebug('@@@@@@@@@@ POI ${poi.profile.userId} RAW matchRelevancyScore: ${poi.matchRelevancyScore} (${(relevancyScore * 100).toStringAsFixed(1)}%)');
 
     // Calculate sizes for circle
-    final strokeWidth = kIsWeb ? 7.2 : 12.0;
-    final circleSize = AppDimensions.poiMarkerSize;
+    final strokeWidth = kIsWeb ? 7.2 : 12.6;
+    final circleSize = AppDimensions.mapPoiMarkerSize;
     final gap = strokeWidth + 2;
     final svgSize = circleSize - gap;
 
@@ -85,7 +84,7 @@ class PoiMarkerWidget {
       final boostedColorScore = (normalizedScore * colorBoost).clamp(0.0, 1.0);
       
       // Interpolate color from AppColors.primary to Colors.redAccent
-      glowColor = Color.lerp(AppColors.primaryVariant, Colors.redAccent, boostedColorScore);
+      glowColor = Color.lerp(Colors.orange.shade500, Colors.deepOrange.shade400, boostedColorScore);
       
       // Interpolate alpha from 0.3 to 0.6, then apply boost
       final baseAlpha = 0.4 + (normalizedScore * 0.3); // 0.3 to 0.6
@@ -104,8 +103,8 @@ class PoiMarkerWidget {
             left: kIsWeb ? 18 : 36,
             top: kIsWeb ? 18 : 36,
             child: Container(
-              width: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
-              height: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
+              width: circleSize - circleSize / (kIsWeb ? 2.5 : 2.52),
+              height: circleSize - circleSize / (kIsWeb ? 2.5 : 2.52),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
@@ -118,9 +117,10 @@ class PoiMarkerWidget {
               ),
             ),
           ),
-        // Circular colored border around avatar based on profileKeywordDataMap
+        // Circular colored border around avatar based on profileKeywordDataMap and attributes
         CategoryStatsUtils.buildCategoryStatsCircle(
           keywordMap: poi.profile.profileKeywordDataMap,
+          attributes: poi.profile.attributes,
           size: circleSize,
           strokeWidth: strokeWidth,
           gapWidth: kIsWeb ? 1.2 : 1.0,
@@ -144,37 +144,37 @@ class PoiMarkerWidget {
         PositionedOnlineStatusBadge(
           isOnline: poi.isOnline,
           isAway: poi.isAway,
-          size: kIsWeb ? 14.4 : 25,
-          right: kIsWeb ? 14.4 : 33,
-          top: kIsWeb ? 14.4 : 33,
-          borderWidth: kIsWeb ? 3.0 : 2.5,
+          size: kIsWeb ? 14.4 : 26.25,
+          right: kIsWeb ? 14.4 : 34.65,
+          top: kIsWeb ? 14.4 : 34.65,
+          borderWidth: kIsWeb ? 3.0 : 2.625,
         ),
         // Match indicator - positioned at bottom right
         if (hasMatch)
           Positioned(
-            right: kIsWeb ? 14.4 : 25,
-            bottom: kIsWeb ? 14.4 : 25,
+            right: kIsWeb ? 14.4 : 26.25,
+            bottom: kIsWeb ? 14.4 : 26.25,
             child: Container(
-              width: kIsWeb ? 21.6 : 42,
-              height: kIsWeb ? 21.6 : 42,
+              width: kIsWeb ? 21.6 : 44.1,
+              height: kIsWeb ? 21.6 : 44.1,
               decoration: BoxDecoration(
                 color: AppColors.secondary,
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: Colors.white,
-                  width: kIsWeb ? 1.2 : 2,
+                  width: kIsWeb ? 1.2 : 2.1,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: kIsWeb ? 1.92 : 4,
-                    offset: Offset(0, kIsWeb ? 1.2 : 2),
+                    blurRadius: kIsWeb ? 1.92 : 4.2,
+                    offset: Offset(0, kIsWeb ? 1.2 : 2.1),
                   ),
                 ],
               ),
               child: Icon(
                 Icons.handshake,
-                size: kIsWeb ? 18 : 30,
+                size: kIsWeb ? 18 : 31.5,
                 color: Colors.white,
               ),
             ),

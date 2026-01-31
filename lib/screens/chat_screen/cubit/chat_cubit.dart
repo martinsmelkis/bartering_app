@@ -450,15 +450,15 @@ class ChatCubit extends Cubit<ChatState> {
       final userId = await userRepository.getUserId();
 
       if (userId == null) {
-        throw Exception('User not authenticated');
+        emit(ChatTransactionError('User not authenticated'));
       }
 
       if (recipientUserId.isEmpty) {
-        throw Exception('Invalid recipient user ID');
+        emit(ChatTransactionError('Invalid recipient user ID'));
       }
 
       if (_currentConversationId == null) {
-        throw Exception('No active conversation');
+        emit(ChatTransactionError('No active conversation'));
       }
 
       String? transactionId;
@@ -478,18 +478,20 @@ class ChatCubit extends Cubit<ChatState> {
         );
 
         if (!updateResponse.success) {
-          throw Exception('Failed to update transaction status');
+          emit(ChatTransactionError('Failed to update transaction status'));
         }
 
-          logDebug('@@@@@@@@@ Transaction status updated to "done"');
+        logDebug('@@@@@@@@@ Transaction status updated to "done"');
         emit(ChatTransactionCompleted(transactionId));
+      } else {
+        emit(ChatTransactionError('Failed to update transaction status'));
       }
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to finish transaction');
-          logDebug('@@@@@@@@@ Error finishing transaction: $errorMessage');
+      logDebug('@@@@@@@@@ Error finishing transaction: $errorMessage');
       emit(ChatTransactionError(errorMessage));
     } catch (e) {
-          logDebug('@@@@@@@@@ Error finishing transaction: $e');
+      logDebug('@@@@@@@@@ Error finishing transaction: $e');
       emit(ChatTransactionError(e.toString()));
     }
 

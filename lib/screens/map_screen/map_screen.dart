@@ -147,7 +147,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         final firstPoi = widget.initialPois!.first;
         logDebug('@@@@@@@@@ didUpdateWidget - Centering map on POI: ${firstPoi.profile.userId}');
 
-        _mapController.setZoom(zoomLevel: 15.0);
+        _mapController.setZoom(zoomLevel: 14.0);
         _mapController.moveTo(
           GeoPoint(
             latitude: firstPoi.profile.latitude ?? 0.0,
@@ -282,7 +282,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         final lat = double.tryParse(parts[0]);
         final lon = double.tryParse(parts[1]);
         if (lat != null && lon != null) {
-          _mapController.setZoom(zoomLevel: 8.0);
+          _mapController.setZoom(zoomLevel: 12.0);
           _mapController.moveTo(GeoPoint(latitude: lat, longitude: lon));
         }
       }
@@ -297,7 +297,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       // Center map on the first POI
       final firstPoi = widget.initialPois!.first;
       logDebug('@@@@@@@@@ Centering map on POI: ${firstPoi.profile.userId} at ${firstPoi.profile.latitude}, ${firstPoi.profile.longitude}');
-      _mapController.setZoom(zoomLevel: 15.0);
+      _mapController.setZoom(zoomLevel: 17.0);
       _mapController.moveTo(
         GeoPoint(latitude: firstPoi.profile.latitude ?? 0.0,
             longitude: firstPoi.profile.longitude ?? 0.0),
@@ -990,8 +990,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                           child: IconButton(
                             icon: SvgPicture.asset(
                               'assets/icons/search_nearby_users.svg',
-                              width: 28,
-                              height: 28,
+                              width: 30,
+                              height: 30,
                               // Removed colorFilter to preserve SVG's original colors
                             ),
                             onPressed: () async {
@@ -1086,16 +1086,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     Expanded(child: mapStack),
                     Container(
                       width: context.panelWidth,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            offset: const Offset(-2, 0),
-                          ),
-                        ],
-                      ),
+                      color: Colors.white,
                       child: SearchResultsListView(
                         key: ValueKey(_searchResultsKey),
                         pois: _searchResults,
@@ -1117,7 +1108,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
                           // Navigate to the user's location on the map (like match history does)
                           if (poi.profile.latitude != null && poi.profile.longitude != null) {
-                            //_mapController.setZoom(zoomLevel: 15.0);
+                            //_mapController.setZoom(zoomLevel: 17.0);
                             _mapController.moveTo(
                               GeoPoint(
                                 latitude: poi.profile.latitude!,

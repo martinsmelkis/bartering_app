@@ -82,17 +82,8 @@ class _ChatsListPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: context.panelWidth,
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(-2, 0),
-          ),
-        ],
-      ),
+      width: context.panelWidth * 0.8,
+      color: AppColors.background,
       child: Column(
         children: [
           // Custom header for the panel
@@ -128,17 +119,8 @@ class _ChatPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: context.panelWidth,
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(-2, 0),
-          ),
-        ],
-      ),
+      width: context.panelWidth * 0.8,
+      color: AppColors.background,
       child: Column(
         children: [
           // Custom header for the panel
@@ -431,9 +413,10 @@ class _PanelHeaderState extends State<_PanelHeader> {
             child: Text(
               widget.title,
               style: const TextStyle(
-                color: AppColors.background,
+                color: Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
+                decoration: TextDecoration.none
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

@@ -6,6 +6,7 @@ import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import '../../../configure_dependencies.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../services/settings_service.dart';
+import '../../../theme/app_colors.dart';
 
 class SearchInMap extends StatefulWidget {
   final MapController controller;
@@ -73,7 +74,7 @@ class _SearchInMapState extends State<SearchInMap> {
                 filled: false,
                 isDense: true,
                 hintText: l10n.searchForAKeyword,
-                prefixIcon: const Icon(Icons.search, size: 22),
+                prefixIcon: const Icon(Icons.search, size: 22, color: AppColors.primary,),
                 suffixIcon: isLoading
                     ? const Padding(
                         padding: EdgeInsets.all(12.0),

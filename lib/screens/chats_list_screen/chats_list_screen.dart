@@ -412,7 +412,7 @@ class _ConversationTile extends StatelessWidget {
     final double verticalPadding = isWebSideBySide ? 2 : 4.h;
     final double spacing = isWebSideBySide ? 6 : 8.w;
     final double nameFontSize = isWebSideBySide ? 12 : 16;
-    final double timestampFontSize = isWebSideBySide ? 9 : 12;
+    final double timestampFontSize = isWebSideBySide ? 11 : 12;
     final double messageFontSize = isWebSideBySide ? 10 : 14;
     final double iconSize = isWebSideBySide ? 10 : 14;
     final double badgeFontSize = isWebSideBySide ? 8 : 11;

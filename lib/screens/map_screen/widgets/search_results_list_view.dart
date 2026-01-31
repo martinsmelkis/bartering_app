@@ -346,7 +346,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         child: ListView.separated(
           padding: const EdgeInsets.all(16),
           itemCount: sortedPois.length,
-          separatorBuilder: (context, index) => const Divider(height: 24),
+          separatorBuilder: (context, index) => const SizedBox(height: 10,),
           itemBuilder: (context, index) {
             final poi = sortedPois[index];
             return _buildPoiListItem(context, poi);
@@ -394,7 +394,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         child: ListView.separated(
           padding: const EdgeInsets.all(16),
           itemCount: _allPostings.length,
-          separatorBuilder: (context, index) => const Divider(height: 24),
+          separatorBuilder: (context, index) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final postingWithUser = _allPostings[index];
             return _buildPostingCard(context, postingWithUser);
@@ -412,10 +412,11 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
 
     return Card(
       margin: EdgeInsets.zero,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      elevation: 3,
+      color: Colors.white,
+      //shape: RoundedRectangleBorder(
+      //  borderRadius: BorderRadius.circular(12),
+      //),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -425,10 +426,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             child: Container(
               padding: const EdgeInsets.fromLTRB(4, 8, 12, 4),
-              decoration: BoxDecoration(
+              /*decoration: BoxDecoration(
                 color: Colors.grey.shade50,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              ),
+              ),*/
               child: Row(
                 children: [
                   // Small avatar with category color circle
@@ -438,6 +439,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                       if (snapshot.hasData) {
                         return CategoryStatsUtils.buildCategoryStatsCircle(
                           keywordMap: poi.profile.profileKeywordDataMap,
+                          attributes: poi.profile.attributes,
                           size: 32,
                           strokeWidth: 2.0,
                           gapWidth: 0.5,
@@ -700,7 +702,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     // Build the main search results container
     final searchResultsContainer = Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: widget.isLargeScreen
             ? null
             : const BorderRadius.only(
@@ -722,11 +724,6 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Colors.grey.shade300),
-              ),
-            ),
             child: Row(
               children: [
                 Expanded(
@@ -841,12 +838,6 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               flex: 6,
               child: searchResultsContainer,
             ),
-            // Divider
-            Divider(
-              height: 1,
-              thickness: 1,
-              color: Colors.grey.shade300,
-            ),
             // Chat panel - takes 40% of height
             Expanded(
               flex: 4,
@@ -866,12 +857,6 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 Expanded(
                   flex: 1,
                   child: searchResultsContainer,
-                ),
-                // Divider
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey.shade300,
                 ),
                 // POI details panel - takes 50% of height
                 Expanded(
@@ -915,6 +900,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       child: Container(
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
         decoration: BoxDecoration(
+          color: Colors.white,
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -944,6 +930,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                         if (snapshot.hasData) {
                           return CategoryStatsUtils.buildCategoryStatsCircle(
                             keywordMap: poi.profile.profileKeywordDataMap,
+                            attributes: poi.profile.attributes,
                             size: 56,
                             strokeWidth: 3.0,
                             gapWidth: 1.0,
@@ -1043,32 +1030,35 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         const Spacer(),
         // Chat button
         if (widget.onChatTap != null)
-          Material(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(8),
-            child: InkWell(
-              onTap: () => _openChatPanel(poi),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Material(
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.chat_bubble_outline,
-                      size: 16,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      l10n.chat,
-                      style: const TextStyle(
-                        fontSize: 12,
+              child: InkWell(
+                onTap: () => _openChatPanel(poi),
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline,
+                        size: 16,
                         color: Colors.white,
-                        fontWeight: FontWeight.w600,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.chat,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -1361,7 +1351,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     final poi = _chatWithPoi!;
     
     return Container(
-      color: Colors.white,
+      color: AppColors.background,
       child: Column(
         children: [
           // Chat header with 3-point menu

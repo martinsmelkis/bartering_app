@@ -358,7 +358,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
             ),
             SizedBox(height: isWebPanel ? 24.h : 12.h),
-            //SizedBox(height: 20.h),
 
             // Offerings Section
             Row(
@@ -519,6 +518,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             // Category Stats Bar
             CategoryStatsUtils.buildCategoryStatsBar(
               keywordMap: _profileKeywordDataMap,
+              attributes: [...?widget.interests, ...?widget.offerings],
             ),
             SizedBox(height: 20.h),
 

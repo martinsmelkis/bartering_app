@@ -16,12 +16,14 @@ class CategoryStatsUtils {
     Color(0xFF26A69A), // Colors.teal.shade400
   ];
 
-  /// Calculates color weights from profileKeywordDataMap
+  /// Calculates color weights from profileKeywordDataMap and attributes
   /// Returns a list of all 7 color-weight pairs based on keyword relevancy scores
   /// Handles negative weights by normalizing them proportionally
+  /// Each attribute belonging to a category adds 0.2 to that category's weight
   static List<MapEntry<Color, double>> calculateColorWeights(
-    Map<String, double>? keywordMap,
-  ) {
+    Map<String, double>? keywordMap, {
+    List<dynamic>? attributes,
+  }) {
     // Always create weights for all 7 categories
     final List<double> weights = List.filled(7, 0.0);
     
@@ -33,6 +35,31 @@ class CategoryStatsUtils {
           weights[idx] = entry.value;
         }
         idx++;
+      }
+    }
+
+    // Add 0.2 for each attribute belonging to each category
+    if (attributes != null && attributes.isNotEmpty) {
+      for (var attribute in attributes) {
+        final String? uiStyleHint = attribute.uiStyleHint;
+        if (uiStyleHint != null) {
+          // Match the category order: 0=GREEN, 1=RED, 2=BLUE, 3=PURPLE, 4=YELLOW, 5=ORANGE, 6=TEAL
+          if (uiStyleHint.contains('GREEN')) {
+            weights[0] += 0.2;
+          } else if (uiStyleHint.contains('RED')) {
+            weights[1] += 0.2;
+          } else if (uiStyleHint.contains('BLUE')) {
+            weights[2] += 0.2;
+          } else if (uiStyleHint.contains('PURPLE')) {
+            weights[3] += 0.2;
+          } else if (uiStyleHint.contains('YELLOW')) {
+            weights[4] += 0.2;
+          } else if (uiStyleHint.contains('ORANGE')) {
+            weights[5] += 0.2;
+          } else if (uiStyleHint.contains('TEAL')) {
+            weights[6] += 0.2;
+          }
+        }
       }
     }
 
@@ -59,11 +86,12 @@ class CategoryStatsUtils {
   /// Always displays all 7 categories, even if keywordMap is null or empty
   static Widget buildCategoryStatsBar({
     required Map<String, double>? keywordMap,
+    List<dynamic>? attributes,
     double height = 4.0,
     double borderRadius = 2.0,
     Widget? fallbackWidget,
   }) {
-    final colorWeights = calculateColorWeights(keywordMap);
+    final colorWeights = calculateColorWeights(keywordMap, attributes: attributes);
 
     // Calculate total weight for normalization
     final totalWeight = colorWeights.fold<double>(
@@ -106,12 +134,13 @@ class CategoryStatsUtils {
   /// Always displays all 7 categories, even if keywordMap is null or empty
   static Widget buildCategoryStatsCircle({
     required Map<String, double>? keywordMap,
+    List<dynamic>? attributes,
     required Widget child,
     double size = 80.0,
     double strokeWidth = 4.0,
     double gapWidth = 2.0,
   }) {
-    final colorWeights = calculateColorWeights(keywordMap);
+    final colorWeights = calculateColorWeights(keywordMap, attributes: attributes);
 
     // Calculate total weight for normalization
     final totalWeight = colorWeights.fold<double>(

@@ -54,16 +54,7 @@ class _SettingsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: context.settingsPanelWidth,
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(2, 0), // Shadow to the right
-          ),
-        ],
-      ),
+      color: AppColors.background,
       child: Column(
         children: [
           // Custom header for the panel
@@ -97,16 +88,7 @@ class _PanelHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      color: Theme.of(context).primaryColor,
       child: Row(
         children: [
           Expanded(

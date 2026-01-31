@@ -158,7 +158,8 @@ class AttributeMatchingUtils {
             decorationColor: (matchType != AttributeMatchType.none)
                 ? null
                 : underscoreColor,
-            decorationThickness: 3.0,
+            decorationThickness: 2.0,
+            height: (matchType == AttributeMatchType.none && underscoreColor != null) ? 1.2 : null,
           ),
         ),
       );

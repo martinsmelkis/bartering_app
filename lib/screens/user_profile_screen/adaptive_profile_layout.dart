@@ -98,13 +98,6 @@ class _ProfilePanelState extends State<_ProfilePanel> {
       width: profileWidth,
       decoration: BoxDecoration(
         color: AppColors.background,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(2, 0), // Shadow to the right
-          ),
-        ],
       ),
       child: Column(
         children: [
@@ -147,34 +140,27 @@ class _PanelHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Row(
         children: [
+          SizedBox(width: 10),
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: AppColors.background,
-                fontSize: 14,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
+                decoration: TextDecoration.none,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
           if (onClose != null)
             IconButton(
-              icon: const Icon(Icons.close, color: AppColors.background, size: 18),
+              icon: const Icon(Icons.close, color: Colors.white, size: 18),
               onPressed: onClose,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),

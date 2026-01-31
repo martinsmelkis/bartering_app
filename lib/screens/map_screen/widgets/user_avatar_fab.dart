@@ -97,19 +97,20 @@ class UserAvatarFab extends StatelessWidget {
     return RepaintBoundary(
       child: CategoryStatsUtils.buildCategoryStatsCircle(
         keywordMap: userPoi.profile.profileKeywordDataMap,
-        size: AppDimensions.poiMarkerSize,
-        strokeWidth: kIsWeb ? 3.6 : 6.0,
-        gapWidth: kIsWeb ? 1.2 : 2.0,
+        attributes: userPoi.profile.attributes,
+        size: AppDimensions.userAvatarSize * 3,
+        strokeWidth: kIsWeb ? 7.2 : 6.0,
+        gapWidth: kIsWeb ? 3.6 : 6.0,
         child: ClipOval(
           child: SvgPicture.string(
             localSvgCopy,
-            width: AppDimensions.poiMarkerSize,
-            height: AppDimensions.poiMarkerSize,
+            width: AppDimensions.userAvatarSize,
+            height: AppDimensions.userAvatarSize,
             fit: BoxFit.contain,
             allowDrawingOutsideViewBox: false,
             placeholderBuilder: (context) => Container(
-              width: AppDimensions.poiMarkerSize,
-              height: AppDimensions.poiMarkerSize,
+              width: AppDimensions.userAvatarSize,
+              height: AppDimensions.userAvatarSize,
               color: Colors.grey.shade200,
             ),
             key: ValueKey('poi_marker_${userPoi.profile.userId}'),

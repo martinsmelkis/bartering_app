@@ -4727,7 +4727,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicyLastUpdated.
   ///
   /// In en, this message translates to:
-  /// **'Last updated: January 2025'**
+  /// **'Last updated: January 2026'**
   String get privacyPolicyLastUpdated;
 }
 

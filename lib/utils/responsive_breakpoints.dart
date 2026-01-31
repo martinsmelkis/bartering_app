@@ -215,8 +215,15 @@ class ResponsiveBreakpoints {
     return getPanelWidth(context) * 1.2;
   }
 
-  /// Get panel width for profile panel (15% narrower than settings panel for better layout on web/large screens)
+  /// Get panel width for profile panel (20% max, 400 min on large screens)
   static double getProfilePanelWidth(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    // On large screens, use 20% of screen width with min 400
+    if (screenWidth >= medium) {
+      final calculatedWidth = screenWidth * 0.20;
+      return calculatedWidth.clamp(400.0, double.infinity);
+    }
+    // On small screens, keep original behavior
     return getSettingsPanelWidth(context) * 0.85;
   }
 
@@ -275,9 +282,9 @@ class ResponsiveBreakpoints {
       context: context,
       compact: 18.0,
       medium: 20.0,
-      expanded: 22.0,
-      large: 18.0,
-      extraLarge: 20.0,
+      expanded: 21.0,
+      large: 17.0,
+      extraLarge: 19.0,
     );
   }
 

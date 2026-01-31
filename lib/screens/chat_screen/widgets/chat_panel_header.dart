@@ -245,16 +245,7 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
     
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      color: AppColors.primary,
       child: Row(
         children: [
           Expanded(
@@ -264,6 +255,7 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
                 color: Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
+                decoration: TextDecoration.none
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
