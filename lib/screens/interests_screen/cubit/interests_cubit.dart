@@ -28,7 +28,7 @@ class InterestsCubit extends Cubit<InterestsState> {
     final savedInterests = await _userRepository.getInterests(loadFromStorage: true);
     if (savedInterests == null || savedInterests.isEmpty) return;
 
-    emit(state.copyWith(allInterests: await _userRepository.getInterests()));
+    emit(state.copyWith(allInterests: savedInterests));
 
     // If allInterests is empty, all saved items are treated as custom
     if (state.allInterests.isEmpty) {
@@ -37,21 +37,23 @@ class InterestsCubit extends Cubit<InterestsState> {
       return;
     }
 
+    final allCachedInterests = await _userRepository.userInterests;
+    emit(state.copyWith(allInterests: allCachedInterests));
     // Find matches between saved interests and available allInterests
     final List<ParsedAttributeData> selectedInterests = [];
     final List<String> customKeywords = [];
 
     for (var saved in savedInterests) {
       // Check if this interest exists in the allInterests list (case-insensitive)
-      final matchIndex = state.allInterests.indexWhere(
+      final matchIndex = allCachedInterests?.indexWhere(
             (interest) =>
         interest.attribute.toLowerCase().replaceAll("_", " ").trim() ==
             saved.attribute.toLowerCase().replaceAll("_", " ").trim(),
       );
 
-      if (matchIndex != -1) {
+      if (matchIndex != -1 && allCachedInterests != null) {
         // It exists in predefined interests, select it
-        selectedInterests.add(state.allInterests[matchIndex]);
+        selectedInterests.add(allCachedInterests[matchIndex!]);
       } else {
         // It's a custom keyword
         customKeywords.add(TextUtils.normalizeSnakeCase(saved.attribute));
@@ -91,10 +93,10 @@ class InterestsCubit extends Cubit<InterestsState> {
     emit(state.copyWith(customKeywords: newCustomKeywords));
   }
 
-  Future<void> submitInterests(String languageCode) async {
+  Future<void> submitInterests(String languageCode, bool persistInterests) async {
     emit(state.copyWith(status: InterestsStatus.loading));
     try {
-      if (state.selectedInterests!.isEmpty) {
+      if (state.selectedInterests.isEmpty) {
         emit(state.copyWith(status: InterestsStatus.initial, selectedInterests: await _userRepository.getInterests()));
       }
       final allInterests = {
@@ -124,8 +126,10 @@ class InterestsCubit extends Cubit<InterestsState> {
         );
       }).toList();
 
-      logDebug('@@@@@@@@@ saved interestsData: $interestsData');
-      _userRepository.interests = interestsData;
+      if (persistInterests) {
+        logDebug('@@@@@@@@@ saved interestsData: $interestsData');
+        _userRepository.interests = interestsData;
+      }
 
       final interestsDataForApi = UserAttributesData(
           userId: _userRepository.userId!,

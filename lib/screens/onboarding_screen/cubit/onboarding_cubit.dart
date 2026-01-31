@@ -74,7 +74,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     try {
       Map<String, double>? profileData = getProfileSummary();
       if (profileData.isEmpty) {
-        profileData = await _userRepository.getProfileKeywordData;
+        profileData = await _userRepository.getProfileKeywordDataMap();
       }
       final userId = _userRepository.userId;
 
@@ -82,8 +82,12 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         throw Exception("User ID is null, cannot complete onboarding.");
       }
 
+      if (profileData == null) {
+        throw Exception("Profile data is null, cannot complete onboarding.");
+      }
+
       _userRepository.profileKeywordDataMap = profileData;
-      _userRepository.saveProfileKeywordDataMap(profileData!);
+      await _userRepository.saveProfileKeywordDataMap(profileData);
 
       // --- Save data to local Drift database ---
       final encodableProfileData = profileData.map((key, value) =>

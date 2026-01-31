@@ -376,7 +376,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   onTap: () async {
                     final locale = Localizations.localeOf(context);
                     (await getIt<InterestsCubit>().submitInterests(
-                        locale.languageCode));
+                        locale.languageCode, false));
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) =>

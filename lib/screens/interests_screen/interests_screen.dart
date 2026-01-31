@@ -2,6 +2,7 @@ import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -58,10 +59,10 @@ class _InterestsViewState extends State<InterestsView> {
           );
         } else if (state.status == InterestsStatus.success) {
           if (this.widget.isInitialOnboarding == false) {
-            // Not in onboarding, pop back to caller (UserProfileScreen will handle navigation)
-            if (context.canPop()) {
-              context.pop();
-            }
+            // Not in onboarding, navigate to map screen
+            logDebug('@@@@@@@@ Interests submitted successfully - navigating to map screen');
+            // Use go to replace the entire navigation stack with map screen
+            context.pushReplacement('/map');
           } else {
             // Save the full ParsedAttributeData with all metadata
             List<ParsedAttributeData> finalList = List.empty(growable: true);
@@ -185,7 +186,7 @@ class _InterestsViewState extends State<InterestsView> {
                         final locale = Localizations.localeOf(context);
                         context
                             .read<InterestsCubit>()
-                            .submitInterests(locale.languageCode);
+                            .submitInterests(locale.languageCode, true);
                       },
                       child: Text(l10n.save),
                     ),

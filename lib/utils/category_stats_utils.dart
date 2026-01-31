@@ -207,13 +207,24 @@ class _CategoryCirclePainter extends CustomPainter {
 
     // Start from the top (-90 degrees in radians)
     double startAngle = -math.pi / 2;
-    
+
     // Calculate total gap angle to subtract from full circle
     final gapAngle = (gapWidth / (2 * math.pi * radius)) * 2 * math.pi;
     final totalGapAngle = gapAngle * colorWeights.length;
     final effectiveCircleAngle = 2 * math.pi - totalGapAngle;
 
-    for (final entry in colorWeights) {
+    // Reorder color weights for painting: GREEN, RED, BLUE, PURPLE, YELLOW, TEAL, ORANGE
+    // Original order: GREEN(0), RED(1), BLUE(2), PURPLE(3), YELLOW(4), ORANGE(5), TEAL(6)
+    // Paint order: GREEN(0), RED(1), BLUE(2), PURPLE(3), YELLOW(4), TEAL(6), ORANGE(5)
+    final List<MapEntry<Color, double>> reorderedWeights = List.from(colorWeights);
+    if (reorderedWeights.length >= 7) {
+      // Swap ORANGE (index 5) and TEAL (index 6)
+      final tmp = reorderedWeights[5];
+      reorderedWeights[5] = reorderedWeights[6];
+      reorderedWeights[6] = tmp;
+    }
+
+    for (final entry in reorderedWeights) {
       final percentage = entry.value / totalWeight;
       final sweepAngle = effectiveCircleAngle * percentage;
 
@@ -221,7 +232,7 @@ class _CategoryCirclePainter extends CustomPainter {
         ..color = entry.key
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round;
+        ..strokeCap = StrokeCap.square;
 
       canvas.drawArc(
         rect,
