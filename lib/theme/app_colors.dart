@@ -11,9 +11,11 @@ class AppColors {
   static const Color secondaryVariant = Color(0xFFf76c8b); // A darker variant
 
   // Define other common colors
-  //static const Color background = Color(0xFFffd9b3);
-  static const Color background = Color(0xFFffd8c5);
-  //static const Color background = Color(0xFAffe3d1);
+  //static const Color background = Color(0xFFfff0e0);
+  static const Color background = Color(0xFFffe0c9);
+  //static const Color background = Color(0xFFffe0c9);
+  //static const Color background = Color(0xFFffe5c3);
+  //static const Color background = Color(0xFFffd8c5);
 
   static const Color surface = Color(0xFFFFFFFF); // Cards, sheets, menus
   static const Color error = Color(0xFFB00020); // Standard error color

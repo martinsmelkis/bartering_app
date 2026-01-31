@@ -260,7 +260,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: widget.isLargeScreen
+            ? const EdgeInsets.symmetric(horizontal: 12, vertical: 6)
+            : const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
@@ -293,19 +295,19 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 12,
-          height: 12,
+          width: widget.isLargeScreen ? 12 : 10,
+          height: widget.isLargeScreen ? 12 : 10,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(3),
             border: Border.all(color: color, width: 1),
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 3),
         Text(
           label,
           style: TextStyle(
-            fontSize: 10,
+            fontSize: widget.isLargeScreen ? 10 : 9,
             color: Colors.grey[700],
             fontWeight: FontWeight.w500,
           ),
@@ -722,101 +724,180 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       child: Column(
           children: [
             // Header
+            const SizedBox(height: 4),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.isLargeScreen ? 16 : 12,
+              vertical: widget.isLargeScreen ? 4 : 2,
+            ),
+            child: widget.isLargeScreen
+                ? Row(
                     children: [
-                      Text(
-                        _viewMode == ViewMode.users
-                            ? '${sortedPois.length} matching ${sortedPois.length == 1 ? 'user' : 'users'} found'
-                            : '${_allPostings.length} matching ${_allPostings.length == 1 ? 'posting' : 'postings'} found',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      // Toggle buttons
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildToggleButton(
-                              icon: Icons.people,
-                              label: 'Users',
-                              isSelected: _viewMode == ViewMode.users,
-                              onTap: () {
-                                setState(() {
-                                  _viewMode = ViewMode.users;
-                                });
-                              },
+                            Text(
+                              _viewMode == ViewMode.users
+                                  ? '${sortedPois.length} matching ${sortedPois.length == 1 ? 'user' : 'users'} found'
+                                  : '${_allPostings.length} matching ${_allPostings.length == 1 ? 'posting' : 'postings'} found',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            _buildToggleButton(
-                              icon: Icons.article,
-                              label: 'Postings',
-                              isSelected: _viewMode == ViewMode.postings,
-                              onTap: () {
-                                setState(() {
-                                  _viewMode = ViewMode.postings;
-                                });
-                              },
+                            const SizedBox(height: 8),
+                            // Toggle buttons with legend for large screens
+                            Row(
+                              children: [
+                                // Toggle buttons
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _buildToggleButton(
+                                        icon: Icons.people,
+                                        label: 'Users',
+                                        isSelected: _viewMode == ViewMode.users,
+                                        onTap: () {
+                                          setState(() {
+                                            _viewMode = ViewMode.users;
+                                          });
+                                        },
+                                      ),
+                                      _buildToggleButton(
+                                        icon: Icons.article,
+                                        label: 'Postings',
+                                        isSelected: _viewMode == ViewMode.postings,
+                                        onTap: () {
+                                          setState(() {
+                                            _viewMode = ViewMode.postings;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Legend - aligned to right of toggle buttons on large screens
+                                if (!_isLoadingUserAttributes)
+                                  Row(
+                                    children: [
+                                      Icon(Icons.info_outline, size: 14, color: Colors.grey[600]),
+                                      const SizedBox(width: 6),
+                                      _buildLegendItem(
+                                        color: AppColors.secondary,
+                                        label: 'Trade match',
+                                      ),
+                                      const SizedBox(width: 12),
+                                      _buildLegendItem(
+                                        color: Colors.blue,
+                                        label: 'Similar',
+                                      ),
+                                    ],
+                                  ),
+                              ],
                             ),
                           ],
                         ),
                       ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: widget.onClose,
+                        tooltip: l10n.close,
+                      ),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _viewMode == ViewMode.users
+                                  ? '${sortedPois.length} matching ${sortedPois.length == 1 ? 'user' : 'users'} found'
+                                  : '${_allPostings.length} matching ${_allPostings.length == 1 ? 'posting' : 'postings'} found',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: widget.onClose,
+                            tooltip: l10n.close,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      // Toggle buttons and legend in flexible layout for small screens
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          // Toggle buttons
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildToggleButton(
+                                  icon: Icons.people,
+                                  label: 'Users',
+                                  isSelected: _viewMode == ViewMode.users,
+                                  onTap: () {
+                                    setState(() {
+                                      _viewMode = ViewMode.users;
+                                    });
+                                  },
+                                ),
+                                _buildToggleButton(
+                                  icon: Icons.article,
+                                  label: 'Postings',
+                                  isSelected: _viewMode == ViewMode.postings,
+                                  onTap: () {
+                                    setState(() {
+                                      _viewMode = ViewMode.postings;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Legend - will wrap to next line if needed
+                          if (!_isLoadingUserAttributes)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.info_outline, size: 14, color: Colors.grey[600]),
+                                const SizedBox(width: 4),
+                                _buildLegendItem(
+                                  color: AppColors.secondary,
+                                  label: 'Trade match',
+                                ),
+                                const SizedBox(width: 8),
+                                _buildLegendItem(
+                                  color: Colors.blue,
+                                  label: 'Similar',
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
                     ],
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: widget.onClose,
-                  tooltip: l10n.close,
-                ),
-              ],
-            ),
           ),
-          // Legend for attribute highlighting
-          if (!_isLoadingUserAttributes) ...[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey.shade200),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, size: 14, color: Colors.grey[600]),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Wrap(
-                      spacing: 12,
-                      runSpacing: 4,
-                      children: [
-                        _buildLegendItem(
-                          color: AppColors.secondary,
-                          label: 'Trade match',
-                        ),
-                        _buildLegendItem(
-                          color: Colors.blue,
-                          label: 'Similar',
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          const SizedBox(height: 4),
           // List of results
           Expanded(
             child: _viewMode == ViewMode.users
