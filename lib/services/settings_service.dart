@@ -16,6 +16,7 @@ class SettingsService {
   static const String _showSearchResultsAsListKey = 'show_search_results_as_list';
   static const String _preferredLanguageKey = 'preferred_language';
   static const String _defaultSearchTypeKey = 'default_search_type';
+  static const String _enableGpsLocationKey = 'enable_gps_location';
 
   // Default values
   static const double defaultNearbyUsersRadius = 50.0; // km
@@ -208,5 +209,26 @@ class SettingsService {
   /// Get default search type synchronously
   String getDefaultSearchTypeSync() {
     return _prefs?.getString(_defaultSearchTypeKey) ?? defaultSearchType;
+  }
+
+  // --- GPS Location Settings ---
+
+  /// Save whether GPS location is enabled
+  /// When false, the app will not request location permissions
+  Future<bool> setEnableGpsLocation(bool enabled) async {
+    final prefs = await _preferences;
+    return await prefs.setBool(_enableGpsLocationKey, enabled);
+  }
+
+  /// Get whether GPS location is enabled
+  /// Returns false by default (location disabled)
+  Future<bool> isGpsLocationEnabled() async {
+    final prefs = await _preferences;
+    return prefs.getBool(_enableGpsLocationKey) ?? false;
+  }
+
+  /// Get GPS location enabled synchronously
+  bool isGpsLocationEnabledSync() {
+    return _prefs?.getBool(_enableGpsLocationKey) ?? false;
   }
 }

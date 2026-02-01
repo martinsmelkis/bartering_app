@@ -264,8 +264,8 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
           _avatarIcon = ClipOval(
             child: SvgPicture.string(
               svgString,
-              width: 73.7, // 67 * 1.1
-              height: 73.7, // 67 * 1.1
+              width: 56,
+              height: 56,
               fit: BoxFit.contain,
             ),
           );
@@ -697,17 +697,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
           child: Column(
             mainAxisSize: widget.isLargeScreen ? MainAxisSize.max : MainAxisSize.min,
             children: [
-              // Sliding panel handle for mobile
-              if (!widget.isLargeScreen)
-                Container(
-                  margin: const EdgeInsets.only(top: 8, bottom: 4),
-                  width: 40,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
               // Close button for large screen panel
               if (widget.isLargeScreen && widget.onClose != null)
                 Container(
@@ -739,135 +728,139 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                 ),
               Flexible(
                 child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Avatar/POI icon on the left with online badge
-                            Transform.translate(
-                              offset: const Offset(0, -11.16), // Move 10% higher + 5px (61.6 * 0.1 + 5)
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  SizedBox(
-                                    width: 61.6, // 56 * 1.1
-                                    height: 61.6, // 56 * 1.1
-                                    child: _isLoadingAvatar
-                                        ? const Center(
-                                      child: SizedBox(
-                                        width: 26,
-                                        height: 26,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      ),
-                                    )
-                                        : _avatarIcon ?? const Icon(Icons.person, size: 35.2), // 32 * 1.1
-                                  ),
-                                  // Rating badge - positioned below the avatar
-                                  if (!_isLoadingRating && _averageRating != null && _averageRating! > 0)
-                                    Positioned(
-                                      bottom: -6,
-                                      left: 0,
-                                      right: 0,
-                                      child: Center(
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: _getRatingColor(),
-                                            borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: Colors.white, width: 1.5),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.star,
-                                                size: 10,
-                                                color: Colors.white,
-                                              ),
-                                              const SizedBox(width: 2),
-                                              Text(
-                                                _averageRating!.toStringAsFixed(1),
-                                                style: const TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  // Online status badge - positioned at bottom-right
-                                  PositionedOnlineStatusBadge(
-                                    isOnline: widget.poi.isOnline,
-                                    isAway: widget.poi.isAway,
-                                    size: 16.0,
-                                    right: 5,
-                                    bottom: 5,
-                                    borderWidth: 2.5,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            //const SizedBox(width: 10),
-                            // Name in the center
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    widget.poi.profile.name +
-                                        (((widget.poi.matchRelevancyScore ?? 0) > 0
-                                            && (widget.poi.matchRelevancyScore ?? 1) < 1)
-                                            ? " (" + (((widget.poi.matchRelevancyScore ?? 0) * 100))
-                                            .toStringAsFixed(1) + "% ${l10n.match})" : ""),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: context.subheadingFontSize * (kIsWeb ? 0.8 : 1.1),
-                                      color: Colors.black,
-                                      fontFamily: 'Courier',
-                                      fontWeight: FontWeight.bold,
-                                      decoration: TextDecoration.none,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            // Favorite icon button on the right
-                            SizedBox(
-                              width: 42,
-                              height: 42,
-                              child: _isLoadingFavorite
-                                  ? const Padding(
-                                padding: EdgeInsets.all(11.0),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                                  : IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: Icon(
-                                  _isFavorite ? Icons.star : Icons.star_border,
-                                  color: _isFavorite ? AppColors.primary : Colors.grey,
-                                ),
-                                onPressed: _isTogglingFavorite ? null : _toggleFavorite,
-                              ),
-                            ),
-                          ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Category stats bar at the very top - extends to edges and clips under rounded corners
+                      ClipRRect(
+                        borderRadius: widget.isLargeScreen
+                            ? BorderRadius.zero
+                            : const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
                         ),
-                        const SizedBox(height: 12),
-                        CategoryStatsUtils.buildCategoryStatsBar(
+                        child: CategoryStatsUtils.buildCategoryStatsBar(
                           keywordMap: widget.poi.profile.profileKeywordDataMap,
                           attributes: widget.poi.profile.attributes,
+                          height: 10
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12.0, 12, 12, 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Card containing avatar, name, favorite, and rating
+                            Card(
+                          elevation: 1,
+                          color: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Row(
+                              children: [
+                                // Favorite icon button on the left
+                                SizedBox(
+                                  width: 30,
+                                  height: 30,
+                                  child: _isLoadingFavorite
+                                      ? const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                      : IconButton(
+                                    padding: EdgeInsets.only(left: 4, top: 0),
+                                    icon: Icon(
+                                      _isFavorite ? Icons.star : Icons.star_border,
+                                      color: _isFavorite ? AppColors.primary : Colors.grey,
+                                    ),
+                                    onPressed: _isTogglingFavorite ? null : _toggleFavorite,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                // Name in the center
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        widget.poi.profile.name +
+                                            (((widget.poi.matchRelevancyScore ?? 0) > 0
+                                                && (widget.poi.matchRelevancyScore ?? 1) < 1)
+                                                ? " (" + (((widget.poi.matchRelevancyScore ?? 0) * 100))
+                                                .toStringAsFixed(1) + "% ${l10n.match})" : ""),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey[900],
+                                          fontSize: ResponsiveBreakpoints.getBodyFontSize(context) * (widget.isLargeScreen ? 0.85 : 1.0),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Rating widget - positioned just before the avatar
+                                if (!_isLoadingRating && _averageRating != null && _averageRating! > 0)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: _getRatingColor(),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.white, width: 1.5),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.star,
+                                          size: 10,
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(width: 2),
+                                        Text(
+                                          _averageRating!.toStringAsFixed(1),
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                // Avatar/POI icon on the right with online badge
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    SizedBox(
+                                      width: 56,
+                                      height: 56,
+                                      child: _isLoadingAvatar
+                                          ? const Center(
+                                        child: SizedBox(
+                                          width: 26,
+                                          height: 26,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      )
+                                          : _avatarIcon ?? const Icon(Icons.person, size: 35),
+                                    ),
+                                    // Online status badge - positioned at bottom-right
+                                    PositionedOnlineStatusBadge(
+                                      isOnline: widget.poi.isOnline,
+                                      isAway: widget.poi.isAway,
+                                      size: 16.0,
+                                      right: 5,
+                                      bottom: 5,
+                                      borderWidth: 2.5,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 12),
                         // Attribute cards
@@ -967,10 +960,12 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                 ),
                               ],
                             ),
-                        // Postings section
-                        _buildPostingsSection(l10n),
-                      ],
-                    ),
+                            // Postings section
+                            _buildPostingsSection(l10n),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

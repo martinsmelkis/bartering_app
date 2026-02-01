@@ -36,6 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _hasSecurityQuestion = false;
   bool _isLoading = true;
   String _selectedLanguage = 'en';
+  bool _enableGpsLocation = false;
 
   @override
   void initState() {
@@ -52,6 +53,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final pinEnabled = await _settingsService.isPinEnabled();
     final hasSecurityQuestion = await SecureStorageService().hasSecurityQuestion();
     final language = await _settingsService.getPreferredLanguage();
+    final gpsLocationEnabled = await _settingsService.isGpsLocationEnabled();
     
     setState(() {
       _useMapCenterForSearch = useMapCenter;
@@ -62,6 +64,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _pinEnabled = pinEnabled;
       _hasSecurityQuestion = hasSecurityQuestion;
       _selectedLanguage = language ?? 'en';
+      _enableGpsLocation = gpsLocationEnabled;
       _isLoading = false;
     });
   }
@@ -79,6 +82,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _showSearchResultsAsList = value;
     });
     await _settingsService.setShowSearchResultsAsList(value);
+    _showSettingsSaved();
+  }
+
+  Future<void> _saveEnableGpsLocation(bool value) async {
+    setState(() {
+      _enableGpsLocation = value;
+    });
+    await _settingsService.setEnableGpsLocation(value);
     _showSettingsSaved();
   }
 
@@ -401,6 +412,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 12),
                     Text(
                       l10n.settingsShowResultsAsListDescription,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // GPS Location Setting
+            Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Enable GPS Location',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _enableGpsLocation
+                                    ? 'GPS location tracking is enabled'
+                                    : 'GPS location tracking is disabled',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Switch(
+                          value: _enableGpsLocation,
+                          activeColor: AppColors.primary,
+                          onChanged: (value) {
+                            _saveEnableGpsLocation(value);
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'When enabled, you can zoom to your current GPS location on the map. The app will request location permissions when needed.',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[500],

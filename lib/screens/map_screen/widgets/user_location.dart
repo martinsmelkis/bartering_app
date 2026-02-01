@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
+import '../../../configure_dependencies.dart';
+import '../../../services/settings_service.dart';
 import '../../../theme/app_colors.dart';
 
 class ActivationUserLocation extends StatelessWidget {
@@ -31,6 +33,23 @@ class ActivationUserLocation extends StatelessWidget {
           key: UniqueKey(),
           backgroundColor: AppColors.background,
           onPressed: () async {
+            // Check if GPS location is enabled in settings
+            final settingsService = getIt<SettingsService>();
+            final isGpsEnabled = await settingsService.isGpsLocationEnabled();
+            
+            if (!isGpsEnabled) {
+              // Show a message to the user
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('GPS location is disabled. Enable it in Settings to use this feature.'),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+              }
+              return;
+            }
+            
             if (!trackingNotifier.value) {
               /*await controller.currentLocation();
               await controller.enableTracking(

@@ -109,12 +109,20 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   // Key to force SearchResultsListView to rebuild when attributes change
   int _searchResultsKey = 0;
 
+  // GPS location tracking enabled state
+  bool _isGpsLocationEnabled = false;
+
   @override
   void initState() {
     super.initState();
     poiCubit = context.read<PoiCubit>();
     mapOperationsCubit = context.read<MapOperationsCubit>();
     _mapController.addObserver(this);
+    
+    // Load GPS location setting
+    final settingsService = getIt<SettingsService>();
+    _isGpsLocationEnabled = settingsService.isGpsLocationEnabledSync();
+    
     _loadUserProfile();
 
     // Handle any pending notification that opened the app when it was terminated
@@ -839,12 +847,15 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   children: [
                     OSMFlutter(
                       controller: _mapController,
-                      osmOption: OSMOption(
+                      osmOption: _isGpsLocationEnabled ? OSMOption(
                           zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
-                          userTrackingOption: const UserTrackingOption(
+                          userTrackingOption: UserTrackingOption(
                             enableTracking: true,
                             unFollowUser: false,
                           ),
+                          showContributorBadgeForOSM: true
+                      ) : OSMOption(
+                          zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
                           showContributorBadgeForOSM: true
                       ),
                       onMapIsReady: _onMapReady,
