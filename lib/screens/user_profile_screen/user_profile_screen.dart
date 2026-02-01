@@ -18,9 +18,11 @@ import 'package:barter_app/screens/user_profile_screen/adaptive_nested_panel_lay
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
+import 'package:barter_app/utils/attribute_matching_utils.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:barter_app/widgets/attribute_bubble.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -298,10 +300,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6.h),
+                        horizontal: 12, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -339,16 +341,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       widget.interests == null
                           ? const SizedBox()
                           : Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: 7.2,
+                        runSpacing: 7.2,
                         children: widget.interests!.map((interest) {
-                          return Chip(
-                            label: Text(
-                                TextUtils.getTranslatedOrNormalizedAttribute(
-                                    interest.attribute, context)),
-                            backgroundColor: _getColorForStyleHint(
-                                interest.uiStyleHint),
-                            labelStyle: const TextStyle(color: Colors.white),
+                          return AttributeBubble(
+                            attribute: interest,
+                            matchType: AttributeMatchType.none,
+                            scaleFactor: 1.2,
                           );
                         }).toList(),
                       ),
@@ -409,10 +408,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6.h),
+                        horizontal: 12, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -450,16 +449,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       widget.offerings == null
                           ? const SizedBox()
                           : Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: 7.2,
+                        runSpacing: 7.2,
                         children: widget.offerings!.map((offering) {
-                          return Chip(
-                            label:
-                            Text(TextUtils.getTranslatedOrNormalizedAttribute(
-                                offering.attribute, context)),
-                            backgroundColor: _getColorForStyleHint(
-                                offering.uiStyleHint),
-                            labelStyle: const TextStyle(color: Colors.white),
+                          return AttributeBubble(
+                            attribute: offering,
+                            matchType: AttributeMatchType.none,
+                            scaleFactor: 1.2,
                           );
                         }).toList(),
                       ),
@@ -543,10 +539,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6.h),
+                        horizontal: 12, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -596,10 +592,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6.h),
+                                horizontal: 12, vertical: 4.h),
                             decoration: BoxDecoration(
                               color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(20.r),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -675,10 +671,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               },
               child: Container(
                 padding: EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 6.h),
+                    horizontal: 12, vertical: 4.h),
                 decoration: BoxDecoration(
                   color: AppColors.secondary,
-                  borderRadius: BorderRadius.circular(20.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -710,20 +706,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ),
       ),
     );
-  }
-
-  Color _getColorForStyleHint(String? hint) {
-    if (hint == null) return Colors.grey;
-
-    if (hint.contains('GREEN')) return Colors.green;
-    if (hint.contains('RED')) return Colors.red;
-    if (hint.contains('YELLOW')) return Colors.yellow[700]!;
-    if (hint.contains('ORANGE')) return Colors.orange;
-    if (hint.contains('TEAL')) return Colors.teal;
-    if (hint.contains('PURPLE')) return Colors.purple;
-    if (hint.contains('BLUE')) return Colors.blue;
-
-    return Colors.grey;
   }
 
   void _showDeleteProfileDialog(BuildContext context) {

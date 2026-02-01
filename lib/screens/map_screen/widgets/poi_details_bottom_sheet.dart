@@ -6,9 +6,10 @@ import 'package:barter_app/utils/attribute_matching_utils.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/image_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:barter_app/utils/text_utils.dart';
+import 'package:barter_app/widgets/attribute_bubble.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
 import 'package:barter_app/widgets/online_status_badge.dart';
-import 'package:barter_app/widgets/rating_circle_avatar.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -59,17 +60,15 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   bool _isLoadingFavorite = true;
   bool _isTogglingFavorite = false;
 
-  // Cache for attribute spans to avoid recalculating on every rebuild
-  Map<String, List<TextSpan>>? _cachedSpans;
-  Future<Map<String, List<TextSpan>>>? _spansFuture;
-
-  // Avatar/POI icon state
   Widget? _avatarIcon;
   bool _isLoadingAvatar = true;
 
-  // User rating state
   double? _averageRating;
   bool _isLoadingRating = true;
+
+  // Current user's attributes for matching (normalized/translated)
+  List<String> _currentUserInterestIds = [];
+  List<String> _currentUserOfferIds = [];
 
   @override
   void initState() {
@@ -96,8 +95,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       _isFavorite = false;
       _isLoadingFavorite = true;
       _isTogglingFavorite = false;
-      _cachedSpans = null;
-      _spansFuture = null;
       _avatarIcon = null;
       _isLoadingAvatar = true;
       _averageRating = null;
@@ -106,9 +103,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   }
 
   void _initializeData() {
-    // Initialize spans immediately but render simple placeholder first
-    _spansFuture = _prepareSpans(context);
-
     // Schedule postings and favorite status loading after the first frame is rendered
     // This prevents blocking the UI, especially on web platform
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -117,8 +111,24 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
         _loadFavoriteStatus();
         _loadAvatarIcon();
         _loadUserRating();
+        _loadCurrentUserAttributes();
       }
     });
+  }
+
+  Future<void> _loadCurrentUserAttributes() async {
+    try {
+      final userMatch = await AttributeMatchingUtils.loadUserAttributes(context);
+      
+      if (mounted) {
+        setState(() {
+          _currentUserInterestIds = userMatch.interestIds;
+          _currentUserOfferIds = userMatch.offerIds;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading current user attributes: $e');
+    }
   }
 
   Future<bool> _loadFavoriteStatus() async {
@@ -254,8 +264,8 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
           _avatarIcon = ClipOval(
             child: SvgPicture.string(
               svgString,
-              width: 67,
-              height: 67,
+              width: 73.7, // 67 * 1.1
+              height: 73.7, // 67 * 1.1
               fit: BoxFit.contain,
             ),
           );
@@ -366,47 +376,42 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     }
   }
 
-  // New async method to prepare all spans for the FutureBuilder
-  Future<Map<String, List<TextSpan>>> _prepareSpans(
-      BuildContext context) async {
-    // 1. Get the current user's attributes for comparison (normalized/translated)
-    final userMatch = await AttributeMatchingUtils.loadUserAttributes(context);
+  Widget _buildAttributeBubbles({
+    required BuildContext context,
+    required List<dynamic> attributes,
+    required bool isPoiInterest,
+  }) {
+    if (attributes.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-    // 2. Filter the POI's attributes into interests and offerings
-    final poiInterests = widget.poi.profile.attributes
-        ?.where((attr) => attr.type != 1)
-        .toList() ?? [];
-    final poiOfferings = widget.poi.profile.attributes
-        ?.where((attr) => attr.type == 1)
-        .toList() ?? [];
+    return Wrap(
+      spacing: 7.2, // 6 * 1.2
+      runSpacing: 7.2, // 6 * 1.2
+      children: attributes.map((attr) {
+        final normalizedAttr = TextUtils.getTranslatedOrNormalizedAttribute(
+          attr.attributeId,
+          context,
+        );
 
-    // 3. Build the styled text spans using the utility
-    final interestSpans = AttributeMatchingUtils.buildAttributeSpans(
-      context: context,
-      attributes: poiInterests,
-      currentUserInterestIds: userMatch.interestIds,
-      currentUserOfferIds: userMatch.offerIds,
-      isPoiInterest: true,
-      complementaryColor: AppColors.secondary,
-      similarColor: Colors.blue,
-      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),
+        // Use utility to determine match type
+        final matchType = AttributeMatchingUtils.getMatchType(
+          normalizedAttribute: normalizedAttr,
+          currentUserInterestIds: _currentUserInterestIds,
+          currentUserOfferIds: _currentUserOfferIds,
+          isPoiInterest: isPoiInterest,
+        );
+
+        return AttributeBubble(
+          attribute: attr,
+          matchType: matchType,
+          scaleFactor: 1.1,
+          currentUserInterestIds: _currentUserInterestIds,
+          currentUserOfferIds: _currentUserOfferIds,
+          isPoiInterest: isPoiInterest,
+        );
+      }).toList(),
     );
-
-    final offeringSpans = AttributeMatchingUtils.buildAttributeSpans(
-      context: context,
-      attributes: poiOfferings,
-      currentUserInterestIds: userMatch.interestIds,
-      currentUserOfferIds: userMatch.offerIds,
-      isPoiInterest: false,
-      complementaryColor: AppColors.secondary,
-      similarColor: Colors.blue,
-      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),
-    );
-
-    return {
-      'interests': interestSpans,
-      'offerings': offeringSpans,
-    };
   }
 
   Widget _buildPostingImage(UserPostingData posting, int index) {
@@ -692,6 +697,17 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
           child: Column(
             mainAxisSize: widget.isLargeScreen ? MainAxisSize.max : MainAxisSize.min,
             children: [
+              // Sliding panel handle for mobile
+              if (!widget.isLargeScreen)
+                Container(
+                  margin: const EdgeInsets.only(top: 8, bottom: 4),
+                  width: 40,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
               // Close button for large screen panel
               if (widget.isLargeScreen && widget.onClose != null)
                 Container(
@@ -731,38 +747,76 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Avatar/POI icon on the left with rating circle and online badge
-                            Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                RatingCircleAvatar(
-                                  size: 56,
-                                  rating: _averageRating,
-                                  isLoading: _isLoadingRating,
-                                  child: _isLoadingAvatar
-                                      ? const Center(
-                                    child: SizedBox(
-                                      width: 26,
-                                      height: 26,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
+                            // Avatar/POI icon on the left with online badge
+                            Transform.translate(
+                              offset: const Offset(0, -11.16), // Move 10% higher + 5px (61.6 * 0.1 + 5)
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  SizedBox(
+                                    width: 61.6, // 56 * 1.1
+                                    height: 61.6, // 56 * 1.1
+                                    child: _isLoadingAvatar
+                                        ? const Center(
+                                      child: SizedBox(
+                                        width: 26,
+                                        height: 26,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    )
+                                        : _avatarIcon ?? const Icon(Icons.person, size: 35.2), // 32 * 1.1
+                                  ),
+                                  // Rating badge - positioned below the avatar
+                                  if (!_isLoadingRating && _averageRating != null && _averageRating! > 0)
+                                    Positioned(
+                                      bottom: -6,
+                                      left: 0,
+                                      right: 0,
+                                      child: Center(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: _getRatingColor(),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: Colors.white, width: 1.5),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.star,
+                                                size: 10,
+                                                color: Colors.white,
+                                              ),
+                                              const SizedBox(width: 2),
+                                              Text(
+                                                _averageRating!.toStringAsFixed(1),
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  )
-                                      : _avatarIcon ?? const Icon(Icons.person, size: 32),
-                                ),
-                                // Online status badge - positioned at bottom-right to avoid overlapping rating badge
-                                PositionedOnlineStatusBadge(
-                                  isOnline: widget.poi.isOnline,
-                                  isAway: widget.poi.isAway,
-                                  size: 16.0,
-                                  right: -5,
-                                  bottom: -5,
-                                  borderWidth: 2.5,
-                                ),
-                              ],
+                                  // Online status badge - positioned at bottom-right
+                                  PositionedOnlineStatusBadge(
+                                    isOnline: widget.poi.isOnline,
+                                    isAway: widget.poi.isAway,
+                                    size: 16.0,
+                                    right: 5,
+                                    bottom: 5,
+                                    borderWidth: 2.5,
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(width: 10),
+                            //const SizedBox(width: 10),
                             // Name in the center
                             Expanded(
                               child: Column(
@@ -787,7 +841,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 16),
                             // Favorite icon button on the right
                             SizedBox(
                               width: 42,
@@ -816,47 +870,8 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                           attributes: widget.poi.profile.attributes,
                         ),
                         const SizedBox(height: 12),
-                        // Use a FutureBuilder with cached future to avoid recalculating on every rebuild
-                        FutureBuilder<Map<String, List<TextSpan>>>(
-                          future: _spansFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting ||
-                                snapshot.data == null) {
-                              // Show simple text while loading for faster initial render
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${l10n.userInterestedIn} ${widget.poi.profile
-                                        .attributes?.where((a) => a.type != 1).map((
-                                        a) => a.attributeId).join(", ") ?? ""}',
-                                    style: TextStyle(color: Colors.grey,
-                                      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    '${l10n.userOffers} ${widget.poi.profile
-                                        .attributes?.where((a) => a.type == 1).map((
-                                        a) => a.attributeId).join(", ") ?? ""}',
-                                    style: TextStyle(color: Colors.grey,
-                                      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),),
-                                  ),
-                                ],
-                              );
-                            }
-                            if (snapshot.hasError) {
-                              return Text(
-                                  '${l10n.errorLoadingAttributes}: ${snapshot
-                                      .error}');
-                            }
-
-                            // Cache the result for potential future use
-                            _cachedSpans ??= snapshot.data;
-
-                            final interestSpans = snapshot.data!['interests']!;
-                            final offeringSpans = snapshot.data!['offerings']!;
-
-                            return Column(
+                        // Attribute cards
+                        Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
@@ -866,38 +881,37 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                     color: Colors.white,
                                     child: Padding(
                                       padding: const EdgeInsets.all(12.0),
-                                      child: Row(
+                                      child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 4.0),
-                                            child: Icon(
-                                              Icons.arrow_downward,
-                                              size: 20,
-                                              color: Colors.blue,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: RichText(
-                                              text: TextSpan(
-                                                style: TextStyle(
-                                                  color: Colors.grey[800],
-                                                  fontSize: context.bodyFontSize,
-                                                  decoration: TextDecoration.none,
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 0.0),
+                                                child: Icon(
+                                                  Icons.arrow_downward,
+                                                  size: 20,
+                                                  color: Colors.blue,
                                                 ),
-                                                children: <TextSpan>[
-                                                  TextSpan(
-                                                    text: '${l10n.userInterestedIn} ',
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.grey[900],
-                                                      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),
-                                                    ),
-                                                  ),
-                                                  ...interestSpans,
-                                                ],
                                               ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                '${l10n.userInterestedIn}',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.grey[900],
+                                                  fontSize: ResponsiveBreakpoints.getBodyFontSize(context) * (widget.isLargeScreen ? 0.85 : 1.0),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 0, top: 6),
+                                            child: _buildAttributeBubbles(
+                                              context: context,
+                                              attributes: widget.poi.profile.attributes?.where((a) => a.type != 1).toList() ?? [],
+                                              isPoiInterest: true,
                                             ),
                                           ),
                                         ],
@@ -913,38 +927,37 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                     color: Colors.white,
                                     child: Padding(
                                       padding: const EdgeInsets.all(12.0),
-                                      child: Row(
+                                      child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 4.0),
-                                            child: Icon(
-                                              Icons.arrow_upward,
-                                              size: 20,
-                                              color: AppColors.secondary,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: RichText(
-                                              text: TextSpan(
-                                                style: TextStyle(
-                                                  color: Colors.grey[800],
-                                                  fontSize: context.bodyFontSize,
-                                                  decoration: TextDecoration.none,
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 0.0),
+                                                child: Icon(
+                                                  Icons.arrow_upward,
+                                                  size: 20,
+                                                  color: AppColors.secondary,
                                                 ),
-                                                children: <TextSpan>[
-                                                  TextSpan(
-                                                    text: '${l10n.userOffers} ',
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.grey[900],
-                                                      fontSize: ResponsiveBreakpoints.getSubheadingFontSize(context),
-                                                    ),
-                                                  ),
-                                                  ...offeringSpans,
-                                                ],
                                               ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                '${l10n.userOffers}',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.grey[900],
+                                                  fontSize: ResponsiveBreakpoints.getBodyFontSize(context) * (widget.isLargeScreen ? 0.85 : 1.0),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 0, top: 6),
+                                            child: _buildAttributeBubbles(
+                                              context: context,
+                                              attributes: widget.poi.profile.attributes?.where((a) => a.type == 1).toList() ?? [],
+                                              isPoiInterest: false,
                                             ),
                                           ),
                                         ],
@@ -953,9 +966,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                   ),
                                 ),
                               ],
-                            );
-                          },
-                        ),
+                            ),
                         // Postings section
                         _buildPostingsSection(l10n),
                       ],
@@ -971,12 +982,12 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.chat_bubble_outline),
-                      label: Text(l10n.chat),
+                      label: Text(l10n.chat, style: TextStyle(fontSize: 14),),
                       onPressed: widget.onChatButtonPressed!,
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                     ),
@@ -988,4 +999,12 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       ),
     );
   }
+
+  Color _getRatingColor() {
+    if (_averageRating == null || _averageRating == 0.0) return Colors.grey.shade400;
+    if (_averageRating! >= 4.0) return Colors.green;
+    if (_averageRating! > 3.0) return Colors.amber;
+    return Colors.red;
+  }
+  
 }

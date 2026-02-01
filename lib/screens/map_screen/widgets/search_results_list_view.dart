@@ -17,6 +17,7 @@ import '../../../utils/avatar_color_utils.dart';
 import '../../../utils/category_stats_utils.dart';
 import '../../../utils/image_utils.dart';
 import '../../../utils/text_utils.dart';
+import '../../../widgets/attribute_bubble.dart';
 import '../../../widgets/online_status_badge.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/poi_panel_cubit.dart';
@@ -1188,34 +1189,13 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 isPoiInterest: true, // This is POI's interest
               );
               
-              // Get styling based on match type
-              final style = AttributeMatchingUtils.getAttributeStyle(
+              return AttributeBubble(
+                attribute: attr,
                 matchType: matchType,
-                defaultColor: _getColorForAttribute(attr.uiStyleHint),
-                complementaryColor: AppColors.secondary,
-                similarColor: Colors.blue,
-              );
-              
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: style.backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: style.borderColor != null
-                      ? Border.all(
-                          color: style.borderColor!,
-                          width: style.borderWidth!,
-                        )
-                      : null,
-                ),
-                child: Text(
-                  normalizedAttr,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: style.textColor,
-                    fontWeight: style.fontWeight,
-                  ),
-                ),
+                scaleFactor: 1.0,
+                currentUserInterestIds: _currentUserInterestIds,
+                currentUserOfferIds: _currentUserOfferIds,
+                isPoiInterest: true,
               );
             }).toList(),
           ),
@@ -1247,34 +1227,13 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 isPoiInterest: false, // This is POI's offering
               );
               
-              // Get styling based on match type
-              final style = AttributeMatchingUtils.getAttributeStyle(
+              return AttributeBubble(
+                attribute: attr,
                 matchType: matchType,
-                defaultColor: _getColorForAttribute(attr.uiStyleHint),
-                complementaryColor: AppColors.secondary,
-                similarColor: Colors.blue,
-              );
-              
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: style.backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: style.borderColor != null
-                      ? Border.all(
-                          color: style.borderColor!,
-                          width: style.borderWidth!,
-                        )
-                      : null,
-                ),
-                child: Text(
-                  normalizedAttr,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: style.textColor,
-                    fontWeight: style.fontWeight,
-                  ),
-                ),
+                scaleFactor: 1.0,
+                currentUserInterestIds: _currentUserInterestIds,
+                currentUserOfferIds: _currentUserOfferIds,
+                isPoiInterest: false,
               );
             }).toList(),
           ),
@@ -1461,27 +1420,6 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     
     // Load SVG without color modification
     return await rootBundle.loadString(selectedIconPath);
-  }
-
-  Color _getColorForAttribute(String? uiStyleHint) {
-    switch (uiStyleHint?.toLowerCase()) {
-      case 'green':
-        return Colors.green;
-      case 'red':
-        return Colors.red;
-      case 'blue':
-        return Colors.blue;
-      case 'purple':
-        return Colors.purple;
-      case 'yellow':
-        return Colors.amber;
-      case 'orange':
-        return Colors.orange;
-      case 'teal':
-        return Colors.teal;
-      default:
-        return AppColors.primary;
-    }
   }
 }
 
