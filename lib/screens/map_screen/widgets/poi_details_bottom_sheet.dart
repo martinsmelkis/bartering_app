@@ -636,7 +636,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(height: 24),
+        const Divider(height: 24, color: AppColors.primary,),
         Text(
           l10n.activePostings,
           style: Theme
@@ -742,7 +742,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                         child: CategoryStatsUtils.buildCategoryStatsBar(
                           keywordMap: widget.poi.profile.profileKeywordDataMap,
                           attributes: widget.poi.profile.attributes,
-                          height: 10
+                          height: 8
                         ),
                       ),
                       Padding(
@@ -865,76 +865,76 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                         const SizedBox(height: 12),
                         // Attribute cards
                         Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: Card(
-                                    elevation: 1,
-                                    color: Colors.white,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: Card(
+                                elevation: 1,
+                                color: Colors.white,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(top: 0.0),
-                                                child: Icon(
-                                                  Icons.arrow_downward,
-                                                  size: 20,
-                                                  color: Colors.blue,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                '${l10n.userInterestedIn}',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey[900],
-                                                  fontSize: ResponsiveBreakpoints.getBodyFontSize(context) * (widget.isLargeScreen ? 0.85 : 1.0),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
                                           Padding(
-                                            padding: const EdgeInsets.only(left: 0, top: 6),
-                                            child: _buildAttributeBubbles(
-                                              context: context,
-                                              attributes: widget.poi.profile.attributes?.where((a) => a.type != 1).toList() ?? [],
-                                              isPoiInterest: true,
+                                            padding: const EdgeInsets.only(top: 0.0),
+                                            child: Icon(
+                                              Icons.arrow_downward,
+                                              size: 20,
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            '${l10n.userInterestedIn}',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey[900],
+                                              fontSize: ResponsiveBreakpoints.getBodyFontSize(context) * (widget.isLargeScreen ? 0.85 : 1.0),
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 0, top: 6),
+                                        child: _buildAttributeBubbles(
+                                          context: context,
+                                          attributes: widget.poi.profile.attributes?.where((a) => a.type != 1).toList() ?? [],
+                                          isPoiInterest: true,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: Card(
-                                    elevation: 1,
-                                    color: Colors.white,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Column(
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Card(
+                                elevation: 1,
+                                color: Colors.white,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(top: 0.0),
-                                                child: Icon(
-                                                  Icons.arrow_upward,
-                                                  size: 20,
-                                                  color: AppColors.secondary,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0.0),
+                                            child: Icon(
+                                              Icons.arrow_upward,
+                                              size: 20,
+                                              color: AppColors.secondary,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
                                               Text(
                                                 '${l10n.userOffers}',
                                                 style: TextStyle(
@@ -943,15 +943,15 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                                   fontSize: ResponsiveBreakpoints.getBodyFontSize(context) * (widget.isLargeScreen ? 0.85 : 1.0),
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 0, top: 6),
-                                            child: _buildAttributeBubbles(
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 0, top: 6),
+                                          child: _buildAttributeBubbles(
                                               context: context,
                                               attributes: widget.poi.profile.attributes?.where((a) => a.type == 1).toList() ?? [],
                                               isPoiInterest: false,
-                                            ),
+                                          ),
                                           ),
                                         ],
                                       ),
@@ -980,7 +980,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                       label: Text(l10n.chat, style: TextStyle(fontSize: 14),),
                       onPressed: widget.onChatButtonPressed!,
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

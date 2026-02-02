@@ -70,25 +70,25 @@ class PoiMarkerWidget {
       double alphaBoost = 1.0;
       if (relevancyScore >= 0.90) {
         // Top tier: 30% boost for scores >= 90%
-        colorBoost = 1.3; // 30% more towards red
-        alphaBoost = 1.3; // 30% more alpha intensity
+        colorBoost = 1.2; // 30% more towards red
+        alphaBoost = 1.2; // 30% more alpha intensity
         logDebug('@@@@@@@@@@ BOOST APPLIED: score >= 0.90, boosting by 30%');
       } else if (relevancyScore >= 0.80) {
         // Mid tier: 20% boost for scores >= 80%
-        colorBoost = 1.2; // 20% more towards red
-        alphaBoost = 1.2; // 20% more alpha intensity
+        colorBoost = 1.1; // 20% more towards red
+        alphaBoost = 1.1; // 20% more alpha intensity
         logDebug('@@@@@@@@@@ BOOST APPLIED: score >= 0.80, boosting by 20%');
       }
       
       // Apply color boost: push normalized score closer to 1.0 for redder color
-      final boostedColorScore = (normalizedScore * colorBoost).clamp(0.0, 1.0);
+      final boostedColorScore = (normalizedScore * colorBoost).clamp(0.0, 0.9);
       
       // Interpolate color from AppColors.primary to Colors.redAccent
       glowColor = Color.lerp(Colors.orange.shade500, Colors.deepOrange.shade400, boostedColorScore);
       
       // Interpolate alpha from 0.3 to 0.6, then apply boost
-      final baseAlpha = 0.4 + (normalizedScore * 0.3); // 0.3 to 0.6
-      glowAlpha = (baseAlpha * alphaBoost).clamp(0.3, 0.9); // Boost but cap at 0.9
+      final baseAlpha = 0.3 + (normalizedScore * 0.3); // 0.3 to 0.6
+      glowAlpha = (baseAlpha * alphaBoost).clamp(0.3, 0.8); // Boost but cap at 0.9
       
       logDebug('@@@@@@@@@@ RESULT: boostedColor=$boostedColorScore, color=$glowColor, alpha=${glowAlpha.toStringAsFixed(3)}');
     }
@@ -100,11 +100,11 @@ class PoiMarkerWidget {
         // Glow effect for relevant POIs
         if (glowColor != null)
           Positioned(
-            left: kIsWeb ? 18 : 36,
-            top: kIsWeb ? 18 : 36,
+            left: kIsWeb ? 18 : 38,
+            top: kIsWeb ? 18 : 38,
             child: Container(
-              width: circleSize - circleSize / (kIsWeb ? 2.5 : 2.52),
-              height: circleSize - circleSize / (kIsWeb ? 2.5 : 2.52),
+              width: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
+              height: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [

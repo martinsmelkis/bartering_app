@@ -338,17 +338,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      widget.interests == null
+                      widget.interests == null || widget.interests!.isEmpty
                           ? const SizedBox()
                           : Wrap(
                         spacing: 7.2,
                         runSpacing: 7.2,
-                        children: widget.interests!.map((interest) {
-                          return AttributeBubble(
-                            attribute: interest,
-                            matchType: AttributeMatchType.none,
-                            scaleFactor: 1.2,
-                          );
+                        children: widget.interests!
+                            .where((interest) => interest != null)
+                            .map((interest) {
+                          try {
+                            return AttributeBubble(
+                              attribute: interest,
+                              matchType: AttributeMatchType.none,
+                              scaleFactor: 1.2,
+                            );
+                          } catch (e) {
+                            logDebug('Error rendering interest bubble: $e');
+                            return const SizedBox.shrink();
+                          }
                         }).toList(),
                       ),
                     ],
@@ -446,17 +453,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      widget.offerings == null
+                      widget.offerings == null || widget.offerings!.isEmpty
                           ? const SizedBox()
                           : Wrap(
                         spacing: 7.2,
                         runSpacing: 7.2,
-                        children: widget.offerings!.map((offering) {
-                          return AttributeBubble(
-                            attribute: offering,
-                            matchType: AttributeMatchType.none,
-                            scaleFactor: 1.2,
-                          );
+                        children: widget.offerings!
+                            .where((offering) => offering != null)
+                            .map((offering) {
+                          try {
+                            return AttributeBubble(
+                              attribute: offering,
+                              matchType: AttributeMatchType.none,
+                              scaleFactor: 1.2,
+                            );
+                          } catch (e) {
+                            logDebug('Error rendering offering bubble: $e');
+                            return const SizedBox.shrink();
+                          }
                         }).toList(),
                       ),
                     ],
@@ -512,10 +526,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             SizedBox(height: 12.h),
 
             // Category Stats Bar
-            CategoryStatsUtils.buildCategoryStatsBar(
-              keywordMap: _profileKeywordDataMap,
-              attributes: [...?widget.interests, ...?widget.offerings],
-            ),
+            if (_profileKeywordDataMap != null)
+              CategoryStatsUtils.buildCategoryStatsBar(
+                keywordMap: _profileKeywordDataMap,
+                attributes: [
+                  ...?(widget.interests?.where((i) => i != null)),
+                  ...?(widget.offerings?.where((o) => o != null)),
+                ],
+              ),
             SizedBox(height: 20.h),
 
             // Notification Preferences and Match History Buttons

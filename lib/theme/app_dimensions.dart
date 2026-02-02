@@ -32,19 +32,19 @@ class AppDimensions {
   // ============================================================================
 
   /// Container size for main cluster markers
-  static double get mainClusterSize => kIsWeb ? 60.0 : 88.0;
+  static double get mainClusterSize => kIsWeb ? 60.0 : 101.2;
 
   /// Font size for main cluster marker text
-  static double get mainClusterFontSize => kIsWeb ? 20.0 : 28.sp;
+  static double get mainClusterFontSize => kIsWeb ? 23.0 : 32.sp;
 
   /// Border width for main cluster markers
   static double get mainClusterBorderWidth => kIsWeb ? 2.0 : 4.0;
 
   /// Container size for sub-cluster markers
-  static double get subClusterSize => kIsWeb ? 50.0 : 72.0;
+  static double get subClusterSize => kIsWeb ? 50.0 : 86.4;
 
   /// Font size for sub-cluster marker text
-  static double get subClusterFontSize => kIsWeb ? 16.0 : 25.sp;
+  static double get subClusterFontSize => kIsWeb ? 19.2 : 30.sp;
 
   /// Border width for sub-cluster markers
   static double get subClusterBorderWidth => kIsWeb ? 2.0 : 2.0;

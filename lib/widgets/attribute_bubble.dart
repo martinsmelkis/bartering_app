@@ -64,24 +64,54 @@ class AttributeBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String attributeText;
+    String attributeText = '';
     String? uiStyleHint;
     
-    // Handle different attribute types
-    if (attribute.runtimeType.toString().contains('ParsedAttributeData')) {
-      attributeText = TextUtils.getTranslatedOrNormalizedAttribute(
-        attribute.attribute,
-        context,
-      );
-      uiStyleHint = attribute.uiStyleHint;
-    } else {
-      attributeText = TextUtils.getTranslatedOrNormalizedAttribute(
-        attribute.attributeId,
-        context,
-      );
-      uiStyleHint = attribute.uiStyleHint;
+    // Safely extract data from attribute object
+    try {
+      final dynamic attr = attribute;
+      
+      // Try ParsedAttributeData first (has 'attribute' property)
+      try {
+        final attrName = attr.attribute;
+        if (attrName != null && attrName is String) {
+          attributeText = TextUtils.getTranslatedOrNormalizedAttribute(
+            attrName,
+            context,
+          );
+          uiStyleHint = attr.uiStyleHint?.toString();
+          return _buildBubble(attributeText, uiStyleHint);
+        }
+      } catch (_) {
+        // Not a ParsedAttributeData, try next approach
+      }
+      
+      // Try UserAttributeEntryData (has 'attributeId' property)
+      try {
+        final attrId = attr.attributeId;
+        if (attrId != null && attrId is String) {
+          attributeText = TextUtils.getTranslatedOrNormalizedAttribute(
+            attrId,
+            context,
+          );
+          uiStyleHint = attr.uiStyleHint?.toString();
+          return _buildBubble(attributeText, uiStyleHint);
+        }
+      } catch (_) {
+        // Not a UserAttributeEntryData either
+      }
+      
+      // Fallback: try to convert to string
+      attributeText = attr?.toString() ?? 'Unknown';
+    } catch (e) {
+      // Ultimate fallback
+      attributeText = 'Error';
     }
-
+    
+    return _buildBubble(attributeText, uiStyleHint);
+  }
+  
+  Widget _buildBubble(String attributeText, String? uiStyleHint) {
     // Get styling based on match type
     final style = AttributeMatchingUtils.getAttributeStyle(
       matchType: matchType,

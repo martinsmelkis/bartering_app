@@ -12,7 +12,7 @@ class AppColors {
 
   // Define other common colors
   //static const Color background = Color(0xFFfff0e0);
-  static const Color background = Color(0xFFffe0c9);
+  static const Color background = Color(0xFFFFD0C0);
   //static const Color background = Color(0xFFffe0c9);
   //static const Color background = Color(0xFFffe5c3);
   //static const Color background = Color(0xFFffd8c5);

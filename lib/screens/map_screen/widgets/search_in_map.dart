@@ -48,7 +48,9 @@ class _SearchInMapState extends State<SearchInMap> {
       child: Card(
         color: Colors.white,
         elevation: 2,
-        shape: const StadiumBorder(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
         child: BlocBuilder<PoiCubit, PoiState>(
           bloc: widget.poiCubit,
           builder: (context, state) {

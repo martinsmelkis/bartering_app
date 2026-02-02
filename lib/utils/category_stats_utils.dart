@@ -41,24 +41,31 @@ class CategoryStatsUtils {
     // Add 0.2 for each attribute belonging to each category
     if (attributes != null && attributes.isNotEmpty) {
       for (var attribute in attributes) {
-        final String? uiStyleHint = attribute.uiStyleHint;
-        if (uiStyleHint != null) {
-          // Match the category order: 0=GREEN, 1=RED, 2=BLUE, 3=PURPLE, 4=YELLOW, 5=ORANGE, 6=TEAL
-          if (uiStyleHint.contains('GREEN')) {
-            weights[0] += 0.2;
-          } else if (uiStyleHint.contains('RED')) {
-            weights[1] += 0.2;
-          } else if (uiStyleHint.contains('BLUE')) {
-            weights[2] += 0.2;
-          } else if (uiStyleHint.contains('PURPLE')) {
-            weights[3] += 0.2;
-          } else if (uiStyleHint.contains('YELLOW')) {
-            weights[4] += 0.2;
-          } else if (uiStyleHint.contains('ORANGE')) {
-            weights[5] += 0.2;
-          } else if (uiStyleHint.contains('TEAL')) {
-            weights[6] += 0.2;
+        if (attribute == null) continue;
+        
+        try {
+          final String? uiStyleHint = attribute.uiStyleHint;
+          if (uiStyleHint != null) {
+            // Match the category order: 0=GREEN, 1=RED, 2=BLUE, 3=PURPLE, 4=YELLOW, 5=ORANGE, 6=TEAL
+            if (uiStyleHint.contains('GREEN')) {
+              weights[0] += 0.2;
+            } else if (uiStyleHint.contains('RED')) {
+              weights[1] += 0.2;
+            } else if (uiStyleHint.contains('BLUE')) {
+              weights[2] += 0.2;
+            } else if (uiStyleHint.contains('PURPLE')) {
+              weights[3] += 0.2;
+            } else if (uiStyleHint.contains('YELLOW')) {
+              weights[4] += 0.2;
+            } else if (uiStyleHint.contains('ORANGE')) {
+              weights[5] += 0.2;
+            } else if (uiStyleHint.contains('TEAL')) {
+              weights[6] += 0.2;
+            }
           }
+        } catch (e) {
+          // Skip invalid attributes
+          continue;
         }
       }
     }

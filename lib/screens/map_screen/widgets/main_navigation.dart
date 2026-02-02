@@ -15,6 +15,9 @@ class MainNavigation extends StatelessWidget {
       heroTag: "MainMenuFab",
       mini: true,
       backgroundColor: AppColors.background,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
       child: const Icon(Icons.menu),
     );
   }

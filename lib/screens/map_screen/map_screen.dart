@@ -942,6 +942,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                   heroTag: "ChatsFab",
                                   mini: true,
                                   backgroundColor: AppColors.background,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
                                   child: const Icon(Icons.chat_bubble_outline),
                                 ),
                                 if (badgeState.unreadCount > 0)
