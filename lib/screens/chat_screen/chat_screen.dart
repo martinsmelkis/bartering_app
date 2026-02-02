@@ -12,6 +12,7 @@ import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
 import 'package:barter_app/screens/chat_screen/widgets/message_status_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -54,20 +55,21 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isUserBlocked = false;
 
   @override
-  void dispose() {
-    // Clear active chat when leaving screen
-    try {
-      final notificationService = getIt<ChatNotificationService>();
-      notificationService.setActiveChat(null);
-    } catch (e) {
-      // Service might not be registered
-    }
-
-    _messages.clear();
-    _messageController.dispose();
-    _scrollController.dispose();
-    super.dispose();
+void dispose() {
+  // Clear active chat when leaving screen
+  try {
+    final notificationService = getIt<ChatNotificationService>();
+    notificationService.setActiveChat(null);
+  } catch (e) {
+    // Service might not be registered
   }
+
+  // Don't clear _messages - this list is repopulated from state on each rebuild
+  // Clearing it causes messages to be lost when navigating between chats
+  _messageController.dispose();
+  _scrollController.dispose();
+  super.dispose();
+}
 
   void _sendMessage() {
     if (_messageController.text.isNotEmpty) {
@@ -644,6 +646,11 @@ class _ChatScreenState extends State<ChatScreen> {
                     await launchUrl(Uri.parse(link.url));
                   }
                 },
+                contextMenuBuilder: (context, editableTextState) {
+                  return AdaptiveTextSelectionToolbar.editableText(
+                    editableTextState: editableTextState,
+                  );
+                },
               )
             ],
             SizedBox(height: spacing),
@@ -855,7 +862,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _downloadFile(FileAttachment attachment) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     try {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -900,13 +907,13 @@ class _ChatScreenState extends State<ChatScreen> {
         fileId: attachment.fileId,
         userId: currentUserId!,
         filename: attachment.filename,
-        senderPublicKey: senderPublicKey, // Changed parameter name for clarity
+        senderPublicKey: senderPublicKey,
       );
 
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (localPath != null) {
-        // Update attachment with local path
+        // Mobile/Desktop: File saved locally
         attachment.copyWith(
           localPath: localPath,
           isDownloaded: true,
@@ -916,6 +923,15 @@ class _ChatScreenState extends State<ChatScreen> {
 
         // Automatically open the file
         await _openFile(localPath);
+      } else {
+        // Web: Browser handles the download automatically
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Download started! Check your downloads folder'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
       }
     } catch (e) {
       final l10n = AppLocalizations.of(context)!;

@@ -1,12 +1,16 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:barter_app/models/chat/file_attachment.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+
+// Web-specific import using conditional compilation
+import 'package:barter_app/services/file_transfer_web.dart' if (dart.library.io) 'package:barter_app/services/file_transfer_stub.dart';
 
 /// Service for handling encrypted file transfers in chat
 class FileTransferService {
@@ -145,12 +149,12 @@ class FileTransferService {
   }
 
   /// Download and decrypt a file
-  /// 
+  ///
   /// Process:
   /// 1. Download encrypted file from server
   /// 2. Decrypt file with sender's public key (using recipient's private key via ECDH)
-  /// 3. Save decrypted file to local storage
-  /// 4. Return local file path
+  /// 3. Save decrypted file to local storage (web: trigger browser download)
+  /// 4. Return local file path (web: null since file is downloaded by browser)
   Future<String?> downloadFile({
     required String fileId,
     required String userId,
@@ -176,29 +180,35 @@ class FileTransferService {
         senderPublicKey,
       );
 
-      // Save to local storage
-      final directory = await getApplicationDocumentsDirectory();
-      final downloadsDir = Directory('${directory.path}/downloads');
-      if (!await downloadsDir.exists()) {
-        await downloadsDir.create(recursive: true);
+      if (kIsWeb) {
+        // Web: Trigger browser download
+        downloadFileOnWeb(filename, decryptedBytes);
+        return null; // No local path on web
+      } else {
+        // Mobile/Desktop: Save to local storage
+        final directory = await getApplicationDocumentsDirectory();
+        final downloadsDir = Directory('${directory.path}/downloads');
+        if (!await downloadsDir.exists()) {
+          await downloadsDir.create(recursive: true);
+        }
+
+        // Generate unique filename if file already exists
+        var localFilePath = '${downloadsDir.path}/$filename';
+        var counter = 1;
+        while (await File(localFilePath).exists()) {
+          final ext = path.extension(filename);
+          final name = path.basenameWithoutExtension(filename);
+          localFilePath = '${downloadsDir.path}/${name}_$counter$ext';
+          counter++;
+        }
+
+        // Write decrypted bytes to file
+        final localFile = File(localFilePath);
+        await localFile.writeAsBytes(decryptedBytes);
+
+        print('File downloaded and decrypted: $localFilePath');
+        return localFilePath;
       }
-
-      // Generate unique filename if file already exists
-      var localFilePath = '${downloadsDir.path}/$filename';
-      var counter = 1;
-      while (await File(localFilePath).exists()) {
-        final ext = path.extension(filename);
-        final name = path.basenameWithoutExtension(filename);
-        localFilePath = '${downloadsDir.path}/${name}_$counter$ext';
-        counter++;
-      }
-
-      // Write decrypted bytes to file
-      final localFile = File(localFilePath);
-      await localFile.writeAsBytes(decryptedBytes);
-
-      print('File downloaded and decrypted: $localFilePath');
-      return localFilePath;
     } catch (e) {
       print('Error downloading file: $e');
       rethrow;

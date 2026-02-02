@@ -21,15 +21,18 @@ class WebSocketChatService {
   WebSocketChannel? _channel;
   StreamController<ChatMessage> _messageController =
     StreamController<ChatMessage>.broadcast();
-  
+
   // Stream for message status updates
   StreamController<MessageStatusUpdate> _statusUpdateController =
     StreamController<MessageStatusUpdate>.broadcast();
-  
+
   // Stream for read receipt notifications
   StreamController<ReadReceiptNotification> _readReceiptController =
     StreamController<ReadReceiptNotification>.broadcast();
-    
+
+  // Callback when public key is received (for re-decryption of old messages)
+  Function(String userId, String publicKey)? onPublicKeyReceived;
+
   CryptoService _cryptoService;
   SecureStorageService secureStorage = SecureStorageService();
   String _currentUserId;
@@ -114,6 +117,9 @@ class WebSocketChatService {
                 // Also persist it for future sessions
                 await secureStorage.saveContactPublicKey(senderId, receivedPublicKey);
                 logDebug('@@@@@@@@@@@@ Public key cached for user: $senderId');
+
+                // Notify callback so messages can be re-decrypted
+                onPublicKeyReceived?.call(senderId!, receivedPublicKey);
               }
 
               logDebug('@@@@@@@@@@@@ Public keys exchanged successfully');
@@ -230,15 +236,15 @@ class WebSocketChatService {
 
               debugPrint('@@@@@@@@@@@@@@ Encrypted message received: '
                   '${encryptedText.substring(0, 20)}...');
-              
+
               if (transactionId != null) {
                 logDebug('@@@@@@@@@@ Message has transactionId: $transactionId');
               }
 
               // Decrypt using the sender's public key from cache
+              // Returns null if decryption fails (e.g., missing public key)
               String? messageDecrypted;
               if (senderId != null) {
-                // Try to get from cache first
                 messageDecrypted = await decryptMessageText(encryptedText, senderId);
               } else {
                 print("ERROR: No senderId in message");
@@ -291,9 +297,9 @@ class WebSocketChatService {
     }
   }
 
-  Future<String> decryptMessageText(String encryptedText, String senderId) async {
+  Future<String?> decryptMessageText(String encryptedText, String senderId) async {
 
-    String? messageDecrypted = "";
+    String? messageDecrypted = null;
     String? senderPublicKeyBase64 = _publicKeyCache[senderId];
 
     // If not in cache, try loading from persistent storage
@@ -393,6 +399,14 @@ class WebSocketChatService {
     }
   }
 
+  /// Disconnect WebSocket without disposing streams (for reconnection)
+  void disconnect() {
+    print("WebSocket: Disconnecting...");
+    _channel?.sink.close(status.goingAway);
+    _channel = null;
+  }
+
+  /// Dispose service completely (closes streams too)
   void dispose() {
     print("WebSocket: Disposing service and closing connection.");
     _channel?.sink.close(status.goingAway);

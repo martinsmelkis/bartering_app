@@ -12,6 +12,7 @@ import 'package:barter_app/screens/map_screen/widgets/search_results_list_view.d
 import 'package:barter_app/screens/map_screen/widgets/user_avatar_fab.dart';
 import 'package:barter_app/screens/map_screen/widgets/zoom_buttons.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
+import 'package:barter_app/services/messaging/global_chat_service.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
@@ -118,11 +119,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     poiCubit = context.read<PoiCubit>();
     mapOperationsCubit = context.read<MapOperationsCubit>();
     _mapController.addObserver(this);
-    
+
     // Load GPS location setting
     final settingsService = getIt<SettingsService>();
     _isGpsLocationEnabled = settingsService.isGpsLocationEnabledSync();
-    
+
     _loadUserProfile();
 
     // Handle any pending notification that opened the app when it was terminated
@@ -300,6 +301,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   void _onMapReady(bool isReady) async {
     _isMapReady = true;
     logDebug('@@@@@@@@@ _onMapReady called with initialPois: ${widget.initialPois?.length ?? 0}');
+
     // If initial POIs were provided (e.g., from match history), use them instead of fetching
     if (widget.initialPois != null && widget.initialPois!.isNotEmpty) {
       // Center map on the first POI
@@ -330,6 +332,21 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         _processPois(_allPois);
       }
     }
+
+    // Initialize global chat service after map is ready
+    _initializeGlobalChat();
+  }
+
+  /// Initialize global chat connection after map is ready
+  /// Re-enabled with server multi-connection support
+  Future<void> _initializeGlobalChat() async {
+    try {
+      final globalChatService = getIt<GlobalChatService>();
+      await globalChatService.initialize();
+      logDebug('✅ Global chat service initialized (multi-connection mode enabled)');
+    } catch (e) {
+      logDebugError('Error initializing global chat service', e);
+    }
   }
 
   void _processPois(List<PointOfInterest> pois, {bool ignoreListViewSetting = false}) async {
@@ -350,7 +367,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       final showAsList = await settingsService.getShowSearchResultsAsList();
       final poiPanelCubit = context.read<PoiPanelCubit>();
 
-      if (showAsList && _allPois.isNotEmpty) {
+      // Disable list view by default on web + small/mobile screens
+      // Only show list if showAsList is enabled AND (not on web OR screen is large enough)
+      if (showAsList && _allPois.isNotEmpty && !(kIsWeb && !context.canShowSideBySide)) {
         // Update search results if list is already showing OR if POI panel is not open
         if (_showSearchResultsList || !poiPanelCubit.state.isOpen) {
           logDebug('@@@@@@@@@ Updating search results list with ${_allPois.length} POIs (key: $_searchResultsKey)');
@@ -368,6 +387,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         } else {
           logDebug('@@@@@@@@@ NOT updating search results list - list not showing and POI panel is open');
         }
+      } else if (kIsWeb && !context.canShowSideBySide && showAsList) {
+        logDebug('@@@@@@@@@ NOT showing search results list - disabled by default on web + small screens');
       }
     }
 
@@ -1061,33 +1082,35 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         right: 0,
                         bottom: 0,
                         top: MediaQuery.of(context).size.height * 0.15,
-                        child: SearchResultsListView(
-                          key: ValueKey(_searchResultsKey),
-                          pois: _searchResults,
-                          isLargeScreen: false,
-                          onClose: () {
-                            setState(() {
-                              _showSearchResultsList = false;
-                              _searchResults = [];
-                            });
-                            if (_allPois.isNotEmpty) {
-                              _processPois(_allPois, ignoreListViewSetting: true);
-                            }
-                          },
-                          onPoiTap: (poi) async {
-                            // On small screens, close the list when POI is tapped
-                            setState(() {
-                              _showSearchResultsList = false;
-                            });
-                            if (_allPois.isNotEmpty) {
-                              _processPois(_allPois, ignoreListViewSetting: true);
-                              await Future.delayed(const Duration(milliseconds: 100));
-                            }
-                            _onIndividualPoiTap(poi);
-                          },
-                          onChatTap: (poi) {
-                            _openChat(poi.profile.userId, poi.profile.name);
-                          },
+                        child: PointerInterceptor(
+                          child: SearchResultsListView(
+                            key: ValueKey(_searchResultsKey),
+                            pois: _searchResults,
+                            isLargeScreen: false,
+                            onClose: () {
+                              setState(() {
+                                _showSearchResultsList = false;
+                                _searchResults = [];
+                              });
+                              if (_allPois.isNotEmpty) {
+                                _processPois(_allPois, ignoreListViewSetting: true);
+                              }
+                            },
+                            onPoiTap: (poi) async {
+                              // On small screens, close the list when POI is tapped
+                              setState(() {
+                                _showSearchResultsList = false;
+                              });
+                              if (_allPois.isNotEmpty) {
+                                _processPois(_allPois, ignoreListViewSetting: true);
+                                await Future.delayed(const Duration(milliseconds: 100));
+                              }
+                              _onIndividualPoiTap(poi);
+                            },
+                            onChatTap: (poi) {
+                              _openChat(poi.profile.userId, poi.profile.name);
+                            },
+                          ),
                         ),
                       ),
                   ]

@@ -47,9 +47,12 @@ class PoiMarkerWidget {
     logDebug('@@@@@@@@@@ POI ${poi.profile.userId} RAW matchRelevancyScore: ${poi.matchRelevancyScore} (${(relevancyScore * 100).toStringAsFixed(1)}%)');
 
     // Calculate sizes for circle
+    // For web mobile, increase resolution to prevent blurriness
     final strokeWidth = kIsWeb ? 7.2 : 12.6;
     final circleSize = AppDimensions.mapPoiMarkerSize;
     final gap = strokeWidth + 2;
+    // On web, render at 2x physical resolution for crisp display
+    final scaleFactor = kIsWeb ? 2.0 : 1.0;
     final svgSize = circleSize - gap;
 
     // Calculate gradient glow color and alpha based on relevance score (70% - 100%)
@@ -127,9 +130,10 @@ class PoiMarkerWidget {
           child: ClipOval(
             child: SvgPicture.string(
               localSvgCopy,
-              width: svgSize,
-              height: svgSize,
-              fit: BoxFit.contain,
+              // Render at 2x on web for crisp display on high-DPI screens
+              width: kIsWeb ? svgSize * 2 : svgSize,
+              height: kIsWeb ? svgSize * 2 : svgSize,
+              fit: BoxFit.fill,
               allowDrawingOutsideViewBox: false,
               placeholderBuilder: (context) => Container(
                 width: svgSize,
@@ -137,6 +141,10 @@ class PoiMarkerWidget {
                 color: Colors.grey.shade200,
               ),
               key: ValueKey('poi_marker_${poi.profile.userId}'),
+              // Improve rendering quality on web mobile
+              clipBehavior: Clip.antiAlias,
+              // Ensure proper rendering on web
+              semanticsLabel: '${poi.profile.name} avatar',
             ),
           ),
         ),

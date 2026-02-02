@@ -268,14 +268,19 @@ class ChatCubit extends Cubit<ChatState> {
         await _chatRepository!.markConversationAsRead(_currentConversationId!);
       }
 
-          logDebug('@@@@@@@@@@@@@ Init chat session - Connecting WebSocket');
+          logDebug('@@@@@@@@@@@@@ Init chat session - Creating chat-specific WebSocket');
 
+      // Always create a chat-specific WebSocket connection for sending messages
+      // The global WebSocket is only for receiving messages
+      // This ensures proper key exchange via authentication
+      logDebug('📡 Creating chat-specific WebSocket connection for sending messages');
+      
       // Get notification service
       ChatNotificationService? notificationService;
       try {
         notificationService = getIt<ChatNotificationService>();
       } catch (e) {
-          logDebug('⚠️ ChatNotificationService not available: $e');
+        logDebug('⚠️ ChatNotificationService not available: $e');
       }
 
       // Get WebSocket URL from environment variables based on platform
@@ -293,28 +298,30 @@ class ChatCubit extends Cubit<ChatState> {
           notificationService: notificationService
       );
 
+      // Register callback to re-decrypt messages when public key is received
+      _webSocketService?.onPublicKeyReceived = (userId, publicKey) async {
+        logDebug('🔑 Public key received for $userId, re-decrypting messages...');
+        await _reDecryptMessages(userId, publicKey);
+      };
+
       // Preload the recipient's public key if available
       await _webSocketService?.loadContactPublicKey(recipientUserId);
 
       // Load recipient's public key for file encryption
-      recipientPublicKey =
-      await secureStorage.getContactPublicKey(recipientUserId);
-          logDebug('@@@@@@@@@@ Recipient public key loaded: ${recipientPublicKey !=
-          null}');
+      recipientPublicKey = await secureStorage.getContactPublicKey(recipientUserId);
+      logDebug('@@@@@@@@@@ Recipient public key loaded: ${recipientPublicKey != null}');
 
       _webSocketService?.connect(userId);
       _listenToMessages();
 
-          logDebug('@@@@@@@@@@@@@ Init chat session - Creating auth signature');
-          logDebug('Key: $pubKey, userId: $userId, recipientUserId: $recipientUserId');
+      logDebug('@@@@@@@@@@@@@ Init chat session - Creating auth signature');
+      logDebug('Key: $pubKey, userId: $userId, recipientUserId: $recipientUserId');
 
       // Create timestamp and signature for authentication
-      final timestamp = DateTime
-          .now()
-          .millisecondsSinceEpoch;
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
       final messageToSign = "$timestamp.$userId.$recipientUserId";
 
-          logDebug('@@@@@@@@@@@@@ Message to sign: $messageToSign');
+      logDebug('@@@@@@@@@@@@@ Message to sign: $messageToSign');
       final signature = cryptoService?.signMessage(messageToSign);
 
       if (signature == null) {
@@ -322,7 +329,7 @@ class ChatCubit extends Cubit<ChatState> {
         return;
       }
 
-          logDebug('@@@@@@@@@@ Signature generated: ${signature.substring(0, 20)}...');
+      logDebug('@@@@@@@@@@ Signature generated: ${signature.substring(0, 20)}...');
 
       final authRequest = AuthRequest(
         userId: userId,
@@ -334,7 +341,7 @@ class ChatCubit extends Cubit<ChatState> {
       );
 
       final authJson = jsonEncode(authRequest.toJson());
-          logDebug('@@@@@@@@@@@@@ Sending auth request: $authJson');
+      logDebug('@@@@@@@@@@@@@ Sending auth request: $authJson');
       _webSocketService?.sendAuthMessage(authJson);
 
       emit(ChatLoaded(List.from(messages)));
@@ -592,6 +599,52 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  /// Re-decrypt encrypted messages after receiving the sender's public key
+  Future<void> _reDecryptMessages(String userId, String publicKey) async {
+    if (_chatRepository == null || _currentConversationId == null) {
+      return;
+    }
+
+    try {
+      // Get all encrypted messages from this sender without decrypted content
+      final encryptedMessages = await _chatRepository!.getEncryptedMessages(
+        conversationId: _currentConversationId!,
+        senderId: userId,
+      );
+
+      if (encryptedMessages.isEmpty) {
+        logDebug('🔑 No encrypted messages to re-decrypt for $userId');
+        return;
+      }
+
+      logDebug('🔑 Re-decrypting ${encryptedMessages.length} messages for $userId');
+
+      final keyPair = cryptoService?.ecPublicKeyFromString(publicKey);
+      if (keyPair == null) {
+        logDebug('❌ Failed to parse public key for re-decryption');
+        return;
+      }
+
+      for (final msg in encryptedMessages) {
+        try {
+          final decryptedText = cryptoService?.decrypt(msg.encryptedContent, keyPair);
+
+          if (decryptedText != null && decryptedText.isNotEmpty) {
+            // Update message in database with decrypted text
+            await _chatRepository!.updateMessageDecryptedContent(msg.messageId, decryptedText);
+            logDebug('✅ Re-decrypted message ${msg.messageId.substring(0, 20)}...');
+          }
+        } catch (e) {
+          logDebug('❌ Error re-decrypting message ${msg.messageId}: $e');
+        }
+      }
+
+      logDebug('✅ Re-decryption complete for $userId');
+    } catch (e) {
+      logDebug('❌ Error during re-decryption: $e');
+    }
+  }
+
   /// Report a user
   Future<String?> reportUser({
     required String reportedUserId,
@@ -706,7 +759,11 @@ class ChatCubit extends Cubit<ChatState> {
     _dbMessagesSubscription?.cancel();
     _statusUpdateSubscription?.cancel();
     _readReceiptSubscription?.cancel();
+    
+    // Always dispose chat-specific WebSocket
     _webSocketService?.dispose();
+    logDebug('🔌 Disposed chat-specific WebSocket connection');
+    
     return super.close();
   }
 

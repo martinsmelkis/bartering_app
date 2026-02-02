@@ -26,6 +26,8 @@ import 'package:barter_app/services/api_client.dart' as _i205;
 import 'package:barter_app/services/app_module.dart' as _i716;
 import 'package:barter_app/services/messaging/chat_notification_service.dart'
     as _i935;
+import 'package:barter_app/services/messaging/global_chat_service.dart'
+    as _i651;
 import 'package:barter_app/services/secure_storage_service.dart' as _i607;
 import 'package:barter_app/services/settings_service.dart' as _i627;
 import 'package:get_it/get_it.dart' as _i174;
@@ -50,6 +52,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i935.ChatNotificationService>(
       () => _i935.ChatNotificationService(),
     );
+    gh.singleton<_i651.GlobalChatService>(() => _i651.GlobalChatService());
     gh.singleton<_i627.SettingsService>(() => _i627.SettingsService());
     gh.factory<_i568.NotificationsCubit>(
       () => _i568.NotificationsCubit(gh<_i205.ApiClient>()),

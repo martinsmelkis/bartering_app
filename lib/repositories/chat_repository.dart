@@ -167,6 +167,12 @@ class ChatRepository {
 
     if (conversation == null) return;
 
+    final newUnreadCount = incrementUnread
+        ? conversation.unreadCount + 1
+        : conversation.unreadCount;
+
+    logDebug('📊 Updating conversation $conversationId: unreadCount ${conversation.unreadCount} -> $newUnreadCount (incrementUnread: $incrementUnread)');
+
     final update = ConversationsCompanion(
       lastMessage: Value(lastMessage),
       lastMessageSenderId: Value(senderId),
@@ -175,9 +181,7 @@ class ChatRepository {
           : const Value.absent(),
       lastMessageTimestamp: Value(timestamp),
       updatedAt: Value(DateTime.now()),
-      unreadCount: incrementUnread
-          ? Value(conversation.unreadCount + 1)
-          : Value(conversation.unreadCount),
+      unreadCount: Value(newUnreadCount),
     );
 
     await (_database.update(_database.conversations)
@@ -388,7 +392,9 @@ class ChatRepository {
             : const Value.absent(),
         // Skip if empty
         encryptedContent: Value(message.encryptedTextPayload),
-        decryptedContent: Value(message.plainText),
+        decryptedContent: message.plainText != null && message.plainText!.isNotEmpty
+            ? Value(message.plainText!)
+            : const Value.absent(),
         status: Value(
             _statusToString(message.status ?? EChatMessageStatus.sending)),
         timestamp: Value(message.timestamp),
@@ -422,16 +428,23 @@ class ChatRepository {
       final id = await _database.into(_database.userChats).insert(messageData);
 
       // Update conversation last message
-      String lastMessageText = message.plainText ?? '';
+      String lastMessageText;
 
-      // If message has file attachment but no text, show file info
-      if (lastMessageText.isEmpty && message.fileAttachment != null) {
+      // If message has file attachment, show file info
+      if (message.fileAttachment != null) {
         lastMessageText = '📎 ${message.fileAttachment!.filename}';
       }
-      
-      // If still empty (encrypted message without plaintext), use placeholder
-      if (lastMessageText.isEmpty && message.encryptedTextPayload.isNotEmpty) {
-        lastMessageText = 'New message'; // Placeholder for encrypted messages
+      // If decrypted text is available, use it
+      else if (message.plainText != null && message.plainText!.isNotEmpty) {
+        lastMessageText = message.plainText!;
+      }
+      // If encrypted message without decrypted text, use placeholder
+      else if (message.encryptedTextPayload.isNotEmpty) {
+        lastMessageText = '🔒 Encrypted message'; // Placeholder for encrypted messages awaiting decryption
+      }
+      // Otherwise empty
+      else {
+        lastMessageText = '';
       }
 
       if (lastMessageText.isNotEmpty) {
@@ -531,6 +544,19 @@ class ChatRepository {
     ));
   }
 
+  /// Get encrypted messages from a specific sender that haven't been decrypted yet
+  Future<List<UserChat>> getEncryptedMessages({
+    required String conversationId,
+    required String senderId,
+  }) async {
+    final query = _database.select(_database.userChats)
+      ..where((tbl) => tbl.conversationId.equals(conversationId))
+      ..where((tbl) => tbl.senderId.equals(senderId))
+      ..where((tbl) => tbl.decryptedContent.isNull());
+
+    return await query.get();
+  }
+
   /// Get messages for a conversation
   Stream<List<UserChat>> watchMessagesForConversation(String conversationId) {
     final query = _database.select(_database.userChats)
@@ -588,43 +614,81 @@ class ChatRepository {
 
   /// Convert UserChat (DB model) to ChatMessage (app model)
   ChatMessage userChatToChatMessage(UserChat dbMessage, String currentUserId) {
-    // Reconstruct file attachment if fields are present
-    FileAttachment? fileAttachment;
-    if (dbMessage.fileId != null) {
-      fileAttachment = FileAttachment(
-        fileId: dbMessage.fileId!,
-        filename: dbMessage.filename ?? '',
-        mimeType: dbMessage.mimeType ?? 'application/octet-stream',
-        fileSize: dbMessage.fileSize ?? 0,
-        expiresAt: dbMessage.expiresAt ?? 0,
-        localPath: dbMessage.localPath,
-        isDownloaded: dbMessage.isDownloaded ?? false,
+    try {
+      // Reconstruct file attachment if fields are present
+      FileAttachment? fileAttachment;
+      if (dbMessage.fileId != null) {
+        try {
+          fileAttachment = FileAttachment(
+            fileId: dbMessage.fileId!,
+            filename: dbMessage.filename ?? '',
+            mimeType: dbMessage.mimeType ?? 'application/octet-stream',
+            fileSize: dbMessage.fileSize ?? 0,
+            expiresAt: dbMessage.expiresAt ?? 0,
+            localPath: dbMessage.localPath,
+            isDownloaded: dbMessage.isDownloaded ?? false,
+          );
+        } catch (e) {
+          logDebug('⚠️ Error creating FileAttachment: $e');
+          // Continue without file attachment
+        }
+      }
+
+      EChatMessageStatus convertedStatus;
+      try {
+        convertedStatus = _stringToStatus(dbMessage.status);
+      } catch (e) {
+        logDebug('⚠️ Error converting status "${dbMessage.status}": $e, using "sent" as default');
+        convertedStatus = EChatMessageStatus.sent;
+      }
+
+      // Determine plainText: use decryptedContent if available, otherwise null
+      // (null indicates encrypted message awaiting public key)
+      final String? plainText;
+      if (dbMessage.decryptedContent != null && dbMessage.decryptedContent!.isNotEmpty) {
+        plainText = dbMessage.decryptedContent;
+      } else {
+        // Null indicates encrypted but not yet decrypted
+        plainText = null;
+      }
+
+      return ChatMessage(
+        id: dbMessage.messageId ?? 'unknown',
+        senderId: dbMessage.senderId ?? '',
+        senderName: dbMessage.senderName ?? '',
+        recipientId: dbMessage.recipientId ?? '',
+        plainText: plainText,
+        encryptedTextPayload: dbMessage.encryptedContent ?? '',
+        timestamp: dbMessage.timestamp ?? DateTime.now(),
+        status: convertedStatus,
+        isSentByCurrentUser: dbMessage.senderId == currentUserId,
+        fileAttachment: fileAttachment,
       );
+    } catch (e) {
+      logDebug('❌ Critical error in userChatToChatMessage: $e');
+      rethrow; // Let the caller handle this
     }
-
-    final convertedStatus = _stringToStatus(dbMessage.status);
-
-    return ChatMessage(
-      id: dbMessage.messageId,
-      senderId: dbMessage.senderId,
-      senderName: dbMessage.senderName,
-      recipientId: dbMessage.recipientId ?? '',
-      // Handle nullable recipientId
-      plainText: dbMessage.decryptedContent,
-      encryptedTextPayload: dbMessage.encryptedContent,
-      timestamp: dbMessage.timestamp,
-      status: convertedStatus,
-      isSentByCurrentUser: dbMessage.senderId == currentUserId,
-      fileAttachment: fileAttachment,
-    );
   }
 
   /// Convert list of UserChats to ChatMessages
   List<ChatMessage> userChatsToChatMessages(List<UserChat> dbMessages,
       String currentUserId,) {
-    return dbMessages
-        .map((db) => userChatToChatMessage(db, currentUserId))
-        .toList();
+    final List<ChatMessage> convertedMessages = [];
+    
+    for (final db in dbMessages) {
+      try {
+        final chatMessage = userChatToChatMessage(db, currentUserId);
+        convertedMessages.add(chatMessage);
+      } catch (e) {
+        logDebug('❌ Error converting UserChat to ChatMessage: $e');
+        logDebug('   Message ID: ${db.messageId}, Sender: ${db.senderId}');
+        // Skip this message but continue with others
+        continue;
+      }
+    }
+    
+    logDebug('✅ Converted ${convertedMessages.length}/${dbMessages.length} messages successfully');
+    return convertedMessages;
   }
 
   // ==================== UTILITIES ====================

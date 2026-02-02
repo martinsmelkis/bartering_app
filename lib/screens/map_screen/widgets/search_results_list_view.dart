@@ -330,31 +330,26 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       );
     }
 
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        // Return true to prevent scroll notifications from bubbling up to parent widgets
-        return true;
-      },
-      child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(
-          scrollbars: true,
-          // Ensure pointer scrolling works on web
-          dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-            PointerDeviceKind.stylus,
-            PointerDeviceKind.trackpad,
-          },
-        ),
-        child: ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: sortedPois.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 10,),
-          itemBuilder: (context, index) {
-            final poi = sortedPois[index];
-            return _buildPoiListItem(context, poi);
-          },
-        ),
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(
+        scrollbars: true,
+        // Ensure pointer scrolling works on web
+        dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.stylus,
+          PointerDeviceKind.trackpad,
+        },
+      ),
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: sortedPois.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 10,),
+        itemBuilder: (context, index) {
+          final poi = sortedPois[index];
+          return _buildPoiListItem(context, poi);
+        },
       ),
     );
   }
@@ -378,31 +373,26 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       );
     }
 
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        // Return true to prevent scroll notifications from bubbling up to parent widgets
-        return true;
-      },
-      child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(
-          scrollbars: true,
-          // Ensure pointer scrolling works on web
-          dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-            PointerDeviceKind.stylus,
-            PointerDeviceKind.trackpad,
-          },
-        ),
-        child: ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: _allPostings.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 8),
-          itemBuilder: (context, index) {
-            final postingWithUser = _allPostings[index];
-            return _buildPostingCard(context, postingWithUser);
-          },
-        ),
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(
+        scrollbars: true,
+        // Ensure pointer scrolling works on web
+        dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.stylus,
+          PointerDeviceKind.trackpad,
+        },
+      ),
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: _allPostings.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          final postingWithUser = _allPostings[index];
+          return _buildPostingCard(context, postingWithUser);
+        },
       ),
     );
   }
@@ -806,10 +796,20 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: widget.onClose,
-                        tooltip: l10n.close,
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: widget.onClose,
+                          borderRadius: BorderRadius.circular(20),
+                          canRequestFocus: false,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   )
@@ -829,10 +829,20 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                               ),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: widget.onClose,
-                            tooltip: l10n.close,
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: widget.onClose,
+                              borderRadius: BorderRadius.circular(20),
+                              canRequestFocus: false,
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Icon(
+                                  Icons.close,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),

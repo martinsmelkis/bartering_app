@@ -49,16 +49,17 @@ class ChatsBadgeCubit extends Cubit<ChatsBadgeState> {
         _conversationsSubscription = _chatRepository
             .watchConversationsForUser(_currentUserId!)
             .listen((conversations) {
+          logDebug('📬📬 Chat badge stream updated: ${conversations.length} conversations');
           final totalUnread = conversations.fold<int>(
             0,
             (sum, conv) => sum + conv.unreadCount,
           );
-          
+
           emit(ChatsBadgeState(
             unreadCount: totalUnread,
             isLoading: false,
           ));
-          
+
           logDebug('📬 Chat badge updated: $totalUnread unread messages');
         });
       } else {
@@ -75,7 +76,7 @@ class ChatsBadgeCubit extends Cubit<ChatsBadgeState> {
     if (_currentUserId == null) {
       _currentUserId = await _userRepository.getUserId();
     }
-    
+
     if (_currentUserId != null) {
       try {
         final count = await _chatRepository.getTotalUnreadCount(_currentUserId!);
@@ -85,6 +86,13 @@ class ChatsBadgeCubit extends Cubit<ChatsBadgeState> {
         logDebugError('Error refreshing chat badge', e);
       }
     }
+  }
+
+  /// Increment badge count manually (for direct message receipts)
+  void incrementBadge() {
+    final newCount = state.unreadCount + 1;
+    emit(state.copyWith(unreadCount: newCount));
+    logDebug('📬 Chat badge incremented: $newCount unread messages');
   }
 
   @override
