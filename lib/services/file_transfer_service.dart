@@ -12,6 +12,17 @@ import 'package:path_provider/path_provider.dart';
 // Web-specific import using conditional compilation
 import 'package:barter_app/services/file_transfer_web.dart' if (dart.library.io) 'package:barter_app/services/file_transfer_stub.dart';
 
+/// Result of a file download operation
+class DownloadResult {
+  final String? localPath; // Path to saved file (null on web)
+  final Uint8List decryptedBytes; // Decrypted file bytes for preview
+
+  DownloadResult({
+    this.localPath,
+    required this.decryptedBytes,
+  });
+}
+
 /// Service for handling encrypted file transfers in chat
 class FileTransferService {
   final ApiClient _apiClient;
@@ -154,13 +165,14 @@ class FileTransferService {
   /// 1. Download encrypted file from server
   /// 2. Decrypt file with sender's public key (using recipient's private key via ECDH)
   /// 3. Save decrypted file to local storage (web: trigger browser download)
-  /// 4. Return local file path (web: null since file is downloaded by browser)
-  Future<String?> downloadFile({
+  /// 4. Return DownloadResult with both bytes (for preview) and path (for opening)
+  Future<DownloadResult> downloadFile({
     required String fileId,
     required String userId,
     required String filename,
     required String senderPublicKey, // Sender's public key for ECDH decryption
     Function(double)? onProgress,
+    bool saveToFile = true, // If false, only returns bytes (for preview)
   }) async {
     try {
       // Download encrypted file
@@ -180,10 +192,17 @@ class FileTransferService {
         senderPublicKey,
       );
 
+      // If only preview is needed, return bytes without saving
+      if (!saveToFile) {
+        return DownloadResult(decryptedBytes: decryptedBytes);
+      }
+
       if (kIsWeb) {
         // Web: Trigger browser download
         downloadFileOnWeb(filename, decryptedBytes);
-        return null; // No local path on web
+        return DownloadResult(
+          decryptedBytes: decryptedBytes,
+        ); // No local path on web
       } else {
         // Mobile/Desktop: Save to local storage
         final directory = await getApplicationDocumentsDirectory();
@@ -207,7 +226,10 @@ class FileTransferService {
         await localFile.writeAsBytes(decryptedBytes);
 
         print('File downloaded and decrypted: $localFilePath');
-        return localFilePath;
+        return DownloadResult(
+          localPath: localFilePath,
+          decryptedBytes: decryptedBytes,
+        );
       }
     } catch (e) {
       print('Error downloading file: $e');

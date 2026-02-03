@@ -1566,10 +1566,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activePostings => 'Active Postings';
 
   @override
-  String get posting => 'posting';
+  String get posting => 'Posting';
 
   @override
-  String get postings => 'postings';
+  String get postings => 'Postings';
 
   @override
   String get offers => 'Offers';

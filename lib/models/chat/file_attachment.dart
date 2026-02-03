@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 /// Model for file attachments in chat messages
 class FileAttachment {
   final String fileId;
@@ -9,6 +11,8 @@ class FileAttachment {
   final bool isDownloaded;
   final bool isUploading;
   final double? uploadProgress;
+  final Uint8List? cachedBytes; // In-memory cache for image previews
+  final bool isDownloading; // Track download in progress
 
   FileAttachment({
     required this.fileId,
@@ -20,6 +24,8 @@ class FileAttachment {
     this.isDownloaded = false,
     this.isUploading = false,
     this.uploadProgress,
+    this.cachedBytes,
+    this.isDownloading = false,
   });
 
   factory FileAttachment.fromJson(Map<String, dynamic> json) {
@@ -56,6 +62,8 @@ class FileAttachment {
     bool? isDownloaded,
     bool? isUploading,
     double? uploadProgress,
+    Uint8List? cachedBytes,
+    bool? isDownloading,
   }) {
     return FileAttachment(
       fileId: fileId ?? this.fileId,
@@ -67,6 +75,8 @@ class FileAttachment {
       isDownloaded: isDownloaded ?? this.isDownloaded,
       isUploading: isUploading ?? this.isUploading,
       uploadProgress: uploadProgress ?? this.uploadProgress,
+      cachedBytes: cachedBytes ?? this.cachedBytes,
+      isDownloading: isDownloading ?? this.isDownloading,
     );
   }
 
@@ -97,4 +107,10 @@ class FileAttachment {
           mimeType.contains('text') ||
           mimeType.contains('msword') ||
           mimeType.contains('spreadsheet');
+
+  /// Check if image is small enough for auto-preview (< 5MB)
+  bool get isSmallImage => isImage && fileSize < 5 * 1024 * 1024;
+
+  /// Check if file has cached preview data
+  bool get hasPreview => cachedBytes != null;
 }

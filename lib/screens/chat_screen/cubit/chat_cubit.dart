@@ -6,6 +6,8 @@ import 'package:barter_app/data/local/app_database.dart';
 import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/services/file_transfer_service.dart';
+import 'package:barter_app/services/image_cache_service.dart';
 import 'package:barter_app/services/messaging/chat_notification_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/dio_error_handler.dart';
@@ -18,6 +20,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../models/chat/auth_request.dart';
 import '../../../models/chat/chat_message.dart';
 import '../../../models/chat/e_chat_message_status.dart';
+import '../../../models/chat/file_attachment.dart';
 import '../../../models/profile/user_profile_data.dart';
 import '../../../models/relationships/report_models.dart';
 import '../../../models/reviews/transaction_response.dart';
@@ -44,6 +47,20 @@ class ChatCubit extends Cubit<ChatState> {
   StreamSubscription? _dbMessagesSubscription;
   StreamSubscription? _statusUpdateSubscription;
   StreamSubscription? _readReceiptSubscription;
+  
+  // Track which files are currently being downloaded to avoid duplicates
+  final Set<String> _downloadingFiles = {};
+  
+  // Global image cache service
+  final ImageCacheService _imageCache = ImageCacheService();
+  
+  // Platform-specific limits for auto-download
+  static const int _maxAutoDownloadWeb = 5; // Lower limit on web due to performance
+  static const int _maxAutoDownloadNative = 20; // Higher limit on native
+  
+  // Debounce auto-download to prevent multiple rapid triggers
+  Timer? _autoDownloadDebounce;
+  bool _isAutoDownloading = false;
 
   ChatCubit({
     required this.currentUserId,
@@ -219,8 +236,27 @@ class ChatCubit extends Cubit<ChatState> {
         messages.clear();
         messages.addAll(chatMessages);
         emit(ChatMessagesLoaded(List.from(messages)));
+
+        // Auto-download recent image previews (debounced to prevent rapid triggers)
+        _scheduleAutoDownload();
       });
     }
+  }
+
+  /// Schedule auto-download with debounce to prevent multiple rapid triggers
+  void _scheduleAutoDownload() {
+    // Cancel previous timer if exists
+    _autoDownloadDebounce?.cancel();
+    
+    // Schedule new download after delay (only if not already downloading)
+    _autoDownloadDebounce = Timer(
+      Duration(milliseconds: kIsWeb ? 500 : 300), 
+      () {
+        if (!_isAutoDownloading) {
+          _autoDownloadRecentImages();
+        }
+      },
+    );
   }
 
   Future<void> initializeChatSession() async {
@@ -766,8 +802,134 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  /// Auto-download recent small images for preview
+  /// Limits: Web: 5 images, Native: 20 images, all < 5MB only
+  /// Downloads incrementally to avoid UI freezing (especially on web)
+  Future<void> _autoDownloadRecentImages() async {
+    if (_isAutoDownloading) {
+      logDebug('⏭️  Auto-download already in progress, skipping');
+      return;
+    }
+    
+    if (recipientPublicKey == null || cryptoService == null) {
+      logDebug('⏭️  Skipping auto-download: keys not ready');
+      return;
+    }
+
+    _isAutoDownloading = true;
+    try {
+      final fileTransferService = FileTransferService(
+        getIt<ApiClient>(),
+        cryptoService!,
+      );
+
+      // Platform-specific limits: fewer images on web for better performance
+      final maxImages = kIsWeb ? _maxAutoDownloadWeb : _maxAutoDownloadNative;
+      
+      // Get recent messages with image attachments
+      final recentMessages = messages.take(maxImages).toList();
+      final imagesToDownload = <ChatMessage>[];
+
+      for (final message in recentMessages) {
+        final attachment = message.fileAttachment;
+        if (attachment != null &&
+            attachment.isSmallImage && // < 5MB
+            !_imageCache.isCached(attachment.fileId) && // Check global cache - CRITICAL CHECK
+            !attachment.isDownloading && // Not currently downloading
+            !_downloadingFiles.contains(attachment.fileId)) {
+          logDebug('📥 Image needs download: ${attachment.filename}');
+          imagesToDownload.add(message);
+        } else if (attachment != null && _imageCache.isCached(attachment.fileId)) {
+          logDebug('✅ Image already cached in global cache: ${attachment.filename}');
+        }
+      }
+
+      if (imagesToDownload.isEmpty) {
+        logDebug('✅ No images need auto-download');
+        return;
+      }
+
+      logDebug('🖼️  Auto-downloading ${imagesToDownload.length} image previews...');
+
+      // Download images one at a time with delays to prevent UI freezing
+      for (var i = 0; i < imagesToDownload.length; i++) {
+        final message = imagesToDownload[i];
+        final attachment = message.fileAttachment!;
+        
+        // Mark as downloading to avoid duplicates
+        _downloadingFiles.add(attachment.fileId);
+        
+        // Update UI to show download in progress
+        _updateMessageAttachment(
+          message.id,
+          attachment.copyWith(isDownloading: true),
+        );
+
+        try {
+          // Download and decrypt file (preview only, don't save to disk yet)
+          final result = await fileTransferService.downloadFile(
+            fileId: attachment.fileId,
+            userId: currentUserId,
+            filename: attachment.filename,
+            senderPublicKey: recipientPublicKey!,
+            saveToFile: false, // Only get bytes for preview
+          );
+
+          // Store in global image cache (persists across rebuilds)
+          _imageCache.cacheImage(attachment.fileId, result.decryptedBytes);
+
+          // Update message to remove downloading state (no need to store bytes)
+          final updatedAttachment = attachment.copyWith(
+            isDownloading: false,
+          );
+
+          _updateMessageAttachment(message.id, updatedAttachment);
+
+          logDebug('✅ Cached preview for: ${attachment.filename} (${i + 1}/${imagesToDownload.length})');
+          
+          // CRITICAL: Add delay between downloads to prevent UI freezing
+          // On web, decryption is CPU-intensive and blocks the main isolate
+          // Longer delay on web, shorter on native (where we have better isolate support)
+          if (i < imagesToDownload.length - 1) {
+            await Future.delayed(
+              Duration(milliseconds: kIsWeb ? 300 : 100),
+            );
+          }
+        } catch (e) {
+          logDebug('❌ Error downloading image ${attachment.filename}: $e');
+          
+          // Update to remove downloading state
+          _updateMessageAttachment(
+            message.id,
+            attachment.copyWith(isDownloading: false),
+          );
+        } finally {
+          _downloadingFiles.remove(attachment.fileId);
+        }
+      }
+    } catch (e) {
+      logDebug('❌ Error in auto-download: $e');
+    } finally {
+      _isAutoDownloading = false;
+    }
+  }
+
+  /// Update a message's attachment in the messages list
+  void _updateMessageAttachment(String messageId, FileAttachment updatedAttachment) {
+    final index = messages.indexWhere((msg) => msg.id == messageId);
+    if (index != -1) {
+      messages[index] = messages[index].copyWith(
+        fileAttachment: updatedAttachment,
+      );
+      emit(ChatMessagesLoaded(List.from(messages)));
+    }
+  }
+
+
+
   @override
   Future<void> close() {
+    _autoDownloadDebounce?.cancel();
     _messageSubscription?.cancel();
     _dbMessagesSubscription?.cancel();
     _statusUpdateSubscription?.cancel();

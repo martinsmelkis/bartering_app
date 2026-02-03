@@ -3119,13 +3119,13 @@ abstract class AppLocalizations {
   /// No description provided for @posting.
   ///
   /// In en, this message translates to:
-  /// **'posting'**
+  /// **'Posting'**
   String get posting;
 
   /// No description provided for @postings.
   ///
   /// In en, this message translates to:
-  /// **'postings'**
+  /// **'Postings'**
   String get postings;
 
   /// No description provided for @offers.

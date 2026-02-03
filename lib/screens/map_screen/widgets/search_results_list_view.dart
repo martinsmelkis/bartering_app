@@ -1276,7 +1276,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '${postings.length} ${postings.length == 1 ? l10n.posting : l10n.postings}',
+                  '${postings.length} ${postings.length == 1 ? l10n.posting.toLowerCase() : l10n.postings.toLowerCase()}',
                   style: TextStyle(
                     fontSize: 11,
                     color: AppColors.primary,

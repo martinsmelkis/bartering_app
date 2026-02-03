@@ -1579,10 +1579,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get activePostings => 'Aktīvie sludinājumi';
 
   @override
-  String get posting => 'sludinājums';
+  String get posting => 'Sludinājums';
 
   @override
-  String get postings => 'sludinājumi';
+  String get postings => 'Sludinājumi';
 
   @override
   String get offers => 'Piedāvājumi';

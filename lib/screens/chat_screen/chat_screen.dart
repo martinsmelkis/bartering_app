@@ -1,6 +1,7 @@
 import 'package:barter_app/l10n/app_localizations.mapper.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/services/image_cache_service.dart';
 import 'package:barter_app/services/messaging/chat_notification_service.dart';
 import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:barter_app/services/file_transfer_service.dart';
@@ -52,6 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
+  final ImageCacheService _imageCache = ImageCacheService();
   bool _isUserBlocked = false;
 
   @override
@@ -551,6 +553,11 @@ void dispose() {
               context.canShowSideBySide;
           final double listPadding = isWebSideBySide ? 4 : 10.w;
 
+          // Use state.messages directly if available to ensure reactive updates
+          final displayMessages = state is ChatMessagesLoaded 
+              ? state.messages 
+              : _messages;
+
           return Column(
             children: [
               if (state is ChatMessagesLoading && _messages.isEmpty)
@@ -561,11 +568,18 @@ void dispose() {
                 child: ListView.builder(
                   controller: _scrollController,
                   padding: EdgeInsets.all(listPadding),
-                  itemCount: _messages.length,
+                  itemCount: displayMessages.length,
+                  // Add keys to prevent unnecessary rebuilds of message bubbles
                   itemBuilder: (context, index) {
-                    final message = _messages[index];
-                    return _buildMessageBubble(message);
+                    final message = displayMessages[index];
+                    return KeyedSubtree(
+                      key: ValueKey('msg_${message.id}'),
+                      child: _buildMessageBubble(message),
+                    );
                   },
+                  // Optimize for long lists
+                  addAutomaticKeepAlives: true, // Keep alive to prevent rebuilds
+                  addRepaintBoundaries: true, // Additional repaint boundaries
                 ),
               ),
               _buildMessageInputField(),
@@ -729,18 +743,81 @@ void dispose() {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image preview for images
-            if (attachment.isImage && attachment.localPath != null)
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-                child: Image.file(
-                  File(attachment.localPath!),
+            // Image preview for images (check global cache first, then local file)
+            if (attachment.isImage && _imageCache.isCached(attachment.fileId))
+              RepaintBoundary(
+                key: ValueKey('image_${attachment.fileId}'), // Stable key prevents rebuilds
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+                  child: Image.memory(
+                  _imageCache.getImage(attachment.fileId)!,
+                  key: ValueKey('img_mem_${attachment.fileId}'), // Unique key for caching
                   width: double.infinity,
                   height: isWebSideBySide ? 195 : 200,
                   fit: BoxFit.cover,
+                  // CRITICAL: Decode at lower resolution to prevent UI freeze
+                  // This is especially important on web where image decoding blocks the main thread
+                  cacheWidth: kIsWeb ? 600 : null, // Limit decoded width on web
+                  cacheHeight: kIsWeb ? 400 : null, // Limit decoded height on web
+                  // Use gapless playback for smoother loading
+                  gaplessPlayback: true,
+                  // Enable image cache to prevent re-decoding
+                  isAntiAlias: false, // Disable anti-aliasing for better performance
+                  filterQuality: FilterQuality.low, // Low quality = faster rendering
+                  // Show loading indicator while decoding
+                  frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                    if (wasSynchronouslyLoaded) return child;
+                    return AnimatedOpacity(
+                      opacity: frame == null ? 0.0 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: frame == null 
+                        ? Container(
+                            width: double.infinity,
+                            height: isWebSideBySide ? 195 : 200,
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    isMe ? Colors.white70 : Colors.grey[600]!,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        : child,
+                    );
+                  },
                   errorBuilder: (context, error, stackTrace) {
                     return _buildFileIcon(attachment, iconSize, fontSize, isMe, isWebSideBySide);
                   },
+                ),
+                ),
+              )
+            else if (attachment.isImage && attachment.localPath != null)
+              RepaintBoundary(
+                key: ValueKey('image_file_${attachment.fileId}'),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+                  child: Image.file(
+                    File(attachment.localPath!),
+                    key: ValueKey('img_file_${attachment.fileId}'),
+                    width: double.infinity,
+                    height: isWebSideBySide ? 195 : 200,
+                    fit: BoxFit.cover,
+                    // Also optimize local file images
+                    cacheWidth: kIsWeb ? 600 : null,
+                    cacheHeight: kIsWeb ? 400 : null,
+                    gaplessPlayback: true,
+                    isAntiAlias: false,
+                    filterQuality: FilterQuality.low,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildFileIcon(attachment, iconSize, fontSize, isMe, isWebSideBySide);
+                    },
+                  ),
                 ),
               )
             else
@@ -903,31 +980,45 @@ void dispose() {
           '@@@@@@@@@ Downloading file with sender public key: ${senderPublicKey
               .substring(0, 20)}...');
 
-      final localPath = await fileTransferService.downloadFile(
+      final downloadResult = await fileTransferService.downloadFile(
         fileId: attachment.fileId,
         userId: currentUserId!,
         filename: attachment.filename,
         senderPublicKey: senderPublicKey,
+        saveToFile: true, // Save to file for user download
       );
 
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-      if (localPath != null) {
+      if (downloadResult.localPath != null) {
         // Mobile/Desktop: File saved locally
-        attachment.copyWith(
-          localPath: localPath,
-          isDownloaded: true,
+        // Add to global image cache for preview
+        if (attachment.isImage) {
+          _imageCache.cacheImage(attachment.fileId, downloadResult.decryptedBytes);
+        }
+        
+        // Update the message with local path
+        final message = _chatCubit.messages.firstWhere(
+          (msg) => msg.fileAttachment?.fileId == attachment.fileId,
         );
+        
+        _chatCubit.messages[_chatCubit.messages.indexOf(message)] = 
+          message.copyWith(
+            fileAttachment: attachment.copyWith(
+              localPath: downloadResult.localPath,
+              isDownloaded: true,
+            ),
+          );
 
         setState(() {}); // Refresh UI
 
         // Automatically open the file
-        await _openFile(localPath);
+        await _openFile(downloadResult.localPath!);
       } else {
         // Web: Browser handles the download automatically
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Download started! Check your downloads folder'),
+            content: Text(l10n.downloadStarted),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 3),
           ),

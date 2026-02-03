@@ -100,4 +100,32 @@ class ChatMessage {
       // isSentByCurrentUser will be determined in Cubit based on senderId
     );
   }
+
+  ChatMessage copyWith({
+    String? id,
+    String? senderId,
+    String? recipientId,
+    String? encryptedTextPayload,
+    String? plainText,
+    DateTime? timestamp,
+    EChatMessageStatus? status,
+    bool? isSentByCurrentUser,
+    FileAttachment? fileAttachment,
+    String? senderName,
+    String? transactionId,
+  }) {
+    return ChatMessage(
+      id: id ?? this.id,
+      senderId: senderId ?? this.senderId,
+      recipientId: recipientId ?? this.recipientId,
+      encryptedTextPayload: encryptedTextPayload ?? this.encryptedTextPayload,
+      plainText: plainText ?? this.plainText,
+      timestamp: timestamp ?? this.timestamp,
+      status: status ?? this.status,
+      isSentByCurrentUser: isSentByCurrentUser ?? this.isSentByCurrentUser,
+      fileAttachment: fileAttachment ?? this.fileAttachment,
+      senderName: senderName ?? this.senderName,
+      transactionId: transactionId ?? this.transactionId,
+    );
+  }
 }
