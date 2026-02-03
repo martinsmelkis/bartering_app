@@ -268,42 +268,44 @@ class _MatchHistoryCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert),
-                    onSelected: (value) {
-                      if (value == 'view') {
-                        _viewMatch(context, match);
-                      } else if (value == 'dismiss') {
-                        _dismissMatch(context, match);
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      if (!match.viewed)
-                        PopupMenuItem(
-                          value: 'view',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.visibility),
-                              SizedBox(width: 8),
-                              Text(l10n.markAsViewed),
-                            ],
+                  PointerInterceptor(
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (value) {
+                        if (value == 'view') {
+                          _viewMatch(context, match);
+                        } else if (value == 'dismiss') {
+                          _dismissMatch(context, match);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        if (!match.viewed)
+                          PopupMenuItem(
+                            value: 'view',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.visibility),
+                                SizedBox(width: 8),
+                                Text(l10n.markAsViewed),
+                              ],
+                            ),
                           ),
-                        ),
-                      if (!match.dismissed)
-                        PopupMenuItem(
-                          value: 'dismiss',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.close, color: Colors.orange),
-                              SizedBox(width: 8),
-                              Text(
-                                l10n.dismiss,
-                                style: const TextStyle(color: Colors.orange),
-                              ),
-                            ],
+                        if (!match.dismissed)
+                          PopupMenuItem(
+                            value: 'dismiss',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.close, color: Colors.orange),
+                                SizedBox(width: 8),
+                                Text(
+                                  l10n.dismiss,
+                                  style: const TextStyle(color: Colors.orange),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -502,20 +504,22 @@ class _MatchHistoryCard extends StatelessWidget {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.dismissMatch),
-        content: Text(l10n.dismissMatchConfirmation),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.orange),
-            child: Text(l10n.dismiss),
-          ),
-        ],
+      builder: (dialogContext) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.dismissMatch),
+          content: Text(l10n.dismissMatchConfirmation),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.orange),
+              child: Text(l10n.dismiss),
+            ),
+          ],
+        ),
       ),
     );
 
