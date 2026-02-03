@@ -1118,48 +1118,165 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
               // On large screens, show map with search results panel
               if (context.canShowSideBySide && _showSearchResultsList) {
-                return Row(
-                  children: [
-                    Expanded(child: mapStack),
-                    Container(
-                      width: context.panelWidth,
-                      color: Colors.white,
-                      child: SearchResultsListView(
-                        key: ValueKey(_searchResultsKey),
-                        pois: _searchResults,
-                        isLargeScreen: true,
-                        onClose: () {
-                          setState(() {
-                            _showSearchResultsList = false;
-                            _searchResults = [];
-                          });
-                          // Clear markers from map when closing list
-                          if (_allPois.isNotEmpty) {
-                            mapOperationsCubit.reset();
-                            _updateMapVisuals();
-                          }
-                        },
-                        onPoiTap: (poi) async {
-                          // On large screens, open POI panel below the search results list
-                          context.read<PoiPanelCubit>().openPoiDetails(poi);
+                return BlocBuilder<ChatPanelCubit, ChatPanelState>(
+                  builder: (context, chatState) {
+                    final isChatOpen = chatState.isChatOpen;
+                    final isChatsListOpen = chatState.isChatsListOpen;
+                    final isPanelOpen = isChatOpen || isChatsListOpen;
+                    final l10n = AppLocalizations.of(context)!;
+                    
+                    return Row(
+                      children: [
+                        Expanded(child: mapStack),
+                        Container(
+                          width: context.panelWidth,
+                          color: Colors.white,
+                          child: isPanelOpen
+                              ? Column(
+                                  children: [
+                                    // Search results list takes 60% of vertical space
+                                    Expanded(
+                                      flex: 60,
+                                      child: SearchResultsListView(
+                                        key: ValueKey(_searchResultsKey),
+                                        pois: _searchResults,
+                                        isLargeScreen: true,
+                                        onClose: () {
+                                          setState(() {
+                                            _showSearchResultsList = false;
+                                            _searchResults = [];
+                                          });
+                                          // Clear markers from map when closing list
+                                          if (_allPois.isNotEmpty) {
+                                            mapOperationsCubit.reset();
+                                            _updateMapVisuals();
+                                          }
+                                        },
+                                        onPoiTap: (poi) async {
+                                          // On large screens, open POI panel below the search results list
+                                          context.read<PoiPanelCubit>().openPoiDetails(poi);
 
-                          // Navigate to the user's location on the map (like match history does)
-                          if (poi.profile.latitude != null && poi.profile.longitude != null) {
-                            //_mapController.setZoom(zoomLevel: 17.0);
-                            _mapController.moveTo(
-                              GeoPoint(
-                                latitude: poi.profile.latitude!,
-                                longitude: poi.profile.longitude!,
-                              ),
-                            );
-                          }
-                        },
-                        onChatTap: (poi) {
-                          _openChat(poi.profile.userId, poi.profile.name);
-                        },
-                      ),
-                    ),
-                  ],
+                                          // Navigate to the user's location on the map (like match history does)
+                                          if (poi.profile.latitude != null && poi.profile.longitude != null) {
+                                            //_mapController.setZoom(zoomLevel: 17.0);
+                                            _mapController.moveTo(
+                                              GeoPoint(
+                                                latitude: poi.profile.latitude!,
+                                                longitude: poi.profile.longitude!,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        onChatTap: (poi) {
+                                          _openChat(poi.profile.userId, poi.profile.name);
+                                        },
+                                      ),
+                                    ),
+                                    // Chat/ChatsListpanel takes 40% of vertical space
+                                    Expanded(
+                                      flex: 40,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: AppColors.background,
+                                          border: Border(
+                                            top: BorderSide(
+                                              color: Colors.grey.shade300,
+                                              width: 1,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            // Panel header
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context).primaryColor,
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      isChatsListOpen 
+                                                          ? l10n.chats 
+                                                          : (chatState.selectedPoiName ?? l10n.chat),
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    icon: const Icon(Icons.close, color: AppColors.background, size: 18),
+                                                    onPressed: () => context.read<ChatPanelCubit>().closePanel(),
+                                                    padding: EdgeInsets.zero,
+                                                    constraints: const BoxConstraints(),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            // Panel content - either chats list or individual chat
+                                            Expanded(
+                                              child: isChatsListOpen
+                                                  ? ChatsListScreen(
+                                                      showAppBar: false,
+                                                      onChatSelected: (poiId, poiName) {
+                                                        context.read<ChatPanelCubit>().openChat(poiId, poiName);
+                                                      },
+                                                    )
+                                                  : ChatScreen(
+                                                      poiId: chatState.selectedPoiId,
+                                                      poiName: chatState.selectedPoiName,
+                                                      showAppBar: false,
+                                                    ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : SearchResultsListView(
+                                  key: ValueKey(_searchResultsKey),
+                                  pois: _searchResults,
+                                  isLargeScreen: true,
+                                  onClose: () {
+                                    setState(() {
+                                      _showSearchResultsList = false;
+                                      _searchResults = [];
+                                    });
+                                    // Clear markers from map when closing list
+                                    if (_allPois.isNotEmpty) {
+                                      mapOperationsCubit.reset();
+                                      _updateMapVisuals();
+                                    }
+                                  },
+                                  onPoiTap: (poi) async {
+                                    // On large screens, open POI panel below the search results list
+                                    context.read<PoiPanelCubit>().openPoiDetails(poi);
+
+                                    // Navigate to the user's location on the map (like match history does)
+                                    if (poi.profile.latitude != null && poi.profile.longitude != null) {
+                                      //_mapController.setZoom(zoomLevel: 17.0);
+                                      _mapController.moveTo(
+                                        GeoPoint(
+                                          latitude: poi.profile.latitude!,
+                                          longitude: poi.profile.longitude!,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  onChatTap: (poi) {
+                                    _openChat(poi.profile.userId, poi.profile.name);
+                                  },
+                                ),
+                        ),
+                      ],
+                    );
+                  },
                 );
               }
 
@@ -1190,12 +1307,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         showSettingsPanel: settingsState.isOpen,
                         onClose: () => context.read<SettingsPanelCubit>().closeSettings(),
                         mainContent: AdaptiveChatLayout(
-                          // Only suppress chat panel when POI is shown in AdaptivePoiLayout
-                          // (not when shown below search results list)
-                          suppressChatPanel: poiPanelState.isOpen &&
+                          // Suppress chat panel when:
+                          // 1. POI panel is open in AdaptivePoiLayout (not in search results), OR
+                          // 2. Search results list is open (chat shows below it instead)
+                          suppressChatPanel: (poiPanelState.isOpen &&
                               !_showSearchResultsList &&
                               chatState.isChatOpen &&
-                              chatState.selectedPoiId == poiPanelState.selectedPoi?.profile.userId,
+                              chatState.selectedPoiId == poiPanelState.selectedPoi?.profile.userId) ||
+                              (_showSearchResultsList && context.canShowSideBySide),
                           panelView: chatState.view,
                           selectedPoiId: chatState.selectedPoiId,
                           selectedPoiName: chatState.selectedPoiName,

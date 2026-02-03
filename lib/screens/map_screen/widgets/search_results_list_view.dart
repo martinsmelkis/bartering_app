@@ -752,7 +752,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                                     children: [
                                       _buildToggleButton(
                                         icon: Icons.people,
-                                        label: 'Users',
+                                        label: l10n.users,
                                         isSelected: _viewMode == ViewMode.users,
                                         onTap: () {
                                           setState(() {
@@ -762,7 +762,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                                       ),
                                       _buildToggleButton(
                                         icon: Icons.article,
-                                        label: 'Postings',
+                                        label: l10n.postings,
                                         isSelected: _viewMode == ViewMode.postings,
                                         onTap: () {
                                           setState(() {
@@ -782,12 +782,12 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                                       const SizedBox(width: 6),
                                       _buildLegendItem(
                                         color: AppColors.secondary,
-                                        label: 'Trade match',
+                                        label: l10n.tradeMatch,
                                       ),
                                       const SizedBox(width: 12),
                                       _buildLegendItem(
                                         color: Colors.blue,
-                                        label: 'Similar',
+                                        label: l10n.similar,
                                       ),
                                     ],
                                   ),
@@ -864,7 +864,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                               children: [
                                 _buildToggleButton(
                                   icon: Icons.people,
-                                  label: 'Users',
+                                        label: l10n.users,
                                   isSelected: _viewMode == ViewMode.users,
                                   onTap: () {
                                     setState(() {
@@ -874,7 +874,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                                 ),
                                 _buildToggleButton(
                                   icon: Icons.article,
-                                  label: 'Postings',
+                                        label: l10n.postings,
                                   isSelected: _viewMode == ViewMode.postings,
                                   onTap: () {
                                     setState(() {
@@ -894,12 +894,12 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                                 const SizedBox(width: 4),
                                 _buildLegendItem(
                                   color: AppColors.secondary,
-                                  label: 'Trade match',
+                                  label: l10n.tradeMatch,
                                 ),
                                 const SizedBox(width: 8),
                                 _buildLegendItem(
                                   color: Colors.blue,
-                                  label: 'Similar',
+                                  label: l10n.similar,
                                 ),
                               ],
                             ),

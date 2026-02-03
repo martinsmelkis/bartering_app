@@ -202,6 +202,19 @@ class ChatCubit extends Cubit<ChatState> {
           currentUserId,
         );
 
+        // AUTO-MARK NEW UNREAD MESSAGES AS READ (if screen is in foreground)
+        // Find any new unread messages from the other user
+        final newUnreadMessages = chatMessages.where(
+          (msg) => !msg.isSentByCurrentUser && 
+                   msg.status != EChatMessageStatus.read
+        ).toList();
+        
+        if (newUnreadMessages.isNotEmpty) {
+          logDebug('📖 Auto-marking ${newUnreadMessages.length} new unread message(s) as read (foreground)');
+          // Mark as read asynchronously (don't wait)
+          markMessagesAsRead(newUnreadMessages);
+        }
+
         // Update local list from DB
         messages.clear();
         messages.addAll(chatMessages);

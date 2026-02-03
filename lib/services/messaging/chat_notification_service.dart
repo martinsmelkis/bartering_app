@@ -150,8 +150,6 @@ class ChatNotificationService with WidgetsBindingObserver {
     );
   }
 
-
-
   /// Cleanup
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
