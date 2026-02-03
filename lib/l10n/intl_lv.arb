@@ -928,6 +928,9 @@
       }
     }
   },
-  "errorVerifyingPin": "Kļūda, pārbaudot PIN"
+  "errorVerifyingPin": "Kļūda, pārbaudot PIN",
+  "deleteAll": "Dzēst visu",
+  "deleteAllMatchesConfirmation": "Vai tiešām vēlaties dzēst visu atbilstību vēsturi? Šo darbību nevar atsaukt.",
+  "allMatchesDeleted": "Visas atbilstības ir dzēstas"
 
 }

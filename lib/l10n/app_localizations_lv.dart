@@ -1505,7 +1505,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get takePhoto => 'Uzņemt fotogrāfiju';
 
   @override
-  String get chooseFromGallery => 'Izvēlēties no galerijas';
+  String get chooseFromGallery => 'Izvēlēties no iekārtas';
 
   @override
   String get maxImagesReached => 'Maksimums 3 attēli atļauti';
@@ -2189,7 +2189,7 @@ class AppLocalizationsLv extends AppLocalizations {
       'Nevar nosūtīt failu: Saņēmēja publiskā atslēga nav pieejama';
 
   @override
-  String get gallery => 'Galerija';
+  String get gallery => 'Iekārta';
 
   @override
   String get camera => 'Kamera';
@@ -2545,4 +2545,14 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get errorVerifyingPin => 'Kļūda, pārbaudot PIN';
+
+  @override
+  String get deleteAll => 'Dzēst visu';
+
+  @override
+  String get deleteAllMatchesConfirmation =>
+      'Vai tiešām vēlaties dzēst visu atbilstību vēsturi? Šo darbību nevar atsaukt.';
+
+  @override
+  String get allMatchesDeleted => 'Visas atbilstības ir dzēstas';
 }

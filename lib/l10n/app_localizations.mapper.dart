@@ -844,6 +844,30 @@ class AppLocalizationsMapper {
       'privacyPolicyContactTitle': localizations.privacyPolicyContactTitle,
       'privacyPolicyContactContent': localizations.privacyPolicyContactContent,
       'privacyPolicyLastUpdated': localizations.privacyPolicyLastUpdated,
+      'chats': localizations.chats,
+      'gpsLocationDisabled': localizations.gpsLocationDisabled,
+      'recommendations': localizations.recommendations,
+      'transactionWillBeReviewed': localizations.transactionWillBeReviewed,
+      'continueAnyway': localizations.continueAnyway,
+      'transactionBlocked': localizations.transactionBlocked,
+      'securityWarning': localizations.securityWarning,
+      'securityNotice': localizations.securityNotice,
+      'securityCheck': localizations.securityCheck,
+      'transactionBlockedMessage': localizations.transactionBlockedMessage,
+      'securityWarningMessage': localizations.securityWarningMessage,
+      'securityNoticeMessage': localizations.securityNoticeMessage,
+      'securityCheckMessage': localizations.securityCheckMessage,
+      'downloadStarted': localizations.downloadStarted,
+      'showPath': localizations.showPath,
+      'users': localizations.users,
+      'tradeMatch': localizations.tradeMatch,
+      'similar': localizations.similar,
+      'languageEnglish': localizations.languageEnglish,
+      'languageLatvian': localizations.languageLatvian,
+      'languageFrench': localizations.languageFrench,
+      'languageGerman': localizations.languageGerman,
+      'languageSpanish': localizations.languageSpanish,
+      'errorVerifyingPin': localizations.errorVerifyingPin,
       'errorWithMessage': (errorMessage) =>
           localizations.errorWithMessage(errorMessage),
       'questionsAnswered': (count) => localizations.questionsAnswered(count),
@@ -877,6 +901,8 @@ class AppLocalizationsMapper {
           localizations.blockUserConfirmationDetailed(userName),
       'unblockUserConfirmationDetailed': (userName) =>
           localizations.unblockUserConfirmationDetailed(userName),
+      'errorWithException': (exception) =>
+          localizations.errorWithException(exception),
     };
   }
 }

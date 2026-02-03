@@ -301,4 +301,28 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       rethrow;
     }
   }
+
+  /// Delete all matches
+  Future<String?> deleteAllMatches() async {
+    try {
+      final message = await _apiClient.deleteAllMatches();
+      // Clear match history in state and reload
+      emit(state.copyWith(matchHistory: null));
+      await loadMatchHistory();
+      return message.message;
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(e, 'Failed to delete all matches');
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: errorMessage,
+      ));
+      rethrow;
+    } catch (e) {
+      emit(state.copyWith(
+        status: NotificationsStatus.error,
+        errorMessage: e.toString(),
+      ));
+      rethrow;
+    }
+  }
 }

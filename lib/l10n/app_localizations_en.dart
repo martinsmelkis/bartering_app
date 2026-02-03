@@ -1493,7 +1493,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get takePhoto => 'Take Photo';
 
   @override
-  String get chooseFromGallery => 'Choose from Gallery';
+  String get chooseFromGallery => 'Choose from Device';
 
   @override
   String get maxImagesReached => 'Maximum 3 images allowed';
@@ -2171,7 +2171,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Cannot send file: Recipient public key not available';
 
   @override
-  String get gallery => 'Gallery';
+  String get gallery => 'Device';
 
   @override
   String get camera => 'Camera';
@@ -2522,4 +2522,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorVerifyingPin => 'Error verifying PIN';
+
+  @override
+  String get deleteAll => 'Delete All';
+
+  @override
+  String get deleteAllMatchesConfirmation =>
+      'Are you sure you want to delete all match history? This action cannot be undone.';
+
+  @override
+  String get allMatchesDeleted => 'All matches have been deleted';
 }

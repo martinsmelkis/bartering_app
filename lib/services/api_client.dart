@@ -431,6 +431,9 @@ abstract class ApiClient {
   @POST('/api/v1/notifications/matches/{matchId}/dismiss')
   Future<NotificationPreferencesResponse> dismissMatch(@Path('matchId') String matchId);
 
+  @DELETE('/api/v1/notifications/matches')
+  Future<NotificationPreferencesResponse> deleteAllMatches();
+
   ///////////// AUTHENTICATION ///////////////
 
   @DELETE('/api/v1/authentication/user/{userId}')

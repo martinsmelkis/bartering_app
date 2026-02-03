@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:barter_app/configure_dependencies.dart';
+import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +11,7 @@ import 'package:web_socket_channel/status.dart' as status;
 import '../../../models/chat/chat_message.dart';
 import '../../../models/chat/e_chat_message_status.dart';
 import '../../../models/chat/file_notification_message.dart';
+import '../../../models/chat/match_notification_message.dart';
 import '../../../models/chat/message_status_update.dart';
 import '../../../models/chat/read_receipt_notification.dart';
 import '../../../models/chat/read_receipt_request.dart';
@@ -176,6 +179,53 @@ class WebSocketChatService {
               } catch (e) {
                 logDebug('@@@@@@@@@ Error processing ReadReceiptNotification: $e');
                 logDebug('@@@@@@@@@ Stack trace: ${StackTrace.current}');
+              }
+            }
+
+            // Handle match notifications (web platform or no notification contacts)
+            if (messageJson['messageType'] != null &&
+                messageJson['messageType'].toString().contains('MatchNotificationMessage')) {
+              logDebug('@@@@@@@@@ Match notification received via WebSocket!');
+              try {
+                final matchNotification = MatchNotificationMessage.fromJson(messageJson);
+                
+                logDebug('@@@@@@@@@ Match details: type=${matchNotification.matchType}, '
+                    'matchId=${matchNotification.matchId}, score=${matchNotification.matchScore}');
+                
+                // Reload match history (same as Firebase push notification handling)
+                try {
+                  final notificationsCubit = getIt<NotificationsCubit>();
+                  await notificationsCubit.loadMatchHistory();
+                  logDebug('✅ Match history reloaded from WebSocket notification');
+                } catch (e) {
+                  logDebug('❌ Failed to reload match history: $e');
+                }
+                
+                // Show local notification if available
+                if (_notificationService != null) {
+                  logDebug('📣 Showing local notification for match');
+                  // Create a system-like chat message for notification purposes
+                  final notificationMessage = ChatMessage(
+                    id: 'match_${matchNotification.matchId}',
+                    senderId: 'system',
+                    recipientId: _currentUserId,
+                    plainText: matchNotification.body,
+                    encryptedTextPayload: '',
+                    timestamp: DateTime.now(),
+                    status: EChatMessageStatus.delivered,
+                  );
+                  
+                  _notificationService!.handleIncomingMessage(
+                    notificationMessage,
+                    senderName: matchNotification.title,
+                  );
+                }
+                
+                logDebug('@@@@@@@@@ Match notification processed successfully');
+                return;
+              } catch (e) {
+                logDebug('@@@@@@@@@ Error processing match notification: $e');
+                logDebug('Stack trace: ${StackTrace.current}');
               }
             }
 

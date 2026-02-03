@@ -924,6 +924,9 @@
       }
     }
   },
-  "errorVerifyingPin": "Error verifying PIN"
+  "errorVerifyingPin": "Error verifying PIN",
+  "deleteAll": "Delete All",
+  "deleteAllMatchesConfirmation": "Are you sure you want to delete all match history? This action cannot be undone.",
+  "allMatchesDeleted": "All matches have been deleted"
 
 }

@@ -2975,7 +2975,7 @@ abstract class AppLocalizations {
   /// No description provided for @chooseFromGallery.
   ///
   /// In en, this message translates to:
-  /// **'Choose from Gallery'**
+  /// **'Choose from Device'**
   String get chooseFromGallery;
 
   /// No description provided for @maxImagesReached.
@@ -4271,7 +4271,7 @@ abstract class AppLocalizations {
   /// No description provided for @gallery.
   ///
   /// In en, this message translates to:
-  /// **'Gallery'**
+  /// **'Device'**
   String get gallery;
 
   /// No description provided for @camera.
@@ -4879,6 +4879,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error verifying PIN'**
   String get errorVerifyingPin;
+
+  /// No description provided for @deleteAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete All'**
+  String get deleteAll;
+
+  /// No description provided for @deleteAllMatchesConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete all match history? This action cannot be undone.'**
+  String get deleteAllMatchesConfirmation;
+
+  /// No description provided for @allMatchesDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'All matches have been deleted'**
+  String get allMatchesDeleted;
 }
 
 class _AppLocalizationsDelegate

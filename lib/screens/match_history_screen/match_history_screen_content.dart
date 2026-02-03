@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
@@ -60,6 +61,14 @@ class _MatchHistoryScreenContentState extends State<MatchHistoryScreenContent> {
                       ),
                     ),
                   ),
+                  // Delete All button
+                  if (matchHistory != null && matchHistory.matches.isNotEmpty)
+                    IconButton(
+                      icon: Icon(Icons.delete_sweep, color: Colors.red),
+                      tooltip: l10n.deleteAll,
+                      onPressed: () => _deleteAllMatches(context),
+                    ),
+                  SizedBox(width: 4),
                   FilterChip(
                     label: Text(l10n.unviewedOnly),
                     selected: _unviewedOnly,
@@ -121,6 +130,83 @@ class _MatchHistoryScreenContentState extends State<MatchHistoryScreenContent> {
         );
       },
     );
+  }
+
+  void _deleteAllMatches(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => PointerInterceptor(
+        child: AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.red),
+              SizedBox(width: 8),
+              Text(l10n.deleteAll),
+            ],
+          ),
+          content: Text(l10n.deleteAllMatchesConfirmation),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(l10n.deleteAll),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      try {
+        // Show loading indicator
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+
+        await context.read<NotificationsCubit>().deleteAllMatches();
+
+        // Dismiss loading dialog
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.allMatchesDeleted),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        // Dismiss loading dialog
+        if (context.mounted && Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.errorWithException(e.toString())),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 }
 
