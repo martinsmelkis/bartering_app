@@ -488,7 +488,7 @@ class _PanelHeaderState extends State<_PanelHeader> {
           if (widget.onClose != null)
             PointerInterceptor(
               child: IconButton(
-                icon: const Icon(Icons.close, color: AppColors.background, size: 18),
+                icon: const Icon(Icons.close, color: Colors.white, size: 18),
                 onPressed: widget.onClose,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),

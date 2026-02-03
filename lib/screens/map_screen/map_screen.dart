@@ -929,7 +929,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                       ),
                     ),
                     Positioned(
-                      top: kIsWeb ? 26 : topPadding,
+                      top: kIsWeb ? 22 : topPadding,
                       left: 64,
                       right: 100,
                       child: PointerInterceptor(
@@ -1007,7 +1007,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
                     // Search complementary users button (with fallback to nearby)
                     Positioned(
-                      top: kIsWeb ? 28 : (topPadding ?? 20.0),
+                      top: kIsWeb ? 23 : (topPadding ?? 20.0),
                       right: 56,
                       child: PointerInterceptor(
                         child: Container(
@@ -1210,7 +1210,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                                     ),
                                                   ),
                                                   IconButton(
-                                                    icon: const Icon(Icons.close, color: AppColors.background, size: 18),
+                                                    icon: const Icon(Icons.close, color: Colors.white, size: 18),
                                                     onPressed: () => context.read<ChatPanelCubit>().closePanel(),
                                                     padding: EdgeInsets.zero,
                                                     constraints: const BoxConstraints(),
@@ -1365,11 +1365,17 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _noUsersMarkerPosition = mapCenter;
     // Load and create the special marker with path333.svg
     final svgString = await rootBundle.loadString('assets/icons/path333.svg');
+    final markerSize = AppDimensions.poiMarkerSize * 0.5; // Make it slightly larger
     final marker = MarkerIcon(
       iconWidget: SvgPicture.string(
         svgString,
-        width: AppDimensions.poiMarkerSize * 1.1, // Make it slightly larger
-        height: AppDimensions.poiMarkerSize * 1.1,
+        // Render at 2x on web for crisp display on high-DPI screens
+        width: kIsWeb ? markerSize * 2 : markerSize * 2,
+        height: kIsWeb ? markerSize * 2 : markerSize * 2,
+        fit: BoxFit.contain,
+        clipBehavior: Clip.none,
+        matchTextDirection: false,
+        allowDrawingOutsideViewBox: false,
         key: const ValueKey('no_users_marker'),
       ),
     );

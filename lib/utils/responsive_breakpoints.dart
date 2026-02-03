@@ -203,11 +203,10 @@ class ResponsiveBreakpoints {
         .of(context)
         .size
         .width;
-    // 20% wider than before
-    if (screenWidth >= extraLarge) return 540.0; // was 450
-    if (screenWidth >= large) return 480.0; // was 400
-    if (screenWidth >= expanded) return 420.0; // was 350
-    return 360.0; // was 300
+    if (screenWidth >= extraLarge) return 600.0;
+    if (screenWidth >= large) return 530.0;
+    if (screenWidth >= expanded) return 465.0;
+    return 396.0;
   }
 
   /// Get panel width for settings panel (20% wider than chat panel)
@@ -215,13 +214,13 @@ class ResponsiveBreakpoints {
     return getPanelWidth(context) * 1.2;
   }
 
-  /// Get panel width for profile panel (20% max, 400 min on large screens)
+  /// Get panel width for profile panel (25% max, 400 min on large screens)
   static double getProfilePanelWidth(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    // On large screens, use 20% of screen width with min 400
+    // On large screens, use 26% of screen width
     if (screenWidth >= medium) {
-      final calculatedWidth = screenWidth * 0.20;
-      return calculatedWidth.clamp(400.0, double.infinity);
+      final calculatedWidth = screenWidth * 0.26;
+      return calculatedWidth.clamp(406.0, double.infinity);
     }
     // On small screens, keep original behavior
     return getSettingsPanelWidth(context) * 0.85;

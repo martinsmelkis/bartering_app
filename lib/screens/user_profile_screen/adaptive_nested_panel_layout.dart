@@ -30,8 +30,9 @@ class AdaptiveNestedPanelLayout extends StatelessWidget {
     if (context.canShowSideBySide && panelType != NestedPanelType.none) {
       return Row(
         children: [
-          // Main content takes remaining space
-          Expanded(
+          // Main content keeps its original width (doesn't shrink)
+          SizedBox(
+            width: context.profilePanelWidth,
             child: mainContent,
           ),
           // Nested panel on the RIGHT within profile container
@@ -67,7 +68,7 @@ class _NestedPanel extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     
     // Nested panel is 75% of profile panel width (25% wider than before)
-    final double nestedPanelWidth = context.profilePanelWidth * 0.75;
+    final double nestedPanelWidth = context.profilePanelWidth * 0.82;
 
     Widget panelContent;
     String panelTitle;

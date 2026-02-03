@@ -87,11 +87,11 @@ class _ProfilePanelState extends State<_ProfilePanel> {
 
   @override
   Widget build(BuildContext context) {
-    // Expand profile panel by 20% when a nested panel is open
-    // Use local state or prop, whichever is more recent
+    // When nested panel is open, add its width to the total container width
+    // Profile itself keeps its original width and doesn't shrink
     final bool isExpanded = widget.hasNestedPanelOpen || _localNestedPanelOpen;
     final double profileWidth = isExpanded
-        ? context.profilePanelWidth * 1.65
+        ? context.profilePanelWidth + (context.profilePanelWidth * 0.82) // Original + nested panel width
         : context.profilePanelWidth;
 
     return Container(

@@ -72,14 +72,14 @@ class _SearchInMapState extends State<SearchInMap> {
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.only(right: 3),
+                contentPadding: const EdgeInsets.only(right: 0),
                 filled: false,
                 isDense: true,
                 hintText: l10n.searchForAKeyword,
                 prefixIcon: const Icon(Icons.search, size: 22, color: AppColors.primary,),
                 suffixIcon: isLoading
                     ? const Padding(
-                        padding: EdgeInsets.all(12.0),
+                        padding: EdgeInsets.all(8.0),
                         child: SizedBox(
                           width: 20,
                           height: 20,

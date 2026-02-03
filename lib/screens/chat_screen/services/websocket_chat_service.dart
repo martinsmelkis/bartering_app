@@ -119,7 +119,7 @@ class WebSocketChatService {
                 logDebug('@@@@@@@@@@@@ Public key cached for user: $senderId');
 
                 // Notify callback so messages can be re-decrypted
-                onPublicKeyReceived?.call(senderId!, receivedPublicKey);
+                onPublicKeyReceived?.call(senderId, receivedPublicKey);
               }
 
               logDebug('@@@@@@@@@@@@ Public keys exchanged successfully');

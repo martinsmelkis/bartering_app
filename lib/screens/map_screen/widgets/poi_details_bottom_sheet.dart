@@ -862,7 +862,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         // Attribute cards
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:barter_app/l10n/app_localizations.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:share_plus/share_plus.dart';
@@ -55,6 +56,13 @@ class InviteFriendsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // On screens larger than mobile (>600px), limit width to 30% of screen
+    // On mobile, use min 280px and max 90% of screen width
+    final dialogWidth = context.isPhone
+        ? min(screenWidth * 0.9, 500.0)  // Mobile: 90% max, cap at 500px
+        : min(screenWidth * 0.3, 600.0);  // Large screens: 30% max, cap at 600px
     
     return PointerInterceptor(
       child: Dialog(
@@ -62,11 +70,17 @@ class InviteFriendsDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         child: PointerInterceptor(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+          child: Container(
+            width: dialogWidth,
+            constraints: BoxConstraints(
+              minWidth: 280,  // Minimum width for readability
+              maxWidth: dialogWidth,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
             // Icon
             Container(
               width: 80,
@@ -149,7 +163,8 @@ class InviteFriendsDialog extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(l10n.close),
             ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

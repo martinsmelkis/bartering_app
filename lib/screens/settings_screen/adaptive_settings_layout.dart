@@ -107,7 +107,7 @@ class _PanelHeader extends StatelessWidget {
           ),
           if (onClose != null)
             IconButton(
-              icon: const Icon(Icons.close, color: AppColors.background, size: 18),
+              icon: const Icon(Icons.close, color: Colors.white, size: 18),
               onPressed: onClose,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
