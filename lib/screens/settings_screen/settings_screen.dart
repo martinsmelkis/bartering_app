@@ -620,26 +620,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           vertical: 8,
                         ),
                       ),
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: 'en',
-                          child: Text('English'),
+                          child: Text(l10n.languageEnglish),
                         ),
                         DropdownMenuItem(
                           value: 'lv',
-                          child: Text('Latviešu'),
+                          child: Text(l10n.languageLatvian),
                         ),
                         DropdownMenuItem(
                           value: 'fr',
-                          child: Text('Français'),
+                          child: Text(l10n.languageFrench),
                         ),
                         DropdownMenuItem(
                           value: 'de',
-                          child: Text('Deutsch'),
+                          child: Text(l10n.languageGerman),
                         ),
                         DropdownMenuItem(
                           value: 'es',
-                          child: Text('Español'),
+                          child: Text(l10n.languageSpanish),
                         ),
                       ],
                       onChanged: (value) async {

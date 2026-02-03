@@ -181,6 +181,7 @@ class _AttributePreferenceCard extends StatelessWidget {
 
   void _toggleNotifications(BuildContext context,
       AttributeNotificationPreference pref, bool enabled) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       await context.read<NotificationsCubit>().updateAttributePreference(
         pref.attributeId,
@@ -192,7 +193,7 @@ class _AttributePreferenceCard extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(l10n.errorWithException(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -240,7 +241,7 @@ class _AttributePreferenceCard extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: $e'),
+              content: Text(l10n.errorWithException(e.toString())),
               backgroundColor: Colors.red,
             ),
           );
@@ -346,7 +347,7 @@ class _AttributePreferenceCard extends StatelessWidget {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Error: $e'),
+                        content: Text(l10n.errorWithException(e.toString())),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -426,7 +427,7 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
           children: [
             Icon(Icons.error, size: 64, color: Colors.red),
             SizedBox(height: 16),
-            Text('Error: $_error'),
+            Text(l10n.errorWithException(_error ?? "Error")),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadUserAttributes,
@@ -757,7 +758,7 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(l10n.errorWithException(e.toString())),
             backgroundColor: Colors.red,
           ),
         );

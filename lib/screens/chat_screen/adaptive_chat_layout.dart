@@ -81,6 +81,7 @@ class _ChatsListPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: context.panelWidth * 0.8,
       color: AppColors.background,
@@ -88,7 +89,7 @@ class _ChatsListPanel extends StatelessWidget {
         children: [
           // Custom header for the panel
           _PanelHeader(
-            title: 'Chats',
+            title: l10n.chats,
             onClose: onClose,
           ),
           // Chats list content
@@ -118,6 +119,7 @@ class _ChatPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: context.panelWidth * 0.8,
       color: AppColors.background,
@@ -125,7 +127,7 @@ class _ChatPanel extends StatelessWidget {
         children: [
           // Custom header for the panel
           _PanelHeader(
-            title: poiName ?? 'Chat',
+            title: poiName ?? l10n.chat,
             onClose: onClose,
             showMenu: true,
             poiId: poiId,

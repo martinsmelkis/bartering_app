@@ -5,6 +5,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import '../../../configure_dependencies.dart';
 import '../../../services/settings_service.dart';
 import '../../../theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ActivationUserLocation extends StatelessWidget {
   final ValueNotifier<bool> trackingNotifier;
@@ -40,10 +41,11 @@ class ActivationUserLocation extends StatelessWidget {
             if (!isGpsEnabled) {
               // Show a message to the user
               if (context.mounted) {
+                final l10n = AppLocalizations.of(context)!;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('GPS location is disabled. Enable it in Settings to use this feature.'),
-                    duration: Duration(seconds: 3),
+                  SnackBar(
+                    content: Text(l10n.gpsLocationDisabled),
+                    duration: const Duration(seconds: 3),
                   ),
                 );
               }

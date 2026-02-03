@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:barter_app/screens/settings_screen/settings_screen.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:barter_app/l10n/app_localizations.dart';
 
 /// Adaptive settings layout that shows settings as a left side panel on large screens
 /// and as a full screen on small screens
@@ -52,6 +53,7 @@ class _SettingsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: context.settingsPanelWidth,
       color: AppColors.background,
@@ -59,7 +61,7 @@ class _SettingsPanel extends StatelessWidget {
         children: [
           // Custom header for the panel
           _PanelHeader(
-            title: 'Settings',
+            title: l10n.settingsTitle,
             onClose: onClose,
           ),
           // Settings screen content

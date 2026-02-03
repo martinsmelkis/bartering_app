@@ -2462,4 +2462,87 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get privacyPolicyLastUpdated =>
       'Pēdējoreiz atjaunots: 2025. gada janvāris';
+
+  @override
+  String get chats => 'Čati';
+
+  @override
+  String get gpsLocationDisabled =>
+      'GPS atrašanās vieta ir atspējota. Iespējojiet to iestatījumos, lai izmantotu šo funkciju.';
+
+  @override
+  String get recommendations => 'Ieteikumi:';
+
+  @override
+  String get transactionWillBeReviewed =>
+      'Šo transakciju pārbaudīs mūsu drošības komanda.';
+
+  @override
+  String get continueAnyway => 'Turpināt tik un tā';
+
+  @override
+  String get transactionBlocked => 'Transakcija bloķēta';
+
+  @override
+  String get securityWarning => 'Drošības brīdinājums';
+
+  @override
+  String get securityNotice => 'Drošības paziņojums';
+
+  @override
+  String get securityCheck => 'Drošības pārbaude';
+
+  @override
+  String get transactionBlockedMessage =>
+      'Šī transakcija ir bloķēta aizdomīgu darbību modeļu dēļ. Lūdzu, sazinieties ar atbalsta dienestu, ja uzskatāt, ka tā ir kļūda.';
+
+  @override
+  String get securityWarningMessage =>
+      'Ir konstatēta neparasta aktivitāte. Var būt nepieciešama papildu verifikācija.';
+
+  @override
+  String get securityNoticeMessage =>
+      'Mēs esam konstatējuši dažus neparastus modeļus. Jūsu pārskatam var piemērot papildu verifikāciju.';
+
+  @override
+  String get securityCheckMessage => 'Viss izskatās labi!';
+
+  @override
+  String get downloadStarted =>
+      'Lejupielāde sākta! Pārbaudiet savu lejupielāžu mapi';
+
+  @override
+  String get showPath => 'Rādīt ceļu';
+
+  @override
+  String get users => 'Lietotāji';
+
+  @override
+  String get tradeMatch => 'Tirdzniecības atbilstība';
+
+  @override
+  String get similar => 'Līdzīgs';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageLatvian => 'Latviešu';
+
+  @override
+  String get languageFrench => 'Français';
+
+  @override
+  String get languageGerman => 'Deutsch';
+
+  @override
+  String get languageSpanish => 'Español';
+
+  @override
+  String errorWithException(String exception) {
+    return 'Kļūda: $exception';
+  }
+
+  @override
+  String get errorVerifyingPin => 'Kļūda, pārbaudot PIN';
 }

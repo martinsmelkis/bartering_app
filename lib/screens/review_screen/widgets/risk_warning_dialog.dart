@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/risk_analysis_model.dart';
+import '../../../l10n/app_localizations.dart';
 
 class RiskWarningDialog extends StatelessWidget {
   final RiskAnalysisReport riskReport;
@@ -12,6 +13,7 @@ class RiskWarningDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       title: Row(
         children: [
@@ -20,7 +22,7 @@ class RiskWarningDialog extends StatelessWidget {
             color: _getColorForRiskLevel(riskReport.riskLevel),
           ),
           const SizedBox(width: 8),
-          Text(_getTitleForRiskLevel(riskReport.riskLevel)),
+          Text(_getTitleForRiskLevel(context, riskReport.riskLevel)),
         ],
       ),
       content: SingleChildScrollView(
@@ -29,14 +31,14 @@ class RiskWarningDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _getMessageForRiskLevel(riskReport.riskLevel),
+              _getMessageForRiskLevel(context, riskReport.riskLevel),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             if (riskReport.recommendations.isNotEmpty) ...[
               const SizedBox(height: 16),
-              const Text(
-                'Recommendations:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                l10n.recommendations,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               ...riskReport.recommendations.map(
@@ -61,14 +63,14 @@ class RiskWarningDialog extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.orange.shade200),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.info_outline, color: Colors.orange),
-                    SizedBox(width: 8),
+                    const Icon(Icons.info_outline, color: Colors.orange),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'This transaction will be reviewed by our security team.',
-                        style: TextStyle(fontSize: 12),
+                        l10n.transactionWillBeReviewed,
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ),
                   ],
@@ -82,11 +84,11 @@ class RiskWarningDialog extends StatelessWidget {
         if (!riskReport.isCritical)
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Continue Anyway'),
+            child: Text(l10n.continueAnyway),
           ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text(riskReport.isCritical ? 'OK' : 'Cancel'),
+          child: Text(riskReport.isCritical ? l10n.ok : l10n.cancel),
         ),
       ],
     );
@@ -118,30 +120,31 @@ class RiskWarningDialog extends StatelessWidget {
     }
   }
 
-  String _getTitleForRiskLevel(String level) {
+  String _getTitleForRiskLevel(BuildContext context, String level) {
+    final l10n = AppLocalizations.of(context)!;
     switch (level) {
       case 'CRITICAL':
-        return 'Transaction Blocked';
+        return l10n.transactionBlocked;
       case 'HIGH':
-        return 'Security Warning';
+        return l10n.securityWarning;
       case 'MEDIUM':
-        return 'Security Notice';
+        return l10n.securityNotice;
       default:
-        return 'Security Check';
+        return l10n.securityCheck;
     }
   }
 
-  String _getMessageForRiskLevel(String level) {
+  String _getMessageForRiskLevel(BuildContext context, String level) {
+    final l10n = AppLocalizations.of(context)!;
     switch (level) {
       case 'CRITICAL':
-        return 'This transaction has been blocked due to suspicious activity patterns. '
-            'Please contact support if you believe this is an error.';
+        return l10n.transactionBlockedMessage;
       case 'HIGH':
-        return 'Unusual activity has been detected. Additional verification may be required.';
+        return l10n.securityWarningMessage;
       case 'MEDIUM':
-        return 'We\'ve detected some unusual patterns. Your review may be subject to additional verification.';
+        return l10n.securityNoticeMessage;
       default:
-        return 'Everything looks good!';
+        return l10n.securityCheckMessage;
     }
   }
 }

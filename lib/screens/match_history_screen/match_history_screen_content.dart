@@ -337,6 +337,7 @@ class _MatchHistoryCard extends StatelessWidget {
   }
 
   void _viewMatch(BuildContext context, MatchHistoryItem match) async {
+    final l10n = AppLocalizations.of(context)!;
     if (!match.viewed) {
       try {
         await context.read<NotificationsCubit>().markMatchViewed(match.id);
@@ -344,7 +345,7 @@ class _MatchHistoryCard extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: $e'),
+              content: Text(l10n.errorWithException(e.toString())),
               backgroundColor: Colors.red,
             ),
           );
@@ -448,7 +449,7 @@ class _MatchHistoryCard extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: $e'),
+              content: Text(l10n.errorWithException(e.toString())),
               backgroundColor: Colors.red,
             ),
           );

@@ -972,7 +972,7 @@ void dispose() {
             content: Text(l10n.noAppToOpenFile),
             backgroundColor: Colors.orange,
             action: SnackBarAction(
-              label: 'Show Path',
+              label: l10n.showPath,
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -1020,7 +1020,7 @@ void dispose() {
           content: Text(l10n.couldNotOpenFile(e.toString())),
           backgroundColor: Colors.red,
           action: SnackBarAction(
-            label: 'Show Path',
+            label: l10n.showPath,
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

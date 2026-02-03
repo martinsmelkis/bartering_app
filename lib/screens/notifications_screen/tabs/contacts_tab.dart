@@ -466,7 +466,7 @@ class _ContactsTabState extends State<ContactsTab> {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Error: $e'),
+                        content: Text(l10n.errorWithException(e.toString())),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -519,7 +519,7 @@ class _ContactsTabState extends State<ContactsTab> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: $e'),
+                        content: Text(l10n.errorWithException(e.toString())),
               backgroundColor: Colors.red,
             ),
           );

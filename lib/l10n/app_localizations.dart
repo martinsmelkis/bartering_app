@@ -4729,6 +4729,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last updated: January 2026'**
   String get privacyPolicyLastUpdated;
+
+  /// No description provided for @chats.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get chats;
+
+  /// No description provided for @gpsLocationDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS location is disabled. Enable it in Settings to use this feature.'**
+  String get gpsLocationDisabled;
+
+  /// No description provided for @recommendations.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendations:'**
+  String get recommendations;
+
+  /// No description provided for @transactionWillBeReviewed.
+  ///
+  /// In en, this message translates to:
+  /// **'This transaction will be reviewed by our security team.'**
+  String get transactionWillBeReviewed;
+
+  /// No description provided for @continueAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Anyway'**
+  String get continueAnyway;
+
+  /// No description provided for @transactionBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Blocked'**
+  String get transactionBlocked;
+
+  /// No description provided for @securityWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Warning'**
+  String get securityWarning;
+
+  /// No description provided for @securityNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Notice'**
+  String get securityNotice;
+
+  /// No description provided for @securityCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Check'**
+  String get securityCheck;
+
+  /// No description provided for @transactionBlockedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This transaction has been blocked due to suspicious activity patterns. Please contact support if you believe this is an error.'**
+  String get transactionBlockedMessage;
+
+  /// No description provided for @securityWarningMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Unusual activity has been detected. Additional verification may be required.'**
+  String get securityWarningMessage;
+
+  /// No description provided for @securityNoticeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve detected some unusual patterns. Your review may be subject to additional verification.'**
+  String get securityNoticeMessage;
+
+  /// No description provided for @securityCheckMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything looks good!'**
+  String get securityCheckMessage;
+
+  /// No description provided for @downloadStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Download started! Check your downloads folder'**
+  String get downloadStarted;
+
+  /// No description provided for @showPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Path'**
+  String get showPath;
+
+  /// No description provided for @users.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get users;
+
+  /// No description provided for @tradeMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade match'**
+  String get tradeMatch;
+
+  /// No description provided for @similar.
+  ///
+  /// In en, this message translates to:
+  /// **'Similar'**
+  String get similar;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// No description provided for @languageLatvian.
+  ///
+  /// In en, this message translates to:
+  /// **'Latviešu'**
+  String get languageLatvian;
+
+  /// No description provided for @languageFrench.
+  ///
+  /// In en, this message translates to:
+  /// **'Français'**
+  String get languageFrench;
+
+  /// No description provided for @languageGerman.
+  ///
+  /// In en, this message translates to:
+  /// **'Deutsch'**
+  String get languageGerman;
+
+  /// No description provided for @languageSpanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Español'**
+  String get languageSpanish;
+
+  /// No description provided for @errorWithException.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {exception}'**
+  String errorWithException(String exception);
+
+  /// No description provided for @errorVerifyingPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Error verifying PIN'**
+  String get errorVerifyingPin;
 }
 
 class _AppLocalizationsDelegate

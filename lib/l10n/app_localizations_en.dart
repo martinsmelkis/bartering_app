@@ -2440,4 +2440,86 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicyLastUpdated => 'Last updated: January 2026';
+
+  @override
+  String get chats => 'Chats';
+
+  @override
+  String get gpsLocationDisabled =>
+      'GPS location is disabled. Enable it in Settings to use this feature.';
+
+  @override
+  String get recommendations => 'Recommendations:';
+
+  @override
+  String get transactionWillBeReviewed =>
+      'This transaction will be reviewed by our security team.';
+
+  @override
+  String get continueAnyway => 'Continue Anyway';
+
+  @override
+  String get transactionBlocked => 'Transaction Blocked';
+
+  @override
+  String get securityWarning => 'Security Warning';
+
+  @override
+  String get securityNotice => 'Security Notice';
+
+  @override
+  String get securityCheck => 'Security Check';
+
+  @override
+  String get transactionBlockedMessage =>
+      'This transaction has been blocked due to suspicious activity patterns. Please contact support if you believe this is an error.';
+
+  @override
+  String get securityWarningMessage =>
+      'Unusual activity has been detected. Additional verification may be required.';
+
+  @override
+  String get securityNoticeMessage =>
+      'We\'ve detected some unusual patterns. Your review may be subject to additional verification.';
+
+  @override
+  String get securityCheckMessage => 'Everything looks good!';
+
+  @override
+  String get downloadStarted => 'Download started! Check your downloads folder';
+
+  @override
+  String get showPath => 'Show Path';
+
+  @override
+  String get users => 'Users';
+
+  @override
+  String get tradeMatch => 'Trade match';
+
+  @override
+  String get similar => 'Similar';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageLatvian => 'Latviešu';
+
+  @override
+  String get languageFrench => 'Français';
+
+  @override
+  String get languageGerman => 'Deutsch';
+
+  @override
+  String get languageSpanish => 'Español';
+
+  @override
+  String errorWithException(String exception) {
+    return 'Error: $exception';
+  }
+
+  @override
+  String get errorVerifyingPin => 'Error verifying PIN';
 }

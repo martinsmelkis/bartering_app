@@ -89,8 +89,9 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
         });
         
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error verifying PIN'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)?.errorVerifyingPin
+                ?? "Error verifying PIN"),
             backgroundColor: Colors.red,
           ),
         );

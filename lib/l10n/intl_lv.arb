@@ -895,6 +895,39 @@
   "privacyPolicyChangesContent": "Mēs varam laiku pa laikam atjaunināt šo Privātuma politiku. Mēs paziņosim jums par jebkādām izmaiņām, publicējot jauno politiku lietotnē. Turpinot lietot lietotni pēc izmaiņām, tas nozīmē atjauninātās politikas pieņemšanu.",
   "privacyPolicyContactTitle": "Sazinieties ar mums",
   "privacyPolicyContactContent": "Ja jums ir kādi jautājumi par šo Privātuma politiku vai mūsu datu praksi, lūdzu, sazinieties ar mums uz info@bartering.app",
-  "privacyPolicyLastUpdated": "Pēdējoreiz atjaunots: 2025. gada janvāris"
+  "privacyPolicyLastUpdated": "Pēdējoreiz atjaunots: 2025. gada janvāris",
+
+  "chats": "Čati",
+  "gpsLocationDisabled": "GPS atrašanās vieta ir atspējota. Iespējojiet to iestatījumos, lai izmantotu šo funkciju.",
+  "recommendations": "Ieteikumi:",
+  "transactionWillBeReviewed": "Šo transakciju pārbaudīs mūsu drošības komanda.",
+  "continueAnyway": "Turpināt tik un tā",
+  "transactionBlocked": "Transakcija bloķēta",
+  "securityWarning": "Drošības brīdinājums",
+  "securityNotice": "Drošības paziņojums",
+  "securityCheck": "Drošības pārbaude",
+  "transactionBlockedMessage": "Šī transakcija ir bloķēta aizdomīgu darbību modeļu dēļ. Lūdzu, sazinieties ar atbalsta dienestu, ja uzskatāt, ka tā ir kļūda.",
+  "securityWarningMessage": "Ir konstatēta neparasta aktivitāte. Var būt nepieciešama papildu verifikācija.",
+  "securityNoticeMessage": "Mēs esam konstatējuši dažus neparastus modeļus. Jūsu pārskatam var piemērot papildu verifikāciju.",
+  "securityCheckMessage": "Viss izskatās labi!",
+  "downloadStarted": "Lejupielāde sākta! Pārbaudiet savu lejupielāžu mapi",
+  "showPath": "Rādīt ceļu",
+  "users": "Lietotāji",
+  "tradeMatch": "Tirdzniecības atbilstība",
+  "similar": "Līdzīgs",
+  "languageEnglish": "English",
+  "languageLatvian": "Latviešu",
+  "languageFrench": "Français",
+  "languageGerman": "Deutsch",
+  "languageSpanish": "Español",
+  "errorWithException": "Kļūda: {exception}",
+  "@errorWithException": {
+    "placeholders": {
+      "exception": {
+        "type": "String"
+      }
+    }
+  },
+  "errorVerifyingPin": "Kļūda, pārbaudot PIN"
 
 }
