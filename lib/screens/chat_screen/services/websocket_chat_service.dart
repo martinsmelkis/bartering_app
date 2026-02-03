@@ -183,14 +183,18 @@ class WebSocketChatService {
             }
 
             // Handle match notifications (web platform or no notification contacts)
-            if (messageJson['messageType'] != null &&
-                messageJson['messageType'].toString().contains('MatchNotificationMessage')) {
+            // Match notifications come as direct JSON with matchId field
+            if (messageJson['matchId'] != null && 
+                messageJson['matchType'] != null &&
+                messageJson['title'] != null) {
               logDebug('@@@@@@@@@ Match notification received via WebSocket!');
               try {
                 final matchNotification = MatchNotificationMessage.fromJson(messageJson);
                 
                 logDebug('@@@@@@@@@ Match details: type=${matchNotification.matchType}, '
                     'matchId=${matchNotification.matchId}, score=${matchNotification.matchScore}');
+                logDebug('@@@@@@@@@ Title: ${matchNotification.title}');
+                logDebug('@@@@@@@@@ Body: ${matchNotification.body}');
                 
                 // Reload match history (same as Firebase push notification handling)
                 try {
