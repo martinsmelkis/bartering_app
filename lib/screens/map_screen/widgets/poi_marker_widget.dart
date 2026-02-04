@@ -4,6 +4,7 @@ import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/svg_utils.dart';
 import 'package:barter_app/utils/text_utils.dart';
 import 'package:barter_app/widgets/online_status_badge.dart';
 import 'package:flutter/foundation.dart';
@@ -25,6 +26,7 @@ class PoiMarkerWidget {
     required PointOfInterest poi,
     required List<ParsedAttributeData>? userInterests,
     required List<ParsedAttributeData>? userOfferings,
+    double? devicePixelRatio, // Optional: pass from context for web sharpness
   }) async {
     // Use the POI's userId to get a consistent random icon
     final userIdHashCode = poi.profile.userId.hashCode;
@@ -51,9 +53,12 @@ class PoiMarkerWidget {
     final strokeWidth = kIsWeb ? 7.2 : 12.6;
     final circleSize = AppDimensions.mapPoiMarkerSize;
     final gap = strokeWidth + 2;
-    // On web, render at 2x physical resolution for crisp display
-    final scaleFactor = kIsWeb ? 2.0 : 1.0;
+    // On web, render at device's actual pixel ratio for crisp display on high-DPI screens
+    // Use provided devicePixelRatio or fallback to conservative 2.5x for web, 1.0x for mobile
+    final scaleFactor = kIsWeb ? (devicePixelRatio ?? 2.5) : 1.0;
     final svgSize = circleSize - gap;
+    
+    logDebug('@@@@@@@@@@ Rendering marker with scaleFactor: $scaleFactor (devicePixelRatio: $devicePixelRatio)');
 
     // Calculate gradient glow color and alpha based on relevance score (70% - 100%)
     Color? glowColor;
@@ -128,23 +133,16 @@ class PoiMarkerWidget {
           strokeWidth: strokeWidth,
           gapWidth: kIsWeb ? 1.2 : 1.0,
           child: ClipOval(
-            child: SvgPicture.string(
-              localSvgCopy,
-              // Render at 2x on web for crisp display on high-DPI screens
-              width: kIsWeb ? svgSize * 2 : svgSize,
-              height: kIsWeb ? svgSize * 2 : svgSize,
+            child: SvgUtils.buildSharpSvg(
+              svgString: localSvgCopy,
+              width: svgSize,
+              height: svgSize,
+              devicePixelRatio: devicePixelRatio,
               fit: BoxFit.fill,
-              allowDrawingOutsideViewBox: false,
-              placeholderBuilder: (context) => Container(
-                width: svgSize,
-                height: svgSize,
-                color: Colors.grey.shade200,
-              ),
-              key: ValueKey('poi_marker_${poi.profile.userId}'),
-              // Improve rendering quality on web mobile
               clipBehavior: Clip.antiAlias,
-              // Ensure proper rendering on web
               semanticsLabel: '${poi.profile.name} avatar',
+              key: ValueKey('poi_marker_${poi.profile.userId}'),
+              allowDrawingOutsideViewBox: false,
             ),
           ),
         ),

@@ -13,7 +13,6 @@ import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
 import 'package:barter_app/screens/chat_screen/widgets/message_status_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -1042,15 +1041,7 @@ void dispose() {
     try {
       logDebug('@@@@@@@@@ Opening file: $filePath');
       final result = await OpenFilex.open(filePath);
-
       logDebug('@@@@@@@@@ OpenFilex result: ${result.type} - ${result.message}');
-
-      // Handle the result based on result.type (int code)
-      // 0 = done (success)
-      // 1 = fileNotFound
-      // 2 = noAppToOpen
-      // 3 = permissionDenied
-      // -1 = error
 
       if (result.type == ResultType.done) {
         // File opened successfully

@@ -16,7 +16,6 @@ part 'interests_state.dart';
 class InterestsCubit extends Cubit<InterestsState> {
   ApiClient? _apiClient;
   final UserRepository _userRepository;
-  //List<ParsedAttributeData>? initialInterests = getIt(instanceName: 'initialInterests');
 
   InterestsCubit(this._apiClient, this._userRepository)
       : super(InterestsState.initial()) {
@@ -139,7 +138,6 @@ class InterestsCubit extends Cubit<InterestsState> {
       final offersList = await _apiClient?.parseInterestsToGetOfferings(
           interestsDataForApi, languageCode);
       updateOffersList(offersList ?? []);
-      //_userRepository.offerings = offersList ?? [];
 
       emit(state.copyWith(status: InterestsStatus.success,
           offersKeyList: offersList));

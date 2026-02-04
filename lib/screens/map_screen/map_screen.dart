@@ -18,6 +18,7 @@ import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/svg_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -673,11 +674,15 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       _userOfferings = await userRepository.getOfferings(loadFromStorage: true);
     }
 
+    // Get device pixel ratio for sharp rendering on web high-DPI screens
+    final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;
+
     // Delegate to the refactored widget class
     return await PoiMarkerWidget.createMarker(
       poi: poi,
       userInterests: _userInterests,
       userOfferings: _userOfferings,
+      devicePixelRatio: pixelRatio,
     );
   }
 
@@ -1366,17 +1371,20 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Load and create the special marker with path333.svg
     final svgString = await rootBundle.loadString('assets/icons/path333.svg');
     final markerSize = AppDimensions.poiMarkerSize * 0.5; // Make it slightly larger
+    
+    // Get device pixel ratio for sharp rendering on web high-DPI screens
+    final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;
+    
     final marker = MarkerIcon(
-      iconWidget: SvgPicture.string(
-        svgString,
-        // Render at 2x on web for crisp display on high-DPI screens
-        width: kIsWeb ? markerSize * 2 : markerSize * 2,
-        height: kIsWeb ? markerSize * 2 : markerSize * 2,
+      iconWidget: SvgUtils.buildSharpSvg(
+        svgString: svgString,
+        width: markerSize,
+        height: markerSize,
+        devicePixelRatio: pixelRatio,
         fit: BoxFit.contain,
-        clipBehavior: Clip.none,
-        matchTextDirection: false,
-        allowDrawingOutsideViewBox: false,
+        clipBehavior: kIsWeb ? Clip.antiAlias : Clip.none,
         key: const ValueKey('no_users_marker'),
+        allowDrawingOutsideViewBox: false,
       ),
     );
 
