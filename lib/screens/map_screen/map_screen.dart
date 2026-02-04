@@ -1378,8 +1378,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     final marker = MarkerIcon(
       iconWidget: SvgUtils.buildSharpSvg(
         svgString: svgString,
-        width: markerSize,
-        height: markerSize,
+        width: markerSize * 2,
+        height: markerSize * 2,
         devicePixelRatio: pixelRatio,
         fit: BoxFit.contain,
         clipBehavior: kIsWeb ? Clip.antiAlias : Clip.none,
