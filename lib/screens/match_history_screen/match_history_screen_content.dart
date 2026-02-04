@@ -3,6 +3,7 @@ import 'package:barter_app/models/notifications/notification_models.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
+import '../../screens/map_screen/map_screen.dart';
 
 class MatchHistoryScreenContent extends StatefulWidget {
   const MatchHistoryScreenContent({super.key});
@@ -474,13 +476,24 @@ class _MatchHistoryCard extends StatelessWidget {
       // Create POI from profile
       final poi = PointOfInterest(profile: profile, distanceKm: 0.0);
 
-      // Navigate to map screen with the POI using go_router
-      // This properly handles navigation state and avoids iframe conflicts on web
+      // Navigate to map screen with the POI
       if (context.mounted) {
         final poisList = [poi];
-        context.go('/map', extra: {
-          'initialPois': poisList,
-        });
+        
+        // On mobile, use Navigator.push to ensure proper navigation
+        // On web, use go_router to handle navigation state and avoid iframe conflicts
+        if (kIsWeb) {
+          context.go('/map', extra: {
+            'initialPois': poisList,
+          });
+        } else {
+          // For mobile, push a new route with the MapScreenV2
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => MapScreenV2(initialPois: poisList),
+            ),
+          );
+        }
       }
     } catch (e) {
       // Dismiss loading dialog if still showing
