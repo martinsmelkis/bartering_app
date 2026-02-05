@@ -333,7 +333,7 @@ class _MatchHistoryCard extends StatelessWidget {
               if (match.matchReason != null && match.matchReason!.isNotEmpty) ...[
                 SizedBox(height: 8),
                 Container(
-                  padding: EdgeInsets.all(10.w),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(8.r),

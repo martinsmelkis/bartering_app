@@ -163,7 +163,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         final firstPoi = widget.initialPois!.first;
         logDebug('@@@@@@@@@ didUpdateWidget - Centering map on POI: ${firstPoi.profile.userId}');
 
-        _mapController.setZoom(zoomLevel: 14.0);
+        //_mapController.setZoom(zoomLevel: 12.0);
         _mapController.moveTo(
           GeoPoint(
             latitude: firstPoi.profile.latitude ?? 0.0,
