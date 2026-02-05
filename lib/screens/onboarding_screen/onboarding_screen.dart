@@ -240,15 +240,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 16.0),
                               child: Text(
-                              'Share your interests to find the best matches with others!',
+                              l10n!.shareYourInterestsToFindBestMatches,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.orange.shade900,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: Colors.deepOrange.shade600,
+                                fontWeight: FontWeight.w600,
                                 shadows: [
                                   Shadow(
-                                    color: Colors.orange.shade200,
+                                    color: Colors.white70,
                                     offset: const Offset(1.5, 1.5),
                                     blurRadius: 3,
                                   ),

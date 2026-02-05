@@ -2532,4 +2532,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allMatchesDeleted => 'All matches have been deleted';
+
+  @override
+  String get selectTheInterestsThatMatchYourPreferences =>
+      'What do you need? What would you like assistance with?\nYou can change this later.';
+
+  @override
+  String get selectTheOffersThatYouCanProvide =>
+      'What can you provide or help out with?\nYou can change this later.';
+
+  @override
+  String get shareYourInterestsToFindBestMatches =>
+      'Share your interests to find the best matches with others!';
 }

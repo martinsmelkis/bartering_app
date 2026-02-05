@@ -2555,4 +2555,16 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get allMatchesDeleted => 'Visas atbilstības ir dzēstas';
+
+  @override
+  String get selectTheInterestsThatMatchYourPreferences =>
+      'Izvēlieties atslēgvārdus, kas atbilst Jūsu vēlmēm';
+
+  @override
+  String get selectTheOffersThatYouCanProvide =>
+      'Izvēlieties piedāvājumus/lietas, ko varat sniegt';
+
+  @override
+  String get shareYourInterestsToFindBestMatches =>
+      'Dalieties ar savām interesēm, lai atrastu labākās atbilstības ar citiem!';
 }

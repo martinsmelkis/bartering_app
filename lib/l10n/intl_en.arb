@@ -927,6 +927,9 @@
   "errorVerifyingPin": "Error verifying PIN",
   "deleteAll": "Delete All",
   "deleteAllMatchesConfirmation": "Are you sure you want to delete all match history? This action cannot be undone.",
-  "allMatchesDeleted": "All matches have been deleted"
+  "allMatchesDeleted": "All matches have been deleted",
+  "selectTheInterestsThatMatchYourPreferences": "What do you need? What would you like assistance with?\nYou can change this later.",
+  "selectTheOffersThatYouCanProvide": "What can you provide or help out with?\nYou can change this later.",
+  "shareYourInterestsToFindBestMatches": "Share your interests to find the best matches with others!"
 
 }

@@ -96,7 +96,7 @@ class PoiCubit extends Cubit<PoiState> {
   }
 
   /// Searches for profiles by keyword with configurable radius and weight
-  Future<void> getProfilesByKeyword(String keyword, {double? radiusMeters, int? weight}) async {
+  Future<void> getProfilesByKeyword(String keyword, {double? radiusMeters, int? weight, String? seeking, String? offering}) async {
     try {
       emit(PoiLoading());
       final location = await userRepository.getOwnLocation();
@@ -119,6 +119,8 @@ class PoiCubit extends Cubit<PoiState> {
         longitude.toString(),
         radiusMeters,
         weight,
+        seeking,
+        offering,
       );
       poi.forEach((poi) {
         print('@@@@@@@@@@@ POI loaded: ${poi.profile.userId} ${poi.matchRelevancyScore}');

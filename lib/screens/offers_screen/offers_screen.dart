@@ -86,94 +86,119 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                   maxWidth: 700.0,
                   child: BlocBuilder<OffersCubit, OffersState>(
                     builder: (context, innerState) {
+              // Determine spacing based on screen width
+              final screenWidth = MediaQuery.of(context).size.width;
+              final isLargeScreen = screenWidth >= 600;
+              final spacing = isLargeScreen ? 12.0 : 4.0;
+              final runSpacing = isLargeScreen ? 12.0 : 4.0;
+              
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                          Wrap(
-                            spacing: 8.0,
-                            runSpacing: 8.0,
-                            children: state.allOffers.map((offer) {
-                              final isSelected = state.selectedOffers.contains(
-                                  offer);
-                              final chipColor = AttributeStyleHelper
-                                  .getColorForStyleHint(
-                                offer.uiStyleHint,
-                                isSelected: isSelected,
-                              );
-                              final textColor = AttributeStyleHelper
-                                  .getTextColor(
-                                offer.uiStyleHint,
-                                isSelected: isSelected,
-                              );
-
-                              return ChoiceChip(
-                                label: Text(offer.attribute),
-                                selected: isSelected,
-                                onSelected: (selected) {
-                                  context
-                                      .read<OffersCubit>()
-                                      .toggleInterest(offer);
-                                },
-                                selectedColor: Colors.blue,
-                                backgroundColor: chipColor,
-                                checkmarkColor: Colors.white,
-                                side: BorderSide(
-                                  color: AttributeStyleHelper.getBorderColor(
-                                      offer.uiStyleHint),
-                                  width: isSelected ? 2.0 : 1.0,
-                                ),
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                          const SizedBox(height: 16),
-                          // Custom keyword input
-                          TextField(
-                            controller: _customKeywordController,
-                            decoration: InputDecoration(
-                              labelText: l10n.addYourOwnKeywords,
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: () {
-                                  context
-                                      .read<OffersCubit>()
-                                      .addCustomKeyword(
-                                      TextUtils.getTranslatedOrNormalizedAttribute(_customKeywordController.text, context));
-                                  _customKeywordController.clear();
-                                },
-                              ),
+                    // Info text
+                    Center(
+                      child: Text(
+                        l10n.selectTheOffersThatYouCanProvide,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.deepOrange,
+                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.1,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black26,
+                              offset: const Offset(1, 1),
+                              blurRadius: 1,
                             ),
-                            onSubmitted: (value) {
-                              context
-                                  .read<OffersCubit>()
-                                  .addCustomKeyword(value);
-                              _customKeywordController.clear();
-                            },
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: isLargeScreen ? 16 : 12),
+                    Wrap(
+                      spacing: spacing,
+                      runSpacing: runSpacing,
+                      children: state.allOffers.map((offer) {
+                        final isSelected = state.selectedOffers.contains(
+                            offer);
+                        final chipColor = AttributeStyleHelper
+                            .getColorForStyleHint(
+                          offer.uiStyleHint,
+                          isSelected: isSelected,
+                        );
+                        final textColor = AttributeStyleHelper
+                            .getTextColor(
+                          offer.uiStyleHint,
+                          isSelected: isSelected,
+                        );
+
+                        return ChoiceChip(
+                          label: Text(offer.attribute),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            context
+                                .read<OffersCubit>()
+                                .toggleInterest(offer);
+                          },
+                          selectedColor: Colors.blue,
+                          backgroundColor: chipColor,
+                          checkmarkColor: Colors.white,
+                          side: BorderSide(
+                            color: AttributeStyleHelper.getBorderColor(
+                                offer.uiStyleHint),
+                            width: isSelected ? 2.0 : 1.0,
                           ),
-                          const SizedBox(height: 16),
-                          // Custom keywords list
-                          Wrap(
-                            spacing: 8.0,
-                            runSpacing: 4.0,
-                            children: state.customKeywords.map((keyword) {
-                              return Chip(
-                                label: Text(keyword),
-                                onDeleted: () {
-                                  context
-                                      .read<OffersCubit>()
-                                      .removeCustomKeyword(keyword);
-                                },
-                              );
-                            }).toList(),
+                          labelStyle: TextStyle(
+                            color: textColor,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    // Custom keyword input
+                    TextField(
+                      controller: _customKeywordController,
+                      decoration: InputDecoration(
+                        labelText: l10n.addYourOwnKeywords,
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            context
+                                .read<OffersCubit>()
+                                .addCustomKeyword(
+                                TextUtils.getTranslatedOrNormalizedAttribute(_customKeywordController.text, context));
+                            _customKeywordController.clear();
+                          },
+                        ),
+                      ),
+                      onSubmitted: (value) {
+                        context
+                            .read<OffersCubit>()
+                            .addCustomKeyword(value);
+                        _customKeywordController.clear();
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    // Custom keywords list
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 4.0,
+                      children: state.customKeywords.map((keyword) {
+                        return Chip(
+                          label: Text(keyword),
+                          onDeleted: () {
+                            context
+                                .read<OffersCubit>()
+                                .removeCustomKeyword(keyword);
+                          },
+                        );
+                      }).toList(),
+                    ),
                     const SizedBox(height: 16),
                     // Submit button
                     Center(

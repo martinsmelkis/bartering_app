@@ -4897,6 +4897,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All matches have been deleted'**
   String get allMatchesDeleted;
+
+  /// No description provided for @selectTheInterestsThatMatchYourPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you need? What would you like assistance with?\nYou can change this later.'**
+  String get selectTheInterestsThatMatchYourPreferences;
+
+  /// No description provided for @selectTheOffersThatYouCanProvide.
+  ///
+  /// In en, this message translates to:
+  /// **'What can you provide or help out with?\nYou can change this later.'**
+  String get selectTheOffersThatYouCanProvide;
+
+  /// No description provided for @shareYourInterestsToFindBestMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your interests to find the best matches with others!'**
+  String get shareYourInterestsToFindBestMatches;
 }
 
 class _AppLocalizationsDelegate

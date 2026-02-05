@@ -342,6 +342,8 @@ class _ApiClient implements ApiClient {
     String lon,
     double? radius,
     int? weight,
+    String? seeking,
+    String? offering,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -351,6 +353,8 @@ class _ApiClient implements ApiClient {
       r'lon': lon,
       r'radius': radius,
       r'weight': weight,
+      r'seeking': seeking,
+      r'offering': offering,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};

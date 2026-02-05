@@ -11,32 +11,60 @@ import '../../../theme/app_colors.dart';
 class SearchInMap extends StatefulWidget {
   final MapController controller;
   final PoiCubit poiCubit;
+  final ValueNotifier<bool> showCheckboxesNotifier;
+  final ValueNotifier<bool> seekingCheckedNotifier;
+  final ValueNotifier<bool> offeringCheckedNotifier;
 
-  const SearchInMap({super.key, required this.controller, required this.poiCubit});
+  const SearchInMap({
+    super.key, 
+    required this.controller, 
+    required this.poiCubit,
+    required this.showCheckboxesNotifier,
+    required this.seekingCheckedNotifier,
+    required this.offeringCheckedNotifier,
+  });
+  
   @override
   State<StatefulWidget> createState() => _SearchInMapState();
 }
 
 class _SearchInMapState extends State<SearchInMap> {
   final textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   late PickerMapController controller = PickerMapController(
     initMapWithUserPosition: const UserTrackingOption(),
   );
+  bool _isFocused = false;
 
   @override
   void initState() {
     super.initState();
     textController.addListener(textOnChanged);
+    _focusNode.addListener(_onFocusChange);
   }
 
   void textOnChanged() {
     controller.setSearchableText(textController.text);
   }
 
+  void _onFocusChange() {
+    setState(() {
+      _isFocused = _focusNode.hasFocus;
+    });
+  }
+
+  void _clearAndUnfocus() {
+    textController.clear();
+    _focusNode.unfocus();
+    widget.showCheckboxesNotifier.value = false;
+  }
+
   @override
   void dispose() {
     textController.removeListener(textOnChanged);
+    _focusNode.removeListener(_onFocusChange);
     textController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -57,7 +85,10 @@ class _SearchInMapState extends State<SearchInMap> {
             final isLoading = state is PoiLoading;
             return TextField(
               controller: textController,
-              onTap: () {},
+              focusNode: _focusNode,
+              onTap: () {
+                widget.showCheckboxesNotifier.value = true;
+              },
               maxLines: 1,
               onSubmitted: (t) async {
                 final settingsService = getIt<SettingsService>();
@@ -67,7 +98,12 @@ class _SearchInMapState extends State<SearchInMap> {
                   t, 
                   radiusMeters: radiusKm * 1000,
                   weight: weight,
+                  seeking: widget.seekingCheckedNotifier.value ? 'true' : 'false',
+                  offering: widget.offeringCheckedNotifier.value ? 'true' : 'false',
                 );
+                // Hide checkboxes and unfocus after search
+                widget.showCheckboxesNotifier.value = false;
+                _focusNode.unfocus();
               },
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.search,
@@ -76,7 +112,11 @@ class _SearchInMapState extends State<SearchInMap> {
                 filled: false,
                 isDense: true,
                 hintText: l10n.searchForAKeyword,
-                prefixIcon: const Icon(Icons.search, size: 22, color: AppColors.primary,),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 0),
+                  child: const Icon(Icons.search, size: 22, color: AppColors.primary,),
+                ),
+                prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 40),
                 suffixIcon: isLoading
                     ? const Padding(
                         padding: EdgeInsets.all(8.0),
@@ -88,7 +128,13 @@ class _SearchInMapState extends State<SearchInMap> {
                           ),
                         ),
                       )
-                    : null,
+                    : _isFocused
+                        ? IconButton(
+                            icon: const Icon(Icons.close, size: 20, color: AppColors.primary),
+                            onPressed: _clearAndUnfocus,
+                            padding: const EdgeInsets.all(8.0),
+                          )
+                        : null,
                 border: const OutlineInputBorder(borderSide: BorderSide.none),
               ),
             );

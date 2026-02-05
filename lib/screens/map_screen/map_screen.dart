@@ -8,6 +8,7 @@ import 'package:barter_app/screens/map_screen/widgets/main_navigation.dart';
 import 'package:barter_app/screens/map_screen/widgets/poi_details_bottom_sheet.dart';
 import 'package:barter_app/screens/map_screen/widgets/poi_marker_widget.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_in_map.dart';
+import 'package:barter_app/screens/map_screen/widgets/search_filter_checkboxes.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_results_list_view.dart';
 import 'package:barter_app/screens/map_screen/widgets/user_avatar_fab.dart';
 import 'package:barter_app/screens/map_screen/widgets/zoom_buttons.dart';
@@ -91,6 +92,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   late MapOperationsCubit mapOperationsCubit;
   ValueNotifier<int> zoomLevelNotifier = ValueNotifier(16);
   ValueNotifier<bool> showFab = ValueNotifier(true);
+  
+  // Search checkboxes state
+  ValueNotifier<bool> _showCheckboxesNotifier = ValueNotifier(false);
+  ValueNotifier<bool> _seekingCheckedNotifier = ValueNotifier(true);
+  ValueNotifier<bool> _offeringCheckedNotifier = ValueNotifier(true);
 
   // User profile data
   String? _currentUserId;
@@ -939,7 +945,23 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                       right: 100,
                       child: PointerInterceptor(
                         child: SearchInMap(
-                          controller: _mapController, poiCubit: poiCubit,),
+                          controller: _mapController, 
+                          poiCubit: poiCubit,
+                          showCheckboxesNotifier: _showCheckboxesNotifier,
+                          seekingCheckedNotifier: _seekingCheckedNotifier,
+                          offeringCheckedNotifier: _offeringCheckedNotifier,
+                        ),
+                      ),
+                    ),
+                    // Search filter checkboxes - positioned separately for full width control
+                    Positioned(
+                      top: (kIsWeb ? 22 : topPadding ?? 0) + 56, // Below the search field
+                      left: 16,
+                      right: 16,
+                      child: SearchFilterCheckboxes(
+                        showCheckboxesNotifier: _showCheckboxesNotifier,
+                        seekingCheckedNotifier: _seekingCheckedNotifier,
+                        offeringCheckedNotifier: _offeringCheckedNotifier,
                       ),
                     ),
                     // Chats button in top right
@@ -1421,6 +1443,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   @override
   void dispose() {
     _mapController.dispose();
+    _showCheckboxesNotifier.dispose();
+    _seekingCheckedNotifier.dispose();
+    _offeringCheckedNotifier.dispose();
     super.dispose();
   }
 

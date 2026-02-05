@@ -868,6 +868,16 @@ class AppLocalizationsMapper {
       'languageGerman': localizations.languageGerman,
       'languageSpanish': localizations.languageSpanish,
       'errorVerifyingPin': localizations.errorVerifyingPin,
+      'deleteAll': localizations.deleteAll,
+      'deleteAllMatchesConfirmation':
+          localizations.deleteAllMatchesConfirmation,
+      'allMatchesDeleted': localizations.allMatchesDeleted,
+      'selectTheInterestsThatMatchYourPreferences':
+          localizations.selectTheInterestsThatMatchYourPreferences,
+      'selectTheOffersThatYouCanProvide':
+          localizations.selectTheOffersThatYouCanProvide,
+      'shareYourInterestsToFindBestMatches':
+          localizations.shareYourInterestsToFindBestMatches,
       'errorWithMessage': (errorMessage) =>
           localizations.errorWithMessage(errorMessage),
       'questionsAnswered': (count) => localizations.questionsAnswered(count),

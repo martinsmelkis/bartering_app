@@ -89,95 +89,119 @@ class _InterestsViewState extends State<InterestsView> {
                   maxWidth: 700.0,
                   child: BlocBuilder<InterestsCubit, InterestsState>(
                     builder: (context, innerState) {
+              // Determine spacing based on screen width
+              final screenWidth = MediaQuery.of(context).size.width;
+              final isLargeScreen = screenWidth >= 600;
+              final spacing = isLargeScreen ? 12.0 : 4.0;
+              final runSpacing = isLargeScreen ? 12.0 : 4.0;
+              
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Pre-defined interests
-                          Wrap(
-                            spacing: 8.0,
-                            runSpacing: 8.0,
-                            children: state.allInterests.map((interest) {
-                              final isSelected =
-                              state.selectedInterests.contains(interest);
-                              final chipColor = AttributeStyleHelper
-                                  .getColorForStyleHint(
-                                interest.uiStyleHint,
-                                isSelected: isSelected,
-                              );
-                              final textColor = AttributeStyleHelper
-                                  .getTextColor(
-                                interest.uiStyleHint,
-                                isSelected: isSelected,
-                              );
-
-                              return ChoiceChip(
-                                label: Text(TextUtils.getTranslatedOrNormalizedAttribute(interest.attribute, context)),
-                                selected: isSelected,
-                                onSelected: (selected) {
-                                  context
-                                      .read<InterestsCubit>()
-                                      .toggleInterest(interest);
-                                },
-                                selectedColor: Colors.blue,
-                                backgroundColor: chipColor,
-                                checkmarkColor: Colors.white,
-                                side: BorderSide(
-                                  color: AttributeStyleHelper.getBorderColor(
-                                      interest.uiStyleHint),
-                                  width: isSelected ? 2.0 : 1.0,
-                                ),
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                          const SizedBox(height: 24),
-                          // Custom keyword input
-                          TextField(
-                            controller: _customKeywordController,
-                            decoration: InputDecoration(
-                              labelText: l10n.addYourOwnKeywords,
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: () {
-                                  context
-                                      .read<InterestsCubit>()
-                                      .addCustomKeyword(
-                                  TextUtils.getTranslatedOrNormalizedAttribute(_customKeywordController.text, context));
-                                  _customKeywordController.clear();
-                                },
-                              ),
+                    // Info text
+                    Center(
+                      child: Text(
+                        l10n.selectTheInterestsThatMatchYourPreferences,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.deepOrange,
+                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.1,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black26,
+                              offset: const Offset(1, 1),
+                              blurRadius: 1,
                             ),
-                            onSubmitted: (value) {
-                              context
-                                  .read<InterestsCubit>()
-                                  .addCustomKeyword(value);
-                              _customKeywordController.clear();
-                            },
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: isLargeScreen ? 16 : 12),
+                    Wrap(
+                      spacing: spacing,
+                      runSpacing: runSpacing,
+                      children: state.allInterests.map((interest) {
+                        final isSelected =
+                        state.selectedInterests.contains(interest);
+                        final chipColor = AttributeStyleHelper
+                            .getColorForStyleHint(
+                          interest.uiStyleHint,
+                          isSelected: isSelected,
+                        );
+                        final textColor = AttributeStyleHelper
+                            .getTextColor(
+                          interest.uiStyleHint,
+                          isSelected: isSelected,
+                        );
+
+                        return ChoiceChip(
+                          label: Text(TextUtils.getTranslatedOrNormalizedAttribute(interest.attribute, context)),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            context
+                                .read<InterestsCubit>()
+                                .toggleInterest(interest);
+                          },
+                          selectedColor: Colors.blue,
+                          backgroundColor: chipColor,
+                          checkmarkColor: Colors.white,
+                          side: BorderSide(
+                            color: AttributeStyleHelper.getBorderColor(
+                                interest.uiStyleHint),
+                            width: isSelected ? 2.0 : 1.0,
                           ),
-                          const SizedBox(height: 16),
-                          // Custom keywords list
-                          Wrap(
-                            spacing: 8.0,
-                            runSpacing: 4.0,
-                            children: state.customKeywords.map((keyword) {
-                              return Chip(
-                                label: Text(keyword),
-                                onDeleted: () {
-                                  context
-                                      .read<InterestsCubit>()
-                                      .removeCustomKeyword(keyword);
-                                },
-                              );
-                            }).toList(),
+                          labelStyle: TextStyle(
+                            color: textColor,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 24),
+                    // Custom keyword input
+                    TextField(
+                      controller: _customKeywordController,
+                      decoration: InputDecoration(
+                        labelText: l10n.addYourOwnKeywords,
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            context
+                                .read<InterestsCubit>()
+                                .addCustomKeyword(
+                            TextUtils.getTranslatedOrNormalizedAttribute(_customKeywordController.text, context));
+                            _customKeywordController.clear();
+                          },
+                        ),
+                      ),
+                      onSubmitted: (value) {
+                        context
+                            .read<InterestsCubit>()
+                            .addCustomKeyword(value);
+                        _customKeywordController.clear();
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    // Custom keywords list
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 4.0,
+                      children: state.customKeywords.map((keyword) {
+                        return Chip(
+                          label: Text(keyword),
+                          onDeleted: () {
+                            context
+                                .read<InterestsCubit>()
+                                .removeCustomKeyword(keyword);
+                          },
+                        );
+                      }).toList(),
+                    ),
                     const SizedBox(height: 16),
                     // Submit button
                     Center(

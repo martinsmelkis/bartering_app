@@ -931,6 +931,9 @@
   "errorVerifyingPin": "Kļūda, pārbaudot PIN",
   "deleteAll": "Dzēst visu",
   "deleteAllMatchesConfirmation": "Vai tiešām vēlaties dzēst visu atbilstību vēsturi? Šo darbību nevar atsaukt.",
-  "allMatchesDeleted": "Visas atbilstības ir dzēstas"
+  "allMatchesDeleted": "Visas atbilstības ir dzēstas",
+  "selectTheInterestsThatMatchYourPreferences": "Izvēlieties atslēgvārdus, kas atbilst Jūsu vēlmēm",
+  "selectTheOffersThatYouCanProvide": "Izvēlieties piedāvājumus/lietas, ko varat sniegt",
+  "shareYourInterestsToFindBestMatches": "Dalieties ar savām interesēm, lai atrastu labākās atbilstības ar citiem!"
 
 }

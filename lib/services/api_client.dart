@@ -190,6 +190,8 @@ abstract class ApiClient {
       @Query("lon") String lon,
       @Query("radius") double? radius,
       @Query("weight") int? weight,
+      @Query("seeking") String? seeking,
+      @Query("offering") String? offering,
   );
 
   @GET('/pois/{id}')
