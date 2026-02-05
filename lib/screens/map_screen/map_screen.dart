@@ -426,8 +426,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
   }
 
-
-
   void _cleanUpMarkers() {
     logDebug('@@@@@@@@@ _cleanUpMarkers: Removing ${_currentMarkerPositions.length} markers');
     // Remove all existing markers from previous render
@@ -452,7 +450,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   /// Returns true if operation should continue, false if it was cancelled
   bool _isRenderOperationValid(int currentOperation) {
     if (currentOperation != _currentRenderOperation) {
-      //_cleanUpMarkers();
       logDebug('@@@@@@@@ Render operation #$currentOperation cancelled (new operation started)');
       _isUpdatingVisuals = false;
       return false;
@@ -467,11 +464,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       logDebug('@@@@@@@@@@@ Skipping visual update - map not ready');
       return;
     }
-
-    // Prevent concurrent updates
     if (_isUpdatingVisuals) {
-      logDebug('@@@@@@@@@@@ Already updating visuals, skipping...');
-      //return;
+      logDebug('@@@@@@@@@@@ Already updating visuals');
     }
     _cleanUpMarkers();
     mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
@@ -572,7 +566,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         }
       } else {
         logDebug('@@@@@@@@@@@ Loose sub-cluster ${looseSubCluster.id} COLLAPSED - adding cluster marker');
-        //looseSubCluster.isExpanded = false;
         if (!_isRenderOperationValid(currentOperation)) return;
         final position = GeoPoint(latitude: looseSubCluster.centroid.latitude,
             longitude: looseSubCluster.centroid.longitude);
@@ -876,271 +869,271 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
               // Build the map Stack
               final mapStack = Stack(
-                  children: [
-                    OSMFlutter(
-                      controller: _mapController,
-                      osmOption: _isGpsLocationEnabled ? OSMOption(
-                          zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
-                          userTrackingOption: UserTrackingOption(
-                            enableTracking: true,
-                            unFollowUser: false,
-                          ),
-                          showContributorBadgeForOSM: true
-                      ) : OSMOption(
-                          zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
-                          showContributorBadgeForOSM: true
-                      ),
-                      onMapIsReady: _onMapReady,
-                      onMapMoved: (event) {
-                        if (((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs() > 0.0004
-                            || ((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs() > 0.0004) {
-                          _mapController.getZoom().then((v) {
-                            print('@@@@@@@@@@ MAP MOVED: ${((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs()} '
-                                '${((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs()}');
-                            final newZoom = v.toDouble();
-                            zoomLevelNotifier.value = v.toInt();
-                            mapOperationsCubit.currentZoom = newZoom;
+                children: [
+                  OSMFlutter(
+                    controller: _mapController,
+                    osmOption: _isGpsLocationEnabled ? OSMOption(
+                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
+                        userTrackingOption: UserTrackingOption(
+                          enableTracking: true,
+                          unFollowUser: false,
+                        ),
+                        showContributorBadgeForOSM: true
+                    ) : OSMOption(
+                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
+                        showContributorBadgeForOSM: true
+                    ),
+                    onMapIsReady: _onMapReady,
+                    onMapMoved: (event) {
+                      if (((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs() > 0.0004
+                          || ((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs() > 0.0004) {
+                        _mapController.getZoom().then((v) {
+                          print('@@@@@@@@@@ MAP MOVED: ${((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs()} '
+                              '${((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs()}');
+                          final newZoom = v.toDouble();
+                          zoomLevelNotifier.value = v.toInt();
+                          mapOperationsCubit.currentZoom = newZoom;
 
-                            // Check if main clustering is needed due to zoom change
-                            // Only perform if we have POIs and zoom is in clustering range
-                            if (_allPois.isNotEmpty && newZoom <= 13.5) {
-                              if (mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom)) {
-                                logDebug('@@@@@@@@@ Zoom changed to $newZoom - performing main clustering');
-                                mapOperationsCubit.performMainClustering(_allPois);
-                                mapOperationsCubit.updateClusteringTracking(_allPois, newZoom);
-                              }
-                            } else if (newZoom > 13.5) {
-                              // Zoomed in past clustering threshold - reset tracking
-                              logDebug('@@@@@@@@@ Zoomed past clustering threshold - resetting tracking');
-                              mapOperationsCubit.resetClusteringTracking();
+                          // Check if main clustering is needed due to zoom change
+                          // Only perform if we have POIs and zoom is in clustering range
+                          if (_allPois.isNotEmpty && newZoom <= 13.5) {
+                            if (mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom)) {
+                              logDebug('@@@@@@@@@ Zoom changed to $newZoom - performing main clustering');
+                              mapOperationsCubit.performMainClustering(_allPois);
+                              mapOperationsCubit.updateClusteringTracking(_allPois, newZoom);
                             }
+                          } else if (newZoom > 13.5) {
+                            // Zoomed in past clustering threshold - reset tracking
+                            logDebug('@@@@@@@@@ Zoomed past clustering threshold - resetting tracking');
+                            mapOperationsCubit.resetClusteringTracking();
+                          }
 
-                            mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
-                          });
-                        }
-                        _previousMapRegion = event;
-                      },
-                      onGeoPointClicked: _onGeoPointTapped,
-                    ),
-                    Positioned(
-                      top: kIsWeb ? 26 : topPadding ?? 26.0,
-                      left: 12,
-                      child: PointerInterceptor(child: const MainNavigation()),
-                    ),
-                    Positioned(
-                      bottom: 32,
-                      right: 16,
-                      child: PointerInterceptor(
-                        child: UserAvatarFab(
-                          userId: _currentUserId,
-                          userName: _currentUserName,
-                          userInterests: _userInterests,
-                          userOfferings: _userOfferings,
-                        ),
+                          mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
+                        });
+                      }
+                      _previousMapRegion = event;
+                    },
+                    onGeoPointClicked: _onGeoPointTapped,
+                  ),
+                  Positioned(
+                    top: kIsWeb ? 26 : topPadding ?? 26.0,
+                    left: 12,
+                    child: PointerInterceptor(child: const MainNavigation()),
+                  ),
+                  Positioned(
+                    bottom: 32,
+                    right: 16,
+                    child: PointerInterceptor(
+                      child: UserAvatarFab(
+                        userId: _currentUserId,
+                        userName: _currentUserName,
+                        userInterests: _userInterests,
+                        userOfferings: _userOfferings,
                       ),
                     ),
-                    Positioned(
-                      top: kIsWeb ? 22 : topPadding,
-                      left: 64,
-                      right: 100,
-                      child: PointerInterceptor(
-                        child: SearchInMap(
-                          controller: _mapController, 
-                          poiCubit: poiCubit,
-                          showCheckboxesNotifier: _showCheckboxesNotifier,
-                          seekingCheckedNotifier: _seekingCheckedNotifier,
-                          offeringCheckedNotifier: _offeringCheckedNotifier,
-                        ),
-                      ),
-                    ),
-                    // Search filter checkboxes - positioned separately for full width control
-                    Positioned(
-                      top: (kIsWeb ? 22 : topPadding ?? 0) + 56, // Below the search field
-                      left: 16,
-                      right: 16,
-                      child: SearchFilterCheckboxes(
+                  ),
+                  Positioned(
+                    top: kIsWeb ? 22 : topPadding,
+                    left: 64,
+                    right: 100,
+                    child: PointerInterceptor(
+                      child: SearchInMap(
+                        controller: _mapController,
+                        poiCubit: poiCubit,
                         showCheckboxesNotifier: _showCheckboxesNotifier,
                         seekingCheckedNotifier: _seekingCheckedNotifier,
                         offeringCheckedNotifier: _offeringCheckedNotifier,
                       ),
                     ),
-                    // Chats button in top right
-                    Positioned(
-                      top: kIsWeb ? 26 : topPadding ?? 26.0,
-                      right: 12,
-                      child: PointerInterceptor(
-                        child: BlocBuilder<ChatsBadgeCubit, ChatsBadgeState>(
-                          builder: (context, badgeState) {
-                            return Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                FloatingActionButton(
-                                  onPressed: () {
-                                    final chatCubit = context.read<ChatPanelCubit>();
-                                    if (context.canShowSideBySide) {
-                                      chatCubit.openChatsList();
-                                    } else {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (_) => const ChatsListScreen(),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  heroTag: "ChatsFab",
-                                  mini: true,
-                                  backgroundColor: AppColors.background,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  child: const Icon(Icons.chat_bubble_outline),
+                  ),
+                  // Search filter checkboxes - positioned separately for full width control
+                  Positioned(
+                    top: (kIsWeb ? 22 : topPadding ?? 0) + 56, // Below the search field
+                    left: 16,
+                    right: 16,
+                    child: SearchFilterCheckboxes(
+                      showCheckboxesNotifier: _showCheckboxesNotifier,
+                      seekingCheckedNotifier: _seekingCheckedNotifier,
+                      offeringCheckedNotifier: _offeringCheckedNotifier,
+                    ),
+                  ),
+                  // Chats button in top right
+                  Positioned(
+                    top: kIsWeb ? 26 : topPadding ?? 26.0,
+                    right: 12,
+                    child: PointerInterceptor(
+                      child: BlocBuilder<ChatsBadgeCubit, ChatsBadgeState>(
+                        builder: (context, badgeState) {
+                          return Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              FloatingActionButton(
+                                onPressed: () {
+                                  final chatCubit = context.read<ChatPanelCubit>();
+                                  if (context.canShowSideBySide) {
+                                    chatCubit.openChatsList();
+                                  } else {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => const ChatsListScreen(),
+                                      ),
+                                    );
+                                  }
+                                },
+                                heroTag: "ChatsFab",
+                                mini: true,
+                                backgroundColor: AppColors.background,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                if (badgeState.unreadCount > 0)
-                                  Positioned(
-                                    top: -4,
-                                    right: -4,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: AppColors.background,
-                                          width: 2,
-                                        ),
+                                child: const Icon(Icons.chat_bubble_outline),
+                              ),
+                              if (badgeState.unreadCount > 0)
+                                Positioned(
+                                  top: -4,
+                                  right: -4,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.background,
+                                        width: 2,
                                       ),
-                                      constraints: const BoxConstraints(
-                                        minWidth: 20,
-                                        minHeight: 20,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          badgeState.unreadCount > 99 ?
-                                          '99+' : badgeState.unreadCount.toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                    ),
+                                    constraints: const BoxConstraints(
+                                      minWidth: 20,
+                                      minHeight: 20,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        badgeState.unreadCount > 99 ?
+                                        '99+' : badgeState.unreadCount.toString(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ),
                                   ),
-                              ],
-                            );
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  // Search complementary users button (with fallback to nearby)
+                  Positioned(
+                    top: kIsWeb ? 23 : (topPadding ?? 20.0),
+                    right: 56,
+                    child: PointerInterceptor(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade50.withValues(alpha: 0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: SvgPicture.asset(
+                            'assets/icons/search_nearby_users.svg',
+                            width: 30,
+                            height: 30,
+                            // Removed colorFilter to preserve SVG's original colors
+                          ),
+                          onPressed: () async {
+                            mapOperationsCubit.reset();
+                            for (var c in mapOperationsCubit.mainPoiClusters) {
+                              c.isExpanded = false;
+                            }
+
+                            // Close POI panel when performing new search
+                            final poiPanelCubit = context.read<PoiPanelCubit>();
+                            if (poiPanelCubit.state.isOpen) {
+                              poiPanelCubit.closePanel();
+                            }
+
+                            final settingsService = getIt<SettingsService>();
+                            final useMapCenter = await settingsService.getUseMapCenterForSearch();
+                            final radiusKm = await settingsService.getNearbyUsersRadius();
+
+                            if (useMapCenter) {
+                              final mapCenter = await _mapController.centerMap;
+                              await poiCubit.getComplementaryProfiles(
+                                _currentUserId ?? "",
+                                lat: mapCenter.latitude,
+                                lon: mapCenter.longitude,
+                                radiusMeters: radiusKm * 1000, // Convert km to meters
+                                fallbackToNearby: true, // Enable fallback to nearby
+                              );
+                            } else {
+                              // Use user location (default)
+                              await poiCubit.getComplementaryProfiles(
+                                _currentUserId ?? "",
+                                radiusMeters: radiusKm * 1000, // Convert km to meters
+                                fallbackToNearby: true, // Enable fallback to nearby
+                              );
+                            }
                           },
                         ),
                       ),
                     ),
-                    // Search complementary users button (with fallback to nearby)
+                  ),
+                  Positioned(
+                    bottom: 23.0,
+                    left: 15,
+                    child: ZoomNavigation(
+                      controller: _mapController,
+                      zoomNotifier: zoomLevelNotifier,
+                    ),
+                  ),
+                  // Search results list view overlay (only for small screens)
+                  if (_showSearchResultsList && !context.canShowSideBySide)
                     Positioned(
-                      top: kIsWeb ? 23 : (topPadding ?? 20.0),
-                      right: 56,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      top: MediaQuery.of(context).size.height * 0.15,
                       child: PointerInterceptor(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.shade50.withValues(alpha: 0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/icons/search_nearby_users.svg',
-                              width: 30,
-                              height: 30,
-                              // Removed colorFilter to preserve SVG's original colors
-                            ),
-                            onPressed: () async {
-                              mapOperationsCubit.reset();
-                              for (var c in mapOperationsCubit.mainPoiClusters) {
-                                c.isExpanded = false;
-                              }
-
-                              // Close POI panel when performing new search
-                              final poiPanelCubit = context.read<PoiPanelCubit>();
-                              if (poiPanelCubit.state.isOpen) {
-                                poiPanelCubit.closePanel();
-                              }
-
-                              final settingsService = getIt<SettingsService>();
-                              final useMapCenter = await settingsService.getUseMapCenterForSearch();
-                              final radiusKm = await settingsService.getNearbyUsersRadius();
-
-                              if (useMapCenter) {
-                                final mapCenter = await _mapController.centerMap;
-                                await poiCubit.getComplementaryProfiles(
-                                  _currentUserId ?? "",
-                                  lat: mapCenter.latitude,
-                                  lon: mapCenter.longitude,
-                                  radiusMeters: radiusKm * 1000, // Convert km to meters
-                                  fallbackToNearby: true, // Enable fallback to nearby
-                                );
-                              } else {
-                                // Use user location (default)
-                                await poiCubit.getComplementaryProfiles(
-                                  _currentUserId ?? "",
-                                  radiusMeters: radiusKm * 1000, // Convert km to meters
-                                  fallbackToNearby: true, // Enable fallback to nearby
-                                );
-                              }
-                            },
-                          ),
+                        child: SearchResultsListView(
+                          key: ValueKey(_searchResultsKey),
+                          pois: _searchResults,
+                          isLargeScreen: false,
+                          onClose: () {
+                            setState(() {
+                              _showSearchResultsList = false;
+                              _searchResults = [];
+                            });
+                            if (_allPois.isNotEmpty) {
+                              _processPois(_allPois, ignoreListViewSetting: true);
+                            }
+                          },
+                          onPoiTap: (poi) async {
+                            // On small screens, close the list when POI is tapped
+                            setState(() {
+                              _showSearchResultsList = false;
+                            });
+                            if (_allPois.isNotEmpty) {
+                              _processPois(_allPois, ignoreListViewSetting: true);
+                              await Future.delayed(const Duration(milliseconds: 100));
+                            }
+                            _onIndividualPoiTap(poi);
+                          },
+                          onChatTap: (poi) {
+                            _openChat(poi.profile.userId, poi.profile.name);
+                          },
                         ),
                       ),
                     ),
-                    Positioned(
-                      bottom: 23.0,
-                      left: 15,
-                      child: ZoomNavigation(
-                        controller: _mapController,
-                        zoomNotifier: zoomLevelNotifier,
-                      ),
-                    ),
-                    // Search results list view overlay (only for small screens)
-                    if (_showSearchResultsList && !context.canShowSideBySide)
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        top: MediaQuery.of(context).size.height * 0.15,
-                        child: PointerInterceptor(
-                          child: SearchResultsListView(
-                            key: ValueKey(_searchResultsKey),
-                            pois: _searchResults,
-                            isLargeScreen: false,
-                            onClose: () {
-                              setState(() {
-                                _showSearchResultsList = false;
-                                _searchResults = [];
-                              });
-                              if (_allPois.isNotEmpty) {
-                                _processPois(_allPois, ignoreListViewSetting: true);
-                              }
-                            },
-                            onPoiTap: (poi) async {
-                              // On small screens, close the list when POI is tapped
-                              setState(() {
-                                _showSearchResultsList = false;
-                              });
-                              if (_allPois.isNotEmpty) {
-                                _processPois(_allPois, ignoreListViewSetting: true);
-                                await Future.delayed(const Duration(milliseconds: 100));
-                              }
-                              _onIndividualPoiTap(poi);
-                            },
-                            onChatTap: (poi) {
-                              _openChat(poi.profile.userId, poi.profile.name);
-                            },
-                          ),
-                        ),
-                      ),
-                  ]
+                ]
               );
 
               // On large screens, show map with search results panel
@@ -1158,115 +1151,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         Container(
                           width: context.panelWidth,
                           color: Colors.white,
-                          child: isPanelOpen
-                              ? Column(
-                                  children: [
-                                    // Search results list takes 60% of vertical space
-                                    Expanded(
-                                      flex: 60,
-                                      child: SearchResultsListView(
-                                        key: ValueKey(_searchResultsKey),
-                                        pois: _searchResults,
-                                        isLargeScreen: true,
-                                        onClose: () {
-                                          setState(() {
-                                            _showSearchResultsList = false;
-                                            _searchResults = [];
-                                          });
-                                          // Clear markers from map when closing list
-                                          if (_allPois.isNotEmpty) {
-                                            mapOperationsCubit.reset();
-                                            _updateMapVisuals();
-                                          }
-                                        },
-                                        onPoiTap: (poi) async {
-                                          // On large screens, open POI panel below the search results list
-                                          context.read<PoiPanelCubit>().openPoiDetails(poi);
-
-                                          // Navigate to the user's location on the map (like match history does)
-                                          if (poi.profile.latitude != null && poi.profile.longitude != null) {
-                                            //_mapController.setZoom(zoomLevel: 17.0);
-                                            _mapController.moveTo(
-                                              GeoPoint(
-                                                latitude: poi.profile.latitude!,
-                                                longitude: poi.profile.longitude!,
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        onChatTap: (poi) {
-                                          _openChat(poi.profile.userId, poi.profile.name);
-                                        },
-                                      ),
-                                    ),
-                                    // Chat/ChatsListpanel takes 40% of vertical space
-                                    Expanded(
-                                      flex: 40,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: AppColors.background,
-                                          border: Border(
-                                            top: BorderSide(
-                                              color: Colors.grey.shade300,
-                                              width: 1,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            // Panel header
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context).primaryColor,
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      isChatsListOpen 
-                                                          ? l10n.chats 
-                                                          : (chatState.selectedPoiName ?? l10n.chat),
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.w600,
-                                                      ),
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    icon: const Icon(Icons.close, color: Colors.white, size: 18),
-                                                    onPressed: () => context.read<ChatPanelCubit>().closePanel(),
-                                                    padding: EdgeInsets.zero,
-                                                    constraints: const BoxConstraints(),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            // Panel content - either chats list or individual chat
-                                            Expanded(
-                                              child: isChatsListOpen
-                                                  ? ChatsListScreen(
-                                                      showAppBar: false,
-                                                      onChatSelected: (poiId, poiName) {
-                                                        context.read<ChatPanelCubit>().openChat(poiId, poiName);
-                                                      },
-                                                    )
-                                                  : ChatScreen(
-                                                      poiId: chatState.selectedPoiId,
-                                                      poiName: chatState.selectedPoiName,
-                                                      showAppBar: false,
-                                                    ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : SearchResultsListView(
+                          child: isPanelOpen ? Column(
+                            children: [
+                              // Search results list takes 60% of vertical space
+                              Expanded(
+                                flex: 60,
+                                child: SearchResultsListView(
                                   key: ValueKey(_searchResultsKey),
                                   pois: _searchResults,
                                   isLargeScreen: true,
@@ -1300,6 +1190,106 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                     _openChat(poi.profile.userId, poi.profile.name);
                                   },
                                 ),
+                              ),
+                              // Chat/ChatsListpanel takes 40% of vertical space
+                              Expanded(
+                                flex: 40,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.background,
+                                    border: Border(
+                                      top: BorderSide(
+                                        color: Colors.grey.shade300,
+                                        width: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      // Panel header
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                isChatsListOpen
+                                                    ? l10n.chats
+                                                    : (chatState.selectedPoiName ?? l10n.chat),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                                              onPressed: () => context.read<ChatPanelCubit>().closePanel(),
+                                              padding: EdgeInsets.zero,
+                                              constraints: const BoxConstraints(),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // Panel content - either chats list or individual chat
+                                      Expanded(
+                                        child: isChatsListOpen
+                                            ? ChatsListScreen(
+                                                showAppBar: false,
+                                                onChatSelected: (poiId, poiName) {
+                                                  context.read<ChatPanelCubit>().openChat(poiId, poiName);
+                                                },
+                                              )
+                                            : ChatScreen(
+                                                poiId: chatState.selectedPoiId,
+                                                poiName: chatState.selectedPoiName,
+                                                showAppBar: false,
+                                              ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],) : SearchResultsListView(
+                              key: ValueKey(_searchResultsKey),
+                              pois: _searchResults,
+                              isLargeScreen: true,
+                              onClose: () {
+                                setState(() {
+                                  _showSearchResultsList = false;
+                                  _searchResults = [];
+                                });
+                                // Clear markers from map when closing list
+                                if (_allPois.isNotEmpty) {
+                                  mapOperationsCubit.reset();
+                                  _updateMapVisuals();
+                                }
+                              },
+                              onPoiTap: (poi) async {
+                                // On large screens, open POI panel below the search results list
+                                context.read<PoiPanelCubit>().openPoiDetails(poi);
+
+                                // Navigate to the user's location on the map (like match history does)
+                                if (poi.profile.latitude != null && poi.profile.longitude != null) {
+                                  //_mapController.setZoom(zoomLevel: 17.0);
+                                  _mapController.moveTo(
+                                    GeoPoint(
+                                      latitude: poi.profile.latitude!,
+                                      longitude: poi.profile.longitude!,
+                                    ),
+                                  );
+                                }
+                              },
+                              onChatTap: (poi) {
+                                _openChat(poi.profile.userId, poi.profile.name);
+                              },
+                            ),
                         ),
                       ],
                     );
@@ -1392,7 +1382,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _noUsersMarkerPosition = mapCenter;
     // Load and create the special marker with path333.svg
     final svgString = await rootBundle.loadString('assets/icons/path333.svg');
-    final markerSize = AppDimensions.poiMarkerSize * 0.5; // Make it slightly larger
+    final markerSize = AppDimensions.poiMarkerSize * 0.5;
     
     // Get device pixel ratio for sharp rendering on web high-DPI screens
     final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;

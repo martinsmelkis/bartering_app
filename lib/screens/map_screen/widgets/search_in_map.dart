@@ -94,12 +94,31 @@ class _SearchInMapState extends State<SearchInMap> {
                 final settingsService = getIt<SettingsService>();
                 final radiusKm = await settingsService.getKeywordSearchRadius();
                 final weight = await settingsService.getKeywordSearchWeight();
+                final useMapCenter = await settingsService.getUseMapCenterForSearch();
+                
+                double? lat;
+                double? lon;
+                
+                // Get coordinates based on settings
+                if (useMapCenter) {
+                  try {
+                    final mapCenter = await widget.controller.centerMap;
+                    lat = mapCenter.latitude;
+                    lon = mapCenter.longitude;
+                  } catch (e) {
+                    // If getting map center fails, continue without it (will use user location)
+                    debugPrint('Error getting map center: $e');
+                  }
+                }
+                
                 widget.poiCubit.getProfilesByKeyword(
                   t, 
                   radiusMeters: radiusKm * 1000,
                   weight: weight,
                   seeking: widget.seekingCheckedNotifier.value ? 'true' : 'false',
                   offering: widget.offeringCheckedNotifier.value ? 'true' : 'false',
+                  lat: lat,
+                  lon: lon,
                 );
                 // Hide checkboxes and unfocus after search
                 widget.showCheckboxesNotifier.value = false;

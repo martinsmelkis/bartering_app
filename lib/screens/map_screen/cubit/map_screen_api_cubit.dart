@@ -96,20 +96,36 @@ class PoiCubit extends Cubit<PoiState> {
   }
 
   /// Searches for profiles by keyword with configurable radius and weight
-  Future<void> getProfilesByKeyword(String keyword, {double? radiusMeters, int? weight, String? seeking, String? offering}) async {
+  /// If lat/lon are provided, uses those coordinates (typically from map center when setting is enabled).
+  /// Otherwise, uses user's saved location.
+  Future<void> getProfilesByKeyword(String keyword, {double? radiusMeters,
+    int? weight, String? seeking, String? offering, double? lat, double? lon}) async {
     try {
       emit(PoiLoading());
-      final location = await userRepository.getOwnLocation();
-      double latitude = location?.isNotEmpty == true ?
-      double.tryParse(location?.split(',')[0] ?? "") ?? 0.0 : 0.0;
-      double longitude = location?.isNotEmpty == true ?
-      double.tryParse(location?.split(',')[1] ?? "") ?? 0.0 : 0.0;
       
-      // Check if location is not set (0.0, 0.0)
-      if (latitude == 0.0 && longitude == 0.0) {
-        log("⚠️ No valid location available - skipping keyword search");
-        emit(const PoiError("Please set your location in settings to search for users"));
-        return;
+      userId ??= await userRepository.getOwnUserId();
+      
+      double latitude;
+      double longitude;
+      
+      // Check if explicit coordinates are provided (e.g., from map center)
+      if (lat != null && lon != null) {
+        latitude = lat;
+        longitude = lon;
+      } else {
+        // Use user's saved location
+        final location = await userRepository.getOwnLocation();
+        latitude = location?.isNotEmpty == true ?
+            double.tryParse(location?.split(',')[0] ?? "") ?? 0.0 : 0.0;
+        longitude = location?.isNotEmpty == true ?
+            double.tryParse(location?.split(',')[1] ?? "") ?? 0.0 : 0.0;
+        
+        // Check if location is not set (0.0, 0.0)
+        if (latitude == 0.0 && longitude == 0.0) {
+          log("⚠️ No valid location available - skipping keyword search");
+          emit(const PoiError("Please set your location in settings to search for users"));
+          return;
+        }
       }
       
       final poi = await _apiClient.getProfilesByKeyword(
