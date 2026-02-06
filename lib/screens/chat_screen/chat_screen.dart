@@ -8,6 +8,7 @@ import 'package:barter_app/services/file_transfer_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/date_time_utils.dart';
 import 'package:barter_app/models/relationships/report_models.dart';
 import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
 import 'package:barter_app/screens/chat_screen/widgets/message_status_indicator.dart';
@@ -18,7 +19,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart'; // For date formatting
 import 'package:open_filex/open_filex.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -565,18 +565,10 @@ void dispose() {
                   child: Center(child: CircularProgressIndicator()),
                 ),
               Expanded(
-                child: ListView.builder(
+                child: ListView(
                   controller: _scrollController,
                   padding: EdgeInsets.all(listPadding),
-                  itemCount: displayMessages.length,
-                  // Add keys to prevent unnecessary rebuilds of message bubbles
-                  itemBuilder: (context, index) {
-                    final message = displayMessages[index];
-                    return KeyedSubtree(
-                      key: ValueKey('msg_${message.id}'),
-                      child: _buildMessageBubble(message),
-                    );
-                  },
+                  children: _buildMessageListWithHeaders(displayMessages),
                   // Optimize for long lists
                   addAutomaticKeepAlives: true, // Keep alive to prevent rebuilds
                   addRepaintBoundaries: true, // Additional repaint boundaries
@@ -588,6 +580,65 @@ void dispose() {
         },
       ),
     );
+  }
+
+
+
+  /// Build date header widget
+  Widget _buildDateHeader(DateTime date) {
+    final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
+        context.canShowSideBySide;
+    final double fontSize = isWebSideBySide ? 11.7 : 12.sp;
+    final double verticalMargin = isWebSideBySide ? 10.4 : 12.h;
+
+    return Center(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: verticalMargin),
+        padding: EdgeInsets.symmetric(
+          vertical: isWebSideBySide ? 5.2 : 6.h,
+          horizontal: isWebSideBySide ? 13 : 16.w,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(isWebSideBySide ? 13 : 16.r),
+        ),
+        child: Text(
+          DateTimeUtils.formatChatDateHeader(date, context),
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: fontSize,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Generate list items with date headers interspersed
+  List<Widget> _buildMessageListWithHeaders(List<ChatMessage> messages) {
+    final List<Widget> items = [];
+    DateTime? lastDate;
+
+    for (int i = 0; i < messages.length; i++) {
+      final message = messages[i];
+      final messageDate = DateTimeUtils.dateOnly(message.timestamp);
+
+      // Add date header if this is a new day
+      if (lastDate == null || !DateTimeUtils.isSameDay(messageDate, lastDate)) {
+        items.add(_buildDateHeader(messageDate));
+        lastDate = messageDate;
+      }
+
+      // Add the message
+      items.add(
+        KeyedSubtree(
+          key: ValueKey('msg_${message.id}'),
+          child: _buildMessageBubble(message),
+        ),
+      );
+    }
+
+    return items;
   }
 
   Widget _buildMessageBubble(ChatMessage message) {
@@ -680,7 +731,7 @@ void dispose() {
               )
             else
               Text(
-                DateFormat('HH:mm').format(message.timestamp), // Example: 14:35
+                DateTimeUtils.formatTime(message.timestamp), // Example: 14:35
                 style: TextStyle(
                   color: Colors.black54,
                   fontSize: timeFontSize,

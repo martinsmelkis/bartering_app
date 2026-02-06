@@ -1545,6 +1545,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get userPrefix => 'User';
 
   @override
+  String get today => 'Today';
+
+  @override
   String get yesterday => 'Yesterday';
 
   @override

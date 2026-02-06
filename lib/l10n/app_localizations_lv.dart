@@ -1558,6 +1558,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get userPrefix => 'Lietotājs';
 
   @override
+  String get today => 'Šodien';
+
+  @override
   String get yesterday => 'Vakar';
 
   @override

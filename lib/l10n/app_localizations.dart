@@ -3074,6 +3074,12 @@ abstract class AppLocalizations {
   /// **'User'**
   String get userPrefix;
 
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
   /// No description provided for @yesterday.
   ///
   /// In en, this message translates to:

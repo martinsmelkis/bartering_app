@@ -37,6 +37,7 @@ import '../../utils/geo_utils.dart';
 import '../../utils/responsive_breakpoints.dart';
 import '../chat_screen/chat_screen.dart';
 import '../chat_screen/adaptive_chat_layout.dart';
+import '../chat_screen/widgets/chat_panel_header.dart';
 import '../settings_screen/adaptive_settings_layout.dart';
 import '../user_profile_screen/adaptive_profile_layout.dart';
 import '../initialize_screen/initialize_screen.dart';
@@ -1231,37 +1232,42 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                   ),
                                   child: Column(
                                     children: [
-                                      // Panel header
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).primaryColor,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                isChatsListOpen
-                                                    ? l10n.chats
-                                                    : (chatState.selectedPoiName ?? l10n.chat),
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
+                                      // Panel header - use ChatPanelHeader for individual chats, simple header for chats list
+                                      if (isChatsListOpen)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).primaryColor,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  l10n.chats,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
                                                 ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(Icons.close, color: Colors.white, size: 18),
-                                              onPressed: () => context.read<ChatPanelCubit>().closePanel(),
-                                              padding: EdgeInsets.zero,
-                                              constraints: const BoxConstraints(),
-                                            ),
-                                          ],
+                                              IconButton(
+                                                icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                                                onPressed: () => context.read<ChatPanelCubit>().closePanel(),
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      else
+                                        ChatPanelHeader(
+                                          chatPoiName: chatState.selectedPoiName,
+                                          chatPoiId: chatState.selectedPoiId!,
+                                          onClose: () => context.read<ChatPanelCubit>().closePanel(),
                                         ),
-                                      ),
                                       // Panel content - either chats list or individual chat
                                       Expanded(
                                         child: isChatsListOpen
