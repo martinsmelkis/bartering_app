@@ -689,7 +689,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         latitude: _userRepository.latitude,
         longitude: _userRepository.longitude,
         attributes: List.empty(growable: false),
-        profileKeywordDataMap: _userRepository.getProfileKeywordData,
+        profileKeywordDataMap: await _userRepository.getProfileKeywordDataMap(),
         activePostingIds: [],
         preferredLanguage: languageCode,
       );

@@ -161,17 +161,21 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
             showDialog(
               context: context,
               builder: (context) =>
-                  ProgressDialog(
-                      message: AppLocalizations.of(context)!.submitting),
+                  PointerInterceptor(
+                    child: ProgressDialog(
+                        message: AppLocalizations.of(context)!.submitting),
+                  ),
             );
           } else if (state.status == LocationPickerStatus.error) {
             showDialog(
               context: context,
               builder: (context) =>
-                  ErrorDialog(
-                    title: AppLocalizations.of(context)!.error,
-                    content: state.errorMessage ??
-                        AppLocalizations.of(context)!.anUnknownErrorOccurred,
+                  PointerInterceptor(
+                    child: ErrorDialog(
+                      title: AppLocalizations.of(context)!.error,
+                      content: state.errorMessage ??
+                          AppLocalizations.of(context)!.anUnknownErrorOccurred,
+                    ),
                   ),
             );
           } else if (state.status == LocationPickerStatus.success) {

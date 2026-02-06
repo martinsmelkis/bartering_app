@@ -113,6 +113,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   // Search results list view state
   bool _showSearchResultsList = false;
   List<PointOfInterest> _searchResults = [];
+  List<PointOfInterest> _previousSearchResults = [];
 
   // Key to force SearchResultsListView to rebuild when attributes change
   int _searchResultsKey = 0;
@@ -136,12 +137,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Handle any pending notification that opened the app when it was terminated
     // Add a delay to ensure the route is fully settled before attempting navigation
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<NotificationsCubit>().loadMatchHistory();
-      }
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           FirebaseService().handlePendingInitialMessage();
+          context.read<NotificationsCubit>().loadMatchHistory();
         }
       });
     });
@@ -298,7 +297,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         final lat = double.tryParse(parts[0]);
         final lon = double.tryParse(parts[1]);
         if (lat != null && lon != null) {
-          _mapController.setZoom(zoomLevel: 12.0);
+          //_mapController.setZoom(zoomLevel: 12.0);
           _mapController.moveTo(GeoPoint(latitude: lat, longitude: lon));
         }
       }
@@ -356,6 +355,24 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
   }
 
+  /// Check if two lists of POIs are different
+  bool _havePoisChanged(List<PointOfInterest> newPois, List<PointOfInterest> oldPois) {
+    // Different lengths means they've changed
+    if (newPois.length != oldPois.length) return true;
+    
+    // If both are empty, nothing changed
+    if (newPois.isEmpty && oldPois.isEmpty) return false;
+    
+    // Compare POI user IDs in order
+    for (int i = 0; i < newPois.length; i++) {
+      if (newPois[i].profile.userId != oldPois[i].profile.userId) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
   void _processPois(List<PointOfInterest> pois, {bool ignoreListViewSetting = false}) async {
     logDebug('@@@@@@@@@ _processPois called with ${pois.length} POIs');
     _allPois = List.from(pois);
@@ -379,13 +396,21 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       if (showAsList && _allPois.isNotEmpty && !(kIsWeb && !context.canShowSideBySide)) {
         // Update search results if list is already showing OR if POI panel is not open
         if (_showSearchResultsList || !poiPanelCubit.state.isOpen) {
-          logDebug('@@@@@@@@@ Updating search results list with ${_allPois.length} POIs (key: $_searchResultsKey)');
-          // Show/update list view
-          setState(() {
-            _searchResults = List.from(_allPois); // Create new list to trigger update
-            _showSearchResultsList = true;
-            _searchResultsKey++; // Force rebuild of list view widget
-          });
+          // Check if POIs have actually changed before updating
+          final poisChanged = _havePoisChanged(_allPois, _previousSearchResults);
+          
+          if (poisChanged) {
+            logDebug('@@@@@@@@@ Updating search results list with ${_allPois.length} POIs (key: $_searchResultsKey)');
+            // Show/update list view
+            setState(() {
+              _searchResults = List.from(_allPois); // Create new list to trigger update
+              _previousSearchResults = List.from(_allPois); // Track current POIs
+              _showSearchResultsList = true;
+              _searchResultsKey++; // Force rebuild of list view widget
+            });
+          } else {
+            logDebug('@@@@@@@@@ POIs unchanged, skipping list update');
+          }
 
           // On small screens, return early (list only, no map markers) only if POI panel is closed
           if (!context.canShowSideBySide && !poiPanelCubit.state.isOpen) {
@@ -1426,7 +1451,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   void _showInviteFriendsDialog() {
     showDialog(
       context: context,
-      builder: (context) => const InviteFriendsDialog(),
+      builder: (context) => PointerInterceptor(
+        child: const InviteFriendsDialog(),
+      ),
     );
   }
 

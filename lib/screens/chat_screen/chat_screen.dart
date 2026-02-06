@@ -13,6 +13,7 @@ import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
 import 'package:barter_app/screens/chat_screen/widgets/message_status_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -1353,27 +1354,42 @@ void dispose() {
           ),
           SizedBox(width: spacing),
           Expanded(
-            child: TextField(
-              controller: _messageController,
-              style: TextStyle(fontSize: fontSize),
-              decoration: InputDecoration(
-                hintText: l10n.typeAMessage,
-                hintStyle: TextStyle(fontSize: fontSize),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(borderRadius),
-                  borderSide: BorderSide.none,
+            child: Focus(
+              onKeyEvent: (node, event) {
+                // On web: Enter sends, Shift+Enter adds newline
+                if (kIsWeb && event is KeyDownEvent) {
+                  if (event.logicalKey == LogicalKeyboardKey.enter) {
+                    if (!HardwareKeyboard.instance.isShiftPressed) {
+                      // Enter without Shift: send message
+                      _sendMessage();
+                      return KeyEventResult.handled;
+                    }
+                    // Shift+Enter: allow default behavior (newline)
+                  }
+                }
+                return KeyEventResult.ignored;
+              },
+              child: TextField(
+                controller: _messageController,
+                style: TextStyle(fontSize: fontSize),
+                decoration: InputDecoration(
+                  hintText: l10n.typeAMessage,
+                  hintStyle: TextStyle(fontSize: fontSize),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(borderRadius),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(
+                      horizontal: contentHorizontalPadding,
+                      vertical: contentVerticalPadding),
+                  isDense: isWebSideBySide,
                 ),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(
-                    horizontal: contentHorizontalPadding,
-                    vertical: contentVerticalPadding),
-                isDense: isWebSideBySide,
+                textInputAction: TextInputAction.newline,
+                minLines: 1,
+                maxLines: isWebSideBySide ? 4 : 5,
               ),
-              //onSubmitted: (_) => _sendMessage(),
-              textInputAction: TextInputAction.send,
-              minLines: 1,
-              maxLines: isWebSideBySide ? 4 : 5,
             ),
           ),
           SizedBox(width: spacing),

@@ -37,7 +37,7 @@ class LocationPickerCubit extends Cubit<LocationPickerState> {
         latitude: position.latitude,
         longitude: position.longitude,
         attributes: List.empty(growable: false),
-        profileKeywordDataMap: _userRepository.getProfileKeywordData,
+        profileKeywordDataMap: await _userRepository.getProfileKeywordDataMap(),
         activePostingIds: List.empty(growable: false),
       );
       logDebug('@@@@@@@@@ profileData: $profileData');
