@@ -408,12 +408,18 @@ void dispose() {
           : null,
       body: BlocConsumer<ChatCubit, ChatState>(
         listener: (context, state) {
-          if (state is ChatMessagesLoaded) {
-            logDebug('🔄 ChatMessagesLoaded state received with ${state.messages.length} messages');
-            setState(() {
-              _messages = state.messages;
-              logDebug('✅ UI _messages updated, triggering rebuild');
-            });
+          // Update _messages for any state that carries message data
+          if (state is ChatMessagesLoaded ||
+              state is ChatMessagesLoading ||
+              state is ChatMessageSending ||
+              state is ChatMessageSent) {
+            if (state.messages.isNotEmpty) {
+              logDebug('🔄 ${state.runtimeType} state received with ${state.messages.length} messages');
+              setState(() {
+                _messages = state.messages;
+                logDebug('✅ UI _messages updated, triggering rebuild');
+              });
+            }
           }
           if (state is ChatMessagesLoaded ||
               state is ChatMessageSent ||
@@ -553,8 +559,9 @@ void dispose() {
               context.canShowSideBySide;
           final double listPadding = isWebSideBySide ? 4 : 10.w;
 
-          // Use state.messages directly if available to ensure reactive updates
-          final displayMessages = state is ChatMessagesLoaded 
+          // Use state.messages if it has content, otherwise fall back to _messages
+          // This ensures messages are displayed during all states (sending, sent, loaded, etc.)
+          final displayMessages = state.messages.isNotEmpty 
               ? state.messages 
               : _messages;
 
