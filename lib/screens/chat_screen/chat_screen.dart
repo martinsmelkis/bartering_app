@@ -165,6 +165,24 @@ void dispose() {
       final pickedFile = await _imagePicker.pickImage(source: source);
       if (pickedFile == null) return;
 
+      // On web, read bytes immediately to prevent Blob URL from being revoked
+      // This is crucial for mobile web browsers where Blob URLs expire quickly
+      Uint8List? webFileBytes;
+      if (kIsWeb) {
+        try {
+          webFileBytes = await pickedFile.readAsBytes();
+        } catch (e) {
+          logDebug('❌ Failed to read image bytes on web: $e');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to read image file. Please try again.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+      }
+
       // Show uploading indicator
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -191,12 +209,11 @@ void dispose() {
       FileAttachment? fileAttachment;
       
       if (kIsWeb) {
-        // On web, read bytes directly since file path doesn't work
-        final fileBytes = await pickedFile.readAsBytes();
+        // On web, use the bytes we read immediately after picking
         fileAttachment = await fileTransferService.uploadFileFromBytes(
           senderId: currentUserId!,
           recipientId: widget.poiId!,
-          fileBytes: fileBytes,
+          fileBytes: webFileBytes!,
           filename: pickedFile.name,
           recipientPublicKey: recipientPublicKey,
         );
