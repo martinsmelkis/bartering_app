@@ -107,20 +107,17 @@ class AvatarColorUtils {
   static Color getColorFromString(String str) {
     final hash = str.hashCode;
     final colorOptions = [
-      Colors.green,
-      Colors.red,
-      Colors.yellow,
-      Colors.orange,
-      Colors.teal,
-      Colors.purple,
-      Colors.blue,
-      Colors.pink,
-      Colors.indigo,
-      Colors.cyan,
+      Colors.green.shade200,
+      Colors.red.shade200,
+      Colors.yellow.shade200,
+      Colors.teal.shade200,
+      Colors.purple.shade200,
+      Colors.blue.shade200,
+      Colors.cyan.shade200,
     ];
 
     final selectedColor = colorOptions[hash.abs() % colorOptions.length];
-    return selectedColor.shade300.withValues(alpha: 0.5);
+    return selectedColor.withValues(alpha: 0.6);
   }
 
   /// Helper method to get color shade with alpha based on the shade level

@@ -562,6 +562,7 @@ class AppLocalizationsMapper {
       'noMessagesYet': localizations.noMessagesYet,
       'ninetyNinePlus': localizations.ninetyNinePlus,
       'userPrefix': localizations.userPrefix,
+      'today': localizations.today,
       'yesterday': localizations.yesterday,
       'notSet': localizations.notSet,
       'errorUpdatingFavorite': localizations.errorUpdatingFavorite,

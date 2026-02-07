@@ -53,10 +53,17 @@ class _OffersScreenState extends State<OffersScreenWidget> {
         //Navigator.of(context).popUntil((route) => route is! PageRoute || route.isFirst);
 
         if (state.status == OffersStatus.error) {
+          // Check if it's the validation error and use localized message
+          String errorMessage = state.errorMessage ?? 
+              AppLocalizations.of(context)!.anUnknownErrorOccurred;
+          
+          if (state.errorMessage?.contains('Please select at least one offer') == true) {
+            errorMessage = AppLocalizations.of(context)!.pleaseSelectAtLeastOneOffer;
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.errorMessage ?? 
-                  AppLocalizations.of(context)!.anUnknownErrorOccurred),
+              content: Text(errorMessage),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 5),
             ),
@@ -104,7 +111,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                         l10n.selectTheOffersThatYouCanProvide,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.deepOrange,
+                          color: Colors.red,
                           fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.1,
                           shadows: [
                             Shadow(
@@ -207,7 +214,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                         final locale = Localizations.localeOf(context);
                         _offersCubit.submitOffers(locale.languageCode);
                       },
-                      child: Text(l10n.save),
+                      child: Text(l10n.continueButton),
                     ),
                   ),
                 ],

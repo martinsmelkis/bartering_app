@@ -49,10 +49,17 @@ class _InterestsViewState extends State<InterestsView> {
     return BlocListener<InterestsCubit, InterestsState>(
       listener: (context, state) async {
         if (state.status == InterestsStatus.error) {
+          // Check if it's the validation error and use localized message
+          String errorMessage = state.errorMessage ?? 
+              AppLocalizations.of(context)!.anUnknownErrorOccurred;
+          
+          if (state.errorMessage?.contains('Please select at least one interest') == true) {
+            errorMessage = AppLocalizations.of(context)!.pleaseSelectAtLeastOneInterest;
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.errorMessage ?? 
-                  AppLocalizations.of(context)!.anUnknownErrorOccurred),
+              content: Text(errorMessage),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 5),
             ),
@@ -107,7 +114,7 @@ class _InterestsViewState extends State<InterestsView> {
                         l10n.selectTheInterestsThatMatchYourPreferences,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.deepOrange,
+                          color: Colors.red,
                           fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.1,
                           shadows: [
                             Shadow(
@@ -212,7 +219,7 @@ class _InterestsViewState extends State<InterestsView> {
                             .read<InterestsCubit>()
                             .submitInterests(locale.languageCode, true);
                       },
-                      child: Text(l10n.save),
+                      child: Text(l10n.continueButton),
                     ),
                   ),
                 ],

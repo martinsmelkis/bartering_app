@@ -159,7 +159,7 @@ class UserAvatarFab extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (_) => UserProfileScreen(
                     userId: userId!,
-                    userName: userName!,
+                    userName: userName ?? "Not registered",
                     interests: interests,
                     offerings: offerings,
                   ),

@@ -6,6 +6,7 @@ import 'package:barter_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../configure_dependencies.dart';
@@ -207,20 +208,22 @@ class _AttributePreferenceCard extends StatelessWidget {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.deletePreference),
-        content: Text(l10n.deletePreferenceConfirmation),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(l10n.delete),
-          ),
-        ],
+      builder: (dialogContext) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.deletePreference),
+          content: Text(l10n.deletePreferenceConfirmation),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: Text(l10n.delete),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -261,8 +264,9 @@ class _AttributePreferenceCard extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+      builder: (dialogContext) => PointerInterceptor(
+        child: StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
           title: Text(l10n.editPreference),
           content: SingleChildScrollView(
             child: Column(
@@ -357,6 +361,7 @@ class _AttributePreferenceCard extends StatelessWidget {
               child: Text(l10n.save),
             ),
           ],
+          ),
         ),
       ),
     );

@@ -1241,23 +1241,25 @@ void dispose() {
       // Show success and offer to block
       final shouldBlock = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(l10n.userReported),
-          content: Text(l10n.reportSubmittedOfferBlock),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(l10n.cancel),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+        builder: (context) => PointerInterceptor(
+          child: AlertDialog(
+            title: Text(l10n.userReported),
+            content: Text(l10n.reportSubmittedOfferBlock),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(l10n.cancel),
               ),
-              child: Text(l10n.blockUser),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(l10n.blockUser),
+              ),
+            ],
+          ),
         ),
       );
 

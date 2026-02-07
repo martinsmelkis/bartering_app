@@ -4,6 +4,7 @@ import 'package:barter_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../../l10n/app_localizations.dart';
 
@@ -430,53 +431,55 @@ class _ContactsTabState extends State<ContactsTab> {
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.updateEmail),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: l10n.emailAddress,
-            border: const OutlineInputBorder(),
+      builder: (dialogContext) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.updateEmail),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: l10n.emailAddress,
+              border: const OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.emailAddress,
           ),
-          keyboardType: TextInputType.emailAddress,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              final email = controller.text.trim();
-              if (email.isNotEmpty) {
-                try {
-                  final message = await context
-                      .read<NotificationsCubit>()
-                      .updateContacts(email: email);
-                  if (context.mounted) {
-                    Navigator.of(dialogContext).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(message ?? l10n.emailUpdated),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.errorWithException(e.toString())),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () async {
+                final email = controller.text.trim();
+                if (email.isNotEmpty) {
+                  try {
+                    final message = await context
+                        .read<NotificationsCubit>()
+                        .updateContacts(email: email);
+                    if (context.mounted) {
+                      Navigator.of(dialogContext).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(message ?? l10n.emailUpdated),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.errorWithException(e.toString())),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
                 }
-              }
-            },
-            child: Text(l10n.save),
-          ),
-        ],
+              },
+              child: Text(l10n.save),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -486,20 +489,22 @@ class _ContactsTabState extends State<ContactsTab> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.removePushToken),
-        content: Text(l10n.removePushTokenConfirmation),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(l10n.remove),
-          ),
-        ],
+      builder: (dialogContext) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.removePushToken),
+          content: Text(l10n.removePushTokenConfirmation),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: Text(l10n.remove),
+            ),
+          ],
+        ),
       ),
     );
 

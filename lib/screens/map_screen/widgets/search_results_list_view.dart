@@ -13,7 +13,6 @@ import '../../../models/postings/posting_data_response.dart';
 import '../../../services/api_client.dart';
 import '../../../theme/app_colors.dart';
 import '../../../utils/attribute_matching_utils.dart';
-import '../../../utils/avatar_color_utils.dart';
 import '../../../utils/category_stats_utils.dart';
 import '../../../utils/image_utils.dart';
 import '../../../utils/text_utils.dart';
@@ -25,11 +24,6 @@ import '../cubit/chat_panel_cubit.dart';
 import '../../chat_screen/widgets/chat_panel_header.dart';
 import 'poi_details_bottom_sheet.dart';
 import '../../chat_screen/chat_screen.dart';
-import '../../chat_screen/cubit/chat_cubit.dart';
-import '../../chat_screen/widgets/report_user_dialog.dart';
-import '../../../models/relationships/report_models.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 class SearchResultsListView extends StatefulWidget {
   final List<PointOfInterest> pois;

@@ -4,6 +4,7 @@ import 'package:barter_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../l10n/app_localizations.dart';
 import 'cubit/review_cubit.dart';
@@ -66,45 +67,47 @@ class _ReviewScreenState extends State<ReviewScreen> {
     
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.warning, color: Colors.red),
-            const SizedBox(width: 8),
-            Text(l10n.reportScam),
+      builder: (context) => PointerInterceptor(
+        child: AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.warning, color: Colors.red),
+              const SizedBox(width: 8),
+              Text(l10n.reportScam),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.reportScamConfirmation),
+              const SizedBox(height: 16),
+              Text(
+                l10n.reportScamConsequencesTitle,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(l10n.reportScamConsequence1),
+              Text(l10n.reportScamConsequence2),
+              Text(l10n.reportScamConsequence3),
+              const SizedBox(height: 16),
+              Text(
+                l10n.falseReportsWarning,
+                style: TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: Text(l10n.report),
+            ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.reportScamConfirmation),
-            const SizedBox(height: 16),
-            Text(
-              l10n.reportScamConsequencesTitle,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Text(l10n.reportScamConsequence1),
-            Text(l10n.reportScamConsequence2),
-            Text(l10n.reportScamConsequence3),
-            const SizedBox(height: 16),
-            Text(
-              l10n.falseReportsWarning,
-              style: TextStyle(color: Colors.red, fontSize: 12),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(l10n.report),
-          ),
-        ],
       ),
     );
   }
@@ -113,7 +116,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
     return showDialog<bool>(
       context: context,
       barrierDismissible: !riskReport.isCritical, // Can't dismiss critical warnings
-      builder: (context) => RiskWarningDialog(riskReport: riskReport),
+      builder: (context) => PointerInterceptor(
+        child: RiskWarningDialog(riskReport: riskReport),
+      ),
     );
   }
 
@@ -123,20 +128,21 @@ class _ReviewScreenState extends State<ReviewScreen> {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green),
-            const SizedBox(width: 8),
-            Text(l10n.reviewSubmitted),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.thankYouForFeedback),
-            const SizedBox(height: 16),
+      builder: (context) => PointerInterceptor(
+        child: AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green),
+              const SizedBox(width: 8),
+              Text(l10n.reviewSubmitted),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.thankYouForFeedback),
+              const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -167,6 +173,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
             child: Text(l10n.done),
           ),
         ],
+        ),
       ),
     );
   }
@@ -176,15 +183,17 @@ class _ReviewScreenState extends State<ReviewScreen> {
     
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.error),
-        content: Text(error),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.ok),
-          ),
-        ],
+      builder: (context) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.error),
+          content: Text(error),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.ok),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -194,19 +203,21 @@ class _ReviewScreenState extends State<ReviewScreen> {
     
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.skipReviewTitle),
-        content: Text(l10n.skipReviewMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.goBack),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.skip),
-          ),
-        ],
+      builder: (context) => PointerInterceptor(
+        child: AlertDialog(
+          title: Text(l10n.skipReviewTitle),
+          content: Text(l10n.skipReviewMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.goBack),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.skip),
+            ),
+          ],
+        ),
       ),
     );
 

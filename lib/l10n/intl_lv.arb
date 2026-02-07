@@ -584,6 +584,8 @@
   "archiveWishlist": "Arhivēt",
   "pleaseEnterTitle": "Lūdzu, ievadiet nosaukumu",
   "atLeastOneKeyword": "Lūdzu, ievadiet vismaz vienu atslēgvārdu",
+  "pleaseSelectAtLeastOneInterest": "Lūdzu, izvēlieties vismaz vienu interesi vai pievienojiet pielāgotu atslēgvārdu",
+  "pleaseSelectAtLeastOneOffer": "Lūdzu, izvēlieties vismaz vienu piedāvājumu vai pievienojiet pielāgotu atslēgvārdu",
 
   "notificationPreferences": "Paziņojumu preferences",
   "contacts": "Kontakti",

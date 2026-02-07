@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectYourInterests.
   ///
   /// In en, this message translates to:
-  /// **'What would be of interest to you?'**
+  /// **'What is of interest to you?'**
   String get selectYourInterests;
 
   /// No description provided for @selectYourOffers.
@@ -3469,6 +3469,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter at least one keyword'**
   String get atLeastOneKeyword;
+
+  /// No description provided for @pleaseSelectAtLeastOneInterest.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select at least one interest or add a custom keyword'**
+  String get pleaseSelectAtLeastOneInterest;
+
+  /// No description provided for @pleaseSelectAtLeastOneOffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select at least one offer or add a custom keyword'**
+  String get pleaseSelectAtLeastOneOffer;
 
   /// No description provided for @notificationPreferences.
   ///

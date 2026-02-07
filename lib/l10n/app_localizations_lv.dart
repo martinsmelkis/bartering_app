@@ -1765,6 +1765,14 @@ class AppLocalizationsLv extends AppLocalizations {
   String get atLeastOneKeyword => 'Lūdzu, ievadiet vismaz vienu atslēgvārdu';
 
   @override
+  String get pleaseSelectAtLeastOneInterest =>
+      'Lūdzu, izvēlieties vismaz vienu interesi vai pievienojiet pielāgotu atslēgvārdu';
+
+  @override
+  String get pleaseSelectAtLeastOneOffer =>
+      'Lūdzu, izvēlieties vismaz vienu piedāvājumu vai pievienojiet pielāgotu atslēgvārdu';
+
+  @override
   String get notificationPreferences => 'Paziņojumu preferences';
 
   @override

@@ -21,7 +21,7 @@
   "errorWithMessage": "Error: {errorMessage}",
   "loading": "Loading...",
   "errorDuringInitialization": "Error during initialization.",
-  "selectYourInterests": "What would be of interest to you?",
+  "selectYourInterests": "What is of interest to you?",
   "selectYourOffers": "What do you have to offer?",
   "userInterestedIn": "Interested in:",
   "userOffers": "Offering:",
@@ -580,6 +580,8 @@
   "archiveWishlist": "Archive",
   "pleaseEnterTitle": "Please enter a title",
   "atLeastOneKeyword": "Please enter at least one keyword",
+  "pleaseSelectAtLeastOneInterest": "Please select at least one interest or add a custom keyword",
+  "pleaseSelectAtLeastOneOffer": "Please select at least one offer or add a custom keyword",
 
   "notificationPreferences": "Notification Preferences",
   "contacts": "Contacts",

@@ -3,6 +3,28 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'user_profile_data.g.dart'; // Import the generated part
 
+/// Converter for safely parsing keyword map, handling both numeric and string values
+class KeywordMapConverter {
+  static Map<String, double>? _fromJson(Map<String, dynamic>? json) {
+    if (json == null) return null;
+    
+    final result = <String, double>{};
+    json.forEach((key, value) {
+      if (value is num) {
+        result[key] = value.toDouble();
+      } else if (value is String) {
+        // Try to parse string as double, default to 0.0 if parsing fails
+        result[key] = double.tryParse(value) ?? 0.0;
+      }
+      // Ignore values that are neither num nor String
+    });
+    
+    return result.isEmpty ? null : result;
+  }
+
+  static Map<String, dynamic>? _toJson(Map<String, double>? object) => object;
+}
+
 @JsonSerializable()
 class UserProfileData {
 
@@ -55,8 +77,21 @@ class UserProfileData {
 
   // Factory constructor for creating a new UserProfileData instance from a map.
   // Tell json_serializable to use this for deserialization.
-  factory UserProfileData.fromJson(Map<String, dynamic> json) =>
-      _$UserProfileDataFromJson(json);
+  factory UserProfileData.fromJson(Map<String, dynamic> json) {
+    // Manually parse profileKeywordDataMap to handle string values
+    Map<String, double>? parsedKeywordMap;
+    if (json['profileKeywordDataMap'] != null) {
+      parsedKeywordMap = KeywordMapConverter._fromJson(
+        json['profileKeywordDataMap'] as Map<String, dynamic>?,
+      );
+    }
+    
+    // Create a modified JSON with the parsed map
+    final modifiedJson = Map<String, dynamic>.from(json);
+    modifiedJson['profileKeywordDataMap'] = parsedKeywordMap;
+    
+    return _$UserProfileDataFromJson(modifiedJson);
+  }
 
   // Method for converting a UserProfileData instance into a map.
   // Tell json_serializable to use this for serialization.

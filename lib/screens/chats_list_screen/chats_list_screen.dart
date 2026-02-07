@@ -15,6 +15,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../l10n/app_localizations.dart';
 
@@ -225,33 +226,35 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     return showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(l10n.deleteConversation),
-          content: Text(l10n.deleteConversationConfirmation),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.cancel),
-            ),
-            if (canShowReview)
+        return PointerInterceptor(
+          child: AlertDialog(
+            title: Text(l10n.deleteConversation),
+            content: Text(l10n.deleteConversationConfirmation),
+            actions: <Widget>[
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                  _showReviewScreen(conversation);
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue,
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(l10n.cancel),
+              ),
+              if (canShowReview)
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                    _showReviewScreen(conversation);
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.blue,
+                  ),
+                  child: Text(l10n.review),
                 ),
-                child: Text(l10n.review),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.red,
+                ),
+                child: Text(l10n.delete),
               ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.red,
-              ),
-              child: Text(l10n.delete),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -332,19 +335,21 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
         final l10n = AppLocalizations.of(context)!;
         final shouldDelete = await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text(l10n.archiveConversationTitle),
-            content: Text(l10n.archiveConversationMessage),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(l10n.keep),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(l10n.archive),
-              ),
-            ],
+          builder: (context) => PointerInterceptor(
+            child: AlertDialog(
+              title: Text(l10n.archiveConversationTitle),
+              content: Text(l10n.archiveConversationMessage),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l10n.keep),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text(l10n.archive),
+                ),
+              ],
+            ),
           ),
         );
 
@@ -409,7 +414,7 @@ class _ConversationTile extends StatelessWidget {
     // Adjust sizes for web side-by-side view
     final double avatarSize = isWebSideBySide ? 40 : 64.w;
     final double horizontalPadding = isWebSideBySide ? 8 : 8.w;
-    final double verticalPadding = isWebSideBySide ? 2 : 4.h;
+    final double verticalPadding = isWebSideBySide ? 3 : 2.h;
     final double spacing = isWebSideBySide ? 6 : 8.w;
     final double nameFontSize = isWebSideBySide ? 12 : 16;
     final double timestampFontSize = isWebSideBySide ? 11 : 12;

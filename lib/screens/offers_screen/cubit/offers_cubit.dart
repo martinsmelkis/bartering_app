@@ -94,6 +94,15 @@ class OffersCubit extends Cubit<OffersState> {
   }
 
   Future<void> submitOffers(String languageCode) async {
+    // Validate that at least one offer is selected (either from chips or custom keywords)
+    if (state.selectedOffers.isEmpty && state.customKeywords.isEmpty) {
+      emit(state.copyWith(
+        status: OffersStatus.error,
+        errorMessage: 'Please select at least one offer or add a custom keyword',
+      ));
+      return;
+    }
+    
     emit(state.copyWith(status: OffersStatus.loading));
     try {
       final allOffers = {

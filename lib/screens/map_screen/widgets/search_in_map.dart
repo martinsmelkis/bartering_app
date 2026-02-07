@@ -138,10 +138,10 @@ class _SearchInMapState extends State<SearchInMap> {
                 prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 40),
                 suffixIcon: isLoading
                     ? const Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.fromLTRB(8.0, 8.0, 16.0, 8.0),
                         child: SizedBox(
-                          width: 20,
-                          height: 20,
+                          width: 18,
+                          height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                           ),

@@ -238,10 +238,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           foregroundColor: AppColors.primary,
                           padding: EdgeInsets.symmetric(
                             horizontal: 32.w,
-                            vertical: 24,
+                            vertical: 20,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.r),
+                            borderRadius: BorderRadius.circular(16.r),
                           ),
                           elevation: 8,
                           shadowColor: Colors.black.withValues(alpha: 0.3),
@@ -493,13 +493,13 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
 
     // Generate a random color
     final colors = [
-      Colors.red.shade200,
-      Colors.blue.shade200,
-      Colors.green.shade200,
-      Colors.purple.shade200,
-      Colors.orange.shade200,
-      Colors.yellow.shade200,
-      Colors.teal.shade200,
+      Colors.red.shade100,
+      Colors.deepOrange.shade100,
+      Colors.brown.shade100,
+      Colors.purple.shade100,
+      Colors.orange.shade100,
+      Colors.yellow.shade100,
+      Colors.grey.shade100,
     ];
 
     final color = colors[random.nextInt(colors.length)];

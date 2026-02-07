@@ -59,6 +59,76 @@ class S {
     return Intl.message('Bartering App', name: 'appTitle', desc: '', args: []);
   }
 
+  /// `Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability`
+  String get category_green {
+    return Intl.message(
+      'Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability',
+      name: 'category_green',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sports, exercise, hands-on, active lifestyle, physical work, mechanisms, tools`
+  String get category_red {
+    return Intl.message(
+      'Sports, exercise, hands-on, active lifestyle, physical work, mechanisms, tools',
+      name: 'category_red',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Business, entrepreneurship, paid work, making contacts, money matters, finance, career`
+  String get category_blue {
+    return Intl.message(
+      'Business, entrepreneurship, paid work, making contacts, money matters, finance, career',
+      name: 'category_blue',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Art, spirituality, philosophy, culture, music, crafts, creativity, design, history`
+  String get category_purple {
+    return Intl.message(
+      'Art, spirituality, philosophy, culture, music, crafts, creativity, design, history',
+      name: 'category_purple',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Chat, social activities, casual conversation, local events, new contacts, communication`
+  String get category_yellow {
+    return Intl.message(
+      'Chat, social activities, casual conversation, local events, new contacts, communication',
+      name: 'category_yellow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Volunteering, support, free items/skills exchange, consulting, assistance, community`
+  String get category_orange {
+    return Intl.message(
+      'Volunteering, support, free items/skills exchange, consulting, assistance, community',
+      name: 'category_orange',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Technology, learning, education, innovation, brainstorming, ideas, science, software`
+  String get category_teal {
+    return Intl.message(
+      'Technology, learning, education, innovation, brainstorming, ideas, science, software',
+      name: 'category_teal',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Tap to chat`
   String get tapToChat {
     return Intl.message('Tap to chat', name: 'tapToChat', desc: '', args: []);
@@ -149,20 +219,20 @@ class S {
     );
   }
 
-  /// `What do you seek/require?`
+  /// `What would be of interest to you?`
   String get selectYourInterests {
     return Intl.message(
-      'What do you seek/require?',
+      'What would be of interest to you?',
       name: 'selectYourInterests',
       desc: '',
       args: [],
     );
   }
 
-  /// `What do you have/offer?`
+  /// `What do you have to offer?`
   String get selectYourOffers {
     return Intl.message(
-      'What do you have/offer?',
+      'What do you have to offer?',
       name: 'selectYourOffers',
       desc: '',
       args: [],
@@ -424,6 +494,16 @@ class S {
     return Intl.message('Settings', name: 'settingsTitle', desc: '', args: []);
   }
 
+  /// `Privacy Policy`
+  String get privacyPolicy {
+    return Intl.message(
+      'Privacy Policy',
+      name: 'privacyPolicy',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Settings saved successfully`
   String get settingsSaved {
     return Intl.message(
@@ -559,6 +639,46 @@ class S {
     return Intl.message(
       'Weight parameter for keyword search relevance (10-100)',
       name: 'settingsKeywordSearchWeightDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Display Search Results As List`
+  String get settingsShowResultsAsListTitle {
+    return Intl.message(
+      'Display Search Results As List',
+      name: 'settingsShowResultsAsListTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show keyword and nearby search results in a list view instead of on the map`
+  String get settingsShowResultsAsListDescription {
+    return Intl.message(
+      'Show keyword and nearby search results in a list view instead of on the map',
+      name: 'settingsShowResultsAsListDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show search results on the map (default)`
+  String get settingsShowResultsOnMapDescription {
+    return Intl.message(
+      'Show search results on the map (default)',
+      name: 'settingsShowResultsOnMapDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show search results in a list view`
+  String get settingsShowResultsAsListViewDescription {
+    return Intl.message(
+      'Show search results in a list view',
+      name: 'settingsShowResultsAsListViewDescription',
       desc: '',
       args: [],
     );
@@ -744,6 +864,46 @@ class S {
     return Intl.message(
       'Update your security PIN',
       name: 'settingsChangePinDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Language`
+  String get settingsLanguageSection {
+    return Intl.message(
+      'Language',
+      name: 'settingsLanguageSection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `App Language`
+  String get settingsLanguageTitle {
+    return Intl.message(
+      'App Language',
+      name: 'settingsLanguageTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose your preferred language for the app`
+  String get settingsLanguageDescription {
+    return Intl.message(
+      'Choose your preferred language for the app',
+      name: 'settingsLanguageDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please restart the app to apply language changes`
+  String get settingsLanguageRestartMessage {
+    return Intl.message(
+      'Please restart the app to apply language changes',
+      name: 'settingsLanguageRestartMessage',
       desc: '',
       args: [],
     );
@@ -1074,16 +1234,6 @@ class S {
     );
   }
 
-  /// `Create Posting`
-  String get createPosting {
-    return Intl.message(
-      'Create Posting',
-      name: 'createPosting',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Offer`
   String get offer {
     return Intl.message('Offer', name: 'offer', desc: '', args: []);
@@ -1097,16 +1247,6 @@ class S {
   /// `Expires`
   String get expires {
     return Intl.message('Expires', name: 'expires', desc: '', args: []);
-  }
-
-  /// `Retry`
-  String get retry {
-    return Intl.message('Retry', name: 'retry', desc: '', args: []);
-  }
-
-  /// `Cancel`
-  String get cancel {
-    return Intl.message('Cancel', name: 'cancel', desc: '', args: []);
   }
 
   /// `Edit Posting`
@@ -1174,10 +1314,10 @@ class S {
     );
   }
 
-  /// `Sports, partying, dancing, running, physical, mechanical`
+  /// `Sports, partying, dancing, active lifestyle, physical work, mechanisms`
   String get categoryActiveDescription {
     return Intl.message(
-      'Sports, partying, dancing, running, physical, mechanical',
+      'Sports, partying, dancing, active lifestyle, physical work, mechanisms',
       name: 'categoryActiveDescription',
       desc: '',
       args: [],
@@ -1194,10 +1334,10 @@ class S {
     );
   }
 
-  /// `Strictly business, paid work, networking, money matters`
+  /// `Strictly business, paid work, networking, money matters, networking`
   String get categoryBusinessDescription {
     return Intl.message(
-      'Strictly business, paid work, networking, money matters',
+      'Strictly business, paid work, networking, money matters, networking',
       name: 'categoryBusinessDescription',
       desc: '',
       args: [],
@@ -1582,76 +1722,6 @@ class S {
   /// `Done`
   String get done {
     return Intl.message('Done', name: 'done', desc: '', args: []);
-  }
-
-  /// `Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability`
-  String get category_green {
-    return Intl.message(
-      'Nature, outdoors, gardening, animals, environment, hiking, plants, sustainability',
-      name: 'category_green',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities`
-  String get category_red {
-    return Intl.message(
-      'Sports, physical exercise, partying, dancing, physical work, mechanisms, tools, hands-on activities',
-      name: 'category_red',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Business, entrepreneurship, paid work, making contacts, money matters, finance, career`
-  String get category_blue {
-    return Intl.message(
-      'Business, entrepreneurship, paid work, making contacts, money matters, finance, career',
-      name: 'category_blue',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Art, spirituality, philosophy, culture, music, crafts, creativity, design, history`
-  String get category_purple {
-    return Intl.message(
-      'Art, spirituality, philosophy, culture, music, crafts, creativity, design, history',
-      name: 'category_purple',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Chat, social activities, casual conversation, local events, new contacts, communication`
-  String get category_yellow {
-    return Intl.message(
-      'Chat, social activities, casual conversation, local events, new contacts, communication',
-      name: 'category_yellow',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Volunteering, open-ended support, free exchange, consulting, non-specific assistance, community`
-  String get category_orange {
-    return Intl.message(
-      'Volunteering, open-ended support, free exchange, consulting, non-specific assistance, community',
-      name: 'category_orange',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Technology, learning, education, innovation, brainstorming, ideas, science, software`
-  String get category_teal {
-    return Intl.message(
-      'Technology, learning, education, innovation, brainstorming, ideas, science, software',
-      name: 'category_teal',
-      desc: '',
-      args: [],
-    );
   }
 
   /// `3D printing`
@@ -4149,10 +4219,10 @@ class S {
     return Intl.message('Take Photo', name: 'takePhoto', desc: '', args: []);
   }
 
-  /// `Choose from Gallery`
+  /// `Choose from Device`
   String get chooseFromGallery {
     return Intl.message(
-      'Choose from Gallery',
+      'Choose from Device',
       name: 'chooseFromGallery',
       desc: '',
       args: [],
@@ -4164,6 +4234,16 @@ class S {
     return Intl.message(
       'Maximum 3 images allowed',
       name: 'maxImagesReached',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create Posting`
+  String get createPosting {
+    return Intl.message(
+      'Create Posting',
+      name: 'createPosting',
       desc: '',
       args: [],
     );
@@ -4217,6 +4297,11 @@ class S {
       desc: '',
       args: [],
     );
+  }
+
+  /// `Cancel`
+  String get cancel {
+    return Intl.message('Cancel', name: 'cancel', desc: '', args: []);
   }
 
   /// `Delete`
@@ -4284,6 +4369,11 @@ class S {
     return Intl.message('User', name: 'userPrefix', desc: '', args: []);
   }
 
+  /// `Today`
+  String get today {
+    return Intl.message('Today', name: 'today', desc: '', args: []);
+  }
+
   /// `Yesterday`
   String get yesterday {
     return Intl.message('Yesterday', name: 'yesterday', desc: '', args: []);
@@ -4342,6 +4432,16 @@ class S {
       desc: '',
       args: [],
     );
+  }
+
+  /// `Posting`
+  String get posting {
+    return Intl.message('Posting', name: 'posting', desc: '', args: []);
+  }
+
+  /// `Postings`
+  String get postings {
+    return Intl.message('Postings', name: 'postings', desc: '', args: []);
   }
 
   /// `Offers`
@@ -4824,6 +4924,26 @@ class S {
     return Intl.message(
       'Please enter at least one keyword',
       name: 'atLeastOneKeyword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please select at least one interest or add a custom keyword`
+  String get pleaseSelectAtLeastOneInterest {
+    return Intl.message(
+      'Please select at least one interest or add a custom keyword',
+      name: 'pleaseSelectAtLeastOneInterest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please select at least one offer or add a custom keyword`
+  String get pleaseSelectAtLeastOneOffer {
+    return Intl.message(
+      'Please select at least one offer or add a custom keyword',
+      name: 'pleaseSelectAtLeastOneOffer',
       desc: '',
       args: [],
     );
@@ -5382,6 +5502,11 @@ class S {
       desc: '',
       args: [],
     );
+  }
+
+  /// `Retry`
+  String get retry {
+    return Intl.message('Retry', name: 'retry', desc: '', args: []);
   }
 
   /// `Offering`
@@ -5949,9 +6074,9 @@ class S {
     );
   }
 
-  /// `Gallery`
+  /// `Device`
   String get gallery {
-    return Intl.message('Gallery', name: 'gallery', desc: '', args: []);
+    return Intl.message('Device', name: 'gallery', desc: '', args: []);
   }
 
   /// `Camera`
@@ -6193,13 +6318,741 @@ class S {
       args: [],
     );
   }
+
+  /// `Report User`
+  String get reportUser {
+    return Intl.message('Report User', name: 'reportUser', desc: '', args: []);
+  }
+
+  /// `Block User`
+  String get blockUser {
+    return Intl.message('Block User', name: 'blockUser', desc: '', args: []);
+  }
+
+  /// `Unblock User`
+  String get unblockUser {
+    return Intl.message(
+      'Unblock User',
+      name: 'unblockUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please provide a reason for reporting this user.`
+  String get reportUserConfirmation {
+    return Intl.message(
+      'Please provide a reason for reporting this user.',
+      name: 'reportUserConfirmation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reason for report (optional)`
+  String get reportReason {
+    return Intl.message(
+      'Reason for report (optional)',
+      name: 'reportReason',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User reported successfully`
+  String get userReported {
+    return Intl.message(
+      'User reported successfully',
+      name: 'userReported',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to block this user? You will no longer be able to communicate with them.`
+  String get blockUserConfirmation {
+    return Intl.message(
+      'Are you sure you want to block this user? You will no longer be able to communicate with them.',
+      name: 'blockUserConfirmation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to unblock this user? They will be able to communicate with you again.`
+  String get unblockUserConfirmation {
+    return Intl.message(
+      'Are you sure you want to unblock this user? They will be able to communicate with you again.',
+      name: 'unblockUserConfirmation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Block`
+  String get block {
+    return Intl.message('Block', name: 'block', desc: '', args: []);
+  }
+
+  /// `Unblock`
+  String get unblock {
+    return Intl.message('Unblock', name: 'unblock', desc: '', args: []);
+  }
+
+  /// `User blocked successfully`
+  String get userBlocked {
+    return Intl.message(
+      'User blocked successfully',
+      name: 'userBlocked',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User unblocked successfully`
+  String get userUnblocked {
+    return Intl.message(
+      'User unblocked successfully',
+      name: 'userUnblocked',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to block user`
+  String get failedToBlockUser {
+    return Intl.message(
+      'Failed to block user',
+      name: 'failedToBlockUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to unblock user`
+  String get failedToUnblockUser {
+    return Intl.message(
+      'Failed to unblock user',
+      name: 'failedToUnblockUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to submit report. Please try again.`
+  String get failedToSubmitReport {
+    return Intl.message(
+      'Failed to submit report. Please try again.',
+      name: 'failedToSubmitReport',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Thank you for helping keep the community safe. Would you also like to block this user?`
+  String get reportSubmittedOfferBlock {
+    return Intl.message(
+      'Thank you for helping keep the community safe. Would you also like to block this user?',
+      name: 'reportSubmittedOfferBlock',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Report {userName}`
+  String reportUserTitle(String userName) {
+    return Intl.message(
+      'Report $userName',
+      name: 'reportUserTitle',
+      desc: '',
+      args: [userName],
+    );
+  }
+
+  /// `Blocking {userName} will prevent them from:\n• Sending you messages\n• Seeing your profile\n• Commenting on your postings`
+  String blockUserConfirmationDetailed(String userName) {
+    return Intl.message(
+      'Blocking $userName will prevent them from:\n• Sending you messages\n• Seeing your profile\n• Commenting on your postings',
+      name: 'blockUserConfirmationDetailed',
+      desc: '',
+      args: [userName],
+    );
+  }
+
+  /// `Unblocking {userName} will allow them to:\n• Send you messages\n• See your profile\n• Comment on your postings`
+  String unblockUserConfirmationDetailed(String userName) {
+    return Intl.message(
+      'Unblocking $userName will allow them to:\n• Send you messages\n• See your profile\n• Comment on your postings',
+      name: 'unblockUserConfirmationDetailed',
+      desc: '',
+      args: [userName],
+    );
+  }
+
+  /// `Why are you reporting this user?`
+  String get whyReportingUser {
+    return Intl.message(
+      'Why are you reporting this user?',
+      name: 'whyReportingUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Spam`
+  String get reportReasonSpam {
+    return Intl.message('Spam', name: 'reportReasonSpam', desc: '', args: []);
+  }
+
+  /// `Harassment`
+  String get reportReasonHarassment {
+    return Intl.message(
+      'Harassment',
+      name: 'reportReasonHarassment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Inappropriate Content`
+  String get reportReasonInappropriateContent {
+    return Intl.message(
+      'Inappropriate Content',
+      name: 'reportReasonInappropriateContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scam`
+  String get reportReasonScam {
+    return Intl.message('Scam', name: 'reportReasonScam', desc: '', args: []);
+  }
+
+  /// `Fake Profile`
+  String get reportReasonFakeProfile {
+    return Intl.message(
+      'Fake Profile',
+      name: 'reportReasonFakeProfile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Impersonation`
+  String get reportReasonImpersonation {
+    return Intl.message(
+      'Impersonation',
+      name: 'reportReasonImpersonation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Threatening Behavior`
+  String get reportReasonThreateningBehavior {
+    return Intl.message(
+      'Threatening Behavior',
+      name: 'reportReasonThreateningBehavior',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Other`
+  String get reportReasonOther {
+    return Intl.message('Other', name: 'reportReasonOther', desc: '', args: []);
+  }
+
+  /// `Additional details (optional)`
+  String get additionalDetails {
+    return Intl.message(
+      'Additional details (optional)',
+      name: 'additionalDetails',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Provide more context...`
+  String get provideMoreContext {
+    return Intl.message(
+      'Provide more context...',
+      name: 'provideMoreContext',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Submit Report`
+  String get submitReport {
+    return Intl.message(
+      'Submit Report',
+      name: 'submitReport',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Introduction`
+  String get privacyPolicyIntroTitle {
+    return Intl.message(
+      'Introduction',
+      name: 'privacyPolicyIntroTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This Privacy Policy describes how we collect, use, and protect your personal information when you use our bartering application. We are committed to ensuring your privacy and protecting your data.`
+  String get privacyPolicyIntroContent {
+    return Intl.message(
+      'This Privacy Policy describes how we collect, use, and protect your personal information when you use our bartering application. We are committed to ensuring your privacy and protecting your data.',
+      name: 'privacyPolicyIntroContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Information We Collect`
+  String get privacyPolicyDataCollectionTitle {
+    return Intl.message(
+      'Information We Collect',
+      name: 'privacyPolicyDataCollectionTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We collect information you provide directly, including your profile information, interests, offerings, location data, and chat messages. We also collect usage data such as app interactions and device information to improve our service.`
+  String get privacyPolicyDataCollectionContent {
+    return Intl.message(
+      'We collect information you provide directly, including your profile information, interests, offerings, location data, and chat messages. We also collect usage data such as app interactions and device information to improve our service.',
+      name: 'privacyPolicyDataCollectionContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `How We Use Your Information`
+  String get privacyPolicyDataUsageTitle {
+    return Intl.message(
+      'How We Use Your Information',
+      name: 'privacyPolicyDataUsageTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We use your information to: facilitate bartering connections between users, display your profile to other users in your area, enable chat functionality, improve our services, and send notifications about matches and messages.`
+  String get privacyPolicyDataUsageContent {
+    return Intl.message(
+      'We use your information to: facilitate bartering connections between users, display your profile to other users in your area, enable chat functionality, improve our services, and send notifications about matches and messages.',
+      name: 'privacyPolicyDataUsageContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Information Sharing`
+  String get privacyPolicyDataSharingTitle {
+    return Intl.message(
+      'Information Sharing',
+      name: 'privacyPolicyDataSharingTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your profile information, interests, and offerings are visible to other users of the app to facilitate bartering. We do not sell your personal information to third parties. We may share data with service providers who assist in operating our app, and we may disclose information if required by law.`
+  String get privacyPolicyDataSharingContent {
+    return Intl.message(
+      'Your profile information, interests, and offerings are visible to other users of the app to facilitate bartering. We do not sell your personal information to third parties. We may share data with service providers who assist in operating our app, and we may disclose information if required by law.',
+      name: 'privacyPolicyDataSharingContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Data Security`
+  String get privacyPolicyDataSecurityTitle {
+    return Intl.message(
+      'Data Security',
+      name: 'privacyPolicyDataSecurityTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We implement appropriate technical and organizational measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.`
+  String get privacyPolicyDataSecurityContent {
+    return Intl.message(
+      'We implement appropriate technical and organizational measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.',
+      name: 'privacyPolicyDataSecurityContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your Rights`
+  String get privacyPolicyUserRightsTitle {
+    return Intl.message(
+      'Your Rights',
+      name: 'privacyPolicyUserRightsTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You have the right to access, update, or delete your personal information at any time through the app settings. You can also request a copy of your data or object to certain types of processing.`
+  String get privacyPolicyUserRightsContent {
+    return Intl.message(
+      'You have the right to access, update, or delete your personal information at any time through the app settings. You can also request a copy of your data or object to certain types of processing.',
+      name: 'privacyPolicyUserRightsContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Third-Party Services`
+  String get privacyPolicyThirdPartyTitle {
+    return Intl.message(
+      'Third-Party Services',
+      name: 'privacyPolicyThirdPartyTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Our app may use third-party services for analytics, maps, and notifications. These services have their own privacy policies, and we encourage you to review them.`
+  String get privacyPolicyThirdPartyContent {
+    return Intl.message(
+      'Our app may use third-party services for analytics, maps, and notifications. These services have their own privacy policies, and we encourage you to review them.',
+      name: 'privacyPolicyThirdPartyContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Changes to This Policy`
+  String get privacyPolicyChangesTitle {
+    return Intl.message(
+      'Changes to This Policy',
+      name: 'privacyPolicyChangesTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the app. Continued use of the app after changes constitutes acceptance of the updated policy.`
+  String get privacyPolicyChangesContent {
+    return Intl.message(
+      'We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the app. Continued use of the app after changes constitutes acceptance of the updated policy.',
+      name: 'privacyPolicyChangesContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Contact Us`
+  String get privacyPolicyContactTitle {
+    return Intl.message(
+      'Contact Us',
+      name: 'privacyPolicyContactTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `If you have any questions about this Privacy Policy or our data practices, please contact us at info@bartering.app`
+  String get privacyPolicyContactContent {
+    return Intl.message(
+      'If you have any questions about this Privacy Policy or our data practices, please contact us at info@bartering.app',
+      name: 'privacyPolicyContactContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last updated: January 2026`
+  String get privacyPolicyLastUpdated {
+    return Intl.message(
+      'Last updated: January 2026',
+      name: 'privacyPolicyLastUpdated',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Chats`
+  String get chats {
+    return Intl.message('Chats', name: 'chats', desc: '', args: []);
+  }
+
+  /// `GPS location is disabled. Enable it in Settings to use this feature.`
+  String get gpsLocationDisabled {
+    return Intl.message(
+      'GPS location is disabled. Enable it in Settings to use this feature.',
+      name: 'gpsLocationDisabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recommendations:`
+  String get recommendations {
+    return Intl.message(
+      'Recommendations:',
+      name: 'recommendations',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This transaction will be reviewed by our security team.`
+  String get transactionWillBeReviewed {
+    return Intl.message(
+      'This transaction will be reviewed by our security team.',
+      name: 'transactionWillBeReviewed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Continue Anyway`
+  String get continueAnyway {
+    return Intl.message(
+      'Continue Anyway',
+      name: 'continueAnyway',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Transaction Blocked`
+  String get transactionBlocked {
+    return Intl.message(
+      'Transaction Blocked',
+      name: 'transactionBlocked',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Security Warning`
+  String get securityWarning {
+    return Intl.message(
+      'Security Warning',
+      name: 'securityWarning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Security Notice`
+  String get securityNotice {
+    return Intl.message(
+      'Security Notice',
+      name: 'securityNotice',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Security Check`
+  String get securityCheck {
+    return Intl.message(
+      'Security Check',
+      name: 'securityCheck',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This transaction has been blocked due to suspicious activity patterns. Please contact support if you believe this is an error.`
+  String get transactionBlockedMessage {
+    return Intl.message(
+      'This transaction has been blocked due to suspicious activity patterns. Please contact support if you believe this is an error.',
+      name: 'transactionBlockedMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unusual activity has been detected. Additional verification may be required.`
+  String get securityWarningMessage {
+    return Intl.message(
+      'Unusual activity has been detected. Additional verification may be required.',
+      name: 'securityWarningMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We've detected some unusual patterns. Your review may be subject to additional verification.`
+  String get securityNoticeMessage {
+    return Intl.message(
+      'We\'ve detected some unusual patterns. Your review may be subject to additional verification.',
+      name: 'securityNoticeMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Everything looks good!`
+  String get securityCheckMessage {
+    return Intl.message(
+      'Everything looks good!',
+      name: 'securityCheckMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Download started! Check your downloads folder`
+  String get downloadStarted {
+    return Intl.message(
+      'Download started! Check your downloads folder',
+      name: 'downloadStarted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show Path`
+  String get showPath {
+    return Intl.message('Show Path', name: 'showPath', desc: '', args: []);
+  }
+
+  /// `Users`
+  String get users {
+    return Intl.message('Users', name: 'users', desc: '', args: []);
+  }
+
+  /// `Trade match`
+  String get tradeMatch {
+    return Intl.message('Trade match', name: 'tradeMatch', desc: '', args: []);
+  }
+
+  /// `Similar`
+  String get similar {
+    return Intl.message('Similar', name: 'similar', desc: '', args: []);
+  }
+
+  /// `English`
+  String get languageEnglish {
+    return Intl.message('English', name: 'languageEnglish', desc: '', args: []);
+  }
+
+  /// `Latviešu`
+  String get languageLatvian {
+    return Intl.message(
+      'Latviešu',
+      name: 'languageLatvian',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Français`
+  String get languageFrench {
+    return Intl.message('Français', name: 'languageFrench', desc: '', args: []);
+  }
+
+  /// `Deutsch`
+  String get languageGerman {
+    return Intl.message('Deutsch', name: 'languageGerman', desc: '', args: []);
+  }
+
+  /// `Español`
+  String get languageSpanish {
+    return Intl.message('Español', name: 'languageSpanish', desc: '', args: []);
+  }
+
+  /// `Error: {exception}`
+  String errorWithException(String exception) {
+    return Intl.message(
+      'Error: $exception',
+      name: 'errorWithException',
+      desc: '',
+      args: [exception],
+    );
+  }
+
+  /// `Error verifying PIN`
+  String get errorVerifyingPin {
+    return Intl.message(
+      'Error verifying PIN',
+      name: 'errorVerifyingPin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete All`
+  String get deleteAll {
+    return Intl.message('Delete All', name: 'deleteAll', desc: '', args: []);
+  }
+
+  /// `Are you sure you want to delete all match history? This action cannot be undone.`
+  String get deleteAllMatchesConfirmation {
+    return Intl.message(
+      'Are you sure you want to delete all match history? This action cannot be undone.',
+      name: 'deleteAllMatchesConfirmation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All matches have been deleted`
+  String get allMatchesDeleted {
+    return Intl.message(
+      'All matches have been deleted',
+      name: 'allMatchesDeleted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `What do you need? What would you like assistance with?\nYou can change this later.`
+  String get selectTheInterestsThatMatchYourPreferences {
+    return Intl.message(
+      'What do you need? What would you like assistance with?\nYou can change this later.',
+      name: 'selectTheInterestsThatMatchYourPreferences',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `What can you provide or help out with?\nYou can change this later.`
+  String get selectTheOffersThatYouCanProvide {
+    return Intl.message(
+      'What can you provide or help out with?\nYou can change this later.',
+      name: 'selectTheOffersThatYouCanProvide',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share your interests to find the best matches with others!`
+  String get shareYourInterestsToFindBestMatches {
+    return Intl.message(
+      'Share your interests to find the best matches with others!',
+      name: 'shareYourInterestsToFindBestMatches',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
   const AppLocalizationDelegate();
 
   List<Locale> get supportedLocales {
-    return const <Locale>[Locale.fromSubtags(languageCode: 'en')];
+    return const <Locale>[
+      Locale.fromSubtags(languageCode: 'en'),
+      Locale.fromSubtags(languageCode: 'lv'),
+    ];
   }
 
   @override

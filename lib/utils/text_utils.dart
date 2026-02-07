@@ -52,7 +52,7 @@ class TextUtils {
   /// - Current user's offerings match POI's interests (type != 1)
   static bool checkForAttributeBarterMatch(PointOfInterest poi,
       List<ParsedAttributeData>? interests, List<ParsedAttributeData>? offers) {
-    // Use cached sets if available, otherwise return false
+    // Return false if both are null
     if (interests == null && offers == null) {
       return false;
     }
@@ -67,13 +67,13 @@ class TextUtils {
         .map((attr) => attr.attributeId.replaceAll("_", " "))
         .toSet() ?? {};
 
-    // Check if current user's interests match POI's offerings
-    final userInterestsMatchPoiOfferings = interests!.any((id) =>
-        poiOfferings.contains(id.attribute.toLowerCase()));
+    // Check if current user's interests match POI's offerings (only if interests is not null)
+    final userInterestsMatchPoiOfferings = interests?.any((id) =>
+        poiOfferings.contains(id.attribute.toLowerCase())) ?? false;
 
-    // Check if current user's offerings match POI's interests
-    final userOfferingsMatchPoiInterests = offers!.any((id) =>
-        poiInterests.contains(id.attribute.toLowerCase()));
+    // Check if current user's offerings match POI's interests (only if offers is not null)
+    final userOfferingsMatchPoiInterests = offers?.any((id) =>
+        poiInterests.contains(id.attribute.toLowerCase())) ?? false;
 
     return userInterestsMatchPoiOfferings || userOfferingsMatchPoiInterests;
   }

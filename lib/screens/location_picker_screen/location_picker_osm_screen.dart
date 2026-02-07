@@ -196,52 +196,55 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
                     child: TextButton(
                       style: TextButton.styleFrom(),
                       onPressed: () => context.pop(),
-                      child: const Icon(Icons.arrow_back_ios),
+                      child: const Icon(Icons.arrow_back),
                     ),
                   ),
                   Expanded(
                     child: PointerInterceptor(
-                      child: TextField(
-                        controller: textEditingController,
-                        onEditingComplete: () async {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                        },
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            color: Colors.black,
-                          ),
-                          suffix: ValueListenableBuilder<TextEditingValue>(
-                            valueListenable: textEditingController,
-                            builder: (ctx, text, child) {
-                              if (text.text.isNotEmpty) {
-                                return child!;
-                              }
-                              return const SizedBox.shrink();
-                            },
-                            child: InkWell(
-                              focusNode: FocusNode(),
-                              onTap: () {
-                                textEditingController.clear();
-                                controller.setSearchableText("");
-                                FocusScope.of(context).requestFocus(FocusNode());
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
+                        child: TextField(
+                          controller: textEditingController,
+                          onEditingComplete: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                          },
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              color: Colors.black,
+                            ),
+                            suffix: ValueListenableBuilder<TextEditingValue>(
+                              valueListenable: textEditingController,
+                              builder: (ctx, text, child) {
+                                if (text.text.isNotEmpty) {
+                                  return child!;
+                                }
+                                return const SizedBox.shrink();
                               },
-                              child: const Icon(
-                                Icons.close,
-                                size: 16,
-                                color: Colors.black,
+                              child: InkWell(
+                                focusNode: FocusNode(),
+                                onTap: () {
+                                  textEditingController.clear();
+                                  controller.setSearchableText("");
+                                  FocusScope.of(context).requestFocus(FocusNode());
+                                },
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
-                          ),
-                          focusColor: Colors.black,
-                          filled: true,
-                          hintText: AppLocalizations.of(context)!
-                              .searchForALocation,
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          fillColor: Colors.grey[100],
-                          errorBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
+                            focusColor: Colors.black,
+                            filled: true,
+                            hintText: AppLocalizations.of(context)!
+                                .searchForALocation,
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            fillColor: Colors.grey[100],
+                            errorBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                            ),
                           ),
                         ),
                       ),

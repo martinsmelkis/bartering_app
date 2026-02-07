@@ -75,7 +75,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorDuringInitialization => 'Error during initialization.';
 
   @override
-  String get selectYourInterests => 'What would be of interest to you?';
+  String get selectYourInterests => 'What is of interest to you?';
 
   @override
   String get selectYourOffers => 'What do you have to offer?';
@@ -1747,6 +1747,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get atLeastOneKeyword => 'Please enter at least one keyword';
+
+  @override
+  String get pleaseSelectAtLeastOneInterest =>
+      'Please select at least one interest or add a custom keyword';
+
+  @override
+  String get pleaseSelectAtLeastOneOffer =>
+      'Please select at least one offer or add a custom keyword';
 
   @override
   String get notificationPreferences => 'Notification Preferences';
