@@ -109,7 +109,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     }
 
     // Onboarding icons are 1/3 less
-    onboardingIconCount = (avatarIconCount * 0.67).round();
+    onboardingIconCount = (avatarIconCount * 0.73).round();
 
     final List<_FloatingIcon> icons = [];
 
@@ -442,9 +442,9 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
     ));
 
     _opacityAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.7), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: 0.7, end: 0.7), weight: 3),
-      TweenSequenceItem(tween: Tween(begin: 0.7, end: 0.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.5), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 0.5, end: 0.5), weight: 3),
+      TweenSequenceItem(tween: Tween(begin: 0.5, end: 0.0), weight: 1),
     ]).animate(widget.controller);
   }
 
@@ -493,13 +493,13 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
 
     // Generate a random color
     final colors = [
-      Colors.red.shade100,
+      Colors.red.shade200,
       Colors.deepOrange.shade100,
-      Colors.brown.shade100,
+      Colors.brown.shade200,
       Colors.purple.shade100,
       Colors.orange.shade100,
       Colors.yellow.shade100,
-      Colors.grey.shade100,
+      Colors.orangeAccent.shade100,
     ];
 
     final color = colors[random.nextInt(colors.length)];
@@ -507,6 +507,6 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
         '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
 
     // Replace the default color with the random color
-    return svgString.replaceAll('#ffd4a3', colorHex);
+    return svgString;//.replaceAll('#ffd4a3', colorHex);
   }
 }

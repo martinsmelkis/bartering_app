@@ -58,6 +58,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
 void dispose() {
+  // Mark chat screen as inactive
+  _chatCubit.setChatScreenActive(false);
+  
   // Clear active chat when leaving screen
   try {
     final notificationService = getIt<ChatNotificationService>();
@@ -278,14 +281,22 @@ void dispose() {
       _checkBlockedStatus();
     }
 
+    // Mark chat screen as active for auto-read behavior
+    _chatCubit.setChatScreenActive(true);
+
     // Set active chat to suppress notifications while in this screen
     try {
       final notificationService = getIt<ChatNotificationService>();
       notificationService.setActiveChat(widget.poiId);
+      // Cancel any existing notifications for this user immediately
+      if (widget.poiId != null) {
+        await notificationService.cancelNotificationsForUser(widget.poiId!);
+      }
       // Request notification permission for Android 13+
       await notificationService.requestNotificationPermission();
     } catch (e) {
       // Service might not be registered yet
+      logDebug('⚠️ Could not set active chat or cancel notifications: $e');
     }
 
     // Mark messages as read when chat screen is opened

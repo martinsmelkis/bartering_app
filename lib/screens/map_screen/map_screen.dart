@@ -75,7 +75,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         TileURLs(url: "https://tile.openstreetmap.de/"),
         TileURLs(url: "https://b.tile.openstreetmap.org"),
         TileURLs(url: "https://c.tile.openstreetmap.org"),
-        TileURLs(url: "https://tiles.wmflabs.org/osm/"),
       ],
       tileSize: 256,
     ),
@@ -1413,7 +1412,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _noUsersMarkerPosition = mapCenter;
     // Load and create the special marker with path333.svg
     final svgString = await rootBundle.loadString('assets/icons/path333.svg');
-    final markerSize = AppDimensions.poiMarkerSize * 0.5;
+    final markerSize = AppDimensions.mapPoiMarkerSize * 0.5;
     
     // Get device pixel ratio for sharp rendering on web high-DPI screens
     final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;

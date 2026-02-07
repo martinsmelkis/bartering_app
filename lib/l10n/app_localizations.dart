@@ -3215,7 +3215,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeStep2Description.
   ///
   /// In en, this message translates to:
-  /// **'Find similar or complementary people, search by keywords'**
+  /// **'Search by keywords, similarity or trade match, get match notifications'**
   String get welcomeStep2Description;
 
   /// No description provided for @welcomeStep3Title.

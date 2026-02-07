@@ -46,6 +46,29 @@ class TextUtils {
     return parsedAttribute;
   }
 
+  /// Normalize notification text that contains attribute IDs
+  /// Converts 'attr_xxx' format to readable text when localization is not available
+  /// Example: 'attr_social_media' -> 'Social Media'
+  static String normalizeNotificationText(String? text) {
+    if (text == null || text.isEmpty) return '';
+    
+    // Check if text contains 'attr_' prefix
+    if (text.contains('attr_')) {
+      // Remove 'attr_' prefix and normalize snake_case
+      final normalized = text.replaceAllMapped(
+        RegExp(r'attr_([a-z_]+)', caseSensitive: false),
+        (match) {
+          final attributeName = match.group(1) ?? '';
+          // Convert snake_case to Title Case (e.g., 'social_media' -> 'Social Media')
+          return normalizeSnakeCase(attributeName);
+        },
+      );
+      return normalized;
+    }
+    
+    return text;
+  }
+
   /// Checks if there's a match between current user and POI
   /// Returns true if:
   /// - Current user's interests match POI's offerings (type == 1), OR

@@ -94,12 +94,16 @@ class InterestsCubit extends Cubit<InterestsState> {
 
   Future<void> submitInterests(String languageCode, bool persistInterests) async {
     // Validate that at least one interest is selected (either from chips or custom keywords)
-    if (state.selectedInterests.isEmpty && state.customKeywords.isEmpty) {
+    if (persistInterests && state.selectedInterests.isEmpty && state.customKeywords.isEmpty) {
       emit(state.copyWith(
         status: InterestsStatus.error,
         errorMessage: 'Please select at least one interest or add a custom keyword',
       ));
       return;
+    } else if (!persistInterests) {
+      if (state.selectedInterests.isEmpty) {
+        emit(state.copyWith(status: InterestsStatus.initial, selectedInterests: await _userRepository.getInterests()));
+      }
     }
     
     emit(state.copyWith(status: InterestsStatus.loading));

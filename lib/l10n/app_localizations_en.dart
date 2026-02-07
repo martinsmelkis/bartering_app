@@ -1616,7 +1616,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get welcomeStep2Description =>
-      'Find similar or complementary people, search by keywords';
+      'Search by keywords, similarity or trade match, get match notifications';
 
   @override
   String get welcomeStep3Title => 'Start Chatting';

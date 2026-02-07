@@ -258,7 +258,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                           // Category cards
                           Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(12.0),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: _categories.asMap().entries.map((entry) {

@@ -4,6 +4,7 @@ import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/text_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
@@ -208,12 +209,17 @@ class WebSocketChatService {
                 // Show local notification if available
                 if (_notificationService != null) {
                   logDebug('📣 Showing local notification for match');
+                  
+                  // Normalize title and body to handle attribute IDs
+                  final normalizedTitle = TextUtils.normalizeNotificationText(matchNotification.title);
+                  final normalizedBody = TextUtils.normalizeNotificationText(matchNotification.body);
+                  
                   // Create a system-like chat message for notification purposes
                   final notificationMessage = ChatMessage(
                     id: 'match_${matchNotification.matchId}',
                     senderId: 'system',
                     recipientId: _currentUserId,
-                    plainText: matchNotification.body,
+                    plainText: normalizedBody,
                     encryptedTextPayload: '',
                     timestamp: DateTime.now(),
                     status: EChatMessageStatus.delivered,
@@ -221,7 +227,7 @@ class WebSocketChatService {
                   
                   _notificationService!.handleIncomingMessage(
                     notificationMessage,
-                    senderName: matchNotification.title,
+                    senderName: normalizedTitle,
                   );
                 }
                 

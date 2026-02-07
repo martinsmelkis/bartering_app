@@ -7,6 +7,7 @@ import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/text_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
@@ -373,10 +374,14 @@ class FirebaseService with WidgetsBindingObserver {
     final notificationType = _isAppInForeground ? 'temporary (5s auto-dismiss)' : 'persistent';
     logDebug('📱 Showing $notificationType local notification with payload: $payload');
     
+    // Normalize title and body to handle attribute IDs
+    final normalizedTitle = TextUtils.normalizeNotificationText(notification.title);
+    final normalizedBody = TextUtils.normalizeNotificationText(notification.body);
+    
     await _localNotifications.plugin.show(
       message.hashCode,
-      notification.title,
-      notification.body,
+      normalizedTitle,
+      normalizedBody,
       details,
       payload: payload,
     );

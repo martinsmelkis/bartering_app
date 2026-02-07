@@ -12,11 +12,8 @@ class AppDimensions {
   // AVATAR & MARKER SIZES
   // ============================================================================
 
-  /// Size for POI markers on the map (5% larger on mobile for map screen)
-  static double get mapPoiMarkerSize => kIsWeb ? 90 : (174 * 1.05);
-
-  /// Size for POI markers on the map (general use)
-  static double get poiMarkerSize => kIsWeb ? 90 : 174;
+  /// Size for POI markers on the map
+  static double get mapPoiMarkerSize => kIsWeb ? 90 : (174 * 1.155);
 
   /// Size for user avatar FAB
   static double get userAvatarSize => kIsWeb ? 88.4 : 90.0;

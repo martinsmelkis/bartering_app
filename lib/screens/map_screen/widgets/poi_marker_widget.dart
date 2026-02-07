@@ -95,8 +95,8 @@ class PoiMarkerWidget {
       glowColor = Color.lerp(Colors.orange.shade500, Colors.deepOrange.shade400, boostedColorScore);
       
       // Interpolate alpha from 0.3 to 0.6, then apply boost
-      final baseAlpha = 0.3 + (normalizedScore * 0.3); // 0.3 to 0.6
-      glowAlpha = (baseAlpha * alphaBoost).clamp(0.3, 0.8); // Boost but cap at 0.9
+      final baseAlpha = 0.3 + (normalizedScore * 0.35); // 0.3 to 0.6
+      glowAlpha = (baseAlpha * alphaBoost).clamp(0.35, 0.85); // Boost but cap at 0.9
       
       logDebug('@@@@@@@@@@ RESULT: boostedColor=$boostedColorScore, color=$glowColor, alpha=${glowAlpha.toStringAsFixed(3)}');
     }
@@ -108,8 +108,8 @@ class PoiMarkerWidget {
         // Glow effect for relevant POIs
         if (glowColor != null)
           Positioned(
-            left: kIsWeb ? 18 : 38,
-            top: kIsWeb ? 18 : 38,
+            left: kIsWeb ? 18 : 42,
+            top: kIsWeb ? 18 : 42,
             child: Container(
               width: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
               height: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),

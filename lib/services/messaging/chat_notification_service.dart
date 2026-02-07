@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../models/chat/chat_message.dart';
+import '../../models/chat/e_chat_message_status.dart';
 import 'local_notification_service.dart';
 
 /// Service to handle chat message notifications when user is not in chat screen
@@ -46,6 +47,12 @@ class ChatNotificationService with WidgetsBindingObserver {
 
   /// Check if we should show notification for this message
   bool _shouldShowNotification(ChatMessage message) {
+    // Don't show notification for messages that are already marked as read
+    if (message.status == EChatMessageStatus.read) {
+      debugPrint('🔕 Notification suppressed: Message already marked as read');
+      return false;
+    }
+
     // Don't show if app is in foreground and user is viewing this specific chat
     if (_isInForeground && _activeChatUserId == message.senderId) {
       debugPrint('🔕 Notification suppressed: User is in chat with ${message
@@ -148,6 +155,26 @@ class ChatNotificationService with WidgetsBindingObserver {
       ),
       payload: jsonEncode({'userId': userId, 'action': 'open_chat'}),
     );
+  }
+
+  /// Cancel notifications for a specific user (when messages are read)
+  Future<void> cancelNotificationsForUser(String userId) async {
+    try {
+      await _notificationService.plugin.cancel(userId.hashCode);
+      debugPrint('🔕 Cancelled notifications for user: $userId');
+    } catch (e) {
+      debugPrint('❌ Error cancelling notifications: $e');
+    }
+  }
+
+  /// Cancel all chat notifications
+  Future<void> cancelAllNotifications() async {
+    try {
+      await _notificationService.plugin.cancelAll();
+      debugPrint('🔕 Cancelled all notifications');
+    } catch (e) {
+      debugPrint('❌ Error cancelling all notifications: $e');
+    }
   }
 
   /// Cleanup

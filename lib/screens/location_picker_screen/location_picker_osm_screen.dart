@@ -55,15 +55,19 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
         unFollowUser: false,
       ),*/
   )..customTile = CustomTile(
-    sourceName: "osm_bright", //for caching | osmFrance
+    sourceName: "osmDeu", // for caching | osmDeu, osmFrance
     tileExtension: ".png",
     minZoomLevel: 2,
     maxZoomLevel: 19,
-    keyApi: MapEntry("api_key", "99031957-2f86-4c0b-b1a3-998c32b7f299"),
     urlsServers: [
-      TileURLs(url: "https://tiles-eu.stadiamaps.com/tiles/osm_bright/"),
+      //TileURLs(url: "https://a.tile.openstreetmap.fr/hot/"),
+      //TileURLs(url: "https://b.tile.openstreetmap.fr/hot/"),
+      //TileURLs(url: "https://c.tile.openstreetmap.fr/hot/"),
+      TileURLs(url: "https://tile.openstreetmap.de/"),
+      TileURLs(url: "https://b.tile.openstreetmap.org"),
+      TileURLs(url: "https://c.tile.openstreetmap.org"),
     ],
-    //tileSize: 256,
+    tileSize: 256,
   );
   late TextEditingController textEditingController = TextEditingController();
 

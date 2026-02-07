@@ -61,12 +61,21 @@ class ChatCubit extends Cubit<ChatState> {
   // Debounce auto-download to prevent multiple rapid triggers
   Timer? _autoDownloadDebounce;
   bool _isAutoDownloading = false;
+  
+  // Track if chat screen is currently active/visible
+  bool _isChatScreenActive = false;
 
   ChatCubit({
     required this.currentUserId,
     required this.currentUserName,
     required this.recipientUserId,
   }) : super(ChatInitial()) {}
+  
+  /// Set whether the chat screen is currently active/visible
+  void setChatScreenActive(bool isActive) {
+    _isChatScreenActive = isActive;
+    logDebug('💬 Chat screen active state changed: $isActive');
+  }
 
   void _listenToMessages() {
     // Listen to message status updates
@@ -219,17 +228,21 @@ class ChatCubit extends Cubit<ChatState> {
           currentUserId,
         );
 
-        // AUTO-MARK NEW UNREAD MESSAGES AS READ (if screen is in foreground)
-        // Find any new unread messages from the other user
-        final newUnreadMessages = chatMessages.where(
-          (msg) => !msg.isSentByCurrentUser && 
-                   msg.status != EChatMessageStatus.read
-        ).toList();
-        
-        if (newUnreadMessages.isNotEmpty) {
-          logDebug('📖 Auto-marking ${newUnreadMessages.length} new unread message(s) as read (foreground)');
-          // Mark as read asynchronously (don't wait)
-          markMessagesAsRead(newUnreadMessages);
+        // AUTO-MARK NEW UNREAD MESSAGES AS READ (only if chat screen is currently active)
+        if (_isChatScreenActive) {
+          // Find any new unread messages from the other user
+          final newUnreadMessages = chatMessages.where(
+            (msg) => !msg.isSentByCurrentUser && 
+                     msg.status != EChatMessageStatus.read
+          ).toList();
+          
+          if (newUnreadMessages.isNotEmpty) {
+            logDebug('📖 Auto-marking ${newUnreadMessages.length} new unread message(s) as read (screen active)');
+            // Mark as read asynchronously (don't wait)
+            markMessagesAsRead(newUnreadMessages);
+          }
+        } else {
+          logDebug('⏸️  Chat screen not active - skipping auto-mark as read');
         }
 
         // Update local list from DB
@@ -753,11 +766,17 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> markMessagesAsRead(List<ChatMessage> messagesToMark) async {
     logDebug('📖 markMessagesAsRead called with ${messagesToMark.length} messages');
     
+    // Track unique sender IDs to cancel notifications
+    final Set<String> senderIds = {};
+    int markedCount = 0;
+    
     for (final message in messagesToMark) {
       // Only mark messages from other users that haven't been read yet
       if (!message.isSentByCurrentUser && message.status != EChatMessageStatus.read) {
         try {
           logDebug('📤 Sending read receipt for message ${message.id.substring(0, 20)}... to sender ${message.senderId.substring(0, 20)}...');
+          
+          senderIds.add(message.senderId);
           
           // Send read receipt to server
           await _webSocketService?.sendReadReceipt(
@@ -771,6 +790,7 @@ class ChatCubit extends Cubit<ChatState> {
               message.id,
               EChatMessageStatus.read,
             );
+            markedCount++;
             logDebug('✅ Updated local DB: message ${message.id.substring(0, 20)}... -> READ');
           }
         } catch (e) {
@@ -778,6 +798,29 @@ class ChatCubit extends Cubit<ChatState> {
         }
       } else {
         logDebug('⏭️  Skipping message ${message.id.substring(0, 20)}... - isSentByMe: ${message.isSentByCurrentUser}, status: ${message.status}');
+      }
+    }
+    
+    // Update conversation unread count if any messages were marked as read
+    if (markedCount > 0 && _currentConversationId != null && _chatRepository != null) {
+      try {
+        await _chatRepository!.markConversationAsRead(_currentConversationId!);
+        logDebug('✅ Updated conversation unread count to 0');
+      } catch (e) {
+        logDebug('❌ Error updating conversation unread count: $e');
+      }
+    }
+    
+    // Cancel notifications for all senders whose messages were marked as read
+    if (senderIds.isNotEmpty) {
+      try {
+        final notificationService = getIt<ChatNotificationService>();
+        for (final senderId in senderIds) {
+          await notificationService.cancelNotificationsForUser(senderId);
+        }
+        logDebug('🔕 Cancelled notifications for ${senderIds.length} sender(s)');
+      } catch (e) {
+        logDebug('⚠️ Could not cancel notifications: $e');
       }
     }
   }
@@ -794,6 +837,12 @@ class ChatCubit extends Cubit<ChatState> {
           messageId,
           EChatMessageStatus.read,
         );
+        
+        // Update conversation unread count
+        if (_currentConversationId != null) {
+          await _chatRepository!.markConversationAsRead(_currentConversationId!);
+          logDebug('✅ Updated conversation unread count to 0');
+        }
       }
       
       logDebug('✅ Marked message $messageId as read');
