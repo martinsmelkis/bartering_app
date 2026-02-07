@@ -297,8 +297,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         final lat = double.tryParse(parts[0]);
         final lon = double.tryParse(parts[1]);
         if (lat != null && lon != null) {
-          //_mapController.setZoom(zoomLevel: 12.0);
-          _mapController.moveTo(GeoPoint(latitude: lat, longitude: lon));
+          await _mapController.moveTo(GeoPoint(latitude: lat, longitude: lon));
+          if (ResponsiveBreakpoints.isPhone(context)) _mapController.setZoom(zoomLevel: 12.0);
         }
       }
     }
@@ -698,15 +698,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       _userOfferings = await userRepository.getOfferings(loadFromStorage: true);
     }
 
-    // Get device pixel ratio for sharp rendering on web high-DPI screens
-    final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;
-
     // Delegate to the refactored widget class
     return await PoiMarkerWidget.createMarker(
       poi: poi,
       userInterests: _userInterests,
       userOfferings: _userOfferings,
-      devicePixelRatio: pixelRatio,
+      devicePixelRatio: 1
     );
   }
 
@@ -1197,19 +1194,21 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                     }
                                   },
                                   onPoiTap: (poi) async {
-                                    // On large screens, open POI panel below the search results list
-                                    context.read<PoiPanelCubit>().openPoiDetails(poi);
-
-                                    // Navigate to the user's location on the map (like match history does)
+                                    // Navigate to the user's location first for smooth animation
                                     if (poi.profile.latitude != null && poi.profile.longitude != null) {
                                       //_mapController.setZoom(zoomLevel: 17.0);
-                                      _mapController.moveTo(
+                                      await _mapController.moveTo(
                                         GeoPoint(
                                           latitude: poi.profile.latitude!,
                                           longitude: poi.profile.longitude!,
-                                        ),
+                                        )
                                       );
                                     }
+
+                                    Future.delayed(Duration(milliseconds: 200), () {
+                                      // Then load POI details after animation completes
+                                      context.read<PoiPanelCubit>().openPoiDetails(poi);
+                                    });
                                   },
                                   onChatTap: (poi) {
                                     _openChat(poi.profile.userId, poi.profile.name);
@@ -1302,19 +1301,21 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                 }
                               },
                               onPoiTap: (poi) async {
-                                // On large screens, open POI panel below the search results list
-                                context.read<PoiPanelCubit>().openPoiDetails(poi);
-
-                                // Navigate to the user's location on the map (like match history does)
+                                // Navigate to the user's location first for smooth animation
                                 if (poi.profile.latitude != null && poi.profile.longitude != null) {
                                   //_mapController.setZoom(zoomLevel: 17.0);
-                                  _mapController.moveTo(
+                                  await _mapController.moveTo(
                                     GeoPoint(
                                       latitude: poi.profile.latitude!,
                                       longitude: poi.profile.longitude!,
-                                    ),
+                                    )
                                   );
                                 }
+                                Future.delayed(Duration(milliseconds: 200), () {
+                                  // Then load POI details after animation completes
+                                  context.read<PoiPanelCubit>().openPoiDetails(poi);
+                                });
+
                               },
                               onChatTap: (poi) {
                                 _openChat(poi.profile.userId, poi.profile.name);

@@ -102,21 +102,21 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     });
   }
 
-  void _initializeData() {
-    // Schedule postings and favorite status loading after the first frame is rendered
-    // This prevents blocking the UI, especially on web platform
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _loadPostings();
-        _loadFavoriteStatus();
-        _loadAvatarIcon();
-        _loadUserRating();
-        _loadCurrentUserAttributes();
-      }
-    });
+  _initializeData() async {
+      // Schedule postings and favorite status loading after the first frame is rendered
+      // This prevents blocking the UI, especially on web platform
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (mounted) {
+          _loadPostings();
+          _loadFavoriteStatus();
+          _loadAvatarIcon();
+          _loadUserRating();
+          _loadCurrentUserAttributes();
+        }
+      });
   }
 
-  Future<void> _loadCurrentUserAttributes() async {
+  _loadCurrentUserAttributes() async {
     try {
       final userMatch = await AttributeMatchingUtils.loadUserAttributes(context);
       
@@ -131,7 +131,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     }
   }
 
-  Future<bool> _loadFavoriteStatus() async {
+  _loadFavoriteStatus() async {
     try {
       final apiClient = getIt<ApiClient>();
       final userRepository = getIt<UserRepository>();
@@ -248,7 +248,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     }
   }
 
-  Future<void> _loadAvatarIcon() async {
+  _loadAvatarIcon() async {
     try {
       // Use the same logic as map_screen to select the icon
       const int svgAssetCount = 29;
@@ -282,7 +282,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     }
   }
 
-  Future<void> _loadUserRating() async {
+  _loadUserRating() async {
     try {
       final apiClient = getIt<ApiClient>();
       final reviewsResponse = await apiClient.getUserReviews(widget.poi.profile.userId);
@@ -309,7 +309,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     return await rootBundle.loadString(assetPath);
   }
 
-  Future<void> _loadPostings() async {
+  _loadPostings() async {
     if (widget.poi.profile.activePostingIds == null ||
         widget.poi.profile.activePostingIds!.isEmpty) {
       if (mounted) {

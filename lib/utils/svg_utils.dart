@@ -5,13 +5,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// Utility class for rendering sharp SVGs on web, especially mobile
 class SvgUtils {
   /// Creates a sharp SVG widget optimized for web high-DPI displays
-  /// 
+  ///
   /// On web, this renders the SVG at the device's pixel ratio and scales it down
   /// using Transform.scale with high filter quality. This prevents blurriness
   /// on high-DPI mobile screens (2x, 3x, 4x pixel ratio).
-  /// 
+  ///
   /// On mobile native, it renders normally without transformation.
-  /// 
+  ///
   /// Parameters:
   /// - [svgString]: The SVG content as a string
   /// - [width]: The desired display width
@@ -33,39 +33,37 @@ class SvgUtils {
     Key? key,
     bool allowDrawingOutsideViewBox = false,
   }) {
-    // Use provided pixel ratio, or default to 2.5x for web (covers most high-DPI screens)
-    final scaleFactor = kIsWeb ? (devicePixelRatio ?? 2.5) : 1.0;
 
     return RepaintBoundary(
       child: kIsWeb
           ? Transform.scale(
-              scale: 1.0 / scaleFactor,
-              filterQuality: FilterQuality.high,
-              child: SizedBox(
-                width: width * scaleFactor,
-                height: height * scaleFactor,
-                child: SvgPicture.string(
-                  svgString,
-                  width: width * scaleFactor,
-                  height: height * scaleFactor,
-                  fit: fit,
-                  clipBehavior: clipBehavior,
-                  semanticsLabel: semanticsLabel,
-                  key: key,
-                  allowDrawingOutsideViewBox: allowDrawingOutsideViewBox,
-                ),
-              ),
-            )
+        scale: 1.0,
+        filterQuality: FilterQuality.high,
+        child: SizedBox(
+          width: width,
+          height: height,
+          child: SvgPicture.string(
+            svgString,
+            width: width,
+            height: height,
+            fit: fit,
+            clipBehavior: clipBehavior,
+            semanticsLabel: semanticsLabel,
+            key: key,
+            allowDrawingOutsideViewBox: allowDrawingOutsideViewBox,
+          ),
+        ),
+      )
           : SvgPicture.string(
-              svgString,
-              width: width,
-              height: height,
-              fit: fit,
-              clipBehavior: clipBehavior,
-              semanticsLabel: semanticsLabel,
-              key: key,
-              allowDrawingOutsideViewBox: allowDrawingOutsideViewBox,
-            ),
+        svgString,
+        width: width,
+        height: height,
+        fit: fit,
+        clipBehavior: clipBehavior,
+        semanticsLabel: semanticsLabel,
+        key: key,
+        allowDrawingOutsideViewBox: allowDrawingOutsideViewBox,
+      ),
     );
   }
 
@@ -98,31 +96,31 @@ class SvgUtils {
     return RepaintBoundary(
       child: kIsWeb
           ? Transform.scale(
-              scale: 1.0 / scaleFactor,
-              filterQuality: FilterQuality.high,
-              child: SizedBox(
-                width: width * scaleFactor,
-                height: height * scaleFactor,
-                child: SvgPicture.asset(
-                  assetPath,
-                  width: width * scaleFactor,
-                  height: height * scaleFactor,
-                  fit: fit,
-                  clipBehavior: clipBehavior,
-                  semanticsLabel: semanticsLabel,
-                  key: key,
-                ),
-              ),
-            )
+        scale: 1.0 / scaleFactor,
+        filterQuality: FilterQuality.high,
+        child: SizedBox(
+          width: width * scaleFactor,
+          height: height * scaleFactor,
+          child: SvgPicture.asset(
+            assetPath,
+            width: width * scaleFactor,
+            height: height * scaleFactor,
+            fit: fit,
+            clipBehavior: clipBehavior,
+            semanticsLabel: semanticsLabel,
+            key: key,
+          ),
+        ),
+      )
           : SvgPicture.asset(
-              assetPath,
-              width: width,
-              height: height,
-              fit: fit,
-              clipBehavior: clipBehavior,
-              semanticsLabel: semanticsLabel,
-              key: key,
-            ),
+        assetPath,
+        width: width,
+        height: height,
+        fit: fit,
+        clipBehavior: clipBehavior,
+        semanticsLabel: semanticsLabel,
+        key: key,
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:barter_app/models/notifications/notification_models.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:barter_app/utils/text_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -352,7 +353,7 @@ class _MatchHistoryCard extends StatelessWidget {
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          match.matchReason!,
+                          TextUtils.normalizeNotificationText(match.matchReason!),
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.grey.shade800,

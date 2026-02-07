@@ -55,24 +55,21 @@ class PoiMarkerWidget {
     final gap = strokeWidth + 2;
     // On web, render at device's actual pixel ratio for crisp display on high-DPI screens
     // Use provided devicePixelRatio or fallback to conservative 2.5x for web, 1.0x for mobile
-    final scaleFactor = kIsWeb ? (devicePixelRatio ?? 2.5) : 1.0;
-    final svgSize = circleSize - gap;
-    
-    logDebug('@@@@@@@@@@ Rendering marker with scaleFactor: $scaleFactor (devicePixelRatio: $devicePixelRatio)');
+    final svgSize = circleSize * (kIsWeb ? 3 : 1) - gap;
 
     // Calculate gradient glow color and alpha based on relevance score (70% - 100%)
     Color? glowColor;
     double glowAlpha = 0.3;
-    
+
     if (isHighRelevance) {
       // Map relevance from 0.70-1.0 range to 0.0-1.0 range for interpolation
       // Formula: (score - min) / (max - min) = (score - 0.70) / (1.0 - 0.70)
       final rawNormalized = (relevancyScore - 0.70) / 0.30;
       var normalizedScore = rawNormalized.clamp(0.0, 1.0);
-      
+
       // Debug calculation
       logDebug('@@@@@@@@@@ NORMALIZATION: score=$relevancyScore, raw=(score-0.70)/0.30=$rawNormalized, clamped=$normalizedScore');
-      
+
       // Tiered boost system to make higher scores stand out more
       double colorBoost = 1.0;
       double alphaBoost = 1.0;
@@ -87,17 +84,17 @@ class PoiMarkerWidget {
         alphaBoost = 1.1; // 20% more alpha intensity
         logDebug('@@@@@@@@@@ BOOST APPLIED: score >= 0.80, boosting by 20%');
       }
-      
+
       // Apply color boost: push normalized score closer to 1.0 for redder color
       final boostedColorScore = (normalizedScore * colorBoost).clamp(0.0, 0.9);
-      
+
       // Interpolate color from AppColors.primary to Colors.redAccent
       glowColor = Color.lerp(Colors.orange.shade500, Colors.deepOrange.shade400, boostedColorScore);
-      
+
       // Interpolate alpha from 0.3 to 0.6, then apply boost
       final baseAlpha = 0.3 + (normalizedScore * 0.35); // 0.3 to 0.6
       glowAlpha = (baseAlpha * alphaBoost).clamp(0.35, 0.85); // Boost but cap at 0.9
-      
+
       logDebug('@@@@@@@@@@ RESULT: boostedColor=$boostedColorScore, color=$glowColor, alpha=${glowAlpha.toStringAsFixed(3)}');
     }
 
