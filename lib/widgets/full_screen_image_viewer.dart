@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'webp_network_image.dart';
 
 /// A full-screen image viewer that supports zooming, panning, and swiping between multiple images
 /// Supports both network URLs and local file paths
@@ -31,6 +32,20 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
     super.initState();
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: widget.initialIndex);
+    
+    for (var i = 0; i < widget.imageUrls.length; i++) {
+      // Evict any cached version of this image URL to force fresh fetch
+      // This ensures we get the full-resolution version, not a cached thumbnail
+      if (widget.imageUrls[i].startsWith('http://') || widget.imageUrls[i].startsWith('https://')) {
+        try {
+          final provider = WebPNetworkImage(widget.imageUrls[i]);
+          provider.evict();
+          print('  ✓ Evicted cached image for fresh load');
+        } catch (e) {
+          print('  ⚠️ Could not evict cache: $e');
+        }
+      }
+    }
   }
 
   @override
@@ -41,16 +56,23 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
 
   /// Helper to determine the image provider based on the path
   ImageProvider _getImageProvider(String path) {
+    print('🔍 _getImageProvider called with path: $path');
+    
     // Check if it's a network URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
-      return NetworkImage(path);
+      print('  → Using WebPNetworkImage for URL: $path');
+      // Use WebPNetworkImage which adds Accept: image/webp header
+      // This ensures the full-res image isn't replaced by cached thumbnail
+      return WebPNetworkImage(path, scale: 1.0);
     }
     // For web platform, treat paths as network URLs (blob URLs)
     else if (kIsWeb) {
-      return NetworkImage(path);
+      print('  → Using WebPNetworkImage (web mode)');
+      return WebPNetworkImage(path, scale: 1.0);
     }
     // For mobile/desktop, treat as file path
     else {
+      print('  → Using FileImage for local file');
       return FileImage(File(path));
     }
   }

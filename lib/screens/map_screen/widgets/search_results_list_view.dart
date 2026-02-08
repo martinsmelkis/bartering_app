@@ -1,4 +1,5 @@
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
+import 'package:barter_app/widgets/webp_network_image.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -636,8 +637,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       },
       child: Hero(
         tag: 'posting_${posting.id}_image_$index',
-        child: Image.network(
-          thumbnailUrl,
+        child: WebPImage(
+          imageUrl: thumbnailUrl,
           width: 100,
           height: 100,
           fit: BoxFit.cover,

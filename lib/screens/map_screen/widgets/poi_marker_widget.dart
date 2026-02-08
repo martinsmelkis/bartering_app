@@ -55,7 +55,7 @@ class PoiMarkerWidget {
     final gap = strokeWidth + 2;
     // On web, render at device's actual pixel ratio for crisp display on high-DPI screens
     // Use provided devicePixelRatio or fallback to conservative 2.5x for web, 1.0x for mobile
-    final svgSize = circleSize * (kIsWeb ? 3 : 1) - gap;
+    final svgSize = circleSize * (kIsWeb ? 4 : 1) - gap;
 
     // Calculate gradient glow color and alpha based on relevance score (70% - 100%)
     Color? glowColor;

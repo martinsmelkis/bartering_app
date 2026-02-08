@@ -10,6 +10,7 @@ import 'package:barter_app/utils/text_utils.dart';
 import 'package:barter_app/widgets/attribute_bubble.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
 import 'package:barter_app/widgets/online_status_badge.dart';
+import 'package:barter_app/widgets/webp_network_image.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -443,15 +444,17 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
             builder: (context) => FullScreenImageViewer(
               imageUrls: allFullImageUrls,
               initialIndex: index,
-              heroTag: 'posting_${posting.id}_image',
+              heroTag: null, // Disable hero animation to prevent thumbnail caching issue
             ),
           ),
         );
       },
       child: Hero(
         tag: 'posting_${posting.id}_image_$index',
-        child: Image.network(
-          thumbnailUrl,
+        // Disable hero animation to prevent thumbnail being used in full-screen view
+        transitionOnUserGestures: false,
+        child: WebPImage(
+          imageUrl: thumbnailUrl,
           width: 100,
           height: 100,
           fit: BoxFit.cover,
