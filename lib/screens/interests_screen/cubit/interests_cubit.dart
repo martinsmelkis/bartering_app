@@ -25,6 +25,7 @@ class InterestsCubit extends Cubit<InterestsState> {
   /// Loads and pre-selects the user's saved interests
   Future<void> _loadSavedInterests() async {
     final savedInterests = await _userRepository.getInterests(loadFromStorage: true);
+
     if (savedInterests == null || savedInterests.isEmpty) return;
 
     emit(state.copyWith(allInterests: savedInterests));
@@ -101,9 +102,8 @@ class InterestsCubit extends Cubit<InterestsState> {
       ));
       return;
     } else if (!persistInterests) {
-      if (state.selectedInterests.isEmpty) {
-        emit(state.copyWith(status: InterestsStatus.initial, selectedInterests: await _userRepository.getInterests()));
-      }
+      final storedInterests = await _userRepository.getInterests(loadFromStorage: true);
+      emit(state.copyWith(status: InterestsStatus.initial, selectedInterests: storedInterests));
     }
     
     emit(state.copyWith(status: InterestsStatus.loading));

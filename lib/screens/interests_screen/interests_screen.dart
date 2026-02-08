@@ -100,7 +100,7 @@ class _InterestsViewState extends State<InterestsView> {
               final screenWidth = MediaQuery.of(context).size.width;
               final isLargeScreen = screenWidth >= 600;
               final spacing = isLargeScreen ? 12.0 : 4.0;
-              final runSpacing = isLargeScreen ? 12.0 : 4.0;
+              final runSpacing = isLargeScreen ? 12.0 : 0.0;
               
               return Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -114,8 +114,8 @@ class _InterestsViewState extends State<InterestsView> {
                         l10n.selectTheInterestsThatMatchYourPreferences,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.red,
-                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.1,
+                          color: Colors.red.shade800,
+                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.2,
                           shadows: [
                             Shadow(
                               color: Colors.black26,

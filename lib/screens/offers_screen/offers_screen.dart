@@ -49,9 +49,6 @@ class _OffersScreenState extends State<OffersScreenWidget> {
 
     return BlocListener<OffersCubit, OffersState>(
       listener: (context, state) async {
-        // Dismiss any existing dialog first
-        //Navigator.of(context).popUntil((route) => route is! PageRoute || route.isFirst);
-
         if (state.status == OffersStatus.error) {
           // Check if it's the validation error and use localized message
           String errorMessage = state.errorMessage ?? 
@@ -97,7 +94,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
               final screenWidth = MediaQuery.of(context).size.width;
               final isLargeScreen = screenWidth >= 600;
               final spacing = isLargeScreen ? 12.0 : 4.0;
-              final runSpacing = isLargeScreen ? 12.0 : 4.0;
+              final runSpacing = isLargeScreen ? 12.0 : 0.0;
               
               return Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -111,8 +108,8 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                         l10n.selectTheOffersThatYouCanProvide,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.red,
-                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.1,
+                          color: Colors.red.shade900,
+                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.2,
                           shadows: [
                             Shadow(
                               color: Colors.black26,
@@ -193,8 +190,8 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                     const SizedBox(height: 16),
                     // Custom keywords list
                     Wrap(
-                      spacing: 8.0,
-                      runSpacing: 4.0,
+                      spacing: spacing,
+                      runSpacing: runSpacing,
                       children: state.customKeywords.map((keyword) {
                         return Chip(
                           label: Text(keyword),
