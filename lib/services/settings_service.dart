@@ -231,4 +231,10 @@ class SettingsService {
   bool isGpsLocationEnabledSync() {
     return _prefs?.getBool(_enableGpsLocationKey) ?? false;
   }
+
+  /// Clear all settings from SharedPreferences
+  Future<void> clearAll() async {
+    final prefs = await _preferences;
+    await prefs.clear();
+  }
 }

@@ -105,7 +105,17 @@ class InterestsCubit extends Cubit<InterestsState> {
       final storedInterests = await _userRepository.getInterests(loadFromStorage: true);
       emit(state.copyWith(status: InterestsStatus.initial, selectedInterests: storedInterests));
     }
-    
+
+    // Ensure userId is loaded from storage
+    final userId = await _userRepository.getUserId();
+    if (userId == null || userId.isEmpty) {
+      emit(state.copyWith(
+        status: InterestsStatus.error,
+        errorMessage: 'User not initialized. Please restart the app.',
+      ));
+      return;
+    }
+
     emit(state.copyWith(status: InterestsStatus.loading));
     try {
       final allInterests = {
@@ -141,7 +151,7 @@ class InterestsCubit extends Cubit<InterestsState> {
       }
 
       final interestsDataForApi = UserAttributesData(
-          userId: _userRepository.userId!,
+          userId: userId,
           attributesRelevancyData: interestsMapToSubmit
       );
 

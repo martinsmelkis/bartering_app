@@ -34,8 +34,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../configure_dependencies.dart';
+import '../../data/local/platform/platform.dart';
 import '../../l10n/app_localizations.dart';
+import '../../repositories/chat_repository.dart';
 import '../../services/messaging/firebase_auth_service.dart';
+import '../../services/settings_service.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/text_utils.dart';
 import '../onboarding_screen/cubit/onboarding_cubit.dart';
@@ -817,6 +820,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       
       // Clear all secure storage data
       await SecureStorageService().clearStorage();
+      
+      // Clear all SharedPreferences settings
+      await getIt<SettingsService>().clearAll();
+      
+      // Clear all local chat data
+      await getIt<ChatRepository>().clearAllChats();
+      
+      // Clear browser storage (IndexedDB, localStorage) on web
+      if (kIsWeb) {
+        await Platform.clearAllBrowserStorage();
+      }
       
       // Dismiss loading dialog
       if (!mounted) return;

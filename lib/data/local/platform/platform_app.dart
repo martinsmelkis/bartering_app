@@ -91,4 +91,9 @@ class PlatformInterface {
       rethrow;
     }
   }
+
+  /// Stub method - browser storage clearing only applies to web platform
+  static Future<void> clearAllBrowserStorage() async {
+    // No-op on mobile platforms - database is handled separately
+  }
 }

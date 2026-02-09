@@ -7,4 +7,9 @@ if (dart.library.html) 'platform_web.dart';
 class Platform {
   static Future<QueryExecutor> createDatabaseConnection(String databaseName) =>
       PlatformInterface.createDatabaseConnection(databaseName);
+
+  /// Clears all browser storage including IndexedDB databases.
+  /// This is used when deleting a profile to ensure a clean slate.
+  static Future<void> clearAllBrowserStorage() =>
+      PlatformInterface.clearAllBrowserStorage();
 }

@@ -17,6 +17,9 @@ import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../configure_dependencies.dart';
+import '../repositories/user_repository.dart';
+
 /// Global key for accessing the router from anywhere
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -65,18 +68,38 @@ class AppRouter {
         builder: (context, state) => const PinVerificationScreen(),
       ),
 
-      // Interests Screen
+      // Interests Screen - Guard: ensure user is initialized
       GoRoute(
         path: '/interests',
         name: 'interests',
         builder: (context, state) => InterestsScreen(),
+        redirect: (context, state) async {
+          // Check if user is properly initialized
+          final userRepository = getIt<UserRepository>();
+          final userId = await userRepository.getUserId();
+          if (userId == null || userId.isEmpty) {
+            logDebug('🛡️ Router guard: User not initialized, redirecting to initialize');
+            return '/initialize';
+          }
+          return null; // Allow navigation
+        },
       ),
 
-      // Offers Screen
+      // Offers Screen - Guard: ensure user is initialized
       GoRoute(
         path: '/offers',
         name: 'offers',
         builder: (context, state) => OffersScreen(),
+        redirect: (context, state) async {
+          // Check if user is properly initialized
+          final userRepository = getIt<UserRepository>();
+          final userId = await userRepository.getUserId();
+          if (userId == null || userId.isEmpty) {
+            logDebug('🛡️ Router guard: User not initialized, redirecting to initialize');
+            return '/initialize';
+          }
+          return null; // Allow navigation
+        },
       ),
 
       // Location Picker Screen

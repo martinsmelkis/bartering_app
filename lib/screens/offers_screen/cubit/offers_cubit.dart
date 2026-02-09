@@ -102,7 +102,17 @@ class OffersCubit extends Cubit<OffersState> {
       ));
       return;
     }
-    
+
+    // Ensure userId is loaded from storage
+    final userId = await _userRepository.getUserId();
+    if (userId == null || userId.isEmpty) {
+      emit(state.copyWith(
+        status: OffersStatus.error,
+        errorMessage: 'User not initialized. Please restart the app.',
+      ));
+      return;
+    }
+
     emit(state.copyWith(status: OffersStatus.loading));
     try {
       final allOffers = {
@@ -135,7 +145,7 @@ class OffersCubit extends Cubit<OffersState> {
       _userRepository.offerings = offersData;
 
       final offersDataToSubmit = UserAttributesData(
-        userId: _userRepository.userId!,
+        userId: userId,
         attributesRelevancyData: offersMapToSubmit,
       );
 
