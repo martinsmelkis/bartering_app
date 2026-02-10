@@ -1414,8 +1414,12 @@ void dispose() {
     final double fontSize = isWebSideBySide ? 14.3 : 14;
 
     return Container(
-      padding: EdgeInsets.symmetric(
-          horizontal: horizontalPadding, vertical: verticalPadding),
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        verticalPadding,
+        horizontalPadding,
+        verticalPadding + MediaQuery.of(context).viewPadding.bottom,
+      ),
       decoration: BoxDecoration(
         color: AppColors.background,
         boxShadow: [

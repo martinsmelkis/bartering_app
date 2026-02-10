@@ -1188,7 +1188,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               
               // Use utility to determine match type
               final matchType = AttributeMatchingUtils.getMatchType(
-                normalizedAttribute: normalizedAttr,
+                normalizedAttribute: normalizedAttr.toLowerCase().replaceAll(" ", "_"),
                 currentUserInterestIds: _currentUserInterestIds,
                 currentUserOfferIds: _currentUserOfferIds,
                 isPoiInterest: true, // This is POI's interest

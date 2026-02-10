@@ -579,6 +579,8 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                   ),
                 ),
               ),
+              // Add bottom padding to account for system navigation bar
+              SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
             ],
           ),
         ),

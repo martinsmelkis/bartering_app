@@ -18,6 +18,7 @@ import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
+import 'package:barter_app/utils/back_button_handler.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/svg_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -939,12 +940,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   Positioned(
                     top: kIsWeb ? 26 : topPadding ?? 26.0,
-                    left: 12,
+                    left: 12 + MediaQuery.of(context).viewPadding.left,
                     child: PointerInterceptor(child: const MainNavigation()),
                   ),
                   Positioned(
-                    bottom: 32,
-                    right: 16,
+                    bottom: 32 + MediaQuery.of(context).viewPadding.bottom,
+                    right: 16 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
                       child: UserAvatarFab(
                         userId: _currentUserId,
@@ -956,8 +957,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   Positioned(
                     top: kIsWeb ? 22 : topPadding,
-                    left: 64,
-                    right: 100,
+                    left: 64 + MediaQuery.of(context).viewPadding.left,
+                    right: 100 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
                       child: SearchInMap(
                         controller: _mapController,
@@ -971,8 +972,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   // Search filter checkboxes - positioned separately for full width control
                   Positioned(
                     top: (kIsWeb ? 22 : topPadding ?? 0) + 56, // Below the search field
-                    left: 16,
-                    right: 16,
+                    left: 16 + MediaQuery.of(context).viewPadding.left,
+                    right: 16 + MediaQuery.of(context).viewPadding.right,
                     child: SearchFilterCheckboxes(
                       showCheckboxesNotifier: _showCheckboxesNotifier,
                       seekingCheckedNotifier: _seekingCheckedNotifier,
@@ -982,7 +983,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   // Chats button in top right
                   Positioned(
                     top: kIsWeb ? 26 : topPadding ?? 26.0,
-                    right: 12,
+                    right: 12 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
                       child: BlocBuilder<ChatsBadgeCubit, ChatsBadgeState>(
                         builder: (context, badgeState) {
@@ -1050,7 +1051,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   // Search complementary users button (with fallback to nearby)
                   Positioned(
                     top: kIsWeb ? 23 : (topPadding ?? 20.0),
-                    right: 56,
+                    right: 56 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
                       child: Container(
                         decoration: BoxDecoration(
@@ -1110,8 +1111,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
                   ),
                   Positioned(
-                    bottom: 23.0,
-                    left: 15,
+                    bottom: 23.0 + MediaQuery.of(context).viewPadding.bottom,
+                    left: 15 + MediaQuery.of(context).viewPadding.left,
                     child: ZoomNavigation(
                       controller: _mapController,
                       zoomNotifier: zoomLevelNotifier,
@@ -1120,9 +1121,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   // Search results list view overlay (only for small screens)
                   if (_showSearchResultsList && !context.canShowSideBySide)
                     Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
+                      left: MediaQuery.of(context).viewPadding.left,
+                      right: MediaQuery.of(context).viewPadding.right,
+                      bottom: MediaQuery.of(context).viewPadding.bottom,
                       top: MediaQuery.of(context).size.height * 0.15,
                       child: PointerInterceptor(
                         child: SearchResultsListView(
@@ -1336,15 +1337,60 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     );
 
     // Wrap with BlocBuilders for panels
-    return BlocBuilder<PoiPanelCubit, PoiPanelState>(
-      builder: (context, poiPanelState) {
-        return BlocBuilder<ChatPanelCubit, ChatPanelState>(
-          builder: (context, chatState) {
-            return BlocBuilder<SettingsPanelCubit, SettingsPanelState>(
-              builder: (context, settingsState) {
-                return BlocBuilder<ProfilePanelCubit, ProfilePanelState>(
-                  builder: (context, profileState) {
-                    return AdaptiveProfileLayout(
+    return BackButtonHandler(
+      onBackPressed: () async {
+        // Handle back button by closing panels in reverse priority order
+        // (same as tapping back arrow in app bar)
+        
+        // 1. Close search results list if open
+        if (_showSearchResultsList) {
+          setState(() {
+            _showSearchResultsList = false;
+            _searchResults = [];
+          });
+          return false; // Prevent navigation
+        }
+        
+        // 2. Close profile panel if open
+        final profileState = context.read<ProfilePanelCubit>().state;
+        if (profileState.isOpen) {
+          context.read<ProfilePanelCubit>().closeProfile();
+          return false;
+        }
+        
+        // 3. Close settings panel if open
+        final settingsState = context.read<SettingsPanelCubit>().state;
+        if (settingsState.isOpen) {
+          context.read<SettingsPanelCubit>().closeSettings();
+          return false;
+        }
+        
+        // 4. Close chat panel if open
+        final chatState = context.read<ChatPanelCubit>().state;
+        if (chatState.isChatOpen || chatState.isChatsListOpen) {
+          context.read<ChatPanelCubit>().closePanel();
+          return false;
+        }
+        
+        // 5. Close POI panel if open
+        final poiState = context.read<PoiPanelCubit>().state;
+        if (poiState.isOpen) {
+          context.read<PoiPanelCubit>().closePanel();
+          return false;
+        }
+        
+        // 6. All panels closed, allow normal navigation
+        return true;
+      },
+      child: BlocBuilder<PoiPanelCubit, PoiPanelState>(
+        builder: (context, poiPanelState) {
+          return BlocBuilder<ChatPanelCubit, ChatPanelState>(
+            builder: (context, chatState) {
+              return BlocBuilder<SettingsPanelCubit, SettingsPanelState>(
+                builder: (context, settingsState) {
+                  return BlocBuilder<ProfilePanelCubit, ProfilePanelState>(
+                    builder: (context, profileState) {
+                      return AdaptiveProfileLayout(
                       showProfilePanel: profileState.isOpen,
                       userId: profileState.userId,
                       userName: profileState.userName,
@@ -1395,13 +1441,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         ),
                       ),
                     );
-                  },
-                );
-              },
-            );
-          },
-        );
-      },
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -1419,15 +1466,54 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;
     
     final marker = MarkerIcon(
-      iconWidget: SvgUtils.buildSharpSvg(
-        svgString: svgString,
-        width: markerSize * 2,
-        height: markerSize * 2,
-        devicePixelRatio: pixelRatio,
-        fit: BoxFit.contain,
-        clipBehavior: kIsWeb ? Clip.antiAlias : Clip.none,
-        key: const ValueKey('no_users_marker'),
-        allowDrawingOutsideViewBox: false,
+      iconWidget: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          SvgUtils.buildSharpSvg(
+            svgString: svgString,
+            width: markerSize * 2,
+            height: markerSize * 2,
+            devicePixelRatio: pixelRatio,
+            fit: BoxFit.contain,
+            clipBehavior: kIsWeb ? Clip.antiAlias : Clip.none,
+            key: const ValueKey('no_users_marker'),
+            allowDrawingOutsideViewBox: false,
+          ),
+          // Red question mark overlay icon
+          Positioned(
+            top: (markerSize * 2 * 0.1),
+            right: (markerSize * 2 * 0.1),
+            child: Container(
+              width: markerSize * 0.8,
+              height: markerSize * 0.8,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  '?',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: markerSize * 0.5,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
 

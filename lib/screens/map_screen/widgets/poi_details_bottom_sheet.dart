@@ -123,8 +123,8 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       
       if (mounted) {
         setState(() {
-          _currentUserInterestIds = userMatch.interestIds;
-          _currentUserOfferIds = userMatch.offerIds;
+          _currentUserInterestIds = userMatch.interestIds.map((e) => e.toLowerCase().replaceAll(" ", "_")).toList();
+          _currentUserOfferIds = userMatch.offerIds.map((e) => e.toLowerCase().replaceAll(" ", "_")).toList();
         });
       }
     } catch (e) {
@@ -397,7 +397,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
 
         // Use utility to determine match type
         final matchType = AttributeMatchingUtils.getMatchType(
-          normalizedAttribute: normalizedAttr,
+          normalizedAttribute: normalizedAttr.toLowerCase().replaceAll(" ", "_"),
           currentUserInterestIds: _currentUserInterestIds,
           currentUserOfferIds: _currentUserOfferIds,
           isPoiInterest: isPoiInterest,
@@ -975,7 +975,12 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
               // Chat button always at the bottom (unless hidden)
               if (widget.showChatButton && widget.onChatButtonPressed != null)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    12,
+                    16,
+                    16 + MediaQuery.of(context).viewPadding.bottom,
+                  ),
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
