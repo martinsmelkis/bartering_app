@@ -629,6 +629,9 @@ class AppLocalizationsMapper {
       'archiveWishlist': localizations.archiveWishlist,
       'pleaseEnterTitle': localizations.pleaseEnterTitle,
       'atLeastOneKeyword': localizations.atLeastOneKeyword,
+      'pleaseSelectAtLeastOneInterest':
+          localizations.pleaseSelectAtLeastOneInterest,
+      'pleaseSelectAtLeastOneOffer': localizations.pleaseSelectAtLeastOneOffer,
       'notificationPreferences': localizations.notificationPreferences,
       'contacts': localizations.contacts,
       'attributes': localizations.attributes,

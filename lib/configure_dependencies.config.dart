@@ -24,6 +24,7 @@ import 'package:barter_app/screens/onboarding_screen/cubit/onboarding_cubit.dart
     as _i12;
 import 'package:barter_app/services/api_client.dart' as _i205;
 import 'package:barter_app/services/app_module.dart' as _i716;
+import 'package:barter_app/services/device_migration_service.dart' as _i529;
 import 'package:barter_app/services/messaging/chat_notification_service.dart'
     as _i935;
 import 'package:barter_app/services/messaging/global_chat_service.dart'
@@ -44,6 +45,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i205.ApiClient>(() => _i205.ApiClient.create());
     gh.factory<_i607.SecureStorageService>(
       () => _i607.SecureStorageService.new(),
+    );
+    gh.factory<_i529.DeviceMigrationService>(
+      () => _i529.DeviceMigrationService(),
     );
     await gh.singletonAsync<_i397.AppDatabase>(
       () => appModule.appDatabase,

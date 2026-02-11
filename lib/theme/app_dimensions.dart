@@ -22,7 +22,7 @@ class AppDimensions {
   static double get avatarEditIconSize => kIsWeb ? 26.0 : 28.0;
 
   /// Size for icon inside the edit icon overlay
-  static double get avatarEditIconInnerSize => kIsWeb ? 15.6 : 14.sp;
+  static double get avatarEditIconInnerSize => kIsWeb ? 15.6 : 15;
 
   // ============================================================================
   // CLUSTER MARKER SIZES
@@ -32,7 +32,7 @@ class AppDimensions {
   static double get mainClusterSize => kIsWeb ? 60.0 : 101.2;
 
   /// Font size for main cluster marker text
-  static double get mainClusterFontSize => kIsWeb ? 23.0 : 32.sp;
+  static double get mainClusterFontSize => kIsWeb ? 23.0 : 30;
 
   /// Border width for main cluster markers
   static double get mainClusterBorderWidth => kIsWeb ? 2.0 : 4.0;
@@ -41,7 +41,7 @@ class AppDimensions {
   static double get subClusterSize => kIsWeb ? 50.0 : 86.4;
 
   /// Font size for sub-cluster marker text
-  static double get subClusterFontSize => kIsWeb ? 19.2 : 30.sp;
+  static double get subClusterFontSize => kIsWeb ? 19.2 : 24;
 
   /// Border width for sub-cluster markers
   static double get subClusterBorderWidth => kIsWeb ? 2.0 : 2.0;
@@ -51,10 +51,10 @@ class AppDimensions {
   // ============================================================================
 
   /// Heading text size
-  static double get headingTextSize => kIsWeb ? 16.0 : 18.sp;
+  static double get headingTextSize => kIsWeb ? 16.0 : 19;
 
   /// Medium heading text size
-  static double get mediumHeadingTextSize => kIsWeb ? 16.0 : 17.sp;
+  static double get mediumHeadingTextSize => kIsWeb ? 16.0 : 17;
 
   /// Body text size
   static double get bodyTextSize => kIsWeb ? 14.0 : 16.sp;
@@ -79,7 +79,7 @@ class AppDimensions {
   static double get largeIconSize => kIsWeb ? 28.0 : 32.sp;
 
   /// Edit icon size (for inline editing)
-  static double get editIconSize => kIsWeb ? 18.0 : 20.sp;
+  static double get editIconSize => kIsWeb ? 18.0 : 20;
 
   // ============================================================================
   // SPACING & PADDING

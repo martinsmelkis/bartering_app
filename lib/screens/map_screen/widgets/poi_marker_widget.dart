@@ -1,10 +1,12 @@
+// lib/screens/map_screen/widgets/poi_marker_widget.dart
+// Widget class for creating POI markers on the map
+
 import 'package:barter_app/models/map/point_of_interest.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
-import 'package:barter_app/utils/svg_utils.dart';
 import 'package:barter_app/utils/text_utils.dart';
 import 'package:barter_app/widgets/online_status_badge.dart';
 import 'package:flutter/foundation.dart';
@@ -21,12 +23,12 @@ class PoiMarkerWidget {
   // Generate SVG asset path by index (1-based)
   static String _getSvgAsset(int index) => 'assets/icons/path$index.svg';
 
-  /// Creates a marker icon for a POI
+  /// Creates a marker icon for a POI with high-resolution rendering for web
   static Future<MarkerIcon> createMarker({
     required PointOfInterest poi,
     required List<ParsedAttributeData>? userInterests,
     required List<ParsedAttributeData>? userOfferings,
-    double? devicePixelRatio, // Optional: pass from context for web sharpness
+    double? devicePixelRatio,
   }) async {
     // Use the POI's userId to get a consistent random icon
     final userIdHashCode = poi.profile.userId.hashCode;
@@ -48,14 +50,14 @@ class PoiMarkerWidget {
     // Debug: Always log relevancy score to diagnose issues
     logDebug('@@@@@@@@@@ POI ${poi.profile.userId} RAW matchRelevancyScore: ${poi.matchRelevancyScore} (${(relevancyScore * 100).toStringAsFixed(1)}%)');
 
-    // Calculate sizes for circle
-    // For web mobile, increase resolution to prevent blurriness
-    final strokeWidth = kIsWeb ? 7.2 : 12.6;
+    // Calculate sizes using original AppDimensions.mapPoiMarkerSize
     final circleSize = AppDimensions.mapPoiMarkerSize;
+    final strokeWidth = kIsWeb ? 7.2 : 12.6;
     final gap = strokeWidth + 2;
-    // On web, render at device's actual pixel ratio for crisp display on high-DPI screens
-    // Use provided devicePixelRatio or fallback to conservative 2.5x for web, 1.0x for mobile
-    final svgSize = circleSize * (kIsWeb ? 4 : 1) - gap;
+    final svgSize = circleSize - gap;
+
+    // For high-res SVG on web: render at 1.5x internal resolution
+    final svgRenderSize = kIsWeb ? svgSize * 2 : svgSize;
 
     // Calculate gradient glow color and alpha based on relevance score (70% - 100%)
     Color? glowColor;
@@ -63,7 +65,6 @@ class PoiMarkerWidget {
 
     if (isHighRelevance) {
       // Map relevance from 0.70-1.0 range to 0.0-1.0 range for interpolation
-      // Formula: (score - min) / (max - min) = (score - 0.70) / (1.0 - 0.70)
       final rawNormalized = (relevancyScore - 0.70) / 0.30;
       var normalizedScore = rawNormalized.clamp(0.0, 1.0);
 
@@ -74,119 +75,149 @@ class PoiMarkerWidget {
       double colorBoost = 1.0;
       double alphaBoost = 1.0;
       if (relevancyScore >= 0.90) {
-        // Top tier: 30% boost for scores >= 90%
-        colorBoost = 1.2; // 30% more towards red
-        alphaBoost = 1.2; // 30% more alpha intensity
+        colorBoost = 1.2;
+        alphaBoost = 1.2;
         logDebug('@@@@@@@@@@ BOOST APPLIED: score >= 0.90, boosting by 30%');
       } else if (relevancyScore >= 0.80) {
-        // Mid tier: 20% boost for scores >= 80%
-        colorBoost = 1.1; // 20% more towards red
-        alphaBoost = 1.1; // 20% more alpha intensity
+        colorBoost = 1.1;
+        alphaBoost = 1.1;
         logDebug('@@@@@@@@@@ BOOST APPLIED: score >= 0.80, boosting by 20%');
       }
 
-      // Apply color boost: push normalized score closer to 1.0 for redder color
       final boostedColorScore = (normalizedScore * colorBoost).clamp(0.0, 0.9);
 
       // Interpolate color from AppColors.primary to Colors.redAccent
       glowColor = Color.lerp(Colors.orange.shade500, Colors.deepOrange.shade400, boostedColorScore);
 
       // Interpolate alpha from 0.3 to 0.6, then apply boost
-      final baseAlpha = 0.3 + (normalizedScore * 0.35); // 0.3 to 0.6
-      glowAlpha = (baseAlpha * alphaBoost).clamp(0.35, 0.85); // Boost but cap at 0.9
+      final baseAlpha = 0.3 + (normalizedScore * 0.35);
+      glowAlpha = (baseAlpha * alphaBoost).clamp(0.35, 0.85);
 
       logDebug('@@@@@@@@@@ RESULT: boostedColor=$boostedColorScore, color=$glowColor, alpha=${glowAlpha.toStringAsFixed(3)}');
     }
 
-    // Create the base marker widget
-    Widget baseMarker = Stack(
-      clipBehavior: Clip.none,
-      children: [
-        // Glow effect for relevant POIs
-        if (glowColor != null)
-          Positioned(
-            left: kIsWeb ? 18 : 42,
-            top: kIsWeb ? 18 : 42,
-            child: Container(
-              width: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
-              height: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: glowColor.withValues(alpha: glowAlpha),
-                    blurRadius: kIsWeb ? 3 : 4,
-                    spreadRadius: kIsWeb ? 3 : 4,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        // Circular colored border around avatar based on profileKeywordDataMap and attributes
-        CategoryStatsUtils.buildCategoryStatsCircle(
-          keywordMap: poi.profile.profileKeywordDataMap,
-          attributes: poi.profile.attributes,
-          size: circleSize,
-          strokeWidth: strokeWidth,
-          gapWidth: kIsWeb ? 1.2 : 1.0,
-          child: ClipOval(
-            child: SvgUtils.buildSharpSvg(
-              svgString: localSvgCopy,
-              width: svgSize,
-              height: svgSize,
-              devicePixelRatio: devicePixelRatio,
-              fit: BoxFit.fill,
-              clipBehavior: Clip.antiAlias,
-              semanticsLabel: '${poi.profile.name} avatar',
-              key: ValueKey('poi_marker_${poi.profile.userId}'),
-              allowDrawingOutsideViewBox: false,
-            ),
-          ),
-        ),
-        // Online status badge - positioned closer to the edge
-        PositionedOnlineStatusBadge(
-          isOnline: poi.isOnline,
-          isAway: poi.isAway,
-          size: kIsWeb ? 14.4 : 26.25,
-          right: kIsWeb ? 14.4 : 34.65,
-          top: kIsWeb ? 14.4 : 34.65,
-          borderWidth: kIsWeb ? 3.0 : 2.625,
-        ),
-        // Match indicator - positioned at bottom right
-        if (hasMatch)
-          Positioned(
-            right: kIsWeb ? 14.4 : 26.25,
-            bottom: kIsWeb ? 14.4 : 26.25,
-            child: Container(
-              width: kIsWeb ? 21.6 : 44.1,
-              height: kIsWeb ? 21.6 : 44.1,
-              decoration: BoxDecoration(
-                color: AppColors.secondary,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: kIsWeb ? 1.2 : 2.1,
+    // Build the marker widget
+    Widget markerWidget = SizedBox(
+      width: circleSize,
+      height: circleSize,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Glow effect for relevant POIs
+          if (glowColor != null)
+            Positioned(
+              left: kIsWeb ? 18 : 42,
+              top: kIsWeb ? 18 : 42,
+              child: Container(
+                  width: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
+                  height: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: glowColor.withValues(alpha: glowAlpha),
+                      blurRadius: 3.0,
+                      spreadRadius: 3.0,
+                    ),
+                  ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: kIsWeb ? 1.92 : 4.2,
-                    offset: Offset(0, kIsWeb ? 1.2 : 2.1),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.handshake,
-                size: kIsWeb ? 18 : 31.5,
-                color: Colors.white,
               ),
             ),
+          // Circular colored border around avatar based on profileKeywordDataMap and attributes
+          CategoryStatsUtils.buildCategoryStatsCircle(
+            keywordMap: poi.profile.profileKeywordDataMap,
+            attributes: poi.profile.attributes,
+            size: circleSize,
+            strokeWidth: strokeWidth,
+            gapWidth: kIsWeb ? 1.2 : 1.0,
+            child: ClipOval(
+              child: kIsWeb
+                  // On web: Render SVG at 2x internal size for sharper display
+                  ? SizedBox(
+                      width: svgSize,
+                      height: svgSize,
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: SizedBox(
+                          width: svgRenderSize,
+                          height: svgRenderSize,
+                          child: SvgPicture.string(
+                            localSvgCopy,
+                            width: svgRenderSize,
+                            height: svgRenderSize,
+                            fit: BoxFit.fill,
+                            clipBehavior: Clip.antiAlias,
+                            semanticsLabel: '${poi.profile.name} avatar',
+                            key: ValueKey('poi_marker_${poi.profile.userId}'),
+                            allowDrawingOutsideViewBox: false,
+                          ),
+                        ),
+                      ),
+                    )
+                  : SvgPicture.string(
+                      localSvgCopy,
+                      width: svgSize,
+                      height: svgSize,
+                      fit: BoxFit.fill,
+                      clipBehavior: Clip.antiAlias,
+                      semanticsLabel: '${poi.profile.name} avatar',
+                      key: ValueKey('poi_marker_${poi.profile.userId}'),
+                      allowDrawingOutsideViewBox: false,
+                    ),
+            ),
           ),
-      ],
+          // Online status badge - positioned closer to the edge
+          PositionedOnlineStatusBadge(
+            isOnline: poi.isOnline,
+            isAway: poi.isAway,
+            size: kIsWeb ? 14.4 : 26.25,
+            right: kIsWeb ? 14.4 : 34.65,
+            top: kIsWeb ? 14.4 : 34.65,
+            borderWidth: kIsWeb ? 3.0 : 2.625,
+          ),
+          // Match indicator - positioned at bottom right
+          if (hasMatch)
+            Positioned(
+              right: kIsWeb ? 14.4 : 30,
+              bottom: kIsWeb ? 14.4 : 30,
+              child: Container(
+                width: kIsWeb ? 21.6 : 44.1,
+                height: kIsWeb ? 21.6 : 44.1,
+                decoration: BoxDecoration(
+                  color: AppColors.secondary,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: kIsWeb ? 1.2 : 2.1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: kIsWeb ? 1.92 : 4.2,
+                      offset: Offset(0, kIsWeb ? 1.2 : 2.1),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.handshake,
+                  size: kIsWeb ? 18.0 : 31.5,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
 
+    // Wrap in RepaintBoundary for better rendering quality on web
+    if (kIsWeb) {
+      markerWidget = RepaintBoundary(
+        child: markerWidget,
+      );
+    }
+
     return MarkerIcon(
-      iconWidget: baseMarker,
+      iconWidget: markerWidget,
     );
   }
 }

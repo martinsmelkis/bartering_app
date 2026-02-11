@@ -585,7 +585,7 @@ void dispose() {
           // Use smaller padding for web side-by-side view
           final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
               context.canShowSideBySide;
-          final double listPadding = isWebSideBySide ? 4 : 10.w;
+          final double listPadding = isWebSideBySide ? 4 : 12;
 
           // Use state.messages if it has content, otherwise fall back to _messages
           // This ensures messages are displayed during all states (sending, sent, loaded, etc.)
@@ -623,15 +623,15 @@ void dispose() {
   Widget _buildDateHeader(DateTime date) {
     final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
         context.canShowSideBySide;
-    final double fontSize = isWebSideBySide ? 11.7 : 12.sp;
-    final double verticalMargin = isWebSideBySide ? 10.4 : 12.h;
+    final double fontSize = isWebSideBySide ? 11.7 : 12;
+    final double verticalMargin = isWebSideBySide ? 10.4 : 16;
 
     return Center(
       child: Container(
         margin: EdgeInsets.symmetric(vertical: verticalMargin),
         padding: EdgeInsets.symmetric(
           vertical: isWebSideBySide ? 5.2 : 6.h,
-          horizontal: isWebSideBySide ? 13 : 16.w,
+          horizontal: isWebSideBySide ? 13 : 16,
         ),
         decoration: BoxDecoration(
           color: Colors.grey.shade300,
@@ -691,13 +691,13 @@ void dispose() {
     // Use much smaller sizes for web side-by-side view
     final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
         context.canShowSideBySide;
-    final double messageFontSize = isWebSideBySide ? 18.2 : 15.sp;
-    final double timeFontSize = isWebSideBySide ? 11.7 : 10.sp;
+    final double messageFontSize = isWebSideBySide ? 18.2 : 16;
+    final double timeFontSize = isWebSideBySide ? 11.7 : 11;
     final double verticalMargin = isWebSideBySide ? 5.2 : 4.h;
     final double horizontalMargin = isWebSideBySide ? 10.4 : 8.w;
     final double verticalPadding = isWebSideBySide ? 10.4 : 8.h;
     final double horizontalPadding = isWebSideBySide ? 7.8 : 8.w;
-    final double borderRadius = isWebSideBySide ? 10.4 : 16.r;
+    final double borderRadius = isWebSideBySide ? 10.4 : 16;
     final double spacing = isWebSideBySide ? 5.2 : 4.h;
 
     return Align(
@@ -782,19 +782,19 @@ void dispose() {
     // Use much smaller sizes for web side-by-side view
     final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
         context.canShowSideBySide;
-    final double messageFontSize = isWebSideBySide ? 15.6 : 13.sp;
-    final double verticalMargin = isWebSideBySide ? 10.4 : 12.h;
+    final double messageFontSize = isWebSideBySide ? 15.6 : 14;
+    final double verticalMargin = isWebSideBySide ? 10.4 : 16;
 
     return Center(
       child: Container(
         margin: EdgeInsets.symmetric(vertical: verticalMargin),
         padding: EdgeInsets.symmetric(
-          vertical: isWebSideBySide ? 7.8 : 8.h,
-          horizontal: isWebSideBySide ? 15.6 : 16.w,
+          vertical: isWebSideBySide ? 7.8 : 8,
+          horizontal: isWebSideBySide ? 15.6 : 16,
         ),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(isWebSideBySide ? 15.6 : 16.r),
+          borderRadius: BorderRadius.circular(isWebSideBySide ? 15.6 : 16),
         ),
         child: Text(
           message.plainText ?? '',
@@ -1404,13 +1404,13 @@ void dispose() {
     // Use much smaller sizes for web side-by-side view
     final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
         context.canShowSideBySide;
-    final double horizontalPadding = isWebSideBySide ? 7.8 : 12.w;
+    final double horizontalPadding = isWebSideBySide ? 7.8 : 16;
     final double verticalPadding = isWebSideBySide ? 5.2 : 8.h;
-    final double borderRadius = isWebSideBySide ? 15.6 : 25.r;
-    final double contentHorizontalPadding = isWebSideBySide ? 10.4 : 16.w;
-    final double contentVerticalPadding = isWebSideBySide ? 6.5 : 10.h;
-    final double iconSize = isWebSideBySide ? 20.8 : 25.w;
-    final double spacing = isWebSideBySide ? 5.2 : 8.w;
+    final double borderRadius = isWebSideBySide ? 15.6 : 24;
+    final double contentHorizontalPadding = isWebSideBySide ? 10.4 : 16;
+    final double contentVerticalPadding = isWebSideBySide ? 6.5 : 10;
+    final double iconSize = isWebSideBySide ? 20.8 : 25;
+    final double spacing = isWebSideBySide ? 5.2 : 8;
     final double fontSize = isWebSideBySide ? 14.3 : 14;
 
     return Container(

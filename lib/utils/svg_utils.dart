@@ -68,9 +68,9 @@ class SvgUtils {
   }
 
   /// Creates a sharp SVG widget from an asset optimized for web high-DPI displays
-  /// 
+  ///
   /// Similar to [buildSharpSvg] but loads from asset path instead of string.
-  /// 
+  ///
   /// Parameters:
   /// - [assetPath]: Path to the SVG asset
   /// - [width]: The desired display width

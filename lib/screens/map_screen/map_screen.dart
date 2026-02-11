@@ -699,12 +699,16 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       _userOfferings = await userRepository.getOfferings(loadFromStorage: true);
     }
 
+    // Get device pixel ratio for sharp rendering on web high-DPI screens
+    // On mobile web browsers (which often have 2x-4x pixel ratios), this ensures crisp markers
+    final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;
+
     // Delegate to the refactored widget class
     return await PoiMarkerWidget.createMarker(
       poi: poi,
       userInterests: _userInterests,
       userOfferings: _userOfferings,
-      devicePixelRatio: 1
+      devicePixelRatio: pixelRatio,
     );
   }
 

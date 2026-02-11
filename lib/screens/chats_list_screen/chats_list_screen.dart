@@ -412,7 +412,7 @@ class _ConversationTile extends StatelessWidget {
     final bool isWebSideBySide = kIsWeb && context.canShowSideBySide;
 
     // Adjust sizes for web side-by-side view
-    final double avatarSize = isWebSideBySide ? 40 : 64.w;
+    final double avatarSize = isWebSideBySide ? 40 : 48;
     final double horizontalPadding = isWebSideBySide ? 8 : 8.w;
     final double verticalPadding = isWebSideBySide ? 3 : 2.h;
     final double spacing = isWebSideBySide ? 6 : 8.w;
