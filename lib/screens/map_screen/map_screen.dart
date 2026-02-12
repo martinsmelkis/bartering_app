@@ -230,7 +230,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
 
     final settingsService = getIt<SettingsService>();
-    final searchType = await settingsService.getDefaultSearchType();
     final useMapCenter = await settingsService.getUseMapCenterForSearch();
     final radiusKm = await settingsService.getNearbyUsersRadius();
 
@@ -248,36 +247,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         debugPrint('Error getting map center: $e');
       }
     }
-    // If not using map center, lat/lon will be null and methods will use user's saved location
 
-    // Perform search based on default type
-    switch (searchType) {
-      case 'complementary':
-        await poiCubit.getComplementaryProfiles(
-          _currentUserId ?? "",
-          lat: lat,
-          lon: lon,
-          radiusMeters: radiusKm * 1000,
-          fallbackToNearby: true, // Enable fallback to nearby
-        );
-        break;
-      case 'similar':
-        await poiCubit.getSimilarProfiles(
-          _currentUserId ?? "",
-          lat: lat,
-          lon: lon,
-          radiusMeters: radiusKm * 1000,
-        );
-        break;
-      case 'nearby':
-      default:
-        await poiCubit.fetchPois(
-          lat: lat,
-          lon: lon,
-          radius: radiusKm * 1000,
-        );
-        break;
-    }
+    await poiCubit.getComplementaryProfiles(
+      _currentUserId ?? "",
+      lat: lat,
+      lon: lon,
+      radiusMeters: radiusKm * 1000,
+      fallbackToNearby: true, // Enable fallback to nearby
+    );
   }
 
   /// Called when user attributes may have changed (e.g., after editing profile/settings)
@@ -356,24 +333,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
   }
 
-  /// Check if two lists of POIs are different
-  bool _havePoisChanged(List<PointOfInterest> newPois, List<PointOfInterest> oldPois) {
-    // Different lengths means they've changed
-    if (newPois.length != oldPois.length) return true;
-    
-    // If both are empty, nothing changed
-    if (newPois.isEmpty && oldPois.isEmpty) return false;
-    
-    // Compare POI user IDs in order
-    for (int i = 0; i < newPois.length; i++) {
-      if (newPois[i].profile.userId != oldPois[i].profile.userId) {
-        return true;
-      }
-    }
-    
-    return false;
-  }
-
   void _processPois(List<PointOfInterest> pois, {bool ignoreListViewSetting = false}) async {
     logDebug('@@@@@@@@@ _processPois called with ${pois.length} POIs');
     _allPois = List.from(pois);
@@ -398,7 +357,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         // Update search results if list is already showing OR if POI panel is not open
         if (_showSearchResultsList || !poiPanelCubit.state.isOpen) {
           // Check if POIs have actually changed before updating
-          final poisChanged = _havePoisChanged(_allPois, _previousSearchResults);
+          final poisChanged = MapOperationsCubit.havePoisChanged(_allPois, _previousSearchResults);
           
           if (poisChanged) {
             logDebug('@@@@@@@@@ Updating search results list with ${_allPois.length} POIs (key: $_searchResultsKey)');
@@ -534,7 +493,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                 .id} COLLAPSED - adding cluster marker');
             if (!_isRenderOperationValid(currentOperation)) return;
             subCluster.isExpanded = false;
-            final subClusterMarker = _createSubClusterMarker(subCluster, l10n);
+            final subClusterMarker = mapOperationsCubit.createSubClusterMarker(subCluster);
             final position = GeoPoint(latitude: subCluster.centroid.latitude,
                 longitude: subCluster.centroid.longitude);
             await _mapController.addMarker(
@@ -560,7 +519,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         }
       } else {
         if (!_isRenderOperationValid(currentOperation)) return;
-        final mainClusterMarker = _createMainClusterMarker(mainCluster, l10n);
+        final mainClusterMarker = mapOperationsCubit.createMainClusterMarker(mainCluster);
         final position = GeoPoint(latitude: mainCluster.centroid.latitude,
             longitude: mainCluster.centroid.longitude);
         await _mapController.addMarker(
@@ -597,7 +556,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             longitude: looseSubCluster.centroid.longitude);
         await _mapController.addMarker(
           position,
-          markerIcon: _createSubClusterMarker(looseSubCluster, l10n),
+          markerIcon: mapOperationsCubit.createSubClusterMarker(looseSubCluster),
         );
         _currentMarkerPositions.add(position);
       }
@@ -709,79 +668,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       userInterests: _userInterests,
       userOfferings: _userOfferings,
       devicePixelRatio: pixelRatio,
-    );
-  }
-
-  MarkerIcon _createMainClusterMarker(PoiClusterOsm cluster,
-      AppLocalizations l10n) {
-    final poiCount = cluster.allPoisInCluster.length;
-
-    return MarkerIcon(
-      iconWidget: Container(
-        width: AppDimensions.mainClusterSize,
-        height: AppDimensions.mainClusterSize,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.9),
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: AppDimensions.mainClusterBorderWidth,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 3,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            poiCount.toString(),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: AppDimensions.mainClusterFontSize,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  MarkerIcon _createSubClusterMarker(PoiSubClusterOsm cluster, AppLocalizations l10n) {
-    final poiCount = cluster.pois.length;
-
-    return MarkerIcon(
-      iconWidget: Container(
-        width: AppDimensions.subClusterSize,
-        height: AppDimensions.subClusterSize,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.8),
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: AppDimensions.subClusterBorderWidth,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 5,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            poiCount.toString(),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: AppDimensions.subClusterFontSize,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -915,8 +801,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                       if (((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs() > 0.0004
                           || ((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs() > 0.0004) {
                         _mapController.getZoom().then((v) {
-                          print('@@@@@@@@@@ MAP MOVED: ${((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs()} '
-                              '${((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs()}');
                           final newZoom = v.toDouble();
                           zoomLevelNotifier.value = v.toInt();
                           mapOperationsCubit.currentZoom = newZoom;
@@ -1343,10 +1227,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     // Wrap with BlocBuilders for panels
     return BackButtonHandler(
       onBackPressed: () async {
-        // Handle back button by closing panels in reverse priority order
-        // (same as tapping back arrow in app bar)
-        
-        // 1. Close search results list if open
         if (_showSearchResultsList) {
           setState(() {
             _showSearchResultsList = false;
@@ -1354,36 +1234,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           });
           return false; // Prevent navigation
         }
-        
-        // 2. Close profile panel if open
-        final profileState = context.read<ProfilePanelCubit>().state;
-        if (profileState.isOpen) {
-          context.read<ProfilePanelCubit>().closeProfile();
-          return false;
-        }
-        
-        // 3. Close settings panel if open
-        final settingsState = context.read<SettingsPanelCubit>().state;
-        if (settingsState.isOpen) {
-          context.read<SettingsPanelCubit>().closeSettings();
-          return false;
-        }
-        
-        // 4. Close chat panel if open
-        final chatState = context.read<ChatPanelCubit>().state;
-        if (chatState.isChatOpen || chatState.isChatsListOpen) {
-          context.read<ChatPanelCubit>().closePanel();
-          return false;
-        }
-        
-        // 5. Close POI panel if open
-        final poiState = context.read<PoiPanelCubit>().state;
-        if (poiState.isOpen) {
-          context.read<PoiPanelCubit>().closePanel();
-          return false;
-        }
-        
-        // 6. All panels closed, allow normal navigation
+        // Allow normal navigation
         return true;
       },
       child: BlocBuilder<PoiPanelCubit, PoiPanelState>(
@@ -1464,62 +1315,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _noUsersMarkerPosition = mapCenter;
     // Load and create the special marker with path333.svg
     final svgString = await rootBundle.loadString('assets/icons/path333.svg');
-    final markerSize = AppDimensions.mapPoiMarkerSize * 0.5;
     
     // Get device pixel ratio for sharp rendering on web high-DPI screens
     final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;
     
-    final marker = MarkerIcon(
-      iconWidget: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          SvgUtils.buildSharpSvg(
-            svgString: svgString,
-            width: markerSize * 2,
-            height: markerSize * 2,
-            devicePixelRatio: pixelRatio,
-            fit: BoxFit.contain,
-            clipBehavior: kIsWeb ? Clip.antiAlias : Clip.none,
-            key: const ValueKey('no_users_marker'),
-            allowDrawingOutsideViewBox: false,
-          ),
-          // Red question mark overlay icon
-          Positioned(
-            top: (markerSize * 2 * 0.1),
-            right: (markerSize * 2 * 0.1),
-            child: Container(
-              width: markerSize * 0.8,
-              height: markerSize * 0.8,
-              decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  '?',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: markerSize * 0.5,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    final marker = mapOperationsCubit.createNoUsersMarker(svgString, devicePixelRatio: pixelRatio);
 
     await _mapController.addMarker(
       mapCenter,

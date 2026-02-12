@@ -1,3 +1,8 @@
+import 'package:barter_app/theme/app_colors.dart';
+import 'package:barter_app/theme/app_dimensions.dart';
+import 'package:barter_app/utils/svg_utils.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/geo_utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -358,9 +363,27 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     _lastClusteringZoom = -1.0;
   }
 
+  /// Check if two lists of POIs are different
+  /// Returns true if the POIs have changed (different count or different user IDs)
+  static bool havePoisChanged(List<PointOfInterest> newPois, List<PointOfInterest> oldPois) {
+    // Different lengths means they've changed
+    if (newPois.length != oldPois.length) return true;
+
+    // If both are empty, nothing changed
+    if (newPois.isEmpty && oldPois.isEmpty) return false;
+
+    // Compare POI user IDs in order
+    for (int i = 0; i < newPois.length; i++) {
+      if (newPois[i].profile.userId != oldPois[i].profile.userId) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /// Check if main clustering should be performed based on POI changes and zoom level
   bool shouldPerformMainClustering(List<PointOfInterest> pois, double currentZoom) {
-    // If never clustered before, do it now
     if (_lastClusteredPoiIds.isEmpty) {
       return true;
     }
@@ -544,4 +567,136 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     return (closestItem, minDistance);
   }
 
+  /// Creates a marker icon for a main cluster
+  MarkerIcon createMainClusterMarker(PoiClusterOsm cluster) {
+    final poiCount = cluster.allPoisInCluster.length;
+
+    return MarkerIcon(
+      iconWidget: Container(
+        width: AppDimensions.mainClusterSize,
+        height: AppDimensions.mainClusterSize,
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.9),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white,
+            width: AppDimensions.mainClusterBorderWidth,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 3,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            poiCount.toString(),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: AppDimensions.mainClusterFontSize,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Creates a marker icon for a sub cluster
+  MarkerIcon createSubClusterMarker(PoiSubClusterOsm cluster) {
+    final poiCount = cluster.pois.length;
+
+    return MarkerIcon(
+      iconWidget: Container(
+        width: AppDimensions.subClusterSize,
+        height: AppDimensions.subClusterSize,
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.8),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white,
+            width: AppDimensions.subClusterBorderWidth,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.4),
+              blurRadius: 5,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            poiCount.toString(),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: AppDimensions.subClusterFontSize,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Creates a marker icon for when no users are nearby
+  /// [svgString] - the SVG content loaded from assets
+  /// [devicePixelRatio] - optional pixel ratio for sharp rendering on high-DPI screens
+  MarkerIcon createNoUsersMarker(String svgString, {double? devicePixelRatio}) {
+    final markerSize = AppDimensions.mapPoiMarkerSize * 0.5;
+
+    return MarkerIcon(
+      iconWidget: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          SvgUtils.buildSharpSvg(
+            svgString: svgString,
+            width: markerSize * 2,
+            height: markerSize * 2,
+            devicePixelRatio: devicePixelRatio,
+            fit: BoxFit.contain,
+            clipBehavior: kIsWeb ? Clip.antiAlias : Clip.none,
+            key: const ValueKey('no_users_marker'),
+            allowDrawingOutsideViewBox: false,
+          ),
+          // Red question mark overlay icon
+          Positioned(
+            top: (markerSize * 2 * 0.1),
+            right: (markerSize * 2 * 0.1),
+            child: Container(
+              width: markerSize * 0.8,
+              height: markerSize * 0.8,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  '?',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: markerSize * 0.5,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

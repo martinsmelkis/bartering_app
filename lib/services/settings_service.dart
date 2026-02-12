@@ -190,27 +190,6 @@ class SettingsService {
     return _prefs?.getString(_preferredLanguageKey);
   }
 
-  // --- Default Search Type Settings ---
-
-  /// Save the default search type
-  /// Options: 'complementary', 'similar', 'nearby'
-  Future<bool> setDefaultSearchType(String searchType) async {
-    final prefs = await _preferences;
-    return await prefs.setString(_defaultSearchTypeKey, searchType);
-  }
-
-  /// Get the default search type
-  /// Returns 'complementary' by default
-  Future<String> getDefaultSearchType() async {
-    final prefs = await _preferences;
-    return prefs.getString(_defaultSearchTypeKey) ?? defaultSearchType;
-  }
-
-  /// Get default search type synchronously
-  String getDefaultSearchTypeSync() {
-    return _prefs?.getString(_defaultSearchTypeKey) ?? defaultSearchType;
-  }
-
   // --- GPS Location Settings ---
 
   /// Save whether GPS location is enabled
