@@ -685,14 +685,7 @@
   "report": "Ziņot",
   "reviewSubmitted": "Atsauksme iesniegta!",
   "thankYouForFeedback": "Paldies par atsauksmēm!",
-  "reviewVisibilityNotice": "Jūsu atsauksme būs redzama pēc tam, kad {otherUserName} iesniegs savu atsauksmi, vai pēc 14 dienām.",
-  "@reviewVisibilityNotice": {
-    "placeholders": {
-      "otherUserName": {
-        "type": "String"
-      }
-    }
-  },
+  "reviewVisibilityNotice": "Jūsu atsauksme būs redzama pēc tam, kad otrs lietotājs iesniegs savu atsauksmi, vai pēc 14 dienām.",
   "ok": "Labi",
   "skipReviewTitle": "Izlaist atsauksmi?",
   "skipReviewMessage": "Jūs varat atsauksmēt šo lietotāju vēlāk no savas transakciju vēstures. Atsauksmes palīdz veidot uzticību kopienā.",

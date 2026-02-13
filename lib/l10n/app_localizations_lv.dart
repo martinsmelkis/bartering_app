@@ -2078,9 +2078,8 @@ class AppLocalizationsLv extends AppLocalizations {
   String get thankYouForFeedback => 'Paldies par atsauksmēm!';
 
   @override
-  String reviewVisibilityNotice(String otherUserName) {
-    return 'Jūsu atsauksme būs redzama pēc tam, kad $otherUserName iesniegs savu atsauksmi, vai pēc 14 dienām.';
-  }
+  String get reviewVisibilityNotice =>
+      'Jūsu atsauksme būs redzama pēc tam, kad otrs lietotājs iesniegs savu atsauksmi, vai pēc 14 dienām.';
 
   @override
   String get ok => 'Labi';

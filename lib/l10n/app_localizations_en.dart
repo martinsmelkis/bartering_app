@@ -2062,9 +2062,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get thankYouForFeedback => 'Thank you for your feedback!';
 
   @override
-  String reviewVisibilityNotice(String otherUserName) {
-    return 'Your review will be visible after $otherUserName submits their review, or in 14 days.';
-  }
+  String get reviewVisibilityNotice =>
+      'Your review will be visible after the other User submits their review, or in 14 days.';
 
   @override
   String get ok => 'OK';

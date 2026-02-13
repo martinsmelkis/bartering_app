@@ -155,7 +155,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      l10n.reviewVisibilityNotice(widget.otherUserName),
+                      l10n.reviewVisibilityNotice,
                       style: const TextStyle(fontSize: 12),
                     ),
                   ),

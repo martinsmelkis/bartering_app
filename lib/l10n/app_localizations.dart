@@ -4067,8 +4067,8 @@ abstract class AppLocalizations {
   /// No description provided for @reviewVisibilityNotice.
   ///
   /// In en, this message translates to:
-  /// **'Your review will be visible after {otherUserName} submits their review, or in 14 days.'**
-  String reviewVisibilityNotice(String otherUserName);
+  /// **'Your review will be visible after the other User submits their review, or in 14 days.'**
+  String get reviewVisibilityNotice;
 
   /// No description provided for @ok.
   ///

@@ -733,6 +733,7 @@ class AppLocalizationsMapper {
       'report': localizations.report,
       'reviewSubmitted': localizations.reviewSubmitted,
       'thankYouForFeedback': localizations.thankYouForFeedback,
+      'reviewVisibilityNotice': localizations.reviewVisibilityNotice,
       'ok': localizations.ok,
       'skipReviewTitle': localizations.skipReviewTitle,
       'skipReviewMessage': localizations.skipReviewMessage,
@@ -895,8 +896,6 @@ class AppLocalizationsMapper {
       'securityAnswerIncorrect': (attempts) =>
           localizations.securityAnswerIncorrect(attempts),
       'styleNumber': (number) => localizations.styleNumber(number),
-      'reviewVisibilityNotice': (otherUserName) =>
-          localizations.reviewVisibilityNotice(otherUserName),
       'reviewUser': (userName) => localizations.reviewUser(userName),
       'downloadingFile': (filename) => localizations.downloadingFile(filename),
       'downloadFailed': (error) => localizations.downloadFailed(error),

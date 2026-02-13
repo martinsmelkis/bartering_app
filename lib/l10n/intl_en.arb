@@ -681,14 +681,7 @@
   "report": "Report",
   "reviewSubmitted": "Review Submitted!",
   "thankYouForFeedback": "Thank you for your feedback!",
-  "reviewVisibilityNotice": "Your review will be visible after {otherUserName} submits their review, or in 14 days.",
-  "@reviewVisibilityNotice": {
-    "placeholders": {
-      "otherUserName": {
-        "type": "String"
-      }
-    }
-  },
+  "reviewVisibilityNotice": "Your review will be visible after the other User submits their review, or in 14 days.",
   "ok": "OK",
   "skipReviewTitle": "Skip Review?",
   "skipReviewMessage": "You can review this user later from your transaction history. Reviews help build trust in the community.",

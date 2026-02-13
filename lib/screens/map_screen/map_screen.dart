@@ -786,14 +786,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   OSMFlutter(
                     controller: _mapController,
                     osmOption: _isGpsLocationEnabled ? OSMOption(
-                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
+                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 5, maxZoomLevel: 17),
                         userTrackingOption: UserTrackingOption(
                           enableTracking: true,
                           unFollowUser: false,
                         ),
                         showContributorBadgeForOSM: true
                     ) : OSMOption(
-                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 2, maxZoomLevel: 19),
+                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 5, maxZoomLevel: 17),
                         showContributorBadgeForOSM: true
                     ),
                     onMapIsReady: _onMapReady,
