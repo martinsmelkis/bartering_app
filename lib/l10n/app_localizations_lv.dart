@@ -29,7 +29,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get category_yellow =>
-      'Saruna, sabiedriskas aktivitātes, ikdienas sarunas, vietējie pasākumi, jauni kontakti, komunikācija';
+      'Sarunas, sabiedriskas aktivitātes, ikdienas sarunas, vietējie pasākumi, jauni kontakti, komunikācija';
 
   @override
   String get category_orange =>
@@ -695,10 +695,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_creative_writing => 'Radošā rakstīšana';
 
   @override
-  String get attr_crocheting => 'Adīšana ar āķi';
+  String get attr_crocheting => 'Tamborēšana';
 
   @override
-  String get attr_cross_stitch => 'Krustaduriena';
+  String get attr_cross_stitch => 'Krustdūriena izšūšana';
 
   @override
   String get attr_dance => 'Dejas';
@@ -785,7 +785,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_machining => 'Metālveidošana';
 
   @override
-  String get attr_magic => 'Burvība';
+  String get attr_magic => 'Maģija';
 
   @override
   String get attr_makeup => 'Grims';
@@ -1151,7 +1151,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_handmade => 'Roku darbs';
 
   @override
-  String get attr_handyman_services => 'Meistar pakalpojumi';
+  String get attr_handyman_services => 'Santehniķa pakalpojumi';
 
   @override
   String get attr_hauling_services => 'Transporta pakalpojumi';
@@ -1169,7 +1169,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_language_exchange => 'Valodu apmaiņa';
 
   @override
-  String get attr_lawn_mowing => 'Zāliena pļaušana';
+  String get attr_lawn_mowing => 'Zāles pļaušana';
 
   @override
   String get attr_local_tours => 'Vietējās ekskursijas';
@@ -1319,19 +1319,19 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_environmentalism => 'Vides aizsardzība';
 
   @override
-  String get attr_fresh_vegetables => 'Svaigas dārzeņi';
+  String get attr_fresh_vegetables => 'Svaigi dārzeņi';
 
   @override
-  String get attr_fresh_fruits => 'Svaigas augļi';
+  String get attr_fresh_fruits => 'Svaigi augļi';
 
   @override
-  String get attr_fresh_herbs => 'Svaigas garšaugi';
+  String get attr_fresh_herbs => 'Svaigi garšaugi';
 
   @override
   String get attr_tea => 'Tēja';
 
   @override
-  String get attr_legal_advice => 'Juridiskie padomi';
+  String get attr_legal_advice => 'Juridiskā palīdzība';
 
   @override
   String get attr_cats => 'Kaķi';
@@ -1364,7 +1364,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_driving => 'Vadīšana';
 
   @override
-  String get attr_machinery_operation => 'Mašīnu vadīšana';
+  String get attr_machinery_operation => 'Smagā tehnika';
 
   @override
   String get attr_truck_driving => 'Kravas auto vadīšana';
@@ -1567,7 +1567,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get notSet => 'Nav iestatīts';
 
   @override
-  String get errorUpdatingFavorite => 'Kļūda iecienītā atjaunināšanā';
+  String get errorUpdatingFavorite => 'Kļūda iecienītā lietotāja atjaunināšanā';
 
   @override
   String get noAttributesToDisplay => 'Nav atribūtu, ko parādīt.';

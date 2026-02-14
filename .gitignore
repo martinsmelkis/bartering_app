@@ -56,3 +56,6 @@ android/app/google-services.json
 
 # Flavor-based dependency management
 pubspec.yaml.backup
+
+# FVM Version Cache
+.fvm/

@@ -43,11 +43,11 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final appModule = _$AppModule();
     gh.factory<_i205.ApiClient>(() => _i205.ApiClient.create());
-    gh.factory<_i607.SecureStorageService>(
-      () => _i607.SecureStorageService.new(),
-    );
     gh.factory<_i529.DeviceMigrationService>(
       () => _i529.DeviceMigrationService(),
+    );
+    gh.factory<_i607.SecureStorageService>(
+      () => _i607.SecureStorageService.new(),
     );
     await gh.singletonAsync<_i397.AppDatabase>(
       () => appModule.appDatabase,
