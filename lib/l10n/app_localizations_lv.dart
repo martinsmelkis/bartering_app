@@ -1562,11 +1562,16 @@ class AppLocalizationsLv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'atbilstoši lietotāji: $count',
-      one: 'atbilstošs lietotājs: $count',
-      zero: '0 atbilstošu lietotāju',
+      other: 'atbilstoši',
+      one: 'atbilstošs',
     );
-    return '$_temp0';
+    String _temp1 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'lietotāji',
+      one: 'lietotāji',
+    );
+    return '$count $_temp0 $_temp1';
   }
 
   @override
@@ -1574,11 +1579,16 @@ class AppLocalizationsLv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'atbilstoši sludinājumi: $count',
-      one: 'atbilstošs sludinājums: $count',
-      zero: '0 atbilstošu sludinājumu',
+      other: 'atbilstoši',
+      one: 'atbilstošs',
     );
-    return '$_temp0';
+    String _temp1 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'sludinājumi',
+      one: 'sludinājumi',
+    );
+    return '$count $_temp0 $_temp1';
   }
 
   @override
