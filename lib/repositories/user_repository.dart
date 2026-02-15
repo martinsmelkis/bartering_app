@@ -34,13 +34,31 @@ class UserRepository {
         await _secureStorageService.getProfileKeywordDataMap();
   }
 
-  /// Gets just the attribute names as strings (for backward compatibility)
+  /// Gets just the attribute keys as strings (for matching/communication purposes)
+  /// Use this for API calls and matching, NOT for display (use localization instead)
+  /// Backward compatible: derives keys from attributes for old stored data
+  Future<List<String>> getInterestKeys() async {
+    final interests = await getInterests();
+    return interests?.map((e) => e.effectiveAttributeKey).toList() ?? [];
+  }
+
+  /// Gets just the offering keys as strings (for matching/communication purposes)
+  /// Use this for API calls and matching, NOT for display (use localization instead)
+  /// Backward compatible: derives keys from attributes for old stored data
+  Future<List<String>> getOfferingKeys() async {
+    final offerings = await getOfferings();
+    return offerings?.map((e) => e.effectiveAttributeKey).toList() ?? [];
+  }
+
+  /// Gets just the attribute names as strings (for display purposes, localized)
+  /// @deprecated Use getInterestKeys() for matching and localize for display instead
   Future<List<String>> getInterestNames() async {
     final interests = await getInterests();
     return interests?.map((e) => e.attribute).toList() ?? [];
   }
 
-  /// Gets just the offering names as strings (for backward compatibility)
+  /// Gets just the offering names as strings (for display purposes, localized)
+  /// @deprecated Use getOfferingKeys() for matching and localize for display instead
   Future<List<String>> getOfferingNames() async {
     final offerings = await getOfferings();
     return offerings?.map((e) => e.attribute).toList() ?? [];

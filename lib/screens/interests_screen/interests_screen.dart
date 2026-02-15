@@ -73,11 +73,20 @@ class _InterestsViewState extends State<InterestsView> {
           } else {
             // Save the full ParsedAttributeData with all metadata
             List<ParsedAttributeData> finalList = List.empty(growable: true);
-            state.offersKeyList?.forEach((e) =>
+            state.offersKeyList?.forEach((e) {
+                // Use e.attributeKey if available (from API), otherwise derive from e.attribute
+                final key = e.effectiveAttributeKey;
+                // Use the API-provided display name (e.attribute) as-is for display
+                // AttributeBubble will use effectiveAttributeKey for translation lookup
                 finalList.add(
-                    ParsedAttributeData(uiStyleHint: e.uiStyleHint, relevancyScore: e.relevancyScore,
-                        attribute: TextUtils.getTranslatedOrNormalizedAttribute(e.attribute, context)))
-            );
+                    ParsedAttributeData(
+                        attributeKey: key,
+                        uiStyleHint: e.uiStyleHint,
+                        relevancyScore: e.relevancyScore,
+                        attribute: e.attribute, // Use API's localized display name directly
+                    )
+                );
+            });
             context.read<InterestsCubit>().updateOffersList(finalList);
             // In onboarding, continue to offers screen
             context.pushReplacement('/offers');
@@ -145,7 +154,7 @@ class _InterestsViewState extends State<InterestsView> {
                         );
 
                         return ChoiceChip(
-                          label: Text(TextUtils.getTranslatedOrNormalizedAttribute(interest.attribute, context)),
+                          label: Text(TextUtils.getTranslatedOrNormalizedAttribute(interest.effectiveAttributeKey, context)),
                           selected: isSelected,
                           onSelected: (selected) {
                             context
@@ -181,7 +190,7 @@ class _InterestsViewState extends State<InterestsView> {
                             context
                                 .read<InterestsCubit>()
                                 .addCustomKeyword(
-                            TextUtils.getTranslatedOrNormalizedAttribute(_customKeywordController.text, context));
+                            _customKeywordController.text.trim());
                             _customKeywordController.clear();
                           },
                         ),

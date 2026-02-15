@@ -8,6 +8,7 @@ part of 'parsed_attribute_data.dart';
 
 ParsedAttributeData _$ParsedAttributeDataFromJson(Map<String, dynamic> json) =>
     ParsedAttributeData(
+      attributeKey: json['attributeKey'] as String?,
       attribute: json['attribute'] as String,
       relevancyScore: (json['relevancyScore'] as num).toDouble(),
       uiStyleHint: json['uiStyleHint'] as String,
@@ -16,6 +17,7 @@ ParsedAttributeData _$ParsedAttributeDataFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ParsedAttributeDataToJson(
   ParsedAttributeData instance,
 ) => <String, dynamic>{
+  'attributeKey': instance.attributeKey,
   'attribute': instance.attribute,
   'relevancyScore': instance.relevancyScore,
   'uiStyleHint': instance.uiStyleHint,

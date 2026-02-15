@@ -69,10 +69,69 @@ class TextUtils {
     return text;
   }
 
-  /// Checks if there's a match between current user and POI
+  /// Normalizes text for attribute comparison by:
+  /// 1. Converting to lowercase
+  /// 2. Replacing spaces with underscores
+  /// 3. Trimming whitespace
+  /// 4. Removing diacritics (e.g., ā→a, š→s, ē→e, ž→z, etc.)
+  /// 
+  /// Use this for API-returned attributes (canonical keys).
+  static String normalizeAttributeId(String? text) {
+    if (text == null || text.isEmpty) return '';
+    
+    var normalized = text.toLowerCase().trim().replaceAll(' ', '_');
+    
+    // Remove diacritics by mapping accented characters to their base forms
+    final diacriticMap = {
+      // Latin extended A
+      'ā': 'a', 'ă': 'a', 'ą': 'a', 'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a',
+      'ć': 'c', 'č': 'c', 'ç': 'c',
+      'đ': 'd', 'ď': 'd',
+      'ē': 'e', 'ė': 'e', 'ę': 'e', 'ě': 'e', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
+      'ģ': 'g', 'ğ': 'g',
+      'ī': 'i', 'į': 'i', 'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i',
+      'ķ': 'k',
+      'ļ': 'l', 'ł': 'l', 'ľ': 'l', 'ĺ': 'l',
+      'ņ': 'n', 'ň': 'n', 'ñ': 'n', 'ń': 'n',
+      'ō': 'o', 'ő': 'o', 'ø': 'o', 'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o',
+      'ř': 'r', 'ŗ': 'r',
+      'š': 's', 'ś': 's', 'ş': 's', 'ș': 's',
+      'ť': 't', 'ţ': 't', 'ț': 't',
+      'ū': 'u', 'ų': 'u', 'ů': 'u', 'ű': 'u', 'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u',
+      'ž': 'z', 'ź': 'z', 'ż': 'z',
+      'æ': 'ae', 'œ': 'oe', 'ß': 'ss',
+    };
+    
+    for (final entry in diacriticMap.entries) {
+      normalized = normalized.replaceAll(entry.key, entry.value);
+    }
+    
+    return normalized;
+  }
+
+  /// Normalizes custom user-entered attribute text for use as a key.
+  /// Unlike normalizeAttributeId, this PRESERVES diacritics so that
+  /// custom attributes like "Zemeņu vākšana" can match between users
+  /// who entered the exact same text.
+  /// 
+  /// Only performs:
+  /// 1. Converting to lowercase
+  /// 2. Replacing spaces with underscores  
+  /// 3. Trimming whitespace
+  static String normalizeCustomAttributeKey(String? text) {
+    if (text == null || text.isEmpty) return '';
+    
+    // Just lowercase, trim, and replace spaces with underscores
+    // DO NOT remove diacritics - we want "Zemeņu vākšana" to stay as "zemeņu_vākšana"
+    return text.toLowerCase().trim().replaceAll(' ', '_');
+  }
   /// Returns true if:
   /// - Current user's interests match POI's offerings (type == 1), OR
   /// - Current user's offerings match POI's interests (type != 1)
+  /// 
+  /// NOTE: This method attempts to match using both canonical keys (effectiveAttributeKey)
+  /// and display names (attribute) because POI data may contain localized display text
+  /// in attributeId field rather than canonical keys.
   static bool checkForAttributeBarterMatch(PointOfInterest poi,
       List<ParsedAttributeData>? interests, List<ParsedAttributeData>? offers) {
     // Return false if both are null
@@ -83,22 +142,50 @@ class TextUtils {
     // Get POI's interests (type != 1) and offerings (type == 1)
     final poiInterests = poi.profile.attributes
         ?.where((attr) => attr.type != 1)
-        .map((attr) => attr.attributeId.replaceAll("_", " "))
-        .toSet() ?? {};
+        .toList() ?? [];
     final poiOfferings = poi.profile.attributes
         ?.where((attr) => attr.type == 1)
-        .map((attr) => attr.attributeId.replaceAll("_", " "))
-        .toSet() ?? {};
+        .toList() ?? [];
+    
+    // Create sets of normalized POI attributeIds (these might be canonical keys OR display names)
+    final poiInterestIds = poiInterests.map((attr) => normalizeAttributeId(attr.attributeId)).toSet();
+    final poiOfferingIds = poiOfferings.map((attr) => normalizeAttributeId(attr.attributeId)).toSet();
 
-    // Check if current user's interests match POI's offerings (only if interests is not null)
-    final userInterestsMatchPoiOfferings = interests?.any((id) =>
-        poiOfferings.contains(id.attribute.toLowerCase())) ?? false;
+    debugPrint('@@@@@ POI offerings: ${poiOfferingIds.take(3)} User offer keys: ${offers?.map((o) => normalizeAttributeId(o.effectiveAttributeKey)).take(3)}');
+    debugPrint('@@@@@ POI interests: ${poiInterestIds.take(3)} User interest keys: ${interests?.map((i) => normalizeAttributeId(i.effectiveAttributeKey)).take(3)}');
 
-    // Check if current user's offerings match POI's interests (only if offers is not null)
-    final userOfferingsMatchPoiInterests = offers?.any((id) =>
-        poiInterests.contains(id.attribute.toLowerCase())) ?? false;
+    // Strategy 1: Match by canonical key (effectiveAttributeKey vs POI attributeId)
+    // This works when POI has canonical keys like "artificial_intelligence"
+    final userInterestsMatchByKey = interests?.any((id) =>
+        poiOfferingIds.contains(normalizeAttributeId(id.effectiveAttributeKey))) ?? false;
+    final userOffersMatchByKey = offers?.any((id) =>
+        poiInterestIds.contains(normalizeAttributeId(id.effectiveAttributeKey))) ?? false;
+    
+    if (userInterestsMatchByKey || userOffersMatchByKey) {
+      debugPrint('@@@@@@ Match found by canonical key!');
+      return true;
+    }
+    
+    // Strategy 2: Match by display name (attribute vs POI attributeId)
+    // This handles the case where POI's attributeId is localized text like "Mākslīgais intelekts"
+    // and user's display name is also "Mākslīgais intelekts"
+    final userInterestDisplayNames = interests?.map((i) => normalizeAttributeId(i.attribute)).toSet() ?? {};
+    final userOfferDisplayNames = offers?.map((o) => normalizeAttributeId(o.attribute)).toSet() ?? {};
+    
+    // Check if any POI offering matches user's interest by display name
+    final poiOfferingsMatchUserInterests = poiOfferings.any((poiAttr) =>
+        userInterestDisplayNames.contains(normalizeAttributeId(poiAttr.attributeId)));
+    // Check if any POI interest matches user's offering by display name  
+    final poiInterestsMatchUserOffers = poiInterests.any((poiAttr) =>
+        userOfferDisplayNames.contains(normalizeAttributeId(poiAttr.attributeId)));
+    
+    if (poiOfferingsMatchUserInterests || poiInterestsMatchUserOffers) {
+      debugPrint('@@@@@@ Match found by display name!');
+      return true;
+    }
 
-    return userInterestsMatchPoiOfferings || userOfferingsMatchPoiInterests;
+    debugPrint('@@@@@@ No match found');
+    return false;
   }
 
 }

@@ -71,12 +71,13 @@ class AttributeBubble extends StatelessWidget {
     try {
       final dynamic attr = attribute;
       
-      // Try ParsedAttributeData first (has 'attribute' property)
+      // Try ParsedAttributeData first (has 'effectiveAttributeKey' getter)
       try {
-        final attrName = attr.attribute;
-        if (attrName != null && attrName is String) {
+        final attrKey = attr.effectiveAttributeKey;
+        if (attrKey != null && attrKey is String && attrKey.isNotEmpty) {
+          // Use effectiveAttributeKey for translation lookup (backward compatible)
           attributeText = TextUtils.getTranslatedOrNormalizedAttribute(
-            attrName,
+            attrKey,
             context,
           );
           uiStyleHint = attr.uiStyleHint?.toString();

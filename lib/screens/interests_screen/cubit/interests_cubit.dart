@@ -44,19 +44,21 @@ class InterestsCubit extends Cubit<InterestsState> {
     final List<String> customKeywords = [];
 
     for (var saved in savedInterests) {
-      // Check if this interest exists in the allInterests list (case-insensitive)
+      // Check if this interest exists in the allInterests list using effectiveAttributeKey
+      // for consistent matching across languages (effectiveAttributeKey doesn't change with locale)
+      // Backward compatible: falls back to normalizing attribute if attributeKey is null
       final matchIndex = allCachedInterests?.indexWhere(
             (interest) =>
-        interest.attribute.toLowerCase().replaceAll("_", " ").trim() ==
-            saved.attribute.toLowerCase().replaceAll("_", " ").trim(),
+        interest.effectiveAttributeKey.toLowerCase().trim() ==
+            saved.effectiveAttributeKey.toLowerCase().trim(),
       );
 
       if (matchIndex != -1 && allCachedInterests != null) {
         // It exists in predefined interests, select it
         selectedInterests.add(allCachedInterests[matchIndex!]);
       } else {
-        // It's a custom keyword
-        customKeywords.add(TextUtils.normalizeSnakeCase(saved.attribute));
+        // It's a custom keyword - use the display name (attribute) as-is for UI
+        customKeywords.add(saved.attribute);
       }
     }
 
@@ -135,11 +137,16 @@ class InterestsCubit extends Cubit<InterestsState> {
       }
 
       // Convert to ParsedAttributeData for storage (user-defined, so no specific category)
+      // attributeKey is normalized for consistent matching across languages
       final interestsData = interestsMapToSubmit
           .entries
           .map((entry) {
+        // For custom user-entered attributes, preserve diacritics so "Zemeņu vākšana" 
+        // can match between users who entered the same custom text
+        final normalizedKey = TextUtils.normalizeCustomAttributeKey(entry.key);
         return ParsedAttributeData(
-          attribute: entry.key,
+          attributeKey: normalizedKey.isNotEmpty ? normalizedKey : entry.key.toLowerCase().replaceAll(' ', '_'),
+          attribute: entry.key, // Display name (user input - preserves diacritics)
           relevancyScore: 1.0 - (entry.value * 0.02),
           uiStyleHint: interestsMap[entry.key] ?? 'user_defined', // User manually selected/added these
         );

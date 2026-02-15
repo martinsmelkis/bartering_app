@@ -139,7 +139,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                         );
 
                         return ChoiceChip(
-                          label: Text(offer.attribute),
+                          label: Text(TextUtils.getTranslatedOrNormalizedAttribute(offer.effectiveAttributeKey, context)),
                           selected: isSelected,
                           onSelected: (selected) {
                             context
@@ -175,7 +175,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                             context
                                 .read<OffersCubit>()
                                 .addCustomKeyword(
-                                TextUtils.getTranslatedOrNormalizedAttribute(_customKeywordController.text, context));
+                                _customKeywordController.text.trim());
                             _customKeywordController.clear();
                           },
                         ),

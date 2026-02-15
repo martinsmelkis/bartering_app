@@ -28,9 +28,12 @@ class OffersCubit extends Cubit<OffersState> {
     if (savedOffers == null || savedOffers.isEmpty) return;
 
     emit(state.copyWith(allOffers: (await _userRepository.getOfferings())?.map(
-          (e) => ParsedAttributeData(attribute: TextUtils.normalizeSnakeCase(e.attribute),
+          (e) => ParsedAttributeData(
+              attributeKey: e.effectiveAttributeKey,
+              attribute: e.attribute, // Pass through display name as-is, AttributeBubble handles translation
               relevancyScore: e.relevancyScore,
-              uiStyleHint: e.uiStyleHint)).toList()));
+              uiStyleHint: e.uiStyleHint,
+          )).toList()));
 
     // If allOffers is empty, all saved items are treated as custom
     if (state.allOffers.isEmpty) {
@@ -44,19 +47,20 @@ class OffersCubit extends Cubit<OffersState> {
     final List<String> customKeywords = [];
 
     for (var saved in savedOffers) {
-      // Check if this offer exists in the allOffers list (case-insensitive)
+      // Check if this offer exists in the allOffers list using effectiveAttributeKey
+      // for consistent matching across languages (attributeKey doesn't change with locale)
       final matchIndex = state.allOffers.indexWhere(
             (offer) =>
-            offer.attribute.toLowerCase().replaceAll("_", " ").trim() ==
-                saved.attribute.toLowerCase().replaceAll("_", " ").trim(),
+            offer.effectiveAttributeKey.toLowerCase().trim() ==
+                saved.effectiveAttributeKey.toLowerCase().trim(),
       );
 
       if (matchIndex != -1) {
         // It exists in predefined offers, select it
         selectedOffers.add(state.allOffers[matchIndex]);
       } else {
-        // It's a custom keyword
-        customKeywords.add(TextUtils.normalizeSnakeCase(saved.attribute));
+        // It's a custom keyword - use display name as-is for UI
+        customKeywords.add(saved.attribute);
       }
     }
 
@@ -135,8 +139,12 @@ class OffersCubit extends Cubit<OffersState> {
           .entries
           .map((entry) {
         logDebug('@@@@@@@@@@@ offersMap get offersMap ${entry.key} ${offersMap[entry.key]}');
+        // For custom user-entered attributes, preserve diacritics so "Zemeņu vākšana" 
+        // can match between users who entered the same custom text
+        final normalizedKey = TextUtils.normalizeCustomAttributeKey(entry.key);
         return ParsedAttributeData(
-          attribute: entry.key,
+          attributeKey: normalizedKey.isNotEmpty ? normalizedKey : entry.key.toLowerCase().replaceAll(' ', '_'),
+          attribute: entry.key, // Display name (user input - preserves diacritics)
           relevancyScore: 1.0 - (entry.value * 0.02),
           uiStyleHint: offersMap[entry.key] ?? 'user_defined', // User manually selected/added these
         );

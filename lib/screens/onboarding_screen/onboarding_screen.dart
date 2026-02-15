@@ -194,14 +194,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               debugPrint('@@@@@@@@@@@ Handling success status');
               // Save the full ParsedAttributeData with all metadata
               List<ParsedAttributeData> finalList = List.empty(growable: true);
-              state.interestsKeyList?.forEach((e) =>
+              state.interestsKeyList?.forEach((e) {
+                  // Use e.attributeKey if available (from API), otherwise derive from e.attribute
+                  final key = e.effectiveAttributeKey;
+                  // Use the API-provided display name (e.attribute) as-is for display
+                  // AttributeBubble will use effectiveAttributeKey for translation lookup
                   finalList.add(
-                      ParsedAttributeData(uiStyleHint: e.uiStyleHint,
+                      ParsedAttributeData(
+                          attributeKey: key,
+                          uiStyleHint: e.uiStyleHint,
                           relevancyScore: e.relevancyScore,
-                          attribute: TextUtils
-                              .getTranslatedOrNormalizedAttribute(
-                              e.attribute, context)))
-              );
+                          attribute: e.attribute, // Use API's localized display name directly
+                      )
+                  );
+              });
               context.read<OnboardingCubit>().updateInterestsList(finalList);
 
               // Use a post-frame callback to ensure clean navigation

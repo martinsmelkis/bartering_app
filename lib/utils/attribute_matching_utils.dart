@@ -14,16 +14,21 @@ class AttributeMatchingUtils {
       final currentUserInterests = await userRepository.getInterests();
       final currentUserOffers = await userRepository.getOfferings();
 
-      // Normalize/translate the current user's attributes using the same method
-      // that will be used for POI attributes, ensuring proper comparison
+      // Normalize/translate the current user's attributes using effectiveAttributeKey
+      // for consistent matching across all languages, regardless of display language
+      // (backward compatible: falls back to normalizing attribute if attributeKey is null)
       final interestIds = currentUserInterests
-          ?.map((attr) => TextUtils.getTranslatedOrNormalizedAttribute(
-              attr.attribute, context))
+          ?.map((attr) {
+            String key = attr.effectiveAttributeKey;
+            return TextUtils.getTranslatedOrNormalizedAttribute(key, context);
+          })
           .toList() ?? [];
       
       final offerIds = currentUserOffers
-          ?.map((attr) => TextUtils.getTranslatedOrNormalizedAttribute(
-              attr.attribute, context))
+          ?.map((attr) {
+            String key = attr.effectiveAttributeKey;
+            return TextUtils.getTranslatedOrNormalizedAttribute(key, context);
+          })
           .toList() ?? [];
 
       return UserAttributesMatch(
