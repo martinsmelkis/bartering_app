@@ -13,7 +13,9 @@ import 'package:barter_app/screens/pin_input_screen/pin_verification_screen.dart
 import 'package:barter_app/screens/settings_screen/settings_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dart';
 import 'package:barter_app/screens/welcome_screen/welcome_screen.dart';
+import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -124,6 +126,32 @@ class AppRouter {
           }
           logDebug('@@@@@@@@@ Map route - No initialPois, using default MapScreenV2');
           return const MapScreenV2();
+        },
+        redirect: (context, state) async {
+          // Check if user is properly initialized
+          final userRepository = getIt<UserRepository>();
+          final userId = await userRepository.getUserId();
+          if (userId == null || userId.isEmpty) {
+            logDebug('🛡️ Router guard: User not initialized, redirecting to initialize');
+            return '/initialize';
+          }
+          
+          // On web platforms, also check if PIN verification is required
+          if (kIsWeb) {
+            final settingsService = getIt<SettingsService>();
+            final pinEnabled = await settingsService.isPinEnabled();
+            if (pinEnabled) {
+              // Check if PIN was verified in this session by looking at the extra data
+              final extra = state.extra;
+              final pinVerified = extra is Map<String, dynamic> && extra['pinVerified'] == true;
+              if (!pinVerified) {
+                logDebug('🛡️ Router guard: PIN enabled but not verified in this session, redirecting to verify-pin');
+                return '/verify-pin';
+              }
+            }
+          }
+          
+          return null; // Allow navigation
         },
       ),
 

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -84,32 +85,35 @@ class _PinInputScreenState extends State<PinInputScreen> {
   }
 
   Widget _buildNumpad() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: ['1', '2', '3'].map((n) => _buildNumberButton(n)).toList(),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: ['4', '5', '6'].map((n) => _buildNumberButton(n)).toList(),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: ['7', '8', '9'].map((n) => _buildNumberButton(n)).toList(),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            const SizedBox(width: 72, height: 72), // Placeholder for alignment
-            _buildNumberButton('0'),
-            _buildBackspaceButton(),
-          ],
-        ),
-      ],
+    return Container(
+      width: kIsWeb ? 350 : null,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: ['1', '2', '3'].map((n) => _buildNumberButton(n)).toList(),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: ['4', '5', '6'].map((n) => _buildNumberButton(n)).toList(),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: ['7', '8', '9'].map((n) => _buildNumberButton(n)).toList(),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(width: 72, height: 72), // Placeholder for alignment
+              _buildNumberButton('0'),
+              _buildBackspaceButton(),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

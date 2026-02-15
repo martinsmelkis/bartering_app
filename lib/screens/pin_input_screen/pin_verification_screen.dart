@@ -1,6 +1,7 @@
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/security_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../l10n/app_localizations.dart';
@@ -52,8 +53,12 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
       if (mounted) {
         if (verifiedPIN) {
           logDebug('@@@@@@@@@ PIN verification successful - navigating to map');
-          // PIN correct - navigate to map
-          context.go('/map');
+          // PIN correct - navigate to map with pinVerified flag for web platforms
+          if (kIsWeb) {
+            context.go('/map', extra: {'pinVerified': true});
+          } else {
+            context.go('/map');
+          }
           
           // Handle any pending notification after successful PIN verification
           // Use a delay to ensure map screen is fully mounted and router is ready
@@ -146,32 +151,35 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
   }
 
   Widget _buildNumpad() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: ['1', '2', '3'].map((n) => _buildNumberButton(n)).toList(),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: ['4', '5', '6'].map((n) => _buildNumberButton(n)).toList(),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: ['7', '8', '9'].map((n) => _buildNumberButton(n)).toList(),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            const SizedBox(width: 72, height: 72), // Placeholder for alignment
-            _buildNumberButton('0'),
-            _buildBackspaceButton(),
-          ],
-        ),
-      ],
+    return Container(
+      width: kIsWeb ? 350 : null,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: ['1', '2', '3'].map((n) => _buildNumberButton(n)).toList(),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: ['4', '5', '6'].map((n) => _buildNumberButton(n)).toList(),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: ['7', '8', '9'].map((n) => _buildNumberButton(n)).toList(),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(width: 72, height: 72), // Placeholder for alignment
+              _buildNumberButton('0'),
+              _buildBackspaceButton(),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

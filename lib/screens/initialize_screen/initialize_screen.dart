@@ -2,6 +2,7 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -46,10 +47,14 @@ class SplashView extends StatelessWidget {
               context.go('/verify-pin');
             }
           } else {
-            // PIN not enabled - go directly to map
+            // PIN not enabled - go directly to map (with pinVerified flag for web)
             logDebug('@@@@@@@@@ PIN is disabled - navigating directly to map');
             if (context.mounted) {
-              context.go('/map');
+              if (kIsWeb) {
+                context.go('/map', extra: {'pinVerified': true});
+              } else {
+                context.go('/map');
+              }
             }
           }
         } else if (state is InitializeStateUnregistered) {
