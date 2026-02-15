@@ -1555,7 +1555,31 @@ class AppLocalizationsLv extends AppLocalizations {
   String get ninetyNinePlus => '99+';
 
   @override
-  String get userPrefix => 'Lietotājs';
+  String get userDetails => 'Lietotāja informācija';
+
+  @override
+  String matchingUsersFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'atbilstoši lietotāji: $count',
+      one: 'atbilstošs lietotājs: $count',
+      zero: '0 atbilstošu lietotāju',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String matchingPostingsFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'atbilstoši sludinājumi: $count',
+      one: 'atbilstošs sludinājums: $count',
+      zero: '0 atbilstošu sludinājumu',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get today => 'Šodien';
@@ -1577,6 +1601,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get errorLoadingAttributes => 'Kļūda atribūtu ielādē';
+
+  @override
+  String get userPrefix => 'Lietotājs';
 
   @override
   String get activePostings => 'Aktīvie sludinājumi';

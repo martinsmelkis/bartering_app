@@ -510,10 +510,27 @@
   "errorLoadingChats": "Kļūda sarunu ielādē",
   "couldNotFindChatParticipant": "Neizdevās atrast sarunas dalībnieku",
   "errorDeletingConversation": "Kļūda sarunas dzēšanā",
+  "userPrefix": "Lietotājs",
   "unknownUser": "Nezināms lietotājs",
   "noMessagesYet": "Vēl nav ziņojumu",
   "ninetyNinePlus": "99+",
-  "userPrefix": "Lietotājs",
+  "userDetails": "Lietotāja informācija",
+  "matchingUsersFound": "{count, plural, =0{0 atbilstošu lietotāju} =1{atbilstošs lietotājs: {count}} other{atbilstoši lietotāji: {count}}}",
+  "@matchingUsersFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchingPostingsFound": "{count, plural, =0{0 atbilstošu sludinājumu} =1{atbilstošs sludinājums: {count}} other{atbilstoši sludinājumi: {count}}}",
+  "@matchingPostingsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "today": "Šodien",
   "yesterday": "Vakar",
   "notSet": "Nav iestatīts",

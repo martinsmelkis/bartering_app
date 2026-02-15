@@ -512,7 +512,23 @@
   "unknownUser": "Unknown User",
   "noMessagesYet": "No messages yet",
   "ninetyNinePlus": "99+",
-  "userPrefix": "User",
+  "userDetails": "User Details",
+  "matchingUsersFound": "{count} matching {count, plural, =1{user} other{users}} found",
+  "@matchingUsersFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchingPostingsFound": "{count} matching {count, plural, =1{posting} other{postings}} found",
+  "@matchingPostingsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "today": "Today",
   "yesterday": "Yesterday",
   "notSet": "Not set",
@@ -520,6 +536,7 @@
   "noAttributesToDisplay": "No attributes to display.",
   "errorLoadingPostings": "Error loading postings",
   "errorLoadingAttributes": "Error loading attributes",
+  "userPrefix": "User",
   "activePostings": "Active Postings",
   "posting": "Posting",
   "postings": "Postings",

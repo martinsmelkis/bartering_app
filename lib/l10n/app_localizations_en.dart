@@ -1542,7 +1542,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ninetyNinePlus => '99+';
 
   @override
-  String get userPrefix => 'User';
+  String get userDetails => 'User Details';
+
+  @override
+  String matchingUsersFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'users',
+      one: 'user',
+    );
+    return '$count matching $_temp0 found';
+  }
+
+  @override
+  String matchingPostingsFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'postings',
+      one: 'posting',
+    );
+    return '$count matching $_temp0 found';
+  }
 
   @override
   String get today => 'Today';
@@ -1564,6 +1586,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorLoadingAttributes => 'Error loading attributes';
+
+  @override
+  String get userPrefix => 'User';
 
   @override
   String get activePostings => 'Active Postings';

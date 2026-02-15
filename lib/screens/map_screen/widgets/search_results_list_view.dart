@@ -457,7 +457,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          poi.profile.name,
+                          poi.profile.name.startsWith('User_')
+                              ? poi.profile.name.replaceFirst('User_', l10n.userPrefix + ' ')
+                              : poi.profile.name,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -725,8 +727,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                           children: [
                             Text(
                               _viewMode == ViewMode.users
-                                  ? '${sortedPois.length} matching ${sortedPois.length == 1 ? 'user' : 'users'} found'
-                                  : '${_allPostings.length} matching ${_allPostings.length == 1 ? 'posting' : 'postings'} found',
+                                  ? l10n.matchingUsersFound(sortedPois.length)
+                                  : l10n.matchingPostingsFound(_allPostings.length),
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -816,8 +818,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                           Expanded(
                             child: Text(
                               _viewMode == ViewMode.users
-                                  ? '${sortedPois.length} matching ${sortedPois.length == 1 ? 'user' : 'users'} found'
-                                  : '${_allPostings.length} matching ${_allPostings.length == 1 ? 'posting' : 'postings'} found',
+                                  ? l10n.matchingUsersFound(sortedPois.length)
+                                  : l10n.matchingPostingsFound(_allPostings.length),
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -979,6 +981,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   }
 
   Widget _buildPoiListItem(BuildContext context, PointOfInterest poi) {
+    final l10n = AppLocalizations.of(context)!;
     final isExpanded = _expandedUserIds.contains(poi.profile.userId);
     
     return InkWell(
@@ -999,7 +1002,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               children: [
                 Expanded(
                   child: Text(
-                    poi.profile.name,
+                    poi.profile.name.startsWith('User_')
+                        ? poi.profile.name.replaceFirst('User_', l10n.userPrefix + ' ')
+                        : poi.profile.name,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

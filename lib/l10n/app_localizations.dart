@@ -3068,11 +3068,23 @@ abstract class AppLocalizations {
   /// **'99+'**
   String get ninetyNinePlus;
 
-  /// No description provided for @userPrefix.
+  /// No description provided for @userDetails.
   ///
   /// In en, this message translates to:
-  /// **'User'**
-  String get userPrefix;
+  /// **'User Details'**
+  String get userDetails;
+
+  /// No description provided for @matchingUsersFound.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} matching {count, plural, =1{user} other{users}} found'**
+  String matchingUsersFound(int count);
+
+  /// No description provided for @matchingPostingsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} matching {count, plural, =1{posting} other{postings}} found'**
+  String matchingPostingsFound(int count);
 
   /// No description provided for @today.
   ///
@@ -3115,6 +3127,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error loading attributes'**
   String get errorLoadingAttributes;
+
+  /// No description provided for @userPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get userPrefix;
 
   /// No description provided for @activePostings.
   ///

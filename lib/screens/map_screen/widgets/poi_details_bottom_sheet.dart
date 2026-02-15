@@ -709,7 +709,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
-                          'User Details',
+                          l10n.userDetails,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15,
@@ -788,7 +788,9 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        widget.poi.profile.name +
+                                        (widget.poi.profile.name.startsWith('User_')
+                                            ? widget.poi.profile.name.replaceFirst('User_', l10n.userPrefix + ' ')
+                                            : widget.poi.profile.name) +
                                             (((widget.poi.matchRelevancyScore ?? 0) > 0
                                                 && (widget.poi.matchRelevancyScore ?? 1) < 1)
                                                 ? " (" + (((widget.poi.matchRelevancyScore ?? 0) * 100))

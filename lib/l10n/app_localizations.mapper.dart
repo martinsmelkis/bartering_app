@@ -561,7 +561,7 @@ class AppLocalizationsMapper {
       'unknownUser': localizations.unknownUser,
       'noMessagesYet': localizations.noMessagesYet,
       'ninetyNinePlus': localizations.ninetyNinePlus,
-      'userPrefix': localizations.userPrefix,
+      'userDetails': localizations.userDetails,
       'today': localizations.today,
       'yesterday': localizations.yesterday,
       'notSet': localizations.notSet,
@@ -896,6 +896,9 @@ class AppLocalizationsMapper {
       'securityAnswerIncorrect': (attempts) =>
           localizations.securityAnswerIncorrect(attempts),
       'styleNumber': (number) => localizations.styleNumber(number),
+      'matchingUsersFound': (count) => localizations.matchingUsersFound(count),
+      'matchingPostingsFound': (count) =>
+          localizations.matchingPostingsFound(count),
       'reviewUser': (userName) => localizations.reviewUser(userName),
       'downloadingFile': (filename) => localizations.downloadingFile(filename),
       'downloadFailed': (error) => localizations.downloadFailed(error),
