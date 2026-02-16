@@ -256,7 +256,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                         ),
                       ),
-                      SizedBox(height: 24),
+                      SizedBox(height: 32),
                       // How it works section
                       Container(
                         constraints: BoxConstraints(
@@ -319,6 +319,24 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               l10n.welcomeStep4Description,
                             ),
                           ],
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      // Import Existing Account link
+                      GestureDetector(
+                        onTap: () {
+                          if (context.mounted) {
+                            context.go('/device-migration');
+                          }
+                        },
+                        child: Text(
+                          'Import Existing Account',
+                          style: TextStyle(
+                            fontSize: context.bodyFontSize / fontScale,
+                            color: Colors.white.withValues(alpha: 0.9),
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.white.withValues(alpha: 0.9),
+                          ),
                         ),
                       ),
                     ],

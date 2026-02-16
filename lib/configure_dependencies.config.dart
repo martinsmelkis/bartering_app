@@ -12,6 +12,8 @@
 import 'package:barter_app/data/local/app_database.dart' as _i397;
 import 'package:barter_app/repositories/chat_repository.dart' as _i1006;
 import 'package:barter_app/repositories/user_repository.dart' as _i33;
+import 'package:barter_app/screens/device_migration_screen/cubit/device_migration_cubit.dart'
+    as _i199;
 import 'package:barter_app/screens/initialize_screen/initialize_cubit.dart'
     as _i646;
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart'
@@ -43,9 +45,6 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final appModule = _$AppModule();
     gh.factory<_i205.ApiClient>(() => _i205.ApiClient.create());
-    gh.factory<_i529.DeviceMigrationService>(
-      () => _i529.DeviceMigrationService(),
-    );
     gh.factory<_i607.SecureStorageService>(
       () => _i607.SecureStorageService.new(),
     );
@@ -61,6 +60,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i568.NotificationsCubit>(
       () => _i568.NotificationsCubit(gh<_i205.ApiClient>()),
     );
+    gh.factory<_i529.DeviceMigrationService>(
+      () => _i529.DeviceMigrationService(
+        gh<_i607.SecureStorageService>(),
+        gh<_i205.ApiClient>(),
+      ),
+    );
     gh.factory<String>(
       () => appModule.serviceBaseUrl,
       instanceName: 'serviceBaseUrl',
@@ -75,6 +80,13 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i838.InterestsCubit(
         gh<_i205.ApiClient>(),
         gh<_i33.UserRepository>(),
+      ),
+    );
+    gh.factory<_i199.DeviceMigrationCubit>(
+      () => _i199.DeviceMigrationCubit(
+        gh<_i529.DeviceMigrationService>(),
+        gh<_i607.SecureStorageService>(),
+        gh<_i205.ApiClient>(),
       ),
     );
     gh.factory<_i646.InitializeCubit>(

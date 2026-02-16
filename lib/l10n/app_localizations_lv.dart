@@ -2614,4 +2614,111 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get shareYourInterestsToFindBestMatches =>
       'Dalieties ar savām interesēm, lai atrastu labākās atbilstības ar citiem!';
+
+  @override
+  String get migrateToNewDevice => 'Migrate to New Device';
+
+  @override
+  String get migrateYourAccount => 'Migrate Your Account';
+
+  @override
+  String get migrationCodeDescription =>
+      'Generate a migration code to transfer your account data to a new device. The code will be valid for 15 minutes.';
+
+  @override
+  String get generateMigrationCode => 'Generate Migration Code';
+
+  @override
+  String get generating => 'Generating...';
+
+  @override
+  String get yourMigrationCode => 'Your Migration Code';
+
+  @override
+  String expiresIn(String time) {
+    return 'Expires in: $time';
+  }
+
+  @override
+  String get copyCode => 'Copy Code';
+
+  @override
+  String get codeCopied => 'Migration code copied to clipboard';
+
+  @override
+  String get generateNewCode => 'Generate New Code';
+
+  @override
+  String get migrationStep1 => 'Generate a migration code';
+
+  @override
+  String get migrationStep2 => 'Open the app on your new device';
+
+  @override
+  String get migrationStep3 =>
+      'Tap \"Import Existing Account\" on the welcome screen';
+
+  @override
+  String get migrationStep4 => 'Enter this code on the new device';
+
+  @override
+  String get newDeviceDetected => 'New Device Detected';
+
+  @override
+  String get newDeviceDetectedMessage =>
+      'A new device wants to import your account data. Do you want to allow this?';
+
+  @override
+  String get deny => 'Deny';
+
+  @override
+  String get allow => 'Allow';
+
+  @override
+  String get migrationDenied => 'Migration denied by user';
+
+  @override
+  String get migrationCompleted => 'Migration completed successfully!';
+
+  @override
+  String get failedToSendMigration => 'Failed to send migration data';
+
+  @override
+  String get migrationCodeExpired =>
+      'Migration code has expired. Please generate a new one.';
+
+  @override
+  String get targetDeviceTimeout => 'Target device did not join in time';
+
+  @override
+  String get expired => 'Expired';
+
+  @override
+  String get importAccount => 'Import Account';
+
+  @override
+  String get importAccountDescription =>
+      'Enter the 10-character migration code from your other device to import your account data.';
+
+  @override
+  String get failedToJoinMigration => 'Failed to join migration session';
+
+  @override
+  String get migrationTimedOut =>
+      'Migration timed out. Please try again with a new code.';
+
+  @override
+  String get failedToProcessMigration => 'Failed to process migration data';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get targetStep1 => 'Open the app on your other device';
+
+  @override
+  String get targetStep2 => 'Go to Settings → Account → Migrate Device';
+
+  @override
+  String get targetStep3 => 'Enter the code shown on that device here';
 }

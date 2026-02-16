@@ -1,4 +1,3 @@
-// lib/services/device_migration_service.dart
 // Secure Device Migration Framework for Barter App
 // Handles cross-device user data synchronization with end-to-end encryption
 
@@ -92,7 +91,7 @@ class MigrationData {
     'offerings': offerings.map((e) => e.toJson()).toList(),
     'profileKeywordDataMap': profileKeywordDataMap,
     'publicKey': publicKey,
-    'timestamp': timestamp.toIso8601String(),
+    'timestamp': timestamp.toUtc().toIso8601String(),
     'deviceFingerprint': deviceFingerprint,
   };
 
@@ -110,7 +109,7 @@ class MigrationData {
       profileKeywordDataMap: (json['profileKeywordDataMap'] as Map<String, dynamic>)
           .map((k, v) => MapEntry(k, (v as num).toDouble())),
       publicKey: json['publicKey'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      timestamp: DateTime.parse(json['timestamp'] as String).toLocal(),
       deviceFingerprint: json['deviceFingerprint'] as String,
     );
   }
@@ -125,6 +124,9 @@ class EncryptedMigrationPayload {
   final String targetDeviceId;
   final String sessionId;
   final int keyVersion;
+  /// The source device's main signing public key (not the ephemeral ECDH key)
+  /// This is used by the backend to verify the payload signature
+  final String? sourceSigningPublicKey;
 
   EncryptedMigrationPayload({
     required this.encryptedData,
@@ -133,6 +135,7 @@ class EncryptedMigrationPayload {
     required this.sourceDeviceId,
     required this.targetDeviceId,
     required this.sessionId,
+    this.sourceSigningPublicKey,
     this.keyVersion = 1,
   });
 
@@ -144,6 +147,7 @@ class EncryptedMigrationPayload {
     'targetDeviceId': targetDeviceId,
     'sessionId': sessionId,
     'keyVersion': keyVersion,
+    'sourceSigningPublicKey': sourceSigningPublicKey,
   };
 
   factory EncryptedMigrationPayload.fromJson(Map<String, dynamic> json) {
@@ -155,6 +159,7 @@ class EncryptedMigrationPayload {
       targetDeviceId: json['targetDeviceId'] as String,
       sessionId: json['sessionId'] as String,
       keyVersion: json['keyVersion'] as int? ?? 1,
+      sourceSigningPublicKey: json['sourceSigningPublicKey'] as String?,
     );
   }
 }
@@ -165,7 +170,7 @@ class EncryptedMigrationPayload {
 
 @injectable
 class DeviceMigrationService {
-  /*static const String _migrationSessionsKey = 'migration_sessions';
+  static const String _migrationSessionsKey = 'migration_sessions';
   static const String _migrationNonceKey = 'migration_nonce_';
   static const Duration _sessionExpiry = Duration(minutes: 15);
   static const Duration _confirmationTimeout = Duration(minutes: 5);
@@ -306,20 +311,24 @@ class DeviceMigrationService {
       // 1. Initialize crypto on target device
       _cryptoService = await CryptoService.create();
 
-      // 2. Generate target device fingerprint
+      // 2. Generate ephemeral key pair for this session (for ECDH)
+      logDebug('🔑 Generating ephemeral key pair for session...');
+      final ephemeralKeyPair = await _generateEphemeralKeyPair();
+      await _storeEphemeralKeys(sessionId, ephemeralKeyPair);
+      final ephemeralPublicKey = _cryptoService!.ecPublicKeyToString(
+        ephemeralKeyPair.publicKey,
+      );
+
+      // 3. Generate target device fingerprint
       final deviceFingerprint = await _generateDeviceFingerprint();
 
-      // 3. Get target device's public key
-      final targetPublicKey = _cryptoService!.ecPublicKeyToString(
-        _cryptoService!.getPublicKey()!,
-      );
-
       // 4. Call API to register target device
-      final response = await _apiClient.registerMigrationTarget(
-        sessionId: sessionId,
-        targetDeviceId: deviceFingerprint,
-        targetPublicKey: targetPublicKey,
-      );
+      // Note: We send the ephemeral public key (for ECDH), not the main device key
+      final response = await _apiClient.registerMigrationTarget({
+        'sessionId': sessionId,
+        'targetDeviceId': deviceFingerprint,
+        'targetPublicKey': ephemeralPublicKey,
+      });
 
       if (!response.success) {
         return MigrationJoinResult.error(
@@ -338,6 +347,8 @@ class DeviceMigrationService {
       );
       await _storeSession(session);
       _currentSession = session;
+
+      logDebug('✅ Joined migration session successfully');
 
       return MigrationJoinResult.success(
         sourceDeviceId: response.sourceDeviceId!,
@@ -379,10 +390,10 @@ class DeviceMigrationService {
       await _importMigrationData(migrationData);
 
       // 5. Notify backend of successful migration
-      await _apiClient.confirmMigrationComplete(
-        sessionId: payload.sessionId,
-        targetDeviceId: payload.targetDeviceId,
-      );
+      await _apiClient.confirmMigrationComplete({
+        'sessionId': payload.sessionId,
+        'targetDeviceId': payload.targetDeviceId,
+      });
 
       return MigrationReceiveResult.success(migrationData);
     } catch (e) {
@@ -439,23 +450,30 @@ class DeviceMigrationService {
 
     final encryptedBytes = cipher.process(utf8.encode(plaintext));
 
-    // 6. Sign the encrypted payload with source device's main key
-    final payloadToSign = '${session.sessionId}.${targetDeviceId}.${base64Encode(encryptedBytes)}';
-    final signature = _cryptoService!.signMessage(payloadToSign);
-    if (signature == null) {
-      throw Exception('Failed to sign payload');
-    }
-
-    // 7. Construct final payload
-    final ephemeralPubKeyStr = _cryptoService!.ecPublicKeyToString(
-      ephemeralKeyPair.publicKey,
-    );
-
-    // Combine salt + iv + ciphertext
+    // 6. Combine salt + iv + ciphertext BEFORE signing
     final combinedPayload = Uint8List(salt.length + iv.length + encryptedBytes.length);
     combinedPayload.setAll(0, salt);
     combinedPayload.setAll(salt.length, iv);
     combinedPayload.setAll(salt.length + iv.length, encryptedBytes);
+
+    // 7. Sign the combined payload
+    final payloadToSign = '${session.sessionId}.${targetDeviceId}.${base64Encode(combinedPayload)}';
+    logDebug('📝 Signing payload: ${payloadToSign.substring(0, min(50, payloadToSign.length))}...');
+    final signature = _cryptoService!.signMessage(payloadToSign);
+    if (signature == null) {
+      throw Exception('Failed to sign payload');
+    }
+    logDebug('✍️ Generated signature: ${signature.substring(0, min(50, signature.length))}...');
+
+    // Get the source device's signing public key for backend verification
+    final sourceSigningPublicKey = _cryptoService!.ecPublicKeyToString(
+      _cryptoService!.getPublicKey()!,
+    );
+
+    // 8. Construct final payload
+    final ephemeralPubKeyStr = _cryptoService!.ecPublicKeyToString(
+      ephemeralKeyPair.publicKey,
+    );
 
     return EncryptedMigrationPayload(
       encryptedData: base64Encode(combinedPayload),
@@ -464,6 +482,7 @@ class DeviceMigrationService {
       sourceDeviceId: session.sourceDeviceId,
       targetDeviceId: targetDeviceId,
       sessionId: session.sessionId,
+      sourceSigningPublicKey: sourceSigningPublicKey,
     );
   }
 
@@ -540,29 +559,46 @@ class DeviceMigrationService {
 
       // We need the source device's public key - get it from the session
       final session = await _getSession(payload.sessionId);
-      if (session == null) return false;
+      if (session == null) {
+        logDebugError('Signature verification: No session found');
+        return false;
+      }
 
       // Get source device public key from backend
       final sourcePublicKeyResponse = await _apiClient.getMigrationPublicKey(
-        sessionId: payload.sessionId,
-        deviceId: payload.sourceDeviceId,
+        payload.sessionId,
+        payload.sourceDeviceId,
       );
 
-      if (!sourcePublicKeyResponse.success) return false;
+      if (!sourcePublicKeyResponse.success) {
+        logDebugError('Signature verification: Failed to get public key');
+        return false;
+      }
+
+      logDebug('🔑 Source public key from backend: ${sourcePublicKeyResponse.publicKey}');
+      logDebug('📝 Payload to verify: ${payloadToVerify.substring(0, min(50, payloadToVerify.length))}...');
+      logDebug('✍️ Signature: ${payload.signature.substring(0, min(50, payload.signature.length))}...');
 
       final sourcePublicKey = _cryptoService!.ecPublicKeyFromString(
         sourcePublicKeyResponse.publicKey!,
       );
-      if (sourcePublicKey == null) return false;
+      if (sourcePublicKey == null) {
+        logDebugError('Signature verification: Failed to parse public key');
+        return false;
+      }
 
       // Verify signature
-      return _cryptoService!.verifySignature(
+      final result = _cryptoService!.verifySignature(
         payloadToVerify,
         payload.signature,
         sourcePublicKey,
       );
-    } catch (e) {
+      
+      logDebug('✅ Signature verification result: $result');
+      return result;
+    } catch (e, stackTrace) {
       logDebugError('Signature verification error: $e');
+      logDebugError('Stack trace: $stackTrace');
       return false;
     }
   }
@@ -648,9 +684,17 @@ class DeviceMigrationService {
     }
 
     // Check timestamp (reject data older than session expiry)
-    final age = DateTime.now().difference(data.timestamp);
-    if (age > _sessionExpiry) {
-      logDebugError('Validation failed: Data expired');
+    // Use UTC comparison to avoid timezone issues
+    final now = DateTime.now().toUtc();
+    final timestampUtc = data.timestamp.toUtc();
+    final age = now.difference(timestampUtc);
+    logDebug('🕐 Migration data age: ${age.inMinutes} minutes (UTC)');
+    logDebug('🕐 Migration data timestamp (UTC): $timestampUtc');
+    logDebug('🕐 Current time (UTC): $now');
+    
+    // Allow some buffer time for network delays (2x session expiry)
+    if (age > _sessionExpiry * 2) {
+      logDebugError('Validation failed: Data expired (age: ${age.inMinutes} min)');
       return false;
     }
 
@@ -689,7 +733,7 @@ class DeviceMigrationService {
     final components = <String>[
       // Device info from DeviceValidationService can be incorporated here
       DateTime.now().millisecondsSinceEpoch.toString(),
-      _generateSecureRandom(16).join('_'),
+      base64Encode(_generateSecureRandom(16)),
     ];
 
     // Hash the components
@@ -725,7 +769,7 @@ class DeviceMigrationService {
   }
 
   Future<void> _storeSession(MigrationSession session) async {
-    final key = '$_migrationSessionsKey_${session.sessionId}';
+    final key = '$_migrationSessionsKey${session.sessionId}';
     final json = jsonEncode({
       'sessionId': session.sessionId,
       'sourceDeviceId': session.sourceDeviceId,
@@ -736,12 +780,12 @@ class DeviceMigrationService {
       'errorMessage': session.errorMessage,
       'attemptCount': session.attemptCount,
     });
-    await _secureStorage._secureStorage.write(key: key, value: json);
+    await _secureStorage.write(key: key, value: json);
   }
 
   Future<MigrationSession?> _getSession(String sessionId) async {
-    final key = '$_migrationSessionsKey_$sessionId';
-    final json = await _secureStorage._secureStorage.read(key: key);
+    final key = '$_migrationSessionsKey$sessionId';
+    final json = await _secureStorage.read(key: key);
     if (json == null) return null;
 
     try {
@@ -770,11 +814,11 @@ class DeviceMigrationService {
     final privateKeyHex = keyPair.privateKey.d!.toRadixString(16);
     final publicKeyBase64 = _cryptoService!.ecPublicKeyToString(keyPair.publicKey);
 
-    await _secureStorage._secureStorage.write(
+    await _secureStorage.write(
       key: '${prefix}_priv',
       value: privateKeyHex,
     );
-    await _secureStorage._secureStorage.write(
+    await _secureStorage.write(
       key: '${prefix}_pub',
       value: publicKeyBase64,
     );
@@ -785,8 +829,8 @@ class DeviceMigrationService {
   ) async {
     final prefix = _migrationNonceKey + sessionId;
 
-    final privateKeyHex = await _secureStorage._secureStorage.read(key: '${prefix}_priv');
-    final publicKeyBase64 = await _secureStorage._secureStorage.read(key: '${prefix}_pub');
+    final privateKeyHex = await _secureStorage.read(key: '${prefix}_priv');
+    final publicKeyBase64 = await _secureStorage.read(key: '${prefix}_pub');
 
     if (privateKeyHex == null || publicKeyBase64 == null) {
       throw Exception('Ephemeral keys not found for session');
@@ -809,16 +853,16 @@ class DeviceMigrationService {
 
   /// Clears all migration-related data
   Future<void> clearMigrationData(String sessionId) async {
-    final sessionKey = '$_migrationSessionsKey_$sessionId';
+    final sessionKey = '$_migrationSessionsKey$sessionId';
     final prefix = _migrationNonceKey + sessionId;
 
-    await _secureStorage._secureStorage.delete(key: sessionKey);
-    await _secureStorage._secureStorage.delete(key: '${prefix}_priv');
-    await _secureStorage._secureStorage.delete(key: '${prefix}_pub');
+    await _secureStorage.delete(key: sessionKey);
+    await _secureStorage.delete(key: '${prefix}_priv');
+    await _secureStorage.delete(key: '${prefix}_pub');
 
     _currentSession = null;
     logDebug('🧹 Migration data cleared for session: $sessionId');
-  }*/
+  }
 }
 
 // ============================================================================
@@ -890,10 +934,10 @@ class MigrationJoinResult {
   }
 
   factory MigrationJoinResult.error(String message) {
-    return MigrationInitiationResult._(
+    return MigrationJoinResult._(
       success: false,
       errorMessage: message,
-    ) as MigrationJoinResult;
+    );
   }
 }
 
@@ -935,65 +979,4 @@ class MigrationReceiveResult {
   factory MigrationReceiveResult.error(String message) {
     return MigrationReceiveResult._(success: false, errorMessage: message);
   }
-}
-
-// ============================================================================
-// API EXTENSION (Add these methods to ApiClient)
-// ============================================================================
-
-/// Extension methods that need to be added to ApiClient
-abstract class MigrationApiMethods {
-  Future<RegisterMigrationTargetResponse> registerMigrationTarget({
-    required String sessionId,
-    required String targetDeviceId,
-    required String targetPublicKey,
-  });
-
-  Future<GetMigrationPublicKeyResponse> getMigrationPublicKey({
-    required String sessionId,
-    required String deviceId,
-  });
-
-  Future<ConfirmMigrationResponse> confirmMigrationComplete({
-    required String sessionId,
-    required String targetDeviceId,
-  });
-}
-
-class RegisterMigrationTargetResponse {
-  final bool success;
-  final String? sourceDeviceId;
-  final String? userId;
-  final bool requiresConfirmation;
-  final String? errorMessage;
-
-  RegisterMigrationTargetResponse({
-    required this.success,
-    this.sourceDeviceId,
-    this.userId,
-    this.requiresConfirmation = true,
-    this.errorMessage,
-  });
-}
-
-class GetMigrationPublicKeyResponse {
-  final bool success;
-  final String? publicKey;
-  final String? errorMessage;
-
-  GetMigrationPublicKeyResponse({
-    required this.success,
-    this.publicKey,
-    this.errorMessage,
-  });
-}
-
-class ConfirmMigrationResponse {
-  final bool success;
-  final String? errorMessage;
-
-  ConfirmMigrationResponse({
-    required this.success,
-    this.errorMessage,
-  });
 }

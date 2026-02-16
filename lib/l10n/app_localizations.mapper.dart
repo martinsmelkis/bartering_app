@@ -569,6 +569,7 @@ class AppLocalizationsMapper {
       'noAttributesToDisplay': localizations.noAttributesToDisplay,
       'errorLoadingPostings': localizations.errorLoadingPostings,
       'errorLoadingAttributes': localizations.errorLoadingAttributes,
+      'userPrefix': localizations.userPrefix,
       'activePostings': localizations.activePostings,
       'posting': localizations.posting,
       'postings': localizations.postings,

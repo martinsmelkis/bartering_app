@@ -12,6 +12,7 @@ import 'package:barter_app/screens/notifications_screen/notifications_screen.dar
 import 'package:barter_app/screens/offers_screen/offers_screen.dart';
 import 'package:barter_app/screens/onboarding_screen/onboarding_screen.dart';
 import 'package:barter_app/screens/manage_postings_screen/manage_postings_screen.dart';
+import 'package:barter_app/screens/device_migration_screen/source_migration_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/cubit/nested_panel_cubit.dart';
 import 'package:barter_app/screens/user_profile_screen/adaptive_nested_panel_layout.dart';
@@ -708,6 +709,44 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     SizedBox(width: 4.w),
                     Text(
                       l10n.managePostings,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 4,),
+            InkWell(
+              onTap: () async {
+                // Navigate to source device migration screen
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const SourceMigrationScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.phonelink_setup,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      'Migrate to New Device',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white,

@@ -4951,6 +4951,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Share your interests to find the best matches with others!'**
   String get shareYourInterestsToFindBestMatches;
+
+  /// No description provided for @migrateToNewDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Migrate to New Device'**
+  String get migrateToNewDevice;
+
+  /// No description provided for @migrateYourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Migrate Your Account'**
+  String get migrateYourAccount;
+
+  /// No description provided for @migrationCodeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate a migration code to transfer your account data to a new device. The code will be valid for 15 minutes.'**
+  String get migrationCodeDescription;
+
+  /// No description provided for @generateMigrationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Migration Code'**
+  String get generateMigrationCode;
+
+  /// No description provided for @generating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating...'**
+  String get generating;
+
+  /// No description provided for @yourMigrationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Migration Code'**
+  String get yourMigrationCode;
+
+  /// No description provided for @expiresIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires in: {time}'**
+  String expiresIn(String time);
+
+  /// No description provided for @copyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Code'**
+  String get copyCode;
+
+  /// No description provided for @codeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration code copied to clipboard'**
+  String get codeCopied;
+
+  /// No description provided for @generateNewCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate New Code'**
+  String get generateNewCode;
+
+  /// No description provided for @migrationStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate a migration code'**
+  String get migrationStep1;
+
+  /// No description provided for @migrationStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the app on your new device'**
+  String get migrationStep2;
+
+  /// No description provided for @migrationStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \"Import Existing Account\" on the welcome screen'**
+  String get migrationStep3;
+
+  /// No description provided for @migrationStep4.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter this code on the new device'**
+  String get migrationStep4;
+
+  /// No description provided for @newDeviceDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'New Device Detected'**
+  String get newDeviceDetected;
+
+  /// No description provided for @newDeviceDetectedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A new device wants to import your account data. Do you want to allow this?'**
+  String get newDeviceDetectedMessage;
+
+  /// No description provided for @deny.
+  ///
+  /// In en, this message translates to:
+  /// **'Deny'**
+  String get deny;
+
+  /// No description provided for @allow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get allow;
+
+  /// No description provided for @migrationDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration denied by user'**
+  String get migrationDenied;
+
+  /// No description provided for @migrationCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration completed successfully!'**
+  String get migrationCompleted;
+
+  /// No description provided for @failedToSendMigration.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send migration data'**
+  String get failedToSendMigration;
+
+  /// No description provided for @migrationCodeExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration code has expired. Please generate a new one.'**
+  String get migrationCodeExpired;
+
+  /// No description provided for @targetDeviceTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Target device did not join in time'**
+  String get targetDeviceTimeout;
+
+  /// No description provided for @expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expired;
+
+  /// No description provided for @importAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Account'**
+  String get importAccount;
+
+  /// No description provided for @importAccountDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 10-character migration code from your other device to import your account data.'**
+  String get importAccountDescription;
+
+  /// No description provided for @failedToJoinMigration.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to join migration session'**
+  String get failedToJoinMigration;
+
+  /// No description provided for @migrationTimedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration timed out. Please try again with a new code.'**
+  String get migrationTimedOut;
+
+  /// No description provided for @failedToProcessMigration.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to process migration data'**
+  String get failedToProcessMigration;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @targetStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the app on your other device'**
+  String get targetStep1;
+
+  /// No description provided for @targetStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Settings → Account → Migrate Device'**
+  String get targetStep2;
+
+  /// No description provided for @targetStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code shown on that device here'**
+  String get targetStep3;
 }
 
 class _AppLocalizationsDelegate

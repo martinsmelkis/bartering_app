@@ -944,6 +944,48 @@
   "allMatchesDeleted": "Visas atbilstības ir dzēstas",
   "selectTheInterestsThatMatchYourPreferences": "Izvēlieties atslēgvārdus, kas atbilst Jūsu vēlmēm",
   "selectTheOffersThatYouCanProvide": "Izvēlieties piedāvājumus/lietas, ko varat sniegt",
-  "shareYourInterestsToFindBestMatches": "Dalieties ar savām interesēm, lai atrastu labākās atbilstības ar citiem!"
+  "shareYourInterestsToFindBestMatches": "Dalieties ar savām interesēm, lai atrastu labākās atbilstības ar citiem!",
+
+  "migrateToNewDevice": "Migrate to New Device",
+  "migrateYourAccount": "Migrate Your Account",
+  "migrationCodeDescription": "Generate a migration code to transfer your account data to a new device. The code will be valid for 15 minutes.",
+  "generateMigrationCode": "Generate Migration Code",
+  "generating": "Generating...",
+  "yourMigrationCode": "Your Migration Code",
+  "expiresIn": "Expires in: {time}",
+  "@expiresIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "copyCode": "Copy Code",
+  "codeCopied": "Migration code copied to clipboard",
+  "generateNewCode": "Generate New Code",
+  "migrationStep1": "Generate a migration code",
+  "migrationStep2": "Open the app on your new device",
+  "migrationStep3": "Tap \"Import Existing Account\" on the welcome screen",
+  "migrationStep4": "Enter this code on the new device",
+  "newDeviceDetected": "New Device Detected",
+  "newDeviceDetectedMessage": "A new device wants to import your account data. Do you want to allow this?",
+  "deny": "Deny",
+  "allow": "Allow",
+  "migrationDenied": "Migration denied by user",
+  "migrationCompleted": "Migration completed successfully!",
+  "failedToSendMigration": "Failed to send migration data",
+  "migrationCodeExpired": "Migration code has expired. Please generate a new one.",
+  "targetDeviceTimeout": "Target device did not join in time",
+  "expired": "Expired",
+
+  "importAccount": "Import Account",
+  "importAccountDescription": "Enter the 10-character migration code from your other device to import your account data.",
+  "failedToJoinMigration": "Failed to join migration session",
+  "migrationTimedOut": "Migration timed out. Please try again with a new code.",
+  "failedToProcessMigration": "Failed to process migration data",
+  "clear": "Clear",
+  "targetStep1": "Open the app on your other device",
+  "targetStep2": "Go to Settings → Account → Migrate Device",
+  "targetStep3": "Enter the code shown on that device here"
 
 }

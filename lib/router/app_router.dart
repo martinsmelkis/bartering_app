@@ -1,5 +1,7 @@
 import 'package:barter_app/screens/chat_screen/chat_screen.dart';
 import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
+import 'package:barter_app/screens/device_migration_screen/device_migration_screen.dart';
+import 'package:barter_app/screens/device_migration_screen/source_migration_screen.dart';
 import 'package:barter_app/screens/forgot_password_screen/forgot_password_screen.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/screens/interests_screen/interests_screen.dart';
@@ -44,6 +46,13 @@ class AppRouter {
         path: '/welcome',
         name: 'welcome',
         builder: (context, state) => const WelcomeScreen(),
+      ),
+
+      // Device Migration Screen
+      GoRoute(
+        path: '/device-migration',
+        name: 'device-migration',
+        builder: (context, state) => const DeviceMigrationScreen(),
       ),
 
       // Onboarding Screen

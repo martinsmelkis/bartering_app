@@ -163,6 +163,23 @@ class SecureStorageService {
     await _secureStorage.deleteAll();
   }
 
+  // --- Generic Storage Operations ---
+
+  /// Writes a value directly to secure storage
+  Future<void> write({required String key, required String value}) async {
+    await _secureStorage.write(key: key, value: value);
+  }
+
+  /// Reads a value directly from secure storage
+  Future<String?> read({required String key}) async {
+    return await _secureStorage.read(key: key);
+  }
+
+  /// Deletes a value from secure storage
+  Future<void> delete({required String key}) async {
+    await _secureStorage.delete(key: key);
+  }
+
   // --- Contact Public Key Management ---
 
   /// Saves a contact's public key for persistent storage

@@ -25,6 +25,7 @@ import 'package:pointycastle/asn1/primitives/asn1_sequence.dart' as pc;
 import 'package:pointycastle/export.dart' as pc;
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
+import '../models/auth/device_management_models.dart';
 import '../models/map/point_of_interest.dart';
 import '../repositories/user_repository.dart';
 import 'crypto/crypto_service.dart';
@@ -445,5 +446,74 @@ abstract class ApiClient {
 
   @GET('/public-api/v1/healthCheck')
   Future<void> healthCheck();
+
+  ///////////// DEVICE MIGRATION ///////////////
+
+  /// Registers a target device for a migration session
+  @POST('/api/v1/migration/target')
+  Future<RegisterMigrationTargetResponse> registerMigrationTarget(
+    @Body() Map<String, dynamic> request,
+  );
+
+  /// Retrieves a device's signing public key for verification
+  @GET('/api/v1/migration/public-key')
+  Future<GetMigrationPublicKeyResponse> getMigrationPublicKey(
+    @Query('sessionId') String sessionId,
+    @Query('deviceId') String deviceId,
+  );
+
+  /// Relays encrypted migration payload from source to target
+  @POST('/api/v1/migration/payload')
+  Future<ConfirmMigrationResponse> sendMigrationPayload(
+    @Body() Map<String, dynamic> request,
+  );
+
+  /// Retrieves the encrypted migration payload (for target device)
+  @GET('/api/v1/migration/payload')
+  Future<EncryptedMigrationPayloadResponse> getMigrationPayload(
+    @Query('sessionId') String sessionId,
+  );
+
+  /// Confirms successful migration and invalidates session
+  @POST('/api/v1/migration/complete')
+  Future<ConfirmMigrationResponse> confirmMigrationComplete(
+    @Body() Map<String, dynamic> request,
+  );
+
+  /// Gets migration session status (for polling)
+  @GET('/api/v1/migration/status')
+  Future<MigrationStatusResponse> getMigrationStatus(
+    @Query('sessionId') String sessionId,
+  );
+
+  ///////////// DEVICE MANAGEMENT ///////////////
+
+  /// Registers a new device for the authenticated user
+  @POST('/api/v1/devices/register')
+  Future<RegisterDeviceResponse> registerDevice(
+    @Body() Map<String, dynamic> request,
+  );
+
+  /// Lists all devices for the authenticated user
+  @GET('/api/v1/devices')
+  Future<UserDevicesResponse> getUserDevices();
+
+  /// Revokes/deactivates a device
+  @POST('/api/v1/devices/revoke')
+  Future<RevokeDeviceResponse> revokeDevice(
+    @Body() Map<String, dynamic> request,
+  );
+
+  /// Updates device information (name, etc.)
+  @POST('/api/v1/devices/update')
+  Future<UpdateDeviceResponse> updateDevice(
+    @Body() Map<String, dynamic> request,
+  );
+
+  /// Migrates device registration from source to target device
+  @POST('/api/v1/devices/migrate')
+  Future<MigrateDeviceResponse> migrateDevice(
+    @Body() Map<String, dynamic> request,
+  );
 
 }
