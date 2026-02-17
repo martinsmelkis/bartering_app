@@ -746,7 +746,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                     SizedBox(width: 4.w),
                     Text(
-                      'Migrate to New Device',
+                      l10n.migrateToNewDevice,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white,

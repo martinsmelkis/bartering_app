@@ -5,6 +5,7 @@ import 'package:barter_app/models/auth/device_management_models.dart';
 import 'package:barter_app/screens/device_migration_screen/cubit/device_migration_state.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/crypto/crypto_service.dart';
+import 'package:barter_app/services/device_fingerprint_service.dart';
 import 'package:barter_app/services/device_migration_service.dart' as service;
 import 'package:barter_app/services/device_migration_service.dart' show EncryptedMigrationPayload;
 import 'package:barter_app/services/secure_storage_service.dart';
@@ -18,11 +19,13 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
   final service.DeviceMigrationService _migrationService;
   final SecureStorageService _secureStorage;
   final ApiClient _apiClient;
+  final DeviceFingerprintService _fingerprintService;
 
   DeviceMigrationCubit(
     this._migrationService,
     this._secureStorage,
     this._apiClient,
+    this._fingerprintService,
   ) : super(const DeviceMigrationInitial());
 
   /// Initiates a migration session from the source device
@@ -235,7 +238,7 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
   /// Confirms successful migration and invalidates the session
   Future<void> confirmMigrationComplete(String sessionId) async {
     try {
-      final deviceId = await _generateDeviceId();
+      final deviceId = await _getDeviceId();
       await _apiClient.confirmMigrationComplete({
         'sessionId': sessionId,
         'targetDeviceId': deviceId,
@@ -254,7 +257,7 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
   ) async {
     try {
       final publicKey = cryptoService.ecPublicKeyToString(cryptoService.getPublicKey()!);
-      final deviceId = await _generateDeviceId();
+      final deviceId = await _getDeviceId();
       final deviceName = await _getDeviceName();
       
       // Platform detection that works on web and mobile
@@ -286,8 +289,20 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
     }
   }
 
-  /// Generates a unique device ID
-  Future<String> _generateDeviceId() async {
+  /// Gets a unique device ID using fingerprint service with fallback
+  Future<String> _getDeviceId() async {
+    try {
+      // Try to get hardware-based fingerprint first
+      return await _fingerprintService.getDeviceFingerprint();
+    } catch (e) {
+      // Fallback for web or errors
+      logDebug('Using fallback device ID generation: $e');
+      return _generateFallbackDeviceId();
+    }
+  }
+
+  /// Generates a fallback device ID when fingerprint service fails
+  Future<String> _generateFallbackDeviceId() async {
     final existingId = await _secureStorage.getContactPublicKey('device_id');
     if (existingId != null) return existingId;
 

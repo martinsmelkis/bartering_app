@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
+import 'package:injectable/injectable.dart';
 
+@singleton
 class DeviceFingerprintService {
   static final DeviceFingerprintService _instance = DeviceFingerprintService._internal();
   factory DeviceFingerprintService() => _instance;
@@ -58,6 +61,15 @@ class DeviceFingerprintService {
           macInfo.systemGUID ?? '',
           macInfo.model,
         ]);
+      } else {
+        if (kIsWeb) {
+          final webInfo = await deviceInfo.webBrowserInfo;
+          components.addAll([
+            webInfo.userAgent ?? '',
+            webInfo.language ?? '',
+            webInfo.data.hashCode.toString() ?? ''
+          ]);
+        }
       }
 
       // Generate hash

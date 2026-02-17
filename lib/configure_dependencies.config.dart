@@ -26,6 +26,7 @@ import 'package:barter_app/screens/onboarding_screen/cubit/onboarding_cubit.dart
     as _i12;
 import 'package:barter_app/services/api_client.dart' as _i205;
 import 'package:barter_app/services/app_module.dart' as _i716;
+import 'package:barter_app/services/device_fingerprint_service.dart' as _i749;
 import 'package:barter_app/services/device_migration_service.dart' as _i529;
 import 'package:barter_app/services/messaging/chat_notification_service.dart'
     as _i935;
@@ -52,6 +53,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => appModule.appDatabase,
       preResolve: true,
     );
+    gh.singleton<_i749.DeviceFingerprintService>(
+      () => _i749.DeviceFingerprintService.new(),
+    );
     gh.singleton<_i935.ChatNotificationService>(
       () => _i935.ChatNotificationService(),
     );
@@ -73,9 +77,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i33.UserRepository>(
       () => _i33.UserRepository(gh<_i607.SecureStorageService>()),
     );
-    gh.factory<_i12.OnboardingCubit>(
-      () => _i12.OnboardingCubit(gh<_i33.UserRepository>()),
-    );
     gh.factory<_i838.InterestsCubit>(
       () => _i838.InterestsCubit(
         gh<_i205.ApiClient>(),
@@ -87,12 +88,20 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i529.DeviceMigrationService>(),
         gh<_i607.SecureStorageService>(),
         gh<_i205.ApiClient>(),
+        gh<_i749.DeviceFingerprintService>(),
       ),
     );
     gh.factory<_i646.InitializeCubit>(
       () => _i646.InitializeCubit(
         gh<_i33.UserRepository>(),
         gh<_i205.ApiClient>(),
+      ),
+    );
+    gh.factory<_i12.OnboardingCubit>(
+      () => _i12.OnboardingCubit(
+        gh<_i33.UserRepository>(),
+        gh<_i205.ApiClient>(),
+        gh<_i749.DeviceFingerprintService>(),
       ),
     );
     gh.factory<_i159.LocationPickerCubit>(

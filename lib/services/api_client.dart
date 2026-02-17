@@ -442,11 +442,6 @@ abstract class ApiClient {
   @DELETE('/api/v1/authentication/user/{userId}')
   Future<void> deleteUser(@Path('userId') String userId);
 
-  ///////////// MISC ///////////////
-
-  @GET('/public-api/v1/healthCheck')
-  Future<void> healthCheck();
-
   ///////////// DEVICE MIGRATION ///////////////
 
   /// Registers a target device for a migration session
@@ -510,10 +505,9 @@ abstract class ApiClient {
     @Body() Map<String, dynamic> request,
   );
 
-  /// Migrates device registration from source to target device
-  @POST('/api/v1/devices/migrate')
-  Future<MigrateDeviceResponse> migrateDevice(
-    @Body() Map<String, dynamic> request,
-  );
+  ///////////// MISC ///////////////
+
+  @GET('/public-api/v1/healthCheck')
+  Future<void> healthCheck();
 
 }

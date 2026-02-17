@@ -1,13 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/data/local/app_database.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/user/user_onboarding_data.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/services/crypto/crypto_service.dart';
+import 'package:barter_app/services/device_fingerprint_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
@@ -18,8 +22,14 @@ part 'onboarding_state.dart';
 @injectable
 class OnboardingCubit extends Cubit<OnboardingState> {
   final UserRepository _userRepository;
+  final ApiClient _apiClient;
+  final DeviceFingerprintService _fingerprintService;
 
-  OnboardingCubit(this._userRepository) : super(OnboardingState.initial());
+  OnboardingCubit(
+    this._userRepository,
+    this._apiClient,
+    this._fingerprintService,
+  ) : super(OnboardingState.initial());
   void answerQuestion(int questionIndex, double answer) {
     if (questionIndex < 0 || questionIndex >= state.questions.length) return;
 
@@ -112,7 +122,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       UserOnboardingData user = UserOnboardingData(
           userId: userId, onboardingKeyNamesToWeights: profileData);
 
-      final _apiClient = ApiClient.create();
       final interestsList = await _apiClient.getInterestsFromOnboardingData(
           user, languageCode);
 
@@ -120,6 +129,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       logDebug('API Result: $interestsList');
 
       updateInterestsList(interestsList);
+
+      // --- Register device with backend after successful onboarding ---
+      await _registerDevice(userId);
 
       // Check if cubit is still active before emitting
       logDebug('@@@@@@@@@@@ About to emit success state. isClosed: $isClosed');
@@ -145,4 +157,83 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     _userRepository.userInterests = parsedInterests;
   }
 
+  /// Registers the device with the backend after successful onboarding
+  Future<void> _registerDevice(String userId) async {
+    try {
+      // Get device fingerprint
+      final deviceId = await _getDeviceId();
+      
+      // Get public key from crypto service
+      final cryptoService = await CryptoService.create();
+      final publicKey = cryptoService.ecPublicKeyToString(cryptoService.getPublicKey()!);
+      
+      // Platform detection
+      String platform;
+      if (kIsWeb) {
+        platform = 'web';
+      } else if (Platform.isIOS) {
+        platform = 'ios';
+      } else {
+        platform = 'android';
+      }
+      
+      // Device name
+      final deviceName = await _getDeviceName();
+
+      final response = await _apiClient.registerDevice({
+        'userId': userId,
+        'deviceId': deviceId,
+        'publicKey': publicKey,
+        'deviceName': deviceName,
+        'deviceType': 'mobile',
+        'platform': platform,
+      });
+
+      if (response.success) {
+        logDebug('✅ Device registered successfully after onboarding');
+      } else {
+        logDebugError('Failed to register device after onboarding: ${response.message}');
+      }
+    } catch (e) {
+      // Don't fail onboarding if device registration fails
+      logDebugError('Error registering device after onboarding: $e');
+    }
+  }
+
+  /// Gets a unique device ID using fingerprint service with fallback
+  Future<String> _getDeviceId() async {
+    try {
+      // Try to get hardware-based fingerprint first
+      return await _fingerprintService.getDeviceFingerprint();
+    } catch (e) {
+      // Fallback for web or errors
+      logDebug('Using fallback device ID generation: $e');
+      return _generateFallbackDeviceId();
+    }
+  }
+
+  /// Generates a fallback device ID when fingerprint service fails
+  Future<String> _generateFallbackDeviceId() async {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final random = base64Encode(List<int>.generate(16, (_) => timestamp % 256));
+    final deviceId = 'device_${timestamp}_$random';
+    return deviceId;
+  }
+
+  /// Gets a friendly device name
+  Future<String> _getDeviceName() async {
+    try {
+      String platformName;
+      if (kIsWeb) {
+        platformName = 'Web';
+      } else if (Platform.isIOS) {
+        platformName = 'iPhone';
+      } else {
+        platformName = 'Android';
+      }
+      return '$platformName Device';
+    } catch (e) {
+      return 'Mobile Device';
+    }
+  }
 }

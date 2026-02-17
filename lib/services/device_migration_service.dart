@@ -174,7 +174,6 @@ class DeviceMigrationService {
   static const String _migrationNonceKey = 'migration_nonce_';
   static const Duration _sessionExpiry = Duration(minutes: 15);
   static const Duration _confirmationTimeout = Duration(minutes: 5);
-  static const int _maxAttempts = 3;
 
   final SecureStorageService _secureStorage;
   final ApiClient _apiClient;
