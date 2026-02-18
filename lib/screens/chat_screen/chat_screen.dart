@@ -1,5 +1,6 @@
 import 'package:barter_app/l10n/app_localizations.mapper.dart';
 import 'package:barter_app/repositories/user_repository.dart';
+import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/image_cache_service.dart';
 import 'package:barter_app/services/messaging/chat_notification_service.dart';
@@ -26,22 +27,26 @@ import 'dart:io';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/map/point_of_interest.dart';
 import '../../models/chat/e_chat_message_status.dart';
 import '../../services/secure_storage_service.dart';
 import '../chat_screen/cubit/chat_cubit.dart';
 import '../../models/chat/chat_message.dart';
 import '../../models/chat/file_attachment.dart';
+import '../map_screen/map_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   final String? poiId; // Optional: ID of the POI that initiated the chat
-  final String? poiName; // Optional: Name of the POI
+  final String? poiName; // Optional: Name of the POI (for display when POI object not available)
+  final PointOfInterest? poi; // Optional: Full POI object when available
   final bool showAppBar; // Whether to show the app bar (false for panel mode)
 
   const ChatScreen({
     super.key,
     this.poiId,
     this.poiName,
-    this.showAppBar = true,
+    this.poi,
+    this.showAppBar = true
   });
 
   @override
@@ -57,24 +62,24 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isUserBlocked = false;
 
   @override
-void dispose() {
-  // Mark chat screen as inactive
-  _chatCubit.setChatScreenActive(false);
-  
-  // Clear active chat when leaving screen
-  try {
-    final notificationService = getIt<ChatNotificationService>();
-    notificationService.setActiveChat(null);
-  } catch (e) {
-    // Service might not be registered
-  }
+  void dispose() {
+    // Mark chat screen as inactive
+    _chatCubit.setChatScreenActive(false);
 
-  // Don't clear _messages - this list is repopulated from state on each rebuild
-  // Clearing it causes messages to be lost when navigating between chats
-  _messageController.dispose();
-  _scrollController.dispose();
-  super.dispose();
-}
+    // Clear active chat when leaving screen
+    try {
+      final notificationService = getIt<ChatNotificationService>();
+      notificationService.setActiveChat(null);
+    } catch (e) {
+      // Service might not be registered
+    }
+
+    // Don't clear _messages - this list is repopulated from state on each rebuild
+    // Clearing it causes messages to be lost when navigating between chats
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _sendMessage() {
     if (_messageController.text.isNotEmpty) {
@@ -375,8 +380,34 @@ void dispose() {
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
-            onSelected: (value) {
-              if (value == 'finish_transaction') {
+            onSelected: (value) async {
+              if (value == 'view_profile') {
+                // Fetch profile info if POI is not available, then navigate to map
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  PointOfInterest? poi = widget.poi;
+                  
+                  if (poi == null && widget.poiId != null) {
+                    // Fetch profile info from API
+                    try {
+                      final apiClient = getIt<ApiClient>();
+                      final userProfile = await apiClient.getProfileInfo(widget.poiId!);
+                      poi = PointOfInterest(
+                        profile: userProfile,
+                        distanceKm: null,
+                      );
+                      logDebug('@@@@@@@@@ ChatScreen view_profile - fetched profile for userId: ${widget.poiId}');
+                    } catch (e) {
+                      logDebugError('Failed to fetch profile for view_profile', e);
+                    }
+                  }
+                  
+                  if (poi != null) {
+                    final List<PointOfInterest> pois = List.empty(growable: true);
+                    pois.add(poi);
+                    AppRouter.navigateToMapWithPois(pois);
+                  }
+                });
+              } else if (value == 'finish_transaction') {
                 _handleFinishTransaction(context);
               } else if (value == 'report_user') {
                 _handleReportUser(context);
@@ -387,6 +418,16 @@ void dispose() {
               }
             },
             itemBuilder: (BuildContext context) => [
+              PopupMenuItem<String>(
+                value: 'view_profile',
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_outline),
+                    SizedBox(width: 8.w),
+                    Text(l10n.viewProfile),
+                  ],
+                ),
+              ),
               PopupMenuItem<String>(
                 value: 'finish_transaction',
                 child: Row(

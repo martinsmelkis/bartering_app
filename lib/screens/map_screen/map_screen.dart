@@ -1,5 +1,6 @@
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
+import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
 import 'package:barter_app/screens/map_screen/widgets/drawer_main.dart';
@@ -17,15 +18,14 @@ import 'package:barter_app/services/messaging/global_chat_service.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
-import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/back_button_handler.dart';
 import 'package:barter_app/utils/debug_utils.dart';
-import 'package:barter_app/utils/svg_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -633,20 +633,13 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   /// Opens chat adaptively based on screen size using ChatPanelCubit
-  void _openChat(String poiId, String poiName) {
+  void _openChat(String poiId, String poiName, {PointOfInterest? poi}) {
     final chatCubit = context.read<ChatPanelCubit>();
     if (context.canShowSideBySide) {
-      chatCubit.openChat(poiId, poiName);
+      chatCubit.openChat(poiId, poiName, poi: poi);
     } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) =>
-              ChatScreen(
-                poiId: poiId,
-                poiName: poiName,
-              ),
-        ),
-      );
+      // Navigate to full-screen chat using GoRouter
+      context.push('/chat/$poiId');
     }
   }
 
@@ -884,11 +877,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                   if (context.canShowSideBySide) {
                                     chatCubit.openChatsList();
                                   } else {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (_) => const ChatsListScreen(),
-                                      ),
-                                    );
+                                    AppRouter.navigateToChats();
                                   }
                                 },
                                 heroTag: "ChatsFab",
@@ -1160,13 +1149,18 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                         child: isChatsListOpen
                                             ? ChatsListScreen(
                                                 showAppBar: false,
-                                                onChatSelected: (poiId, poiName) {
-                                                  context.read<ChatPanelCubit>().openChat(poiId, poiName);
+                                                onChatSelected: (poi) {
+                                                  context.read<ChatPanelCubit>().openChat(
+                                                    poi.profile.userId,
+                                                    poi.profile.name,
+                                                    poi: poi,
+                                                  );
                                                 },
                                               )
                                             : ChatScreen(
                                                 poiId: chatState.selectedPoiId,
                                                 poiName: chatState.selectedPoiName,
+                                                poi: chatState.selectedPoi,
                                                 showAppBar: false,
                                               ),
                                       ),
@@ -1252,7 +1246,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                       interests: profileState.interests,
                       offerings: profileState.offerings,
                       onClose: () => context.read<ProfilePanelCubit>().closeProfile(),
-                      mainContent: AdaptiveSettingsLayout(
+                                                mainContent: AdaptiveSettingsLayout(
                         showSettingsPanel: settingsState.isOpen,
                         onClose: () => context.read<SettingsPanelCubit>().closeSettings(),
                         mainContent: AdaptiveChatLayout(
@@ -1268,8 +1262,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                           selectedPoiId: chatState.selectedPoiId,
                           selectedPoiName: chatState.selectedPoiName,
                           onClose: () => context.read<ChatPanelCubit>().closePanel(),
-                          onChatSelected: (poiId, poiName) {
-                            context.read<ChatPanelCubit>().openChat(poiId, poiName);
+                          onChatSelected: (poi) {
+                            context.read<ChatPanelCubit>().openChat(
+                              poi.profile.userId,
+                              poi.profile.name,
+                              poi: poi,
+                            );
                           },
                           mainContent: AdaptivePoiLayout(
                             // Only show POI panel here if search results list is NOT open
@@ -1284,10 +1282,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                   context.read<ChatPanelCubit>().openChat(
                                     poi.profile.userId,
                                     poi.profile.name,
+                                    poi: poi,
                                   );
                                 } else {
                                   context.read<PoiPanelCubit>().closePanel();
-                                  _openChat(poi.profile.userId, poi.profile.name);
+                                  _openChat(poi.profile.userId, poi.profile.name, poi: poi);
                                 }
                               }
                             },

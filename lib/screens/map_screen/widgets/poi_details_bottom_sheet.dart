@@ -64,9 +64,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   Widget? _avatarIcon;
   bool _isLoadingAvatar = true;
 
-  double? _averageRating;
-  bool _isLoadingRating = true;
-
   // Current user's attributes for matching (normalized/translated)
   List<String> _currentUserInterestIds = [];
   List<String> _currentUserOfferIds = [];
@@ -98,8 +95,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       _isTogglingFavorite = false;
       _avatarIcon = null;
       _isLoadingAvatar = true;
-      _averageRating = null;
-      _isLoadingRating = true;
     });
   }
 
@@ -111,7 +106,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
           _loadPostings();
           _loadFavoriteStatus();
           _loadAvatarIcon();
-          _loadUserRating();
           _loadCurrentUserAttributes();
         }
       });
@@ -278,28 +272,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       if (mounted) {
         setState(() {
           _isLoadingAvatar = false;
-        });
-      }
-    }
-  }
-
-  _loadUserRating() async {
-    try {
-      final apiClient = getIt<ApiClient>();
-      final reviewsResponse = await apiClient.getUserReviews(widget.poi.profile.userId);
-
-      if (mounted) {
-        setState(() {
-          _averageRating = reviewsResponse.averageRating;
-          _isLoadingRating = false;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error loading user rating: $e');
-      if (mounted) {
-        setState(() {
-          _averageRating = null;
-          _isLoadingRating = false;
         });
       }
     }
@@ -805,11 +777,13 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                   ),
                                 ),
                                 // Rating widget - positioned just before the avatar
-                                if (!_isLoadingRating && _averageRating != null && _averageRating! > 0)
-                                  Container(
+                                Builder(builder: (context) {
+                                  final poiRating = widget.poi.averageRating ?? widget.poi.profile.averageRating;
+                                  if (poiRating != null && poiRating > 0) {
+                                    return Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: _getRatingColor(),
+                                      color: _getRatingColor(poiRating),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(color: Colors.white, width: 1.5),
                                     ),
@@ -823,7 +797,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                         ),
                                         const SizedBox(width: 2),
                                         Text(
-                                          _averageRating!.toStringAsFixed(1),
+                                          poiRating.toStringAsFixed(1),
                                           style: const TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
@@ -832,7 +806,10 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                         ),
                                       ],
                                     ),
-                                  ),
+                                  );
+                                  }
+                                  return const SizedBox.shrink();
+                                }),
                                 // Avatar/POI icon on the right with online badge
                                 Stack(
                                   clipBehavior: Clip.none,
@@ -1005,10 +982,10 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     );
   }
 
-  Color _getRatingColor() {
-    if (_averageRating == null || _averageRating == 0.0) return Colors.grey.shade400;
-    if (_averageRating! >= 4.0) return Colors.green;
-    if (_averageRating! > 3.0) return Colors.amber;
+  Color _getRatingColor(double rating) {
+    if (rating == 0.0) return Colors.grey.shade400;
+    if (rating >= 4.0) return Colors.green;
+    if (rating > 3.0) return Colors.amber;
     return Colors.red;
   }
   

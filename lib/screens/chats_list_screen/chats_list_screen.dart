@@ -3,7 +3,9 @@ import 'package:barter_app/data/local/app_database.dart';
 import 'package:barter_app/models/reviews/review_eligibility.dart';
 import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
+import 'package:barter_app/screens/map_screen/cubit/profile_panel_cubit.dart';
 import 'package:barter_app/screens/review_screen/review_screen.dart';
+import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
@@ -11,6 +13,7 @@ import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -18,15 +21,17 @@ import 'package:intl/intl.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../models/map/point_of_interest.dart';
+import '../../models/profile/user_profile_data.dart';
 
 class ChatsListScreen extends StatefulWidget {
   final bool showAppBar;
-  final Function(String poiId, String poiName)? onChatSelected;
+  final Function(PointOfInterest poi)? onChatSelected;
 
   const ChatsListScreen({
     super.key,
     this.showAppBar = true,
-    this.onChatSelected,
+    this.onChatSelected
   });
 
   @override
@@ -191,29 +196,49 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
 
     final otherUserId = participants.first;
 
-    // Try to fetch the other user's name from API
-    String? otherUserName;
+    // Try to fetch the other user's profile from API
+    UserProfileData? userProfile;
     try {
-      final userProfile = await apiClient.getProfileInfo(otherUserId);
-      otherUserName = userProfile.name;
+      userProfile = await apiClient.getProfileInfo(otherUserId);
     } catch (e) {
       // Failed to fetch user profile, will use userId as fallback
       logDebugError('Failed to fetch user profile for $otherUserId', e);
     }
 
-    final fallbackUserName = otherUserName ?? otherUserId;
-
-    //If callback is provided (side-by-side mode), use it
-    if (widget.onChatSelected != null) {
-      widget.onChatSelected!(
-        otherUserId,
-        fallbackUserName,
+    // Create a PointOfInterest from the user profile if available
+    PointOfInterest? poi;
+    if (userProfile != null) {
+      poi = PointOfInterest(
+        profile: userProfile,
+        distanceKm: null,
       );
+    }
+
+    final fallbackUserName = userProfile?.name ?? otherUserId;
+
+    // If callback is provided (side-by-side mode), use it
+    if (widget.onChatSelected != null) {
+      if (poi != null) {
+        widget.onChatSelected!(poi);
+      }
       return;
     }
 
     // Otherwise, navigate to chat screen (mobile/full-screen mode)
-    context.push('/chat/$otherUserId');
+    // Pass the POI via extra to avoid re-fetching
+    final result = await context.push(
+      '/chat/$otherUserId',
+      extra: poi != null ? {'poi': poi} : null,
+    );
+    
+    // Handle result from chat screen (e.g., when user taps "View Profile")
+    if (result is Map<String, dynamic> && result['action'] == 'view_profile_on_map') {
+      final userId = result['userId'] as String;
+      logDebug('@@@@@@@@@ Chat closed with view_profile_on_map from chats list for userId: $userId');
+      // Navigate back to map with the user ID
+      // ignore: use_build_context_synchronously
+      context.go('/map?viewUserId=$userId');
+    }
   }
 
   Future<bool?> _confirmDelete(BuildContext context,

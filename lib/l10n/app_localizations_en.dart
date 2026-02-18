@@ -2310,6 +2310,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportUser => 'Report User';
 
   @override
+  String get viewProfile => 'View Profile';
+
+  @override
   String get blockUser => 'Block User';
 
   @override

@@ -835,6 +835,7 @@
   "inviteMessageSubject": "Join me on BarterApp!",
   
   "reportUser": "Report User",
+  "viewProfile": "View Profile",
   "blockUser": "Block User",
   "unblockUser": "Unblock User",
   "reportUserConfirmation": "Please provide a reason for reporting this user.",

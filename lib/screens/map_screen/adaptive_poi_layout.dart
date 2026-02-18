@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:barter_app/screens/map_screen/widgets/poi_details_bottom_sheet.dart';
 import 'package:barter_app/screens/map_screen/cubit/chat_panel_cubit.dart';
+import 'package:barter_app/screens/map_screen/cubit/profile_panel_cubit.dart';
 import 'package:barter_app/screens/chat_screen/chat_screen.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/screens/chat_screen/widgets/chat_panel_header.dart';
@@ -22,7 +23,7 @@ class AdaptivePoiLayout extends StatelessWidget {
     this.showPoiPanel = false,
     this.selectedPoi,
     this.onClose,
-    this.onChatButtonPressed,
+    this.onChatButtonPressed
   });
 
   @override
@@ -44,7 +45,7 @@ class AdaptivePoiLayout extends StatelessWidget {
                 onChatButtonPressed: onChatButtonPressed,
                 showChatBelow: chatState.isChatOpen && chatState.selectedPoiId == selectedPoi!.profile.userId,
                 chatPoiId: chatState.selectedPoiId,
-                chatPoiName: chatState.selectedPoiName,
+                chatPoiName: chatState.selectedPoiName
               ),
             ],
           );
@@ -73,7 +74,7 @@ class _PoiDetailsPanel extends StatelessWidget {
     this.onChatButtonPressed,
     this.showChatBelow = false,
     this.chatPoiId,
-    this.chatPoiName,
+    this.chatPoiName
   });
 
   @override
@@ -110,13 +111,14 @@ class _PoiDetailsPanel extends StatelessWidget {
                       ChatPanelHeader(
                         chatPoiName: chatPoiName,
                         chatPoiId: chatPoiId!,
-                        onClose: () => context.read<ChatPanelCubit>().closePanel(),
+                        onClose: () => context.read<ChatPanelCubit>().closePanel()
                       ),
                       // Chat content
                       Expanded(
                         child: ChatScreen(
                           poiId: chatPoiId!,
                           poiName: chatPoiName,
+                          poi: poi.profile.userId == chatPoiId ? poi : null,
                           showAppBar: false,
                         ),
                       ),

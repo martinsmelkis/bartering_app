@@ -3,9 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
+import '../../../configure_dependencies.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../models/map/point_of_interest.dart';
 import '../../../models/relationships/report_models.dart';
+import '../../../router/app_router.dart';
+import '../../../services/api_client.dart';
 import '../../../theme/app_colors.dart';
+import '../../../utils/debug_utils.dart';
 import '../cubit/chat_cubit.dart';
 import 'report_user_dialog.dart';
 
@@ -19,7 +24,7 @@ class ChatPanelHeader extends StatefulWidget {
     super.key,
     this.chatPoiName,
     required this.chatPoiId,
-    this.onClose,
+    this.onClose
   });
 
   @override
@@ -242,6 +247,10 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Use chatPoiName when available, otherwise fallback to generic label
+    final displayName = widget.chatPoiName?.isNotEmpty == true
+        ? widget.chatPoiName
+        : l10n.unknownUser;
     
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -250,7 +259,7 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
         children: [
           Expanded(
             child: Text(
-              'Chat: ${widget.chatPoiName ?? 'User'}',
+              'Chat: $displayName',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -267,6 +276,27 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
               onSelected: (value) {
                 if (value == 'finish_transaction') {
                   _handleFinishTransaction(context);
+                } else if (value == 'view_profile') {
+                  // Fetch profile info if POI is not available, then navigate to map
+                  WidgetsBinding.instance.addPostFrameCallback((_) async {
+                    PointOfInterest? poi;
+                    try {
+                      final apiClient = getIt<ApiClient>();
+                      final userProfile = await apiClient.getProfileInfo(widget.chatPoiId);
+                      poi = PointOfInterest(
+                        profile: userProfile,
+                        distanceKm: null,
+                      );
+                      logDebug('@@@@@@@@@ ChatScreen view_profile - fetched profile for userId: ${widget.chatPoiId}');
+                    } catch (e) {
+                      logDebugError('Failed to fetch profile for view_profile', e);
+                    }
+                    if (poi != null) {
+                      final List<PointOfInterest> pois = List.empty(growable: true);
+                      pois.add(poi);
+                      AppRouter.navigateToMapWithPois(pois);
+                    }
+                  });
                 } else if (value == 'report_user') {
                   _handleReportUser(context);
                 } else if (value == 'block_user') {
@@ -276,6 +306,16 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
                 }
               },
               itemBuilder: (BuildContext context) => [
+                PopupMenuItem<String>(
+                  value: 'view_profile',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.person_outline),
+                      SizedBox(width: 8.w),
+                      Text(l10n.viewProfile),
+                    ],
+                  ),
+                ),
                 PopupMenuItem<String>(
                   value: 'finish_transaction',
                   child: Row(

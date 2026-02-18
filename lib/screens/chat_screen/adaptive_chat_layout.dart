@@ -1,5 +1,6 @@
 // lib/screens/chat_screen/adaptive_chat_layout.dart
 import 'package:flutter/material.dart';
+import 'package:barter_app/models/map/point_of_interest.dart';
 import 'package:barter_app/screens/chat_screen/chat_screen.dart';
 import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
 import 'package:barter_app/screens/map_screen/cubit/chat_panel_cubit.dart';
@@ -22,7 +23,7 @@ class AdaptiveChatLayout extends StatelessWidget {
   final String? selectedPoiId;
   final String? selectedPoiName;
   final VoidCallback? onClose;
-  final Function(String poiId, String poiName)? onChatSelected;
+  final Function(PointOfInterest poi)? onChatSelected;
   final bool suppressChatPanel;
 
   const AdaptiveChatLayout({
@@ -72,7 +73,7 @@ class AdaptiveChatLayout extends StatelessWidget {
 /// Chats list panel widget for side-by-side layout
 class _ChatsListPanel extends StatelessWidget {
   final VoidCallback? onClose;
-  final Function(String poiId, String poiName)? onChatSelected;
+  final Function(PointOfInterest poi)? onChatSelected;
 
   const _ChatsListPanel({
     this.onClose,
@@ -96,7 +97,9 @@ class _ChatsListPanel extends StatelessWidget {
           Expanded(
             child: ChatsListScreen(
               showAppBar: false,
-              onChatSelected: onChatSelected,
+              onChatSelected: onChatSelected != null
+                  ? (poi) => onChatSelected!(poi)
+                  : null,
             ),
           ),
         ],
@@ -109,11 +112,13 @@ class _ChatsListPanel extends StatelessWidget {
 class _ChatPanel extends StatelessWidget {
   final String poiId;
   final String? poiName;
+  final PointOfInterest? poi;
   final VoidCallback? onClose;
 
   const _ChatPanel({
     required this.poiId,
     this.poiName,
+    this.poi,
     this.onClose,
   });
 
@@ -137,6 +142,7 @@ class _ChatPanel extends StatelessWidget {
             child: ChatScreen(
               poiId: poiId,
               poiName: poiName,
+              poi: poi,
               showAppBar: false, // No app bar in panel mode
             ),
           ),

@@ -3,6 +3,7 @@ import 'dart:developer' show log;
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/dio_error_handler.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart'; // For value equality in states
 import '../../../configure_dependencies.dart';
@@ -74,7 +75,6 @@ class PoiCubit extends Cubit<PoiState> {
 
       final pois = await _apiClient.getPointsOfInterest(
           latitude, longitude, radius ?? 5000.0, userId);
-      print('@@@@@@@@@@@ POIs loaded: $pois');
       final sortedPois = _sortPois(pois);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
@@ -139,7 +139,7 @@ class PoiCubit extends Cubit<PoiState> {
         offering,
       );
       poi.forEach((poi) {
-        print('@@@@@@@@@@@ POI loaded: ${poi.profile.userId} ${poi.matchRelevancyScore}');
+        debugPrint('@@@@@@@@@@@ POI loaded: ${poi.profile.userId} ${poi.matchRelevancyScore}');
       });
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));

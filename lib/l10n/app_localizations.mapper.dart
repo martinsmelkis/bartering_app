@@ -791,6 +791,7 @@ class AppLocalizationsMapper {
       'unableToShareAtThisTime': localizations.unableToShareAtThisTime,
       'inviteMessageSubject': localizations.inviteMessageSubject,
       'reportUser': localizations.reportUser,
+      'viewProfile': localizations.viewProfile,
       'blockUser': localizations.blockUser,
       'unblockUser': localizations.unblockUser,
       'reportUserConfirmation': localizations.reportUserConfirmation,

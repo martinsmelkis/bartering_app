@@ -8,10 +8,15 @@ class PointOfInterest {
   final UserProfileData profile;
   final double? distanceKm;
   double? matchRelevancyScore;
+  // Optional rating fields that can override profile values
+  double? averageRating;
+  int? totalReviews;
 
   PointOfInterest({
     required this.profile,
     required this.distanceKm,
+    this.averageRating,
+    this.totalReviews,
   });
   
   // Helper method to get online status from profile
@@ -32,11 +37,15 @@ class PointOfInterest {
   PointOfInterest copyWith({
     UserProfileData? userProfileData,
     double? distanceKm,
-    double? matchRelevancyScore
+    double? matchRelevancyScore,
+    double? averageRating,
+    int? totalReviews,
   }) {
     return PointOfInterest(
       profile: profile,
       distanceKm: distanceKm ?? this.distanceKm,
+      averageRating: averageRating ?? this.averageRating,
+      totalReviews: totalReviews ?? this.totalReviews,
     );
   }
 }

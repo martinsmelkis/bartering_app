@@ -2341,6 +2341,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get reportUser => 'Ziņot par lietotāju';
 
   @override
+  String get viewProfile => 'Skatīt profilu';
+
+  @override
   String get blockUser => 'Bloķēt lietotāju';
 
   @override

@@ -22,6 +22,7 @@ import '../../../widgets/online_status_badge.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/poi_panel_cubit.dart';
 import '../cubit/chat_panel_cubit.dart';
+import '../cubit/profile_panel_cubit.dart';
 import '../../chat_screen/widgets/chat_panel_header.dart';
 import 'poi_details_bottom_sheet.dart';
 import '../../chat_screen/chat_screen.dart';
@@ -45,7 +46,7 @@ class SearchResultsListView extends StatefulWidget {
     this.isLargeScreen = false,
     this.selectedPoi,
     this.onClosePoiPanel,
-    this.onChatWithSelectedPoi,
+    this.onChatWithSelectedPoi
   });
 
   @override
@@ -963,6 +964,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                       context.read<ChatPanelCubit>().openChat(
                         poi.profile.userId,
                         poi.profile.name,
+                        poi: poi,
                       );
                     },
                   ),
@@ -1322,10 +1324,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
 
   /// Build rating display widget
   Widget _buildRatingDisplay(PointOfInterest poi) {
-    // Use actual rating data from profile, default to 0.0 and 0 if not available
-    final rating = poi.profile.averageRating ?? 0.0;
-    final reviewCount = poi.profile.totalReviews ?? 0;
-    
+    // Use rating data from POI fields, default to 0.0 and 0 if not available
+    final rating = poi.averageRating ?? poi.profile.averageRating ?? 0.0;
+    final reviewCount = poi.totalReviews ?? poi.profile.totalReviews ?? 0;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1361,10 +1363,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
 
   /// Build compact rating display widget for posting cards (horizontal layout)
   Widget _buildCompactRatingDisplay(PointOfInterest poi) {
-    // Use actual rating data from profile, default to 0.0 and 0 if not available
-    final rating = poi.profile.averageRating ?? 0.0;
-    final reviewCount = poi.profile.totalReviews ?? 0;
-    
+    // Use rating data from POI fields, default to 0.0 and 0 if not available
+    final rating = poi.averageRating ?? poi.profile.averageRating ?? 0.0;
+    final reviewCount = poi.totalReviews ?? poi.profile.totalReviews ?? 0;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1408,13 +1410,14 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           ChatPanelHeader(
             chatPoiName: poi.profile.name,
             chatPoiId: poi.profile.userId,
-            onClose: _closeChatPanel,
+            onClose: _closeChatPanel
           ),
           // Chat content
           Expanded(
             child: ChatScreen(
               poiId: poi.profile.userId,
               poiName: poi.profile.name,
+              poi: poi,
               showAppBar: false,
             ),
           ),

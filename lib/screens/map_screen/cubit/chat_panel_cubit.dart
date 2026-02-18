@@ -1,3 +1,4 @@
+import 'package:barter_app/models/map/point_of_interest.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum PanelView { none, chatsList, chat }
@@ -7,11 +8,13 @@ class ChatPanelState {
   final PanelView view;
   final String? selectedPoiId;
   final String? selectedPoiName;
+  final PointOfInterest? selectedPoi; // Full POI object when available
 
   const ChatPanelState({
     this.view = PanelView.none,
     this.selectedPoiId,
     this.selectedPoiName,
+    this.selectedPoi,
   });
 
   bool get isOpen => view != PanelView.none;
@@ -24,6 +27,7 @@ class ChatPanelState {
     PanelView? view,
     String? selectedPoiId,
     String? selectedPoiName,
+    PointOfInterest? selectedPoi,
     bool? clearSelection,
   }) {
     if (clearSelection == true) {
@@ -33,6 +37,7 @@ class ChatPanelState {
       view: view ?? this.view,
       selectedPoiId: selectedPoiId ?? this.selectedPoiId,
       selectedPoiName: selectedPoiName ?? this.selectedPoiName,
+      selectedPoi: selectedPoi ?? this.selectedPoi,
     );
   }
 }
@@ -47,12 +52,13 @@ class ChatPanelCubit extends Cubit<ChatPanelState> {
   }
 
   /// Open chat with a specific POI
-  void openChat(String poiId, String poiName) {
+  void openChat(String poiId, String poiName, {PointOfInterest? poi}) {
     emit(
       ChatPanelState(
         view: PanelView.chat,
         selectedPoiId: poiId,
         selectedPoiName: poiName,
+        selectedPoi: poi,
       ),
     );
   }

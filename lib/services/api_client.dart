@@ -57,7 +57,6 @@ abstract class ApiClient {
     // Add interceptors for logging, auth, etc. if needed
     dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     dio.interceptors.add(ReviewRiskTrackingInterceptor());
-    // Example: Add an Auth Interceptor
     dio.interceptors.add(InterceptorsWrapper(
 
        onRequest:(options, handler) async {
@@ -107,7 +106,6 @@ abstract class ApiClient {
            signer.init(true, pc.PrivateKeyParameter<pc.ECPrivateKey>(privateECKey));
 
            final challengeBytes = Uint8List.fromList(utf8.encode(challenge));
-
            final signature = signer.generateSignature(challengeBytes) as pc.ECSignature;
 
            // 4. Encode the signature
@@ -194,9 +192,6 @@ abstract class ApiClient {
       @Query("seeking") String? seeking,
       @Query("offering") String? offering,
   );
-
-  @GET('/pois/{id}')
-  Future<PointOfInterest> getPointOfInterestById(@Path('id') String id);
 
   ///////////// POSTINGS ////////////
 
@@ -356,11 +351,6 @@ abstract class ApiClient {
       @Path('id') String transactionId,
       @Body() UpdateTransactionStatusRequest request);
 
-  /// Get all transactions for a user | Returns list of TransactionResponse
-  @GET('/api/v1/transactions/user/{userId}')
-  Future<List<TransactionResponse>> getUserTransactions(
-      @Path('userId') String userId);
-
   // Reviews API
   
   /// Check if user can review another user (for conversation deletion flow)
@@ -381,11 +371,6 @@ abstract class ApiClient {
   /// Returns UserReviewsResponse with reviews list, totalCount, and averageRating
   @GET('/api/v1/reviews/user/{userId}')
   Future<UserReviewsResponse> getUserReviews(@Path('userId') String userId);
-
-  /// Get reviews for a specific transaction (both parties must be involved)
-  /// Returns list of ReviewResponse for the transaction
-  @GET('/api/v1/reviews/transaction/{transactionId}')
-  Future<List<ReviewResponse>> getTransactionReviews(@Path('transactionId') String transactionId);
 
   // Reputation Endpoints
   

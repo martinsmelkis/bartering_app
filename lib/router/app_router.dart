@@ -1,7 +1,7 @@
+import 'package:barter_app/models/map/point_of_interest.dart';
 import 'package:barter_app/screens/chat_screen/chat_screen.dart';
 import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
 import 'package:barter_app/screens/device_migration_screen/device_migration_screen.dart';
-import 'package:barter_app/screens/device_migration_screen/source_migration_screen.dart';
 import 'package:barter_app/screens/forgot_password_screen/forgot_password_screen.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/screens/interests_screen/interests_screen.dart';
@@ -127,12 +127,14 @@ class AppRouter {
         builder: (context, state) {
           // Support passing initialPois via extra parameter
           final extra = state.extra;
-          logDebug('@@@@@@@@@ Map route builder - extra type: ${extra.runtimeType}, content: $extra');
+          logDebug('@@@@@@@@@ Map route builder - extra type: ${extra.runtimeType}, content: $extra, queryParams: ${state.uri.queryParameters}');
+
           if (extra is Map<String, dynamic> && extra['initialPois'] != null) {
             final initialPois = extra['initialPois'];
             logDebug('@@@@@@@@@ Map route - initialPois type: ${initialPois.runtimeType}, length: ${initialPois is List ? initialPois.length : "N/A"}');
             return MapScreenV2(initialPois: initialPois);
           }
+          
           logDebug('@@@@@@@@@ Map route - No initialPois, using default MapScreenV2');
           return const MapScreenV2();
         },
@@ -177,7 +179,20 @@ class AppRouter {
         name: 'chat',
         builder: (context, state) {
           final userId = state.pathParameters['userId']!;
-          return ChatScreen(poiId: userId);
+          
+          // Extract POI from extra if provided
+          PointOfInterest? poi;
+          final extra = state.extra;
+          if (extra is Map<String, dynamic> && extra['poi'] is PointOfInterest) {
+            poi = extra['poi'] as PointOfInterest;
+            logDebug('@@@@@@@@@ ChatScreen builder - received POI from extra for userId: $userId');
+          }
+          
+          return ChatScreen(
+            poiId: userId,
+            poiName: poi?.profile.name,
+            poi: poi
+          );
         },
       ),
 
@@ -185,7 +200,7 @@ class AppRouter {
       GoRoute(
         path: '/chats',
         name: 'chats',
-        builder: (context, state) => const ChatsListScreen(
+        builder: (context, state) => ChatsListScreen(
           showAppBar: true,
         ),
       ),
