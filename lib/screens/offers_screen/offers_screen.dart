@@ -1,3 +1,4 @@
+import 'package:barter_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -5,9 +6,9 @@ import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repositories/user_repository.dart';
 import '../../services/api_client.dart';
-import '../../utils/attribute_style_helper.dart';
 import '../../utils/text_utils.dart';
 import '../../widgets/responsive_center_container.dart';
+import '../../widgets/selectable_attribute_bubble.dart';
 import 'cubit/offers_cubit.dart';
 
 class OffersScreen extends StatelessWidget {
@@ -94,7 +95,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
               final screenWidth = MediaQuery.of(context).size.width;
               final isLargeScreen = screenWidth >= 600;
               final spacing = isLargeScreen ? 12.0 : 4.0;
-              final runSpacing = isLargeScreen ? 12.0 : 0.0;
+              final runSpacing = isLargeScreen ? 12.0 : 2.0;
               
               return Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -108,15 +109,9 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                         l10n.selectTheOffersThatYouCanProvide,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.red.shade900,
-                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.2,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black26,
-                              offset: const Offset(1, 1),
-                              blurRadius: 1,
-                            ),
-                          ],
+                          color: Colors.black.withValues(alpha: 0.8),
+                          //fontWeight: FontWeight.bold,
+                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 12) * 1.2,
                         ),
                       ),
                     ),
@@ -127,39 +122,16 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                       children: state.allOffers.map((offer) {
                         final isSelected = state.selectedOffers.contains(
                             offer);
-                        final chipColor = AttributeStyleHelper
-                            .getColorForStyleHint(
-                          offer.uiStyleHint,
-                          isSelected: isSelected,
-                        );
-                        final textColor = AttributeStyleHelper
-                            .getTextColor(
-                          offer.uiStyleHint,
-                          isSelected: isSelected,
-                        );
 
-                        return ChoiceChip(
-                          label: Text(TextUtils.getTranslatedOrNormalizedAttribute(offer.effectiveAttributeKey, context)),
-                          selected: isSelected,
+                        return SelectableAttributeBubble(
+                          attribute: offer,
+                          isSelected: isSelected,
+                          scaleFactor: 1.15,
                           onSelected: (selected) {
                             context
                                 .read<OffersCubit>()
                                 .toggleInterest(offer);
                           },
-                          selectedColor: Colors.blue,
-                          backgroundColor: chipColor,
-                          checkmarkColor: Colors.white,
-                          side: BorderSide(
-                            color: AttributeStyleHelper.getBorderColor(
-                                offer.uiStyleHint),
-                            width: isSelected ? 2.0 : 1.0,
-                          ),
-                          labelStyle: TextStyle(
-                            color: textColor,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
                         );
                       }).toList(),
                     ),

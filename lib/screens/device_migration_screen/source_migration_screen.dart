@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../../configure_dependencies.dart';
 
@@ -519,74 +520,81 @@ class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(
-              Icons.phone_android,
-              color: AppColors.primary,
+      useRootNavigator: kIsWeb,
+      builder: (dialogContext) => PointerInterceptor(
+        child: AlertDialog(
+          title: Row(
+            children: [
+              Icon(
+                Icons.phone_android,
+                color: AppColors.primary,
+              ),
+              SizedBox(width: 8.w),
+              Text(l10n.newDeviceDetected),
+            ],
+          ),
+          content: Text(
+            l10n.newDeviceDetectedMessage,
+          ),
+          actions: [
+            PointerInterceptor(
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  // Deny migration - cancel the session
+                  setState(() {
+                    _errorMessage = l10n.migrationDenied;
+                  });
+                },
+                child: Text(
+                  l10n.deny,
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
             ),
-            SizedBox(width: 8.w),
-            Text(l10n.newDeviceDetected),
+            PointerInterceptor(
+              child: ElevatedButton(
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop();
+                  // Allow migration - prepare and send data
+                  setState(() {
+                    _isSendingPayload = true;
+                  });
+                  
+                  final cubit = context.read<DeviceMigrationCubit>();
+                  final success = await cubit.prepareAndSendMigrationPayload(
+                    targetDeviceId,
+                    targetPublicKey,
+                  );
+                  
+                  setState(() {
+                    _isSendingPayload = false;
+                  });
+                  
+                  if (success) {
+                    // Show success message
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.migrationCompleted),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } else {
+                    setState(() {
+                      _errorMessage = l10n.failedToSendMigration;
+                    });
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                ),
+                child: Text(l10n.allow),
+              ),
+            ),
           ],
         ),
-        content: Text(
-          l10n.newDeviceDetectedMessage,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              // Deny migration - cancel the session
-              setState(() {
-                _errorMessage = l10n.migrationDenied;
-              });
-            },
-            child: Text(
-              l10n.deny,
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              // Allow migration - prepare and send data
-              setState(() {
-                _isSendingPayload = true;
-              });
-              
-              final cubit = context.read<DeviceMigrationCubit>();
-              final success = await cubit.prepareAndSendMigrationPayload(
-                targetDeviceId,
-                targetPublicKey,
-              );
-              
-              setState(() {
-                _isSendingPayload = false;
-              });
-              
-              if (success) {
-                // Show success message
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.migrationCompleted),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
-              } else {
-                setState(() {
-                  _errorMessage = l10n.failedToSendMigration;
-                });
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-            ),
-            child: Text(l10n.allow),
-          ),
-        ],
       ),
     );
   }

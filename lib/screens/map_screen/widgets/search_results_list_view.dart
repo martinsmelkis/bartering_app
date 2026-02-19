@@ -1327,6 +1327,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     // Use rating data from POI fields, default to 0.0 and 0 if not available
     final rating = poi.averageRating ?? poi.profile.averageRating ?? 0.0;
     final reviewCount = poi.totalReviews ?? poi.profile.totalReviews ?? 0;
+    final ratingColor = _getRatingColor(rating);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1334,18 +1335,31 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.star,
-              size: 14,
-              color: Colors.amber[700],
-            ),
-            const SizedBox(width: 2),
-            Text(
-              rating.toStringAsFixed(1),
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[800],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                color: ratingColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.star,
+                    size: 12,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 2),
+                  Text(
+                    rating.toStringAsFixed(1),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -1366,22 +1380,36 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     // Use rating data from POI fields, default to 0.0 and 0 if not available
     final rating = poi.averageRating ?? poi.profile.averageRating ?? 0.0;
     final reviewCount = poi.totalReviews ?? poi.profile.totalReviews ?? 0;
+    final ratingColor = _getRatingColor(rating);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          Icons.star,
-          size: 12,
-          color: Colors.amber[700],
-        ),
-        const SizedBox(width: 2),
-        Text(
-          rating.toStringAsFixed(1),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+          decoration: BoxDecoration(
+            color: ratingColor,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: Colors.white, width: 1.0),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.star,
+                size: 10,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 1),
+              Text(
+                rating.toStringAsFixed(1),
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(width: 2),
@@ -1394,6 +1422,14 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         ),
       ],
     );
+  }
+
+  /// Get rating color based on rating value (matches POI sheet styling)
+  Color _getRatingColor(double rating) {
+    if (rating == 0.0) return Colors.grey.shade400;
+    if (rating >= 4.0) return Colors.green;
+    if (rating > 3.0) return Colors.amber;
+    return Colors.red;
   }
 
   /// Build inline chat panel that appears below search results

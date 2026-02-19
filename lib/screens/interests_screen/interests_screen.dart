@@ -2,6 +2,7 @@ import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,9 +10,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/user/parsed_attribute_data.dart';
-import '../../utils/attribute_style_helper.dart';
 import '../../utils/text_utils.dart';
 import '../../widgets/responsive_center_container.dart';
+import '../../widgets/selectable_attribute_bubble.dart';
 
 class InterestsScreen extends StatelessWidget {
   bool? isInitialOnboarding = true;
@@ -123,15 +124,9 @@ class _InterestsViewState extends State<InterestsView> {
                         l10n.selectTheInterestsThatMatchYourPreferences,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.red.shade800,
-                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * 1.2,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black26,
-                              offset: const Offset(1, 1),
-                              blurRadius: 1,
-                            ),
-                          ],
+                          color: Colors.black.withValues(alpha: 0.8),
+                          //fontWeight: FontWeight.bold,
+                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 12) * 1.2,
                         ),
                       ),
                     ),
@@ -142,39 +137,16 @@ class _InterestsViewState extends State<InterestsView> {
                       children: state.allInterests.map((interest) {
                         final isSelected =
                         state.selectedInterests.contains(interest);
-                        final chipColor = AttributeStyleHelper
-                            .getColorForStyleHint(
-                          interest.uiStyleHint,
-                          isSelected: isSelected,
-                        );
-                        final textColor = AttributeStyleHelper
-                            .getTextColor(
-                          interest.uiStyleHint,
-                          isSelected: isSelected,
-                        );
 
-                        return ChoiceChip(
-                          label: Text(TextUtils.getTranslatedOrNormalizedAttribute(interest.effectiveAttributeKey, context)),
-                          selected: isSelected,
+                        return SelectableAttributeBubble(
+                          attribute: interest,
+                          isSelected: isSelected,
+                          scaleFactor: 1.15,
                           onSelected: (selected) {
                             context
                                 .read<InterestsCubit>()
                                 .toggleInterest(interest);
                           },
-                          selectedColor: Colors.blue,
-                          backgroundColor: chipColor,
-                          checkmarkColor: Colors.white,
-                          side: BorderSide(
-                            color: AttributeStyleHelper.getBorderColor(
-                                interest.uiStyleHint),
-                            width: isSelected ? 2.0 : 1.0,
-                          ),
-                          labelStyle: TextStyle(
-                            color: textColor,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
                         );
                       }).toList(),
                     ),

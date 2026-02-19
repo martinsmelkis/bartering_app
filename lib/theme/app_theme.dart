@@ -29,7 +29,7 @@ class AppTheme {
       bodyLarge: TextStyle(
           fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.5),
       bodyMedium: TextStyle(
-          fontSize: 14, fontWeight: FontWeight.w400, letterSpacing: 0.25),
+          fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.2),
       bodySmall: TextStyle(
           fontSize: 12, fontWeight: FontWeight.w400, letterSpacing: 0.4),
 

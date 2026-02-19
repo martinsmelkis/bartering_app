@@ -367,63 +367,129 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
   }
 
   Widget _buildCodeInput(double fontScale) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(10, (index) {
-        final isFilled = _characters[index] != null;
-        return Row(
-          children: [
-            SizedBox(
-              width: 48,
-              height: 55,
-              child: RawKeyboardListener(
-                focusNode: FocusNode(skipTraversal: true),
-                onKey: (event) => _onKeyPressed(index, event),
-                child: TextField(
-                  controller: _controllers[index],
-                  focusNode: _focusNodes[index],
-                  textAlign: TextAlign.center,
-                  textCapitalization: TextCapitalization.characters,
-                  maxLength: 1,
-                  style: TextStyle(
-                    fontSize: 21 / fontScale,
-                    fontWeight: FontWeight.bold,
-                    color: isFilled ? AppColors.primary : Colors.grey,
-                  ),
-                  decoration: InputDecoration(
-                    counterText: '',
-                    filled: true,
-                    fillColor: isFilled
-                        ? AppColors.primary.withValues(alpha: 0.1)
-                        : Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(
-                        color: isFilled
-                            ? AppColors.primary
-                            : Colors.grey.shade300,
+    return Column(
+      children: [
+        // First row: characters 0-4
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(5, (index) {
+            final isFilled = _characters[index] != null;
+            return Row(
+              children: [
+                SizedBox(
+                  width: 48,
+                  height: 55,
+                  child: RawKeyboardListener(
+                    focusNode: FocusNode(skipTraversal: true),
+                    onKey: (event) => _onKeyPressed(index, event),
+                    child: TextField(
+                      controller: _controllers[index],
+                      focusNode: _focusNodes[index],
+                      textAlign: TextAlign.center,
+                      textCapitalization: TextCapitalization.characters,
+                      maxLength: 1,
+                      style: TextStyle(
+                        fontSize: 21 / fontScale,
+                        fontWeight: FontWeight.bold,
+                        color: isFilled ? AppColors.primary : Colors.grey,
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(
-                        color: AppColors.primary,
-                        width: 2,
+                      decoration: InputDecoration(
+                        counterText: '',
+                        filled: true,
+                        fillColor: isFilled
+                            ? AppColors.primary.withValues(alpha: 0.1)
+                            : Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                          borderSide: BorderSide(
+                            color: isFilled
+                                ? AppColors.primary
+                                : Colors.grey.shade300,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                          borderSide: BorderSide(
+                            color: AppColors.primary,
+                            width: 2,
+                          ),
+                        ),
                       ),
+                      onChanged: (value) => _onCharacterChanged(index, value),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+                      ],
                     ),
                   ),
-                  onChanged: (value) => _onCharacterChanged(index, value),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
-                  ],
                 ),
-              ),
-            ),
-            // Add spacing after every 2 characters (except last)
-            if (index < 9) SizedBox(width: index % 2 == 1 ? 12.w : 4.w),
-          ],
-        );
-      }),
+                // Add spacing after each box (except last)
+                if (index < 4) SizedBox(width: index % 2 == 1 ? 12.w : 4.w),
+              ],
+            );
+          }),
+        ),
+        SizedBox(height: 12.h),
+        // Second row: characters 5-9
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(5, (subIndex) {
+            final index = subIndex + 5;
+            final isFilled = _characters[index] != null;
+            return Row(
+              children: [
+                SizedBox(
+                  width: 48,
+                  height: 55,
+                  child: RawKeyboardListener(
+                    focusNode: FocusNode(skipTraversal: true),
+                    onKey: (event) => _onKeyPressed(index, event),
+                    child: TextField(
+                      controller: _controllers[index],
+                      focusNode: _focusNodes[index],
+                      textAlign: TextAlign.center,
+                      textCapitalization: TextCapitalization.characters,
+                      maxLength: 1,
+                      style: TextStyle(
+                        fontSize: 21 / fontScale,
+                        fontWeight: FontWeight.bold,
+                        color: isFilled ? AppColors.primary : Colors.grey,
+                      ),
+                      decoration: InputDecoration(
+                        counterText: '',
+                        filled: true,
+                        fillColor: isFilled
+                            ? AppColors.primary.withValues(alpha: 0.1)
+                            : Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                          borderSide: BorderSide(
+                            color: isFilled
+                                ? AppColors.primary
+                                : Colors.grey.shade300,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                          borderSide: BorderSide(
+                            color: AppColors.primary,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      onChanged: (value) => _onCharacterChanged(index, value),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+                      ],
+                    ),
+                  ),
+                ),
+                // Add spacing after each box (except last)
+                if (subIndex < 4) SizedBox(width: subIndex % 2 == 1 ? 12.w : 4.w),
+              ],
+            );
+          }),
+        ),
+      ],
     );
   }
 

@@ -76,10 +76,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get errorDuringInitialization => 'Kļūda inicializācijas laikā.';
 
   @override
-  String get selectYourInterests => 'Ko jūs meklējat/vajadzīgs?';
+  String get selectYourInterests => 'Ko Jūs meklējat?';
 
   @override
-  String get selectYourOffers => 'Ko jums ir/piedāvājat?';
+  String get selectYourOffers => 'Ko Jūs piedāvājat?';
 
   @override
   String get userInterestedIn => 'Interesē:';
@@ -2619,109 +2619,111 @@ class AppLocalizationsLv extends AppLocalizations {
       'Dalieties ar savām interesēm, lai atrastu labākās atbilstības ar citiem!';
 
   @override
-  String get migrateToNewDevice => 'Migrate to New Device';
+  String get migrateToNewDevice => 'Pārcelt uz jaunu ierīci';
 
   @override
-  String get migrateYourAccount => 'Migrate Your Account';
+  String get migrateYourAccount => 'Pārcelt savu kontu';
 
   @override
   String get migrationCodeDescription =>
-      'Generate a migration code to transfer your account data to a new device. The code will be valid for 15 minutes.';
+      'Ģenerējiet pārcelšanas kodu, lai pārsūtītu konta datus uz jaunu ierīci. Kods būs derīgs 15 minūtes.';
 
   @override
-  String get generateMigrationCode => 'Generate Migration Code';
+  String get generateMigrationCode => 'Ģenerēt pārcelšanas kodu';
 
   @override
-  String get generating => 'Generating...';
+  String get generating => 'Ģenerē...';
 
   @override
-  String get yourMigrationCode => 'Your Migration Code';
+  String get yourMigrationCode => 'Jūsu pārcelšanas kods';
 
   @override
   String expiresIn(String time) {
-    return 'Expires in: $time';
+    return 'Derīgs vēl: $time';
   }
 
   @override
-  String get copyCode => 'Copy Code';
+  String get copyCode => 'Kopēt kodu';
 
   @override
-  String get codeCopied => 'Migration code copied to clipboard';
+  String get codeCopied => 'Pārcelšanas kods nokopēts starpliktuvē';
 
   @override
-  String get generateNewCode => 'Generate New Code';
+  String get generateNewCode => 'Ģenerēt jaunu kodu';
 
   @override
-  String get migrationStep1 => 'Generate a migration code';
+  String get migrationStep1 => 'Ģenerējiet pārcelšanas kodu';
 
   @override
-  String get migrationStep2 => 'Open the app on your new device';
+  String get migrationStep2 => 'Atveriet lietotni jaunajā ierīcē';
 
   @override
   String get migrationStep3 =>
-      'Tap \"Import Existing Account\" on the welcome screen';
+      'Sākumekrānā pieskarieties \"Ievietot esošo kontu\"';
 
   @override
-  String get migrationStep4 => 'Enter this code on the new device';
+  String get migrationStep4 => 'Ievadiet šo kodu jaunajā ierīcē';
 
   @override
-  String get newDeviceDetected => 'New Device Detected';
+  String get newDeviceDetected => 'Jauna ierīce konstatēta';
 
   @override
   String get newDeviceDetectedMessage =>
-      'A new device wants to import your account data. Do you want to allow this?';
+      'Jauna ierīce vēlas importēt jūsu konta datus. Vai vēlaties to atļaut?';
 
   @override
-  String get deny => 'Deny';
+  String get deny => 'Aizliegt';
 
   @override
-  String get allow => 'Allow';
+  String get allow => 'Atļaut';
 
   @override
-  String get migrationDenied => 'Migration denied by user';
+  String get migrationDenied => 'Pārcelšana aizliegta lietotāja';
 
   @override
-  String get migrationCompleted => 'Migration completed successfully!';
+  String get migrationCompleted => 'Pārcelšana pabeigta veiksmīgi!';
 
   @override
-  String get failedToSendMigration => 'Failed to send migration data';
+  String get failedToSendMigration => 'Neizdevās nosūtīt pārcelšanas datus';
 
   @override
   String get migrationCodeExpired =>
-      'Migration code has expired. Please generate a new one.';
+      'Pārcelšanas kods ir beidzies. Lūdzu, ģenerējiet jaunu.';
 
   @override
-  String get targetDeviceTimeout => 'Target device did not join in time';
+  String get targetDeviceTimeout => 'Mērķa ierīce nepievienojās laikā';
 
   @override
-  String get expired => 'Expired';
+  String get expired => 'Beidzies';
 
   @override
-  String get importAccount => 'Import Account';
+  String get importAccount => 'Ievietot kontu';
 
   @override
   String get importAccountDescription =>
-      'Enter the 10-character migration code from your other device to import your account data.';
+      'Ievadiet 10 rakstzīmju pārcelšanas kodu no savas citas ierīces, lai importētu konta datus.';
 
   @override
-  String get failedToJoinMigration => 'Failed to join migration session';
+  String get failedToJoinMigration =>
+      'Neizdevās pievienoties pārcelšanas sesijai';
 
   @override
   String get migrationTimedOut =>
-      'Migration timed out. Please try again with a new code.';
+      'Pārcelšanas laiks beidzies. Lūdzu, mēģiniet vēlreiz ar jaunu kodu.';
 
   @override
-  String get failedToProcessMigration => 'Failed to process migration data';
+  String get failedToProcessMigration =>
+      'Neizdevās apstrādāt pārcelšanas datus';
 
   @override
-  String get clear => 'Clear';
+  String get clear => 'Notīrīt';
 
   @override
-  String get targetStep1 => 'Open the app on your other device';
+  String get targetStep1 => 'Atveriet lietotni savā citā ierīcē';
 
   @override
-  String get targetStep2 => 'Go to Settings → Account → Migrate Device';
+  String get targetStep2 => 'Dodieties uz Iestatījumi → Konts → Pārcelt ierīci';
 
   @override
-  String get targetStep3 => 'Enter the code shown on that device here';
+  String get targetStep3 => 'Ievadiet kodu, kas redzams uz šīs ierīces';
 }

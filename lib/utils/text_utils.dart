@@ -34,7 +34,8 @@ class TextUtils {
   static String getTranslatedOrNormalizedAttribute(String attribute, BuildContext context) {
     String parsedAttribute;
     try {
-      var localizedItem = context.parseL10n('attr_$attribute');
+      var normalizedAttr = normalizeAttributeId(attribute);
+      var localizedItem = context.parseL10n('attr_$normalizedAttr');
       if (localizedItem.contains("Translation key not found")) {
         throw Exception("Translation key not found");
       }
