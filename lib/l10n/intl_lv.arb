@@ -987,6 +987,9 @@
   "clear": "Notīrīt",
   "targetStep1": "Atveriet lietotni savā citā ierīcē",
   "targetStep2": "Dodieties uz Iestatījumi → Konts → Pārcelt ierīci",
-  "targetStep3": "Ievadiet kodu, kas redzams uz šīs ierīces"
+  "targetStep3": "Ievadiet kodu, kas redzams uz šīs ierīces",
+
+  "showMore": "Rādīt vairāk",
+  "showLess": "Rādīt mazāk"
 
 }

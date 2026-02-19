@@ -183,7 +183,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
                   ),
             );
           } else if (state.status == LocationPickerStatus.success) {
-            context.go('/map');
+            context.pushReplacement('/map');
           }
         },
       child: CustomPickerLocation(

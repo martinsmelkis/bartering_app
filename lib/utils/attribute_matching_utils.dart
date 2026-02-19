@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/user/parsed_attribute_data.dart';
 import '../models/user/user_attribute_entry_data.dart';
 import '../repositories/user_repository.dart';
 import '../configure_dependencies.dart';

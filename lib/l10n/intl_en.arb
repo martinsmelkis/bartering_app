@@ -822,6 +822,8 @@
   "shareApp": "Share App",
   "copyLink": "Copy Link",
   "close": "Close",
+  "showMore": "Show more",
+  "showLess": "Show less",
   "linkCopiedToClipboard": "Link copied to clipboard!",
   "unableToShareAtThisTime": "Unable to share at this time",
   "inviteMessageShare": "Hey! Join me on BarterApp - a great way to trade items and services with people nearby! 🔄\n\n{appLink}",

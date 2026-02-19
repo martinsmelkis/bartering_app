@@ -230,7 +230,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       ElevatedButton(
                         onPressed: () {
                           if (context.mounted) {
-                            context.go('/onboarding?isInitialOnboarding=true');
+                            context.pushReplacement('/onboarding?isInitialOnboarding=true');
                           }
                         },
                         style: ElevatedButton.styleFrom(

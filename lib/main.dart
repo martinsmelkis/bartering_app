@@ -26,7 +26,7 @@ void main() async {
   await dotenv.load(fileName: flavor.envFileName);
   logDebug('✅ Environment variables loaded');
 
-  // Run security tests
+  // TODO eventually, in release version, run security tests
   //if (!kDebugMode) {
   //  await SecurityTestHelper.runAllTests();
   //}
@@ -63,7 +63,7 @@ class BarterApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: AppLocalizations.of(context)?.appTitle ?? 'Barter App',
+      title: AppLocalizations.of(context)?.appTitle ?? 'Bartering App',
       theme: ThemeData(
         primarySwatch: Colors.orange, // Defines the primary color swatch for the app
         useMaterial3: true, // Opt-in for Material 3 design system

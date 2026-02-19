@@ -22,7 +22,6 @@ import '../../../widgets/online_status_badge.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/poi_panel_cubit.dart';
 import '../cubit/chat_panel_cubit.dart';
-import '../cubit/profile_panel_cubit.dart';
 import '../../chat_screen/widgets/chat_panel_header.dart';
 import 'poi_details_bottom_sheet.dart';
 import '../../chat_screen/chat_screen.dart';
@@ -1170,7 +1169,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     final postings = poi.profile.activePostingIds ?? [];
     
     // Check if there are more items to show
-    final hasMoreItems = interests.length > 3 || offerings.length > 3 || postings.isNotEmpty;
+    final hasMoreItems = interests.length > 4 || offerings.length > 4 || postings.isNotEmpty;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1189,7 +1188,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           Wrap(
             spacing: 6,
             runSpacing: 6,
-            children: (isExpanded ? interests : interests.take(3)).map((attr) {
+            children: (isExpanded ? interests : interests.take(4)).map((attr) {
               final normalizedAttr = TextUtils.getTranslatedOrNormalizedAttribute(
                   attr.attributeId, context);
               
@@ -1227,7 +1226,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           Wrap(
             spacing: 6,
             runSpacing: 6,
-            children: (isExpanded ? offerings : offerings.take(3)).map((attr) {
+            children: (isExpanded ? offerings : offerings.take(4)).map((attr) {
               final normalizedAttr = TextUtils.getTranslatedOrNormalizedAttribute(
                   attr.attributeId, context);
               
@@ -1306,7 +1305,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    isExpanded ? 'Show less' : 'Show more',
+                    isExpanded ? l10n.showLess : l10n.showMore,
                     style: TextStyle(
                       fontSize: 11,
                       color: AppColors.primary,

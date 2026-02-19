@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:barter_app/l10n/app_localizations.dart';
 import 'package:barter_app/models/auth/device_management_models.dart';
 import 'package:barter_app/screens/device_migration_screen/cubit/device_migration_cubit.dart';
-import 'package:barter_app/screens/device_migration_screen/cubit/device_migration_state.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';

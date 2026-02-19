@@ -217,7 +217,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   if (widget.isInitialOnboarding == true) {
                     debugPrint('@@@@@@@@@@@ Navigating to InterestsScreen');
                     // Initial onboarding: navigate to interests screen using go_router
-                    context.go('/interests');
+                    context.pushReplacement('/interests');
                   } else {
                     debugPrint('@@@@@@@@@@@ Editing mode - popping back to caller');
                     // Editing mode: pop back to previous screen (works for both mobile and web)

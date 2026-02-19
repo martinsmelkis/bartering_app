@@ -4442,6 +4442,18 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
+  /// No description provided for @showMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get showMore;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get showLess;
+
   /// No description provided for @linkCopiedToClipboard.
   ///
   /// In en, this message translates to:

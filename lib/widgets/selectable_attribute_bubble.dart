@@ -157,12 +157,10 @@ class SelectableAttributeBubble extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0 * scaleFactor),
       ),
-      side: borderColor != null
-          ? BorderSide(
-              color: borderColor,
-              width: borderWidth,
-            )
-          : null,
+      side: BorderSide(
+        color: borderColor,
+        width: borderWidth,
+      ),
       // Adjust padding for bubble-like proportions
       padding: EdgeInsets.symmetric(
         horizontal: 8.0 * scaleFactor,

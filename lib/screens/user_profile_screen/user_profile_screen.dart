@@ -20,6 +20,7 @@ import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/attribute_matching_utils.dart';
+import 'package:barter_app/utils/back_button_handler.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
@@ -38,6 +39,7 @@ import '../../configure_dependencies.dart';
 import '../../data/local/platform/platform.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repositories/chat_repository.dart';
+import '../../router/app_router.dart';
 import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/settings_service.dart';
 import '../../theme/app_colors.dart';
@@ -99,670 +101,676 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     // Check if we're in web panel mode
     final bool isWebPanel = kIsWeb && !widget.showAppBar && context.canShowSideBySide;
 
-    return BlocProvider(
-      create: (context) => NestedPanelCubit(),
-      child: BlocListener<NestedPanelCubit, NestedPanelState>(
-        listener: (context, nestedPanelState) {
-          // Notify parent when nested panel state changes (for panel expansion)
-          widget.onNestedPanelChanged?.call(nestedPanelState.isOpen);
-        },
-        child: BlocBuilder<NestedPanelCubit, NestedPanelState>(
-          builder: (context, nestedPanelState) {
-            return AdaptiveNestedPanelLayout(
-              panelType: nestedPanelState.panelType,
-              userId: nestedPanelState.userId,
-              onClose: () => context.read<NestedPanelCubit>().closePanel(),
-              mainContent: Scaffold(
-      appBar: widget.showAppBar
-          ? AppBar(
-              title: Text(l10n.accountSetupSuccess),
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            )
-          : null,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // User Info Card
-            SizedBox(
-              width: double.infinity,
-              child: Card(
-                elevation: 2,
+    return BackButtonHandler(
+      onBackPressed: () {
+        Navigator.pop(context);
+        return Future.value(false);
+      },
+      child: BlocProvider(
+        create: (context) => NestedPanelCubit(),
+        child: BlocListener<NestedPanelCubit, NestedPanelState>(
+          listener: (context, nestedPanelState) {
+            // Notify parent when nested panel state changes (for panel expansion)
+            widget.onNestedPanelChanged?.call(nestedPanelState.isOpen);
+          },
+          child: BlocBuilder<NestedPanelCubit, NestedPanelState>(
+            builder: (context, nestedPanelState) {
+              return AdaptiveNestedPanelLayout(
+                panelType: nestedPanelState.panelType,
+                userId: nestedPanelState.userId,
+                onClose: () => context.read<NestedPanelCubit>().closePanel(),
+                mainContent: Scaffold(
+        appBar: widget.showAppBar
+            ? AppBar(
+                title: Text(l10n.accountSetupSuccess),
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+              )
+            : null,
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // User Info Card
+              SizedBox(
+                width: double.infinity,
+                child: Card(
+                  elevation: 2,
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.userName,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            Text(
+                              l10n.userId,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[800],
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              widget.userId,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Courier',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: PointerInterceptor(
+                          child: IconButton(
+                            onPressed: () => _showDeleteProfileDialog(context),
+                            icon: Icon(
+                              Icons.delete_forever,
+                              color: Colors.red,
+                              size: 24,
+                            ),
+                            padding: EdgeInsets.all(8),
+                            constraints: const BoxConstraints(),
+                            tooltip: l10n.deleteProfile,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.h),
+
+              // Location Section
+              Card(
+                elevation: 1,
                 child: Stack(
                   children: [
                     Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      padding: EdgeInsets.all(12),
+                      child: Row(
                         children: [
-                          Text(
-                            widget.userName,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          Icon(
+                            Icons.location_on,
+                            color: AppColors.primary,
+                            size: 20,
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _userLocation ?? l10n.notSet,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontFamily: 'Courier',
+                                color: _userLocation != null
+                                    ? Colors.black87
+                                    : Colors.grey,
+                              ),
                             ),
                           ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            l10n.userId,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[800],
-                              fontWeight: FontWeight.w700,
-                            ),
+                          SizedBox(width: 40), // Space for the edit icon
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      top: kIsWeb ? 6 : -2,
+                      right: kIsWeb ? 6 : -2,
+                      child: PointerInterceptor(
+                        child: IconButton(
+                          onPressed: () async {
+                            // Navigate to location picker
+                            // If in full-screen mode, the location picker will handle navigation back
+                            // If in panel mode, just reload data when done
+                            if (widget.showAppBar) {
+                              // Full-screen mode: use go navigation
+                              context.push('/location-picker');
+                            } else {
+                              // Panel mode: use push and reload on return
+                              await context.push('/location-picker');
+                              if (mounted) {
+                                await _loadProfileKeywordData();
+                              }
+                            }
+                          },
+                          icon: Icon(
+                            Icons.edit,
+                            size: AppDimensions.editIconSize,
+                            color: AppColors.primary,
                           ),
-                          SizedBox(height: 4.h),
+                          padding: EdgeInsets.all(4),
+                          constraints: const BoxConstraints(),
+                          tooltip: l10n.editLocation,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.h),
+
+              // Interests Section
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Text(
+                    l10n.userInterestedIn,
+                    style: TextStyle(
+                      fontSize: isWebPanel
+                          ? AppDimensions.headingTextSize * 1.1
+                          : AppDimensions.headingTextSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  InkWell(
+                    onTap: () async {
+                      final locale = Localizations.localeOf(context);
+                      await getIt<OnboardingCubit>().completeOnboarding(
+                          locale.languageCode);
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              InterestsScreen(isInitialOnboarding: false),
+                        ),
+                      );
+
+                      // Reload data after returning from interests screen
+                      // The InterestsScreen will pop back when done, so we just reload
+                      if (mounted) {
+                        await _loadProfileKeywordData();
+                      }
+                    },
+                    child: Icon(
+                      Icons.edit,
+                      size: AppDimensions.editIconSize,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const Spacer(),
+                  InkWell(
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                          const CreatePostingScreen(isOffer: false),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.add,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 4.w),
                           Text(
-                            widget.userId,
+                            l10n.addNewPosting,
                             style: TextStyle(
                               fontSize: 12,
-                              fontFamily: 'Courier',
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: PointerInterceptor(
-                        child: IconButton(
-                          onPressed: () => _showDeleteProfileDialog(context),
-                          icon: Icon(
-                            Icons.delete_forever,
-                            color: Colors.red,
-                            size: 24,
-                          ),
-                          padding: EdgeInsets.all(8),
-                          constraints: const BoxConstraints(),
-                          tooltip: l10n.deleteProfile,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 16.h),
-
-            // Location Section
-            Card(
-              elevation: 1,
-              child: Stack(
-                children: [
-                  Padding(
+              SizedBox(height: 12.h),
+              SizedBox(
+                width: double.infinity,
+                child: Card(
+                  elevation: 1,
+                  child: Padding(
                     padding: EdgeInsets.all(12),
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.location_on,
-                          color: AppColors.primary,
-                          size: 20,
+                        widget.interests == null || widget.interests!.isEmpty
+                            ? const SizedBox()
+                            : Wrap(
+                          spacing: 7.2,
+                          runSpacing: 7.2,
+                          children: widget.interests!
+                              .where((interest) => interest != null)
+                              .map((interest) {
+                            try {
+                              return AttributeBubble(
+                                attribute: interest,
+                                matchType: AttributeMatchType.none,
+                                scaleFactor: 1.2,
+                              );
+                            } catch (e) {
+                              logDebug('Error rendering interest bubble: $e');
+                              return const SizedBox.shrink();
+                            }
+                          }).toList(),
                         ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            _userLocation ?? l10n.notSet,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontFamily: 'Courier',
-                              color: _userLocation != null
-                                  ? Colors.black87
-                                  : Colors.grey,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 40), // Space for the edit icon
                       ],
                     ),
                   ),
-                  Positioned(
-                    top: kIsWeb ? 6 : -2,
-                    right: kIsWeb ? 6 : -2,
-                    child: PointerInterceptor(
-                      child: IconButton(
-                        onPressed: () async {
-                          // Navigate to location picker
-                          // If in full-screen mode, the location picker will handle navigation back
-                          // If in panel mode, just reload data when done
-                          if (widget.showAppBar) {
-                            // Full-screen mode: use go navigation
-                            context.push('/location-picker');
-                          } else {
-                            // Panel mode: use push and reload on return
-                            await context.push('/location-picker');
-                            if (mounted) {
-                              await _loadProfileKeywordData();
-                            }
-                          }
-                        },
-                        icon: Icon(
-                          Icons.edit,
-                          size: AppDimensions.editIconSize,
-                          color: AppColors.primary,
+                ),
+              ),
+              SizedBox(height: isWebPanel ? 24.h : 12.h),
+
+              // Offerings Section
+              Row(
+                children: [
+                  Text(
+                    l10n.userOffers,
+                    style: TextStyle(
+                      fontSize: isWebPanel
+                          ? AppDimensions.headingTextSize * 1.1
+                          : AppDimensions.headingTextSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  InkWell(
+                    onTap: () async {
+                      final locale = Localizations.localeOf(context);
+                      (await getIt<InterestsCubit>().submitInterests(
+                          locale.languageCode, false));
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              OffersScreen(isInitialOnboarding: false),
                         ),
-                        padding: EdgeInsets.all(4),
-                        constraints: const BoxConstraints(),
-                        tooltip: l10n.editLocation,
+                      );
+
+                      // Reload data after returning from offers screen
+                      // The OffersScreen will pop back when done, so we just reload
+                      if (mounted) {
+                        await _loadProfileKeywordData();
+                      }
+                    },
+                    child: Icon(
+                      Icons.edit,
+                      size: AppDimensions.editIconSize,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const Spacer(),
+                  SizedBox(width: 8.w),
+                  InkWell(
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                          const CreatePostingScreen(isOffer: true),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.add,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            l10n.addNewPosting,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: 20.h),
-
-            // Interests Section
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Text(
-                  l10n.userInterestedIn,
-                  style: TextStyle(
-                    fontSize: isWebPanel 
-                        ? AppDimensions.headingTextSize * 1.1 
-                        : AppDimensions.headingTextSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 8),
-                InkWell(
-                  onTap: () async {
-                    final locale = Localizations.localeOf(context);
-                    await getIt<OnboardingCubit>().completeOnboarding(
-                        locale.languageCode);
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            InterestsScreen(isInitialOnboarding: false),
-                      ),
-                    );
-                    
-                    // Reload data after returning from interests screen
-                    // The InterestsScreen will pop back when done, so we just reload
-                    if (mounted) {
-                      await _loadProfileKeywordData();
-                    }
-                  },
-                  child: Icon(
-                    Icons.edit,
-                    size: AppDimensions.editIconSize,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const Spacer(),
-                InkWell(
-                  onTap: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                        const CreatePostingScreen(isOffer: false),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+              SizedBox(height: 12.h),
+              SizedBox(
+                width: double.infinity,
+                child: Card(
+                  elevation: 1,
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.add,
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          l10n.addNewPosting,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        widget.offerings == null || widget.offerings!.isEmpty
+                            ? const SizedBox()
+                            : Wrap(
+                          spacing: 7.2,
+                          runSpacing: 7.2,
+                          children: widget.offerings!
+                              .where((offering) => offering != null)
+                              .map((offering) {
+                            try {
+                              return AttributeBubble(
+                                attribute: offering,
+                                matchType: AttributeMatchType.none,
+                                scaleFactor: 1.2,
+                              );
+                            } catch (e) {
+                              logDebug('Error rendering offering bubble: $e');
+                              return const SizedBox.shrink();
+                            }
+                          }).toList(),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-            SizedBox(
-              width: double.infinity,
-              child: Card(
-                elevation: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      widget.interests == null || widget.interests!.isEmpty
-                          ? const SizedBox()
-                          : Wrap(
-                        spacing: 7.2,
-                        runSpacing: 7.2,
-                        children: widget.interests!
-                            .where((interest) => interest != null)
-                            .map((interest) {
-                          try {
-                            return AttributeBubble(
-                              attribute: interest,
-                              matchType: AttributeMatchType.none,
-                              scaleFactor: 1.2,
-                            );
-                          } catch (e) {
-                            logDebug('Error rendering interest bubble: $e');
-                            return const SizedBox.shrink();
-                          }
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ),
               ),
-            ),
-            SizedBox(height: isWebPanel ? 24.h : 12.h),
+              SizedBox(height: 12.h),
 
-            // Offerings Section
-            Row(
-              children: [
-                Text(
-                  l10n.userOffers,
-                  style: TextStyle(
-                    fontSize: isWebPanel 
-                        ? AppDimensions.headingTextSize * 1.1 
-                        : AppDimensions.headingTextSize,
-                    fontWeight: FontWeight.bold,
+              // Keywords Section
+              Row(
+                children: [
+                  Text(
+                    l10n.editKeywords,
+                    style: TextStyle(
+                      fontSize: AppDimensions.mediumHeadingTextSize,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(width: 8),
-                InkWell(
-                  onTap: () async {
-                    final locale = Localizations.localeOf(context);
-                    (await getIt<InterestsCubit>().submitInterests(
-                        locale.languageCode, false));
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            OffersScreen(isInitialOnboarding: false),
-                      ),
-                    );
-                    
-                    // Reload data after returning from offers screen
-                    // The OffersScreen will pop back when done, so we just reload
-                    if (mounted) {
-                      await _loadProfileKeywordData();
-                    }
-                  },
-                  child: Icon(
-                    Icons.edit,
-                    size: AppDimensions.editIconSize,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const Spacer(),
-                SizedBox(width: 8.w),
-                InkWell(
-                  onTap: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                        const CreatePostingScreen(isOffer: true),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4.h),
-                    decoration: BoxDecoration(
+                  SizedBox(width: 8),
+                  InkWell(
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              OnboardingScreen(isInitialOnboarding: false),
+                        ),
+                      );
+
+                      // Reload data after returning from onboarding screen
+                      if (mounted) {
+                        await _loadProfileKeywordData();
+
+                        // Navigate back to MapScreenV2 after editing (only in full-screen mode)
+                        // In panel mode, just stay on the current screen
+                        if (mounted && widget.showAppBar) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (_) => const MapScreenV2(),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: Icon(
+                      Icons.edit,
+                      size: AppDimensions.editIconSize,
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.add,
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          l10n.addNewPosting,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-            SizedBox(
-              width: double.infinity,
-              child: Card(
-                elevation: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      widget.offerings == null || widget.offerings!.isEmpty
-                          ? const SizedBox()
-                          : Wrap(
-                        spacing: 7.2,
-                        runSpacing: 7.2,
-                        children: widget.offerings!
-                            .where((offering) => offering != null)
-                            .map((offering) {
-                          try {
-                            return AttributeBubble(
-                              attribute: offering,
-                              matchType: AttributeMatchType.none,
-                              scaleFactor: 1.2,
-                            );
-                          } catch (e) {
-                            logDebug('Error rendering offering bubble: $e');
-                            return const SizedBox.shrink();
-                          }
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ),
-            ),
-            SizedBox(height: 12.h),
+              SizedBox(height: 12.h),
 
-            // Keywords Section
-            Row(
-              children: [
-                Text(
-                  l10n.editKeywords,
-                  style: TextStyle(
-                    fontSize: AppDimensions.mediumHeadingTextSize,
-                    fontWeight: FontWeight.bold,
-                  ),
+              // Category Stats Bar
+              if (_profileKeywordDataMap != null)
+                CategoryStatsUtils.buildCategoryStatsBar(
+                  keywordMap: _profileKeywordDataMap,
+                  attributes: [
+                    ...?(widget.interests?.where((i) => i != null)),
+                    ...?(widget.offerings?.where((o) => o != null)),
+                  ],
                 ),
-                SizedBox(width: 8),
-                InkWell(
-                  onTap: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            OnboardingScreen(isInitialOnboarding: false),
-                      ),
-                    );
-                    
-                    // Reload data after returning from onboarding screen
-                    if (mounted) {
-                      await _loadProfileKeywordData();
-                      
-                      // Navigate back to MapScreenV2 after editing (only in full-screen mode)
-                      // In panel mode, just stay on the current screen
-                      if (mounted && widget.showAppBar) {
-                        Navigator.of(context).pushReplacement(
+              SizedBox(height: 20.h),
+
+              // Notification Preferences and Match History Buttons
+              Row(
+                children: [
+                  // Notification Preferences Button
+                  InkWell(
+                    onTap: () async {
+                      // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                      if (isWebPanel) {
+                        // Open as nested panel within profile on web
+                        context.read<NestedPanelCubit>().openNotifications();
+                      } else {
+                        // Navigate to full-screen on mobile
+                        await Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) => const MapScreenV2(),
+                            builder: (_) => const NotificationsScreen(),
                           ),
                         );
                       }
-                    }
-                  },
-                  child: Icon(
-                    Icons.edit,
-                    size: AppDimensions.editIconSize,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-
-            // Category Stats Bar
-            if (_profileKeywordDataMap != null)
-              CategoryStatsUtils.buildCategoryStatsBar(
-                keywordMap: _profileKeywordDataMap,
-                attributes: [
-                  ...?(widget.interests?.where((i) => i != null)),
-                  ...?(widget.offerings?.where((o) => o != null)),
-                ],
-              ),
-            SizedBox(height: 20.h),
-
-            // Notification Preferences and Match History Buttons
-            Row(
-              children: [
-                // Notification Preferences Button
-                InkWell(
-                  onTap: () async {
-                    // Use adaptive behavior: panel within profile on web, full-screen on mobile
-                    if (isWebPanel) {
-                      // Open as nested panel within profile on web
-                      context.read<NestedPanelCubit>().openNotifications();
-                    } else {
-                      // Navigate to full-screen on mobile
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationsScreen(),
-                        ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.notifications_active,
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          l10n.notificationPreferences,
-                          style: TextStyle(
-                            fontSize: 12,
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.notifications_active,
+                            size: 18,
                             color: Colors.white,
-                            fontWeight: FontWeight.w600,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 4),
+                          Text(
+                            l10n.notificationPreferences,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 12),
-                // Match History Button
-                BlocBuilder<NotificationsCubit, NotificationsState>(
-                  bloc: getIt<NotificationsCubit>()..loadMatchHistory(),
-                  builder: (context, notificationState) {
-                    final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
+                  SizedBox(width: 12),
+                  // Match History Button
+                  BlocBuilder<NotificationsCubit, NotificationsState>(
+                    bloc: getIt<NotificationsCubit>()..loadMatchHistory(),
+                    builder: (context, notificationState) {
+                      final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
 
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        InkWell(
-                          onTap: () async {
-                            // Use adaptive behavior: panel within profile on web, full-screen on mobile
-                            if (isWebPanel) {
-                              // Open as nested panel within profile on web
-                              context.read<NestedPanelCubit>().openMatchHistory();
-                            } else {
-                              // Navigate to full-screen on mobile
-                              await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => const MatchHistoryScreen(),
-                                ),
-                              );
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 4.h),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.history,
-                                  size: 18,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  l10n.matchHistory,
-                                  style: TextStyle(
-                                    fontSize: 12,
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          InkWell(
+                            onTap: () async {
+                              // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                              if (isWebPanel) {
+                                // Open as nested panel within profile on web
+                                context.read<NestedPanelCubit>().openMatchHistory();
+                              } else {
+                                // Navigate to full-screen on mobile
+                                await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const MatchHistoryScreen(),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 4.h),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.history,
+                                    size: 18,
                                     color: Colors.white,
-                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    l10n.matchHistory,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          if (unreadCount > 0)
+                            Positioned(
+                              top: -6,
+                              right: -6,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 1.5,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        if (unreadCount > 0)
-                          Positioned(
-                            top: -6,
-                            right: -6,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 1.5,
+                                constraints: const BoxConstraints(
+                                  minWidth: 28,
+                                  minHeight: 28,
+                                ),
+                                child: Text(
+                                  unreadCount > 99 ? '99+' : '$unreadCount',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                              constraints: const BoxConstraints(
-                                minWidth: 28,
-                                minHeight: 28,
-                              ),
-                              child: Text(
-                                unreadCount > 99 ? '99+' : '$unreadCount',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
                             ),
-                          ),
-                      ],
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              InkWell(
+                onTap: () async {
+                  // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                  if (isWebPanel) {
+                    // Open as nested panel within profile on web
+                    context.read<NestedPanelCubit>().openManagePostings(widget.userId);
+                  } else {
+                    // Navigate to full-screen on mobile
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ManagePostingsScreen(userId: widget.userId),
+                      ),
                     );
-                  },
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.manage_accounts,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        l10n.managePostings,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-            SizedBox(height: 12),
-            InkWell(
-              onTap: () async {
-                // Use adaptive behavior: panel within profile on web, full-screen on mobile
-                if (isWebPanel) {
-                  // Open as nested panel within profile on web
-                  context.read<NestedPanelCubit>().openManagePostings(widget.userId);
-                } else {
-                  // Navigate to full-screen on mobile
+              ),
+              SizedBox(height: 4,),
+              InkWell(
+                onTap: () async {
+                  // Navigate to source device migration screen
                   await Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => ManagePostingsScreen(userId: widget.userId),
+                      builder: (_) => const SourceMigrationScreen(),
                     ),
                   );
-                }
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.manage_accounts,
-                      size: 18,
-                      color: Colors.white,
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      l10n.managePostings,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 4,),
-            InkWell(
-              onTap: () async {
-                // Navigate to source device migration screen
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const SourceMigrationScreen(),
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.8),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.phonelink_setup,
-                      size: 18,
-                      color: Colors.white,
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      l10n.migrateToNewDevice,
-                      style: TextStyle(
-                        fontSize: 12,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.phonelink_setup,
+                        size: 18,
                         color: Colors.white,
-                        fontWeight: FontWeight.w600,
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 4.w),
+                      Text(
+                        l10n.migrateToNewDevice,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-            ),
-          );
-        },
+              ),
+            );
+          },
+          ),
         ),
       ),
     );

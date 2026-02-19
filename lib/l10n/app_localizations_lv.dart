@@ -2324,6 +2324,12 @@ class AppLocalizationsLv extends AppLocalizations {
   String get close => 'Aizvērt';
 
   @override
+  String get showMore => 'Rādīt vairāk';
+
+  @override
+  String get showLess => 'Rādīt mazāk';
+
+  @override
   String get linkCopiedToClipboard => 'Saite nokopēta starpliktuvē!';
 
   @override

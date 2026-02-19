@@ -2293,6 +2293,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
+  String get showMore => 'Show more';
+
+  @override
+  String get showLess => 'Show less';
+
+  @override
   String get linkCopiedToClipboard => 'Link copied to clipboard!';
 
   @override
