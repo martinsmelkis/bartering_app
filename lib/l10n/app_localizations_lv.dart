@@ -2065,6 +2065,18 @@ class AppLocalizationsLv extends AppLocalizations {
   String get emailSaved => 'E-pasta adrese veiksmīgi saglabāta';
 
   @override
+  String get marketingConsentLabel =>
+      'Piekrītu saņemt mārketinga e-pastus par jaunām funkcijām, piedāvājumiem un atjauninājumiem';
+
+  @override
+  String get marketingConsentDescription =>
+      'Mēs varam jums nosūtīt reizēm e-pastus par mūsu pakalpojumiem. Jūs jebkurā laikā varat atteikties no abonēšanas.';
+
+  @override
+  String get marketingConsentRequired =>
+      'Lūdzu, piekrītiet saņemt mārketinga e-pastus, lai turpinātu';
+
+  @override
   String get deleteProfile => 'Dzēst profilu';
 
   @override

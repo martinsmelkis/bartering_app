@@ -46,6 +46,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     bool? notificationsEnabled,
     int? quietHoursStart,
     int? quietHoursEnd,
+    bool? marketingConsent,
   }) async {
     try {
       // Build request from parameters if not provided
@@ -55,6 +56,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
             notificationsEnabled: notificationsEnabled,
             quietHoursStart: quietHoursStart == -1 ? null : quietHoursStart,
             quietHoursEnd: quietHoursEnd == -1 ? null : quietHoursEnd,
+            marketingConsent: marketingConsent,
           );
 
       final response = await _apiClient.updateNotificationContacts(updateRequest);

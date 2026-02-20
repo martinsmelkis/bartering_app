@@ -19,6 +19,7 @@ class _ContactsTabState extends State<ContactsTab> {
   final _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
+  bool _marketingConsent = false; // Default to false - unselected by default (GDPR compliant)
 
   @override
   void dispose() {
@@ -32,11 +33,11 @@ class _ContactsTabState extends State<ContactsTab> {
 
     return BlocBuilder<NotificationsCubit, NotificationsState>(
       builder: (context, state) {
-        final contacts = state.contacts;
+        final contacts = state.contacts!;
 
         // Show email input form if no contacts found (404 or empty response)
         if (contacts == null) {
-          return _buildEmailInputForm(context, l10n);
+          //return _buildEmailInputForm(context, l10n);
         }
 
         return RefreshIndicator(
@@ -285,6 +286,52 @@ class _ContactsTabState extends State<ContactsTab> {
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.h),
+
+              // Marketing Consent Section
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.campaign, color: AppColors.primary),
+                          SizedBox(width: 8),
+                          Text(
+                            'Marketing Preferences',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12.h),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          l10n.marketingConsentLabel,
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        subtitle: Text(
+                          l10n.marketingConsentDescription,
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        value: contacts.marketingConsent,
+                        activeColor: AppColors.primary,
+                        onChanged: (value) {
+                          context
+                              .read<NotificationsCubit>()
+                              .updateContacts(marketingConsent: value);
+                        },
                       ),
                     ],
                   ),
@@ -609,6 +656,49 @@ class _ContactsTabState extends State<ContactsTab> {
                 },
                 enabled: !_isSubmitting,
               ),
+              SizedBox(height: 16.h),
+              // Marketing Consent Checkbox - GDPR compliant, unselected by default
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                padding: EdgeInsets.all(12.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        l10n.marketingConsentLabel,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      value: _marketingConsent,
+                      activeColor: AppColors.primary,
+                      onChanged: _isSubmitting
+                          ? null
+                          : (value) {
+                              setState(() {
+                                _marketingConsent = value ?? false;
+                              });
+                            },
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.w, right: 8.w, bottom: 8.h),
+                      child: Text(
+                        l10n.marketingConsentDescription,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               SizedBox(height: 24.h),
               ElevatedButton(
                 onPressed: _isSubmitting ? null : () => _submitEmail(context),
@@ -658,7 +748,7 @@ class _ContactsTabState extends State<ContactsTab> {
       final email = _emailController.text.trim();
       final message = await context
           .read<NotificationsCubit>()
-          .updateContacts(email: email);
+          .updateContacts(email: email, marketingConsent: _marketingConsent);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -669,8 +759,11 @@ class _ContactsTabState extends State<ContactsTab> {
           ),
         );
         
-        // Clear the form
+        // Clear the form and reset consent checkbox
         _emailController.clear();
+        setState(() {
+          _marketingConsent = false;
+        });
       }
     } catch (e) {
       if (context.mounted) {

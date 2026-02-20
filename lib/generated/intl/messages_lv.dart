@@ -856,6 +856,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "emailSaved": MessageLookupByLibrary.simpleMessage(
       "E-pasta adrese veiksmīgi saglabāta",
     ),
+    "marketingConsentLabel": MessageLookupByLibrary.simpleMessage(
+      "Piekrītu saņemt mārketinga e-pastus par jaunām funkcijām, piedāvājumiem un atjauninājumiem",
+    ),
+    "marketingConsentDescription": MessageLookupByLibrary.simpleMessage(
+      "Mēs varam jums nosūtīt reizēm e-pastus par mūsu pakalpojumiem. Jūs jebkurā laikā varat atteikties no abonēšanas.",
+    ),
+    "marketingConsentRequired": MessageLookupByLibrary.simpleMessage(
+      "Lūdzu, piekrītiet saņemt mārketinga e-pastus, lai turpinātu",
+    ),
     "emailUpdated": MessageLookupByLibrary.simpleMessage("E-pasts atjaunināts"),
     "enableNotifications": MessageLookupByLibrary.simpleMessage(
       "Ieslēgt paziņojumus",

@@ -3992,6 +3992,24 @@ abstract class AppLocalizations {
   /// **'Email address saved successfully'**
   String get emailSaved;
 
+  /// No description provided for @marketingConsentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to receive marketing emails about new features, offers, and updates'**
+  String get marketingConsentLabel;
+
+  /// No description provided for @marketingConsentDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'We may send you occasional emails about our services. You can unsubscribe at any time.'**
+  String get marketingConsentDescription;
+
+  /// No description provided for @marketingConsentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please consent to receive marketing emails to continue'**
+  String get marketingConsentRequired;
+
   /// No description provided for @deleteProfile.
   ///
   /// In en, this message translates to:

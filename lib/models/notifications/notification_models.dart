@@ -24,6 +24,7 @@ class UserNotificationContacts {
   final bool notificationsEnabled;
   final int? quietHoursStart; // Hour in 24-hour format (0-23)
   final int? quietHoursEnd; // Hour in 24-hour format (0-23)
+  final bool marketingConsent; // GDPR marketing consent
 
   const UserNotificationContacts({
     required this.userId,
@@ -33,6 +34,7 @@ class UserNotificationContacts {
     this.notificationsEnabled = true,
     this.quietHoursStart,
     this.quietHoursEnd,
+    this.marketingConsent = false,
   });
 
   factory UserNotificationContacts.fromJson(Map<String, dynamic> json) =>
@@ -178,12 +180,14 @@ class UpdateUserNotificationContactsRequest {
   final bool? notificationsEnabled;
   final int? quietHoursStart;
   final int? quietHoursEnd;
+  final bool? marketingConsent;
 
   const UpdateUserNotificationContactsRequest({
     this.email,
     this.notificationsEnabled,
     this.quietHoursStart,
     this.quietHoursEnd,
+    this.marketingConsent,
   });
 
   factory UpdateUserNotificationContactsRequest.fromJson(Map<String, dynamic> json) =>

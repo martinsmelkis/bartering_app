@@ -742,6 +742,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "emailSaved": MessageLookupByLibrary.simpleMessage(
       "Email address saved successfully",
     ),
+    "marketingConsentLabel": MessageLookupByLibrary.simpleMessage(
+      "I agree to receive marketing emails about new features, offers, and updates",
+    ),
+    "marketingConsentDescription": MessageLookupByLibrary.simpleMessage(
+      "We may send you occasional emails about our services. You can unsubscribe at any time.",
+    ),
+    "marketingConsentRequired": MessageLookupByLibrary.simpleMessage(
+      "Please consent to receive marketing emails to continue",
+    ),
     "emailUpdated": MessageLookupByLibrary.simpleMessage("Email updated"),
     "enableNotifications": MessageLookupByLibrary.simpleMessage(
       "Enable Notifications",

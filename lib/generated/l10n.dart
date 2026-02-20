@@ -5629,6 +5629,36 @@ class S {
     );
   }
 
+  /// `I agree to receive marketing emails about new features, offers, and updates`
+  String get marketingConsentLabel {
+    return Intl.message(
+      'I agree to receive marketing emails about new features, offers, and updates',
+      name: 'marketingConsentLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We may send you occasional emails about our services. You can unsubscribe at any time.`
+  String get marketingConsentDescription {
+    return Intl.message(
+      'We may send you occasional emails about our services. You can unsubscribe at any time.',
+      name: 'marketingConsentDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please consent to receive marketing emails to continue`
+  String get marketingConsentRequired {
+    return Intl.message(
+      'Please consent to receive marketing emails to continue',
+      name: 'marketingConsentRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Delete Profile`
   String get deleteProfile {
     return Intl.message(

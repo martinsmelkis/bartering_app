@@ -2038,6 +2038,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailSaved => 'Email address saved successfully';
 
   @override
+  String get marketingConsentLabel =>
+      'I agree to receive marketing emails about new features, offers, and updates';
+
+  @override
+  String get marketingConsentDescription =>
+      'We may send you occasional emails about our services. You can unsubscribe at any time.';
+
+  @override
+  String get marketingConsentRequired =>
+      'Please consent to receive marketing emails to continue';
+
+  @override
   String get deleteProfile => 'Delete Profile';
 
   @override

@@ -283,6 +283,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   void _onMapReady(bool isReady) async {
+    // Guard to prevent multiple executions
+    if (_isMapReady) {
+      logDebug('@@@@@@@@@ _onMapReady called but already ready, ignoring');
+      return;
+    }
+    
     _isMapReady = true;
     logDebug('@@@@@@@@@ _onMapReady called with initialPois: ${widget.initialPois?.length ?? 0}');
 

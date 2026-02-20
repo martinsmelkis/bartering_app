@@ -20,6 +20,7 @@ UserNotificationContacts _$UserNotificationContactsFromJson(
   notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
   quietHoursStart: (json['quietHoursStart'] as num?)?.toInt(),
   quietHoursEnd: (json['quietHoursEnd'] as num?)?.toInt(),
+  marketingConsent: json['marketingConsent'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$UserNotificationContactsToJson(
@@ -32,6 +33,7 @@ Map<String, dynamic> _$UserNotificationContactsToJson(
   'notificationsEnabled': instance.notificationsEnabled,
   'quietHoursStart': instance.quietHoursStart,
   'quietHoursEnd': instance.quietHoursEnd,
+  'marketingConsent': instance.marketingConsent,
 };
 
 PushTokenInfo _$PushTokenInfoFromJson(Map<String, dynamic> json) =>
@@ -186,6 +188,7 @@ _$UpdateUserNotificationContactsRequestFromJson(Map<String, dynamic> json) =>
       notificationsEnabled: json['notificationsEnabled'] as bool?,
       quietHoursStart: (json['quietHoursStart'] as num?)?.toInt(),
       quietHoursEnd: (json['quietHoursEnd'] as num?)?.toInt(),
+      marketingConsent: json['marketingConsent'] as bool?,
     );
 
 Map<String, dynamic> _$UpdateUserNotificationContactsRequestToJson(
@@ -195,6 +198,7 @@ Map<String, dynamic> _$UpdateUserNotificationContactsRequestToJson(
   'notificationsEnabled': instance.notificationsEnabled,
   'quietHoursStart': instance.quietHoursStart,
   'quietHoursEnd': instance.quietHoursEnd,
+  'marketingConsent': instance.marketingConsent,
 };
 
 AddPushTokenRequest _$AddPushTokenRequestFromJson(Map<String, dynamic> json) =>

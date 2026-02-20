@@ -15,12 +15,11 @@ class SettingsService {
   static const String _pinSetupCompletedKey = 'pin_setup_completed';
   static const String _showSearchResultsAsListKey = 'show_search_results_as_list';
   static const String _preferredLanguageKey = 'preferred_language';
-  static const String _defaultSearchTypeKey = 'default_search_type';
   static const String _enableGpsLocationKey = 'enable_gps_location';
 
   // Default values
   static const double defaultNearbyUsersRadius = 50.0; // km
-  static const double defaultKeywordSearchRadius = 100.0; // km
+  static const double defaultKeywordSearchRadius = 90.0; // km
   static const int defaultKeywordSearchWeight = 50; // 10-100 range
   static const String defaultSearchType = 'complementary'; // 'complementary', 'similar', 'nearby'
 
