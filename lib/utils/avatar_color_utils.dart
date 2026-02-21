@@ -157,37 +157,6 @@ class AvatarColorUtils {
     return modifiedSvg;
   }
 
-  /// Loads an SVG and colors it based on user attributes
-  /// 
-  /// This is a convenience method that combines [getDominantColorFromAttributes]
-  /// and [loadAndColorSvg]
-  /// 
-  /// Parameters:
-  /// - [profileKeywordDataMap]: Optional map of keywords to relevancy scores.
-  ///   Keys matching color categories (GREEN, RED, YELLOW, ORANGE, TEAL, PURPLE, BLUE)
-  ///   will boost their respective color counts based on relevancy:
-  ///   - Score >= 0.9: +2 to color count
-  ///   - Score >= 0.7: +1 to color count
-  static Future<String> loadAndColorSvgFromAttributes({
-    required String assetPath,
-    required List<String>? attributes,
-    double? relevancyScore,
-    Map<String, double>? profileKeywordDataMap,
-    String defaultColorHex = '#ffd4a3',
-  }) async {
-    final color = getDominantColorFromAttributes(
-      attributes: attributes,
-      relevancyScore: relevancyScore,
-      profileKeywordDataMap: profileKeywordDataMap,
-    );
-
-    return loadAndColorSvg(
-      assetPath: assetPath,
-      replacementColor: color,
-      defaultColorHex: defaultColorHex,
-    );
-  }
-
   /// Loads an SVG and colors it based on a string (e.g., userId)
   /// 
   /// This is a convenience method that combines [getColorFromString]

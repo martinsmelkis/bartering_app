@@ -88,36 +88,34 @@ class _NotificationsScreenView extends StatelessWidget {
             Expanded(
               child: BlocBuilder<NotificationsCubit, NotificationsState>(
                 builder: (context, state) {
-            if (state.status == NotificationsStatus.loading &&
-                state.contacts == null &&
-                state.attributePreferences.isEmpty) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (state.status == NotificationsStatus.error &&
-                state.contacts == null) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, size: 48.sp, color: Colors.red),
-                    SizedBox(height: 16.h),
-                    Text('${l10n.error}: ${state.errorMessage}'),
-                    SizedBox(height: 16.h),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<NotificationsCubit>().loadContacts();
-                        context
-                            .read<NotificationsCubit>()
-                            .loadAttributePreferences();
-                      },
-                      child: Text(l10n.continueButton),
-                    ),
-                  ],
-                ),
-              );
-            }
-
+                  if (state.status == NotificationsStatus.loading &&
+                      state.contacts == null &&
+                      state.attributePreferences.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (state.status == NotificationsStatus.error &&
+                      state.contacts == null) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error_outline, size: 48.sp, color: Colors.red),
+                          SizedBox(height: 16.h),
+                          Text('${l10n.error}: ${state.errorMessage}'),
+                          SizedBox(height: 16.h),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<NotificationsCubit>().loadContacts();
+                              context
+                                  .read<NotificationsCubit>()
+                                  .loadAttributePreferences();
+                            },
+                            child: Text(l10n.continueButton),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
                   return const TabBarView(
                     children: [
                       AttributePreferencesTab(),

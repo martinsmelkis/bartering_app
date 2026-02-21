@@ -154,7 +154,7 @@ class CertificatePinning {
   ///   ],
   /// );
   /// ```
-  /// // TODO use eventually
+  /// // TODO use eventually, with public key pinning
   static void setupCertificatePinning(
     Dio dio, {
     List<String> allowedCertFingerprints = const [],

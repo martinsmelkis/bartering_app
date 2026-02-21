@@ -204,7 +204,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
           imageFiles,
         );
       } else {
-        // Create new posting
+        // Create new posting TODO optionally add attributes?
         await apiClient.createPosting(
           userRepository.userId!,
           _titleController.text.trim(),
