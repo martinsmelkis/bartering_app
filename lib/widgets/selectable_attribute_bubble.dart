@@ -52,9 +52,7 @@ class SelectableAttributeBubble extends StatelessWidget {
     if (hint == 'yellow' || hint == 'orange') {
       // Make text 20% darker for yellow and orange
       final hsl = HSLColor.fromColor(baseTextColor);
-      return hsl.withLightness(
-        (hsl.lightness * 0.7).clamp(0.0, 1.0),
-      ).toColor();
+      return hsl.withLightness(0.3).toColor();
     }
 
     return baseTextColor;

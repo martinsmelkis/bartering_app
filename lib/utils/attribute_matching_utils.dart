@@ -10,8 +10,8 @@ class AttributeMatchingUtils {
   static Future<UserAttributesMatch> loadUserAttributes(BuildContext context) async {
     try {
       final userRepository = getIt<UserRepository>();
-      final currentUserInterests = await userRepository.getInterests();
-      final currentUserOffers = await userRepository.getOfferings();
+      final currentUserInterests = await userRepository.getInterests(loadFromStorage: true);
+      final currentUserOffers = await userRepository.getOfferings(loadFromStorage: true);
 
       // Normalize/translate the current user's attributes using effectiveAttributeKey
       // for consistent matching across all languages, regardless of display language

@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:barter_app/configure_dependencies.dart';
+import 'package:barter_app/models/notifications/notification_models.dart';
+import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -15,6 +18,7 @@ import 'local_notification_service.dart';
 @singleton
 class ChatNotificationService with WidgetsBindingObserver {
   final LocalNotificationService _notificationService = LocalNotificationService();
+  final ApiClient _apiClient;
 
   // Track if user is currently viewing a specific chat
   String? _activeChatUserId;
@@ -24,6 +28,9 @@ class ChatNotificationService with WidgetsBindingObserver {
   Function(String userId)? onNotificationTap;
   
   bool _isInitialized = false;
+
+  /// Constructor for dependency injection
+  ChatNotificationService(this._apiClient);
 
   /// Initialize the notification service
   /// Uses the LocalNotificationService singleton which may already be initialized
@@ -109,15 +116,42 @@ class ChatNotificationService with WidgetsBindingObserver {
   }
 
   /// Request notification permissions
+  /// GDPR-compliant: Records user consent via updateNotificationContacts when permission granted
   Future<bool?> requestNotificationPermission() async {
     if (!kIsWeb) {
       final androidImplementation = _notificationService.plugin
           .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
 
-      return await androidImplementation?.requestNotificationsPermission();
+      final permissionGranted = await androidImplementation?.requestNotificationsPermission();
+      
+      // GDPR: If permission granted, update backend to record user's explicit consent
+      if (permissionGranted == true) {
+        await _recordNotificationConsent();
+      }
+      
+      return permissionGranted;
     }
     return null;
+  }
+  
+  /// GDPR-compliant: Records user consent for push notifications to backend
+  /// Called when user explicitly grants notification permission
+  Future<void> _recordNotificationConsent() async {
+    try {
+      logDebug('🔔 Recording notification consent (GDPR-compliant)');
+      
+      await _apiClient.updateNotificationContacts(
+        UpdateUserNotificationContactsRequest(
+          notificationsEnabled: true,
+        ),
+      );
+      
+      logDebug('✅ Notification consent recorded successfully');
+    } catch (e) {
+      // Log but don't fail - permission was already granted locally
+      logDebug('⚠️ Failed to record notification consent: $e');
+    }
   }
 
   /// Show local notification

@@ -99,6 +99,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       _userRepository.profileKeywordDataMap = profileData;
       await _userRepository.saveProfileKeywordDataMap(profileData);
 
+      // --- Check if this is initial onboarding (no prior profile exists) ---
+      final AppDatabase _appDatabase = getIt<AppDatabase>();
+      final existingProfileCount = await _appDatabase.profiles.count().getSingle();
+      final isInitialOnboarding = existingProfileCount == 0;
+
       // --- Save data to local Drift database ---
       final encodableProfileData = profileData.map((key, value) =>
           MapEntry(key.toString(), value));
@@ -108,7 +113,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         onboardingData: drift.Value(onboardingJson),
       );
       logDebug("@@@@@@@@@ User data saved to local database 0.");
-      final AppDatabase _appDatabase = getIt<AppDatabase>();
       logDebug("@@@@@@@@@ User data saved to local database 1.");
       await _appDatabase.profiles.insertOne(
           userCompanion, mode: drift.InsertMode.insertOrReplace);
@@ -130,8 +134,12 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
       updateInterestsList(interestsList);
 
-      // --- Register device with backend after successful onboarding ---
-      await _registerDevice(userId);
+      // --- Register device only on initial onboarding ---
+      if (isInitialOnboarding) {
+        await _registerDevice(userId);
+      } else {
+        logDebug('ℹ️ Skipping device registration - user profile already exists (re-onboarding)');
+      }
 
       // Check if cubit is still active before emitting
       logDebug('@@@@@@@@@@@ About to emit success state. isClosed: $isClosed');

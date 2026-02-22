@@ -311,7 +311,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       final locationString = await SecureStorageService().getOwnLocation();
       if (locationString != null && locationString.isNotEmpty) {
         // User has a location set, trigger default search now that map is ready
-        _performDefaultSearch();
+        await _performDefaultSearch();
       } else {
         debugPrint('⚠️ No user location set yet - skipping initial search');
         // Optionally show a message to the user that they need to set their location
@@ -395,7 +395,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       return;
     }
 
-    // Force cluster refresh to clear old markers from previous search
+    // Always perform clustering - the clustering logic handles zoom levels internally
+    // via handleZoomBasedClusterChanges and the expanded/collapsed state of clusters
     if (zoomLevelNotifier.value.toDouble() <= 14) {
       logDebug('@@@@@@@@@ Force performing main clustering for ${_allPois.length} POIs at zoom ${zoomLevelNotifier.value}');
       mapOperationsCubit.performMainClustering(_allPois);
@@ -456,7 +457,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       return;
     }
     if (_isUpdatingVisuals) {
-      logDebug('@@@@@@@@@@@ Already updating visuals');
+      logDebug('@@@@@@@@@@@ Already updating visuals, skipping');
     }
     _cleanUpMarkers();
     mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
@@ -468,11 +469,13 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     logDebug('@@@@@@@@@@@ Starting render operation #$currentOperation vs ${_currentRenderOperation}');
 
     logDebug('@@@@@@@@@@@ Updating map visuals with ${_allPois.length} POIs');
+    logDebug('@@@@@@@@@@@ mainPoiClusters: ${mapOperationsCubit.mainPoiClusters.length}, looseSubClusters: ${mapOperationsCubit.looseSubClusters.length}, individualPois: ${mapOperationsCubit.individualPois.length}');
     final l10n = AppLocalizations.of(context)!;
 
     for (var mainCluster in mapOperationsCubit.mainPoiClusters) {
       // Check if operation is still current
       if (!_isRenderOperationValid(currentOperation)) return;
+      logDebug('@@@@@@@@@@@ Processing main cluster ${mainCluster.id}, isExpanded=${mainCluster.isExpanded}, pois=${mainCluster.allPoisInCluster.length}');
 
       if (mainCluster.isExpanded) {
         logDebug('@@@@@@@@@@@ Main cluster ${mainCluster
@@ -484,56 +487,75 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               // Check if operation is still current before each marker add
               if (!_isRenderOperationValid(currentOperation)) return;
 
-              logDebug('@@@@@@@@@@@ Adding POI marker: ${poi.profile.userId}');
-              final newMarker = await _createPoiMarker(poi, l10n);
-              final position = GeoPoint(latitude: poi.profile.latitude ?? 0.0,
-                  longitude: poi.profile.longitude ?? 0.0);
-              await _mapController.addMarker(
-                position,
-                markerIcon: newMarker,
-              );
-              _currentMarkerPositions.add(position);
+              try {
+                logDebug('@@@@@@@@@@@ Adding POI marker: ${poi.profile.userId}');
+                final newMarker = await _createPoiMarker(poi, l10n);
+                final position = GeoPoint(latitude: poi.profile.latitude ?? 0.0,
+                    longitude: poi.profile.longitude ?? 0.0);
+                await _mapController.addMarker(
+                  position,
+                  markerIcon: newMarker,
+                );
+                _currentMarkerPositions.add(position);
+              } catch (e) {
+                logDebugError('Failed to add POI marker for ${poi.profile.userId}', e);
+                // Continue with next marker
+              }
             }
           } else {
             logDebug('@@@@@@@@@@@ Sub-cluster ${subCluster
                 .id} COLLAPSED - adding cluster marker');
             if (!_isRenderOperationValid(currentOperation)) return;
-            subCluster.isExpanded = false;
-            final subClusterMarker = mapOperationsCubit.createSubClusterMarker(subCluster);
-            final position = GeoPoint(latitude: subCluster.centroid.latitude,
-                longitude: subCluster.centroid.longitude);
-            await _mapController.addMarker(
-              position,
-              markerIcon: subClusterMarker,
-            );
-            _currentMarkerPositions.add(position);
+            try {
+              subCluster.isExpanded = false;
+              final subClusterMarker = mapOperationsCubit.createSubClusterMarker(subCluster);
+              final position = GeoPoint(latitude: subCluster.centroid.latitude,
+                  longitude: subCluster.centroid.longitude);
+              await _mapController.addMarker(
+                position,
+                markerIcon: subClusterMarker,
+              );
+              _currentMarkerPositions.add(position);
+            } catch (e) {
+              logDebugError('Failed to add sub-cluster marker', e);
+            }
           }
         }
         for (var poi in mainCluster.individualPoisWithinExpandedCluster) {
           // Check if operation is still current
           if (!_isRenderOperationValid(currentOperation)) return;
 
-          final poiMarker = await _createPoiMarker(poi, l10n);
-          final position = GeoPoint(
-              latitude: poi.profile.latitude ?? 0.0,
-              longitude: poi.profile.longitude ?? 0.0);
-          await _mapController.addMarker(
-            position,
-            markerIcon: poiMarker,
-          );
-          _currentMarkerPositions.add(position);
+          try {
+            final poiMarker = await _createPoiMarker(poi, l10n);
+            final position = GeoPoint(
+                latitude: poi.profile.latitude ?? 0.0,
+                longitude: poi.profile.longitude ?? 0.0);
+            await _mapController.addMarker(
+              position,
+              markerIcon: poiMarker,
+            );
+            _currentMarkerPositions.add(position);
+          } catch (e) {
+            logDebugError('Failed to add individual POI marker in cluster', e);
+          }
         }
       } else {
         if (!_isRenderOperationValid(currentOperation)) return;
-        final mainClusterMarker = mapOperationsCubit.createMainClusterMarker(mainCluster);
-        final position = GeoPoint(latitude: mainCluster.centroid.latitude,
-            longitude: mainCluster.centroid.longitude);
-        await _mapController.addMarker(
-          position,
-          markerIcon: mainClusterMarker,
-        );
-        mainCluster.isExpanded = false;
-        _currentMarkerPositions.add(position);
+
+        try {
+          await Future.delayed(const Duration(milliseconds: 100));
+          final mainClusterMarker = mapOperationsCubit.createMainClusterMarker(mainCluster);
+          final position = GeoPoint(latitude: mainCluster.centroid.latitude,
+              longitude: mainCluster.centroid.longitude);
+          await _mapController.addMarker(
+            position,
+            markerIcon: mainClusterMarker,
+          );
+          mainCluster.isExpanded = false;
+          _currentMarkerPositions.add(position);
+        } catch (e) {
+          logDebugError('Failed to add main cluster marker', e);
+        }
       }
     }
 
@@ -545,45 +567,59 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         for (var poi in looseSubCluster.pois) {
           logDebug('@@@@@@@@@@@ Adding loose POI marker: ${poi.profile.userId}');
           if (!_isRenderOperationValid(currentOperation)) return;
-          final svg = await _createPoiMarker(poi, l10n);
-          final position = GeoPoint(
-              latitude: poi.profile.latitude ?? 0.0,
-              longitude: poi.profile.longitude ?? 0.0);
-          await _mapController.addMarker(
-            position,
-            markerIcon: svg,
-          );
-          _currentMarkerPositions.add(position);
+          try {
+            final svg = await _createPoiMarker(poi, l10n);
+            final position = GeoPoint(
+                latitude: poi.profile.latitude ?? 0.0,
+                longitude: poi.profile.longitude ?? 0.0);
+            await _mapController.addMarker(
+              position,
+              markerIcon: svg,
+            );
+            _currentMarkerPositions.add(position);
+          } catch (e) {
+            logDebugError('Failed to add loose POI marker', e);
+          }
         }
       } else {
         logDebug('@@@@@@@@@@@ Loose sub-cluster ${looseSubCluster.id} COLLAPSED - adding cluster marker');
         if (!_isRenderOperationValid(currentOperation)) return;
-        final position = GeoPoint(latitude: looseSubCluster.centroid.latitude,
-            longitude: looseSubCluster.centroid.longitude);
-        await _mapController.addMarker(
-          position,
-          markerIcon: mapOperationsCubit.createSubClusterMarker(looseSubCluster),
-        );
-        _currentMarkerPositions.add(position);
+        try {
+          final position = GeoPoint(latitude: looseSubCluster.centroid.latitude,
+              longitude: looseSubCluster.centroid.longitude);
+          await _mapController.addMarker(
+            position,
+            markerIcon: mapOperationsCubit.createSubClusterMarker(looseSubCluster),
+          );
+          _currentMarkerPositions.add(position);
+        } catch (e) {
+          logDebugError('Failed to add loose sub-cluster marker', e);
+        }
       }
     }
 
     // Calculate which POIs are truly individual (not part of any cluster)
     List<PointOfInterest> trulyIndividualPois = mapOperationsCubit.calculateTrulyIndividualPois(_allPois);
+    logDebug('@@@@@@@@@@@ Processing ${trulyIndividualPois.length} truly individual POIs');
     for (var poi in trulyIndividualPois) {
       logDebug('@@@@@@@@@@@ Adding truly individual POI marker: ${poi.profile
           .userId}');
       if (!_isRenderOperationValid(currentOperation)) return;
 
-      final svg = await _createPoiMarker(poi, l10n);
-      final position = GeoPoint(
-          latitude: poi.profile.latitude ?? 0.0, longitude: poi.profile.longitude ?? 0.0);
-      await _mapController.addMarker(
-        position,
-        markerIcon: svg,
-      );
-      _currentMarkerPositions.add(position);
+      try {
+        final svg = await _createPoiMarker(poi, l10n);
+        final position = GeoPoint(
+            latitude: poi.profile.latitude ?? 0.0, longitude: poi.profile.longitude ?? 0.0);
+        await _mapController.addMarker(
+          position,
+          markerIcon: svg,
+        );
+        _currentMarkerPositions.add(position);
+      } catch (e) {
+        logDebugError('Failed to add truly individual POI marker', e);
+      }
     }
+    logDebug('@@@@@@@@@@@ _updateMapVisuals completed successfully, added ${_currentMarkerPositions.length} markers');
     _isUpdatingVisuals = false;
   }
 
@@ -792,7 +828,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         ),
                         showContributorBadgeForOSM: true
                     ) : OSMOption(
-                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 5, maxZoomLevel: 17),
+                        zoomOption: const ZoomOption(initZoom: 10, minZoomLevel: 5, maxZoomLevel: 17),
                         showContributorBadgeForOSM: true
                     ),
                     onMapIsReady: _onMapReady,
