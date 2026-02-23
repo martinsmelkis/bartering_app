@@ -55,16 +55,19 @@ dependencies:
   uuid: ^4.4.0
   path: ^1.9.0
   jwt_decoder: ^2.0.1 # Decode and validate JWTs
-  flutter_osm_plugin: ^1.4.3
+  flutter_osm_plugin:
+    git:
+      url: https://github.com/martinsmelkis/osm_flutter.git
+      ref: svg-marker-support
+    #path:
+    #  ../osm_flutter
   flutter_hooks: ^0.18.5+1
   flutter_local_notifications: ^19.5.0
   connectivity_plus: ^6.1.3
   open_filex: ^4.7.0
   flutter_dotenv: ^6.0.0
 
-  #flutter_osm_plugin:
-  #  path: 'osm_flutter'
-  flutter_svg: ^2.0.10+1
+  flutter_svg: ^2.2.3
   pointer_interceptor: ^0.10.1+2
   routing_client_dart: ^0.5.5
   image_picker: ^1.2.1
@@ -123,6 +126,10 @@ flutter:
     - env_properties.prod.env
     - assets/rive/
     - assets/icons/
+    - assets/icons/avatars/
+    - packages/flutter_osm_web/src/asset/map.html
+    - packages/flutter_osm_web/src/asset/map.js
+    - packages/flutter_osm_web/src/asset/osm_interop.js
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

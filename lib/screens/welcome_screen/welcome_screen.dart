@@ -27,7 +27,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   static const int _svgAssetCount = 29;
 
   // Generate SVG asset path by index (1-based)
-  static String _getSvgAsset(int index) => 'assets/icons/path$index.svg';
+  static String _getSvgAsset(int index) => 'assets/icons/avatars/path$index.svg';
 
   // Onboarding category icons
   static const List<IconData> _onboardingIcons = [

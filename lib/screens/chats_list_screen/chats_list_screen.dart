@@ -426,7 +426,7 @@ class _ConversationTile extends StatelessWidget {
   });
 
   // Generate SVG asset path by index (1-based)
-  static String _getSvgAsset(int index) => 'assets/icons/path$index.svg';
+  static String _getSvgAsset(int index) => 'assets/icons/avatars/path$index.svg';
 
   @override
   Widget build(BuildContext context) {

@@ -543,7 +543,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         if (!_isRenderOperationValid(currentOperation)) return;
 
         try {
-          await Future.delayed(const Duration(milliseconds: 100));
+          //await Future.delayed(const Duration(milliseconds: 100));
           final mainClusterMarker = mapOperationsCubit.createMainClusterMarker(mainCluster);
           final position = GeoPoint(latitude: mainCluster.centroid.latitude,
               longitude: mainCluster.centroid.longitude);
@@ -1355,7 +1355,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     final mapCenter = await _mapController.centerMap;
     _noUsersMarkerPosition = mapCenter;
     // Load and create the special marker with path333.svg
-    final svgString = await rootBundle.loadString('assets/icons/path333.svg');
+    final svgString = await rootBundle.loadString('assets/icons/avatars/path333.svg');
     
     // Get device pixel ratio for sharp rendering on web high-DPI screens
     final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;

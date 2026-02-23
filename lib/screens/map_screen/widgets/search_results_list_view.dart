@@ -1464,7 +1464,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   Future<String> _loadSvg(PointOfInterest poi) async {
     final userIdHashCode = poi.profile.userId.hashCode;
     final index = userIdHashCode.abs() % 29; // Assuming 29 avatars
-    final selectedIconPath = 'assets/icons/path${index + 1}.svg';
+    final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
     
     // Load SVG without color modification
     return await rootBundle.loadString(selectedIconPath);

@@ -249,7 +249,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       const int svgAssetCount = 29;
       final userIdHashCode = widget.poi.profile.userId.hashCode;
       final index = userIdHashCode.abs() % svgAssetCount;
-      final selectedIconPath = 'assets/icons/path${index + 1}.svg';
+      final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
 
       // Load SVG without color modification
       final svgString = await _loadSvg(selectedIconPath);

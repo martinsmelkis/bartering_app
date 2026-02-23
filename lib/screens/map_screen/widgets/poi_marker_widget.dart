@@ -1,5 +1,4 @@
-// lib/screens/map_screen/widgets/poi_marker_widget.dart
-// Widget class for creating POI markers on the map
+import 'dart:math';
 
 import 'package:barter_app/models/map/point_of_interest.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
@@ -17,11 +16,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 /// Widget class for creating POI markers on the map
 class PoiMarkerWidget {
-  // Avatar SVG assets (dynamically generated)
+  // Avatar SVG/SI assets (dynamically generated)
   static const int _svgAssetCount = 29;
 
   // Generate SVG asset path by index (1-based)
-  static String _getSvgAsset(int index) => 'assets/icons/path$index.svg';
+  static String _getSvgAsset(int index) => 'assets/icons/avatars/path$index.svg';
 
   /// Creates a marker icon for a POI with high-resolution rendering for web
   static Future<MarkerIcon> createMarker({
@@ -35,10 +34,6 @@ class PoiMarkerWidget {
     logDebug('@@@@@@@@@@ Creating POI marker for ${poi.profile.userId}, hashCode: $userIdHashCode');
     final index = userIdHashCode.abs() % _svgAssetCount;
     final selectedIconPath = _getSvgAsset(index + 1); // 1-based index
-
-    // Load SVG without color modification
-    final svgString = await rootBundle.loadString(selectedIconPath);
-    final localSvgCopy = String.fromCharCodes(svgString.runes);
 
     // Check if there's a match between user interests/offerings and POI offerings/interests
     final hasMatch = TextUtils.checkForAttributeBarterMatch(poi, userInterests, userOfferings);
@@ -56,9 +51,6 @@ class PoiMarkerWidget {
     final gap = strokeWidth + 2;
     final svgSize = circleSize - gap;
 
-    // For high-res SVG on web: render at 1.5x internal resolution
-    final svgRenderSize = kIsWeb ? svgSize * 2 : svgSize;
-
     // Calculate gradient glow color and alpha based on relevance score (70% - 100%)
     Color? glowColor;
     double glowAlpha = 0.3;
@@ -74,11 +66,11 @@ class PoiMarkerWidget {
       // Tiered boost system to make higher scores stand out more
       double colorBoost = 1.0;
       double alphaBoost = 1.0;
-      if (relevancyScore >= 0.90) {
+      if (relevancyScore >= 0.80) {
         colorBoost = 1.2;
         alphaBoost = 1.2;
         logDebug('@@@@@@@@@@ BOOST APPLIED: score >= 0.90, boosting by 30%');
-      } else if (relevancyScore >= 0.80) {
+      } else if (relevancyScore >= 0.70) {
         colorBoost = 1.1;
         alphaBoost = 1.1;
         logDebug('@@@@@@@@@@ BOOST APPLIED: score >= 0.80, boosting by 20%');
@@ -96,7 +88,51 @@ class PoiMarkerWidget {
       logDebug('@@@@@@@@@@ RESULT: boostedColor=$boostedColorScore, color=$glowColor, alpha=${glowAlpha.toStringAsFixed(3)}');
     }
 
-    // Build the marker widget
+    // For WEB platform: Use direct SVG string for sharp vector rendering
+    // The modified flutter_osm_web plugin now supports passing SVG directly to Leaflet
+    if (kIsWeb) {
+      logDebug('@@@@@@@@@@ Using direct SVG for web platform');
+
+      // Load the SVG string
+      final svgString = await rootBundle.loadString(selectedIconPath);
+
+      // Calculate color segments for the border
+      final colorWeights = CategoryStatsUtils.calculateColorWeights(
+        poi.profile.profileKeywordDataMap,
+        attributes: poi.profile.attributes,
+      );
+
+      // Build a composite marker SVG that includes:
+      // 1. Glow effect (if high relevance)
+      // 2. Colored segmented border
+      // 3. Avatar in center
+      // 4. Online status badge
+      // 5. Match indicator (if has match)
+      final compositeSvg = _buildCompositeMarkerSvg(
+        avatarSvgContent: svgString,
+        colorWeights: colorWeights,
+        size: circleSize,
+        strokeWidth: strokeWidth,
+        hasMatch: hasMatch,
+        glowColor: glowColor,
+        glowAlpha: glowAlpha,
+        isOnline: poi.isOnline,
+        isAway: poi.isAway,
+      );
+
+      logDebug('@@@@@@@@@@ Returning MarkerIcon with SVG string (${compositeSvg.length} chars)');
+
+      // Return MarkerIcon with direct SVG - the modified plugin will pass this to Leaflet
+      return MarkerIcon(
+        svgString: compositeSvg,
+      );
+    }
+
+    // For NATIVE platforms: Use widget-based rendering with flutter_svg
+    final svgString = await rootBundle.loadString(selectedIconPath);
+    final localSvgCopy = String.fromCharCodes(svgString.runes);
+
+    // Mobile native: Use widget-based SVG rendering at high resolution
     Widget markerWidget = SizedBox(
       width: circleSize,
       height: circleSize,
@@ -106,11 +142,11 @@ class PoiMarkerWidget {
           // Glow effect for relevant POIs
           if (glowColor != null)
             Positioned(
-              left: kIsWeb ? 18 : 42,
-              top: kIsWeb ? 18 : 42,
+              left: 42,
+              top: 42,
               child: Container(
-                  width: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
-                  height: circleSize - circleSize / (kIsWeb ? 2.5 : 2.4),
+                width: circleSize - circleSize / 2.4,
+                height: circleSize - circleSize / 2.4,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
@@ -129,78 +165,55 @@ class PoiMarkerWidget {
             attributes: poi.profile.attributes,
             size: circleSize,
             strokeWidth: strokeWidth,
-            gapWidth: kIsWeb ? 1.2 : 1.0,
+            gapWidth: 1.0,
             child: ClipOval(
-              child: kIsWeb
-                  // On web: Render SVG at 2x internal size for sharper display
-                  ? SizedBox(
-                      width: svgSize,
-                      height: svgSize,
-                      child: FittedBox(
-                        fit: BoxFit.fill,
-                        child: SizedBox(
-                          width: svgRenderSize,
-                          height: svgRenderSize,
-                          child: SvgPicture.string(
-                            localSvgCopy,
-                            width: svgRenderSize,
-                            height: svgRenderSize,
-                            fit: BoxFit.fill,
-                            clipBehavior: Clip.antiAlias,
-                            semanticsLabel: '${poi.profile.name} avatar',
-                            key: ValueKey('poi_marker_${poi.profile.userId}'),
-                            allowDrawingOutsideViewBox: false,
-                          ),
-                        ),
-                      ),
-                    )
-                  : SvgPicture.string(
-                      localSvgCopy,
-                      width: svgSize,
-                      height: svgSize,
-                      fit: BoxFit.fill,
-                      clipBehavior: Clip.antiAlias,
-                      semanticsLabel: '${poi.profile.name} avatar',
-                      key: ValueKey('poi_marker_${poi.profile.userId}'),
-                      allowDrawingOutsideViewBox: false,
-                    ),
+              child: SvgPicture.string(
+                localSvgCopy,
+                width: svgSize,
+                height: svgSize,
+                fit: BoxFit.fill,
+                clipBehavior: Clip.antiAlias,
+                semanticsLabel: '${poi.profile.name} avatar',
+                key: ValueKey('poi_marker_${poi.profile.userId}'),
+                allowDrawingOutsideViewBox: false,
+              ),
             ),
           ),
           // Online status badge - positioned closer to the edge
           PositionedOnlineStatusBadge(
             isOnline: poi.isOnline,
             isAway: poi.isAway,
-            size: kIsWeb ? 14.4 : 26.25,
-            right: kIsWeb ? 14.4 : 34.65,
-            top: kIsWeb ? 14.4 : 34.65,
-            borderWidth: kIsWeb ? 3.0 : 2.625,
+            size: 26.25,
+            right: 34.65,
+            top: 34.65,
+            borderWidth: 2.625,
           ),
           // Match indicator - positioned at bottom right
           if (hasMatch)
             Positioned(
-              right: kIsWeb ? 14.4 : 30,
-              bottom: kIsWeb ? 14.4 : 30,
+              right: 30,
+              bottom: 30,
               child: Container(
-                width: kIsWeb ? 21.6 : 44.1,
-                height: kIsWeb ? 21.6 : 44.1,
+                width: 44.1,
+                height: 44.1,
                 decoration: BoxDecoration(
                   color: AppColors.secondary,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white,
-                    width: kIsWeb ? 1.2 : 2.1,
+                    width: 2.1,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: kIsWeb ? 1.92 : 4.2,
-                      offset: Offset(0, kIsWeb ? 1.2 : 2.1),
+                      blurRadius: 4.2,
+                      offset: Offset(0, 2.1),
                     ),
                   ],
                 ),
                 child: Icon(
                   Icons.handshake,
-                  size: kIsWeb ? 18.0 : 31.5,
+                  size: 31.5,
                   color: Colors.white,
                 ),
               ),
@@ -209,15 +222,132 @@ class PoiMarkerWidget {
       ),
     );
 
-    // Wrap in RepaintBoundary for better rendering quality on web
-    if (kIsWeb) {
-      markerWidget = RepaintBoundary(
-        child: markerWidget,
-      );
-    }
-
     return MarkerIcon(
       iconWidget: markerWidget,
     );
+  }
+
+  /// Builds a composite SVG marker with all visual elements
+  /// This creates a single SVG that contains: avatar, border, badges, and indicators
+  static String _buildCompositeMarkerSvg({
+    required String avatarSvgContent,
+    required List<MapEntry<Color, double>> colorWeights,
+    required double size,
+    required double strokeWidth,
+    required bool hasMatch,
+    required Color? glowColor,
+    required double glowAlpha,
+    required bool isOnline,
+    required bool isAway,
+  }) {
+    final center = size / 2;
+    final radius = (size - strokeWidth) / 2;
+
+    // Calculate total weight for normalization
+    final totalWeight = colorWeights.fold<double>(0.0, (sum, entry) => sum + entry.value);
+
+    // Build segmented border path
+    String borderSegments = '';
+    if (totalWeight > 0) {
+      double currentAngle = -90; // Start at top
+      for (int i = 0; i < colorWeights.length; i++) {
+        final entry = colorWeights[i];
+        final percentage = entry.value / totalWeight;
+        final sweepAngle = percentage * 360;
+
+        // Calculate arc path for this segment
+        final startAngle = currentAngle * 3.14159 / 180;
+        final endAngle = (currentAngle + sweepAngle - 2) * 3.14159 / 180; // -2 for gap
+
+        final x1 = center + radius * cos(startAngle);
+        final y1 = center + radius * sin(startAngle);
+        final x2 = center + radius * cos(endAngle);
+        final y2 = center + radius * sin(endAngle);
+
+        final largeArc = sweepAngle > 180 ? 1 : 0;
+
+        // Add segment path
+        final colorHex = _colorToHex(entry.key);
+        borderSegments +=
+            '<path d="M $center $center L $x1 $y1 A $radius $radius 0 $largeArc 1 $x2 $y2 Z" '
+            'fill="none" stroke="$colorHex" stroke-width="$strokeWidth" stroke-linecap="round" />\n';
+
+        currentAngle += sweepAngle;
+      }
+    }
+
+    // Determine background color based on glow
+    final backgroundColor = glowColor != null 
+        ? _colorToHex(glowColor) 
+        : '#F5F5F5';
+
+    // Build online status badge
+    String onlineBadge = '';
+    if (isOnline || isAway) {
+      final badgeColor = isOnline ? '#4CAF50' : '#FF9800'; // Green or Orange
+      final badgeX = size - 16;
+      final badgeY = 8;
+      onlineBadge = '''
+    <!-- Online status badge -->
+    <circle cx="$badgeX" cy="$badgeY" r="10" fill="$badgeColor" stroke="white" stroke-width="2" />
+''';
+    }
+
+    // Build match indicator
+    String matchIndicator = '';
+    if (hasMatch) {
+      final matchX = size - 16;
+      final matchY = size - 16;
+      matchIndicator = '''
+    <!-- Match indicator -->
+    <circle cx="$matchX" cy="$matchY" r="15" fill="#FF6B6B" stroke="white" stroke-width="2" />
+    <text x="$matchX" y="${matchY + 6}" text-anchor="middle" fill="white" font-size="20">🤝</text>
+''';
+    }
+
+    // Extract the avatar content (path elements) from the original SVG
+    // Match width/height only when preceded by space (not part of stroke-width etc)
+    final avatarContent = avatarSvgContent
+        .replaceAll(RegExp(r'<\?xml.*\?>'), '')
+        .replaceAll(RegExp(r'<svg[^>]*>'), '')
+        .replaceAll(RegExp(r'</svg>'), '')
+        .replaceAll(RegExp(r'\swidth="[^"]*"'), ' ')  // Preceded by space
+        .replaceAll(RegExp(r'\sheight="[^"]*"'), ' '); // Preceded by space
+
+    // Build final composite SVG
+    return '''<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="$size" height="$size" viewBox="0 0 $size $size">
+  
+  <!-- Segmented colored border -->
+  <g transform="rotate(-90 $center $center)">
+    $borderSegments
+  </g>
+  
+  <!-- Avatar circle with clip -->
+  <defs>
+    <clipPath id="avatarClip">
+      <circle cx="$center" cy="$center" r="${radius - strokeWidth / 2}" />
+    </clipPath>
+  </defs>
+  
+  <!-- Avatar content -->
+  <g clip-path="url(#avatarClip)">
+    <rect x="0" y="0" width="$size" height="$size" fill="$backgroundColor" />
+    <!-- Avatar SVG uses 512x512 coordinates, scale to fit inside marker (with padding for border) -->
+    <g transform="translate(${size * -0.2}, ${size * -0.2}) scale(${size * 1.4 / 512})">
+      $avatarContent
+    </g>
+  </g>
+  
+  $onlineBadge
+  $matchIndicator
+</svg>''';  }
+
+  /// Converts a Color to hex string
+  static String _colorToHex(Color color) {
+    final r = (color.r * 255).round();
+    final g = (color.g * 255).round();
+    final b = (color.b * 255).round();
+    return '#${r.toRadixString(16).padLeft(2, '0')}${g.toRadixString(16).padLeft(2, '0')}${b.toRadixString(16).padLeft(2, '0')}';
   }
 }
