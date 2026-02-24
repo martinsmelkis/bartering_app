@@ -3,11 +3,13 @@ import 'package:barter_app/data/local/app_database.dart';
 import 'package:barter_app/models/reviews/review_eligibility.dart';
 import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
+import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/screens/map_screen/cubit/profile_panel_cubit.dart';
 import 'package:barter_app/screens/review_screen/review_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:barter_app/utils/back_button_handler.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
@@ -62,7 +64,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     if (_currentUserId == null) {
-      return Scaffold(
+      Widget loadingContent = Scaffold(
         appBar: widget.showAppBar ? AppBar(
           title: Text(l10n.chat),
           backgroundColor: Theme
@@ -72,9 +74,27 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
         ) : null,
         body: const Center(child: CircularProgressIndicator()),
       );
+
+      // On mobile with app bar, wrap with BackButtonHandler
+      if (!kIsWeb) {
+        return BackButtonHandler(
+          onBackPressed: () async {
+            // Try to pop back first, fallback to navigate
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              AppRouter.navigateToHome();
+            }
+            return false;
+          },
+          child: loadingContent,
+        );
+      }
+      return loadingContent;
     }
 
-    return Scaffold(
+    // Wrap with BackButtonHandler on mobile to navigate to map instead of exiting app
+    Widget chatsContent = Scaffold(
       appBar: widget.showAppBar ? AppBar(
         title: Text(l10n.chat),
         backgroundColor: Theme
@@ -175,6 +195,25 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
         },
       ),
     );
+
+    // On mobile (non-web), wrap with BackButtonHandler to navigate back to map
+    // instead of exiting the whole app
+    if (!kIsWeb && widget.showAppBar) {
+      return BackButtonHandler(
+        onBackPressed: () async {
+          // Try to pop back first, fallback to navigate
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            AppRouter.navigateToHome();
+          }
+          return false; // Prevent default back behavior
+        },
+        child: chatsContent,
+      );
+    }
+
+    return chatsContent;
   }
 
   Future<void> _openChat(Conversation conversation) async {
@@ -214,8 +253,6 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
       );
     }
 
-    final fallbackUserName = userProfile?.name ?? otherUserId;
-
     // If callback is provided (side-by-side mode), use it
     if (widget.onChatSelected != null) {
       if (poi != null) {
@@ -226,19 +263,10 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
 
     // Otherwise, navigate to chat screen (mobile/full-screen mode)
     // Pass the POI via extra to avoid re-fetching
-    final result = await context.push(
+    await context.push(
       '/chat/$otherUserId',
       extra: poi != null ? {'poi': poi} : null,
     );
-    
-    // Handle result from chat screen (e.g., when user taps "View Profile")
-    if (result is Map<String, dynamic> && result['action'] == 'view_profile_on_map') {
-      final userId = result['userId'] as String;
-      logDebug('@@@@@@@@@ Chat closed with view_profile_on_map from chats list for userId: $userId');
-      // Navigate back to map with the user ID
-      // ignore: use_build_context_synchronously
-      context.go('/map?viewUserId=$userId');
-    }
   }
 
   Future<bool?> _confirmDelete(BuildContext context,

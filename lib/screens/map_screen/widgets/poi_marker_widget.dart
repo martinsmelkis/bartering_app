@@ -40,52 +40,82 @@ class PoiMarkerWidget {
 
     // Determine relevance tier based on matchRelevancyScore
     final relevancyScore = poi.matchRelevancyScore ?? 0.0;
-    final isHighRelevance = relevancyScore >= 0.70;
+    final isHighRelevance = kIsWeb ? relevancyScore >= 0.50 : relevancyScore >= 0.70;
 
     // Debug: Always log relevancy score to diagnose issues
     logDebug('@@@@@@@@@@ POI ${poi.profile.userId} RAW matchRelevancyScore: ${poi.matchRelevancyScore} (${(relevancyScore * 100).toStringAsFixed(1)}%)');
 
     // Calculate sizes using original AppDimensions.mapPoiMarkerSize
     final circleSize = AppDimensions.mapPoiMarkerSize;
-    final strokeWidth = kIsWeb ? 7.2 : 12.6;
+    final strokeWidth = kIsWeb ? 7.2 : 11.0;
     final gap = strokeWidth + 2;
     final svgSize = circleSize - gap;
 
-    // Calculate gradient glow color and alpha based on relevance score (70% - 100%)
+    // Calculate gradient glow color and alpha based on relevance score
+    // Web: starts at 50% with alpha 0.2, progresses to 90% with alpha 1.0
+    // Native: starts at 70% with alpha 0.3, progresses to 100% with alpha ~0.85
     Color? glowColor;
-    double glowAlpha = 0.3;
+    double glowAlpha = kIsWeb ? 0.2 : 0.3;
 
     if (isHighRelevance) {
-      // Map relevance from 0.70-1.0 range to 0.0-1.0 range for interpolation
-      final rawNormalized = (relevancyScore - 0.70) / 0.30;
-      var normalizedScore = rawNormalized.clamp(0.0, 1.0);
+      if (kIsWeb) {
+        // Web platform: 0.50-0.90 range, alpha 0.2 to 1.0
+        final normalizedScore = ((relevancyScore - 0.50) / 0.40).clamp(0.0, 1.0);
+        
+        logDebug('@@@@@@@@@@ WEB NORMALIZATION: score=$relevancyScore, normalized=$normalizedScore');
 
-      // Debug calculation
-      logDebug('@@@@@@@@@@ NORMALIZATION: score=$relevancyScore, raw=(score-0.70)/0.30=$rawNormalized, clamped=$normalizedScore');
+        // Tiered boost system
+        double colorBoost = 0.7;
+        double alphaBoost = 0.5;
+        if (relevancyScore >= 0.80) {
+          colorBoost = 1.2;
+          alphaBoost = 0.9;
+        } else if (relevancyScore >= 0.65) {
+          colorBoost = 0.9;
+          alphaBoost = 0.6;
+        }
 
-      // Tiered boost system to make higher scores stand out more
-      double colorBoost = 1.0;
-      double alphaBoost = 1.0;
-      if (relevancyScore >= 0.80) {
-        colorBoost = 1.2;
-        alphaBoost = 1.2;
-        logDebug('@@@@@@@@@@ BOOST APPLIED: score >= 0.90, boosting by 30%');
-      } else if (relevancyScore >= 0.70) {
-        colorBoost = 1.1;
-        alphaBoost = 1.1;
-        logDebug('@@@@@@@@@@ BOOST APPLIED: score >= 0.80, boosting by 20%');
+        final boostedColorScore = (normalizedScore * colorBoost).clamp(0.0, 1.0);
+
+        // Interpolate color from orange to deep orange
+        glowColor = Color.lerp(Colors.white54, Colors.orangeAccent.shade700, boostedColorScore);
+
+        // Interpolate alpha from 0.2 to 1.0
+        final baseAlpha = 0.2 + (normalizedScore * 0.8);
+        glowAlpha = (baseAlpha * alphaBoost).clamp(0.2, 1.0);
+
+        logDebug('@@@@@@@@@@ WEB RESULT: color=$glowColor, alpha=${glowAlpha.toStringAsFixed(3)}');
+      } else {
+        // Native platform: original 0.70-1.0 range, alpha 0.3 to ~0.85
+        final rawNormalized = (relevancyScore - 0.70) / 0.30;
+        var normalizedScore = rawNormalized.clamp(0.0, 1.0);
+
+        logDebug('@@@@@@@@@@ NATIVE NORMALIZATION: score=$relevancyScore, raw=$rawNormalized, clamped=$normalizedScore');
+
+        // Tiered boost system to make higher scores stand out more
+        double colorBoost = 1.0;
+        double alphaBoost = 1.0;
+        if (relevancyScore >= 0.90) {
+          colorBoost = 1.2;
+          alphaBoost = 1.2;
+          logDebug('@@@@@@@@@@ NATIVE BOOST: score >= 0.90');
+        } else if (relevancyScore >= 0.80) {
+          colorBoost = 1.1;
+          alphaBoost = 1.1;
+          logDebug('@@@@@@@@@@ NATIVE BOOST: score >= 0.80');
+        }
+
+        final boostedColorScore = (normalizedScore * colorBoost).clamp(0.0, 0.9);
+
+        // Interpolate color from orange to deep orange
+        glowColor = Color.lerp(Colors.orange.shade500, Colors.deepOrange.shade400, boostedColorScore);
+
+        // Interpolate alpha from 0.3 to 0.6, then apply boost
+        final baseAlpha = 0.3 + (normalizedScore * 0.35);
+        glowAlpha = (baseAlpha * alphaBoost).clamp(0.35, 0.85);
+
+        logDebug('@@@@@@@@@@ NATIVE RESULT: boostedColor=$boostedColorScore, color=$glowColor, alpha=${glowAlpha.toStringAsFixed(3)}');
       }
-
-      final boostedColorScore = (normalizedScore * colorBoost).clamp(0.0, 0.9);
-
-      // Interpolate color from AppColors.primary to Colors.redAccent
-      glowColor = Color.lerp(Colors.orange.shade500, Colors.deepOrange.shade400, boostedColorScore);
-
-      // Interpolate alpha from 0.3 to 0.6, then apply boost
-      final baseAlpha = 0.3 + (normalizedScore * 0.35);
-      glowAlpha = (baseAlpha * alphaBoost).clamp(0.35, 0.85);
-
-      logDebug('@@@@@@@@@@ RESULT: boostedColor=$boostedColorScore, color=$glowColor, alpha=${glowAlpha.toStringAsFixed(3)}');
     }
 
     // For WEB platform: Use direct SVG string for sharp vector rendering
@@ -165,7 +195,7 @@ class PoiMarkerWidget {
             attributes: poi.profile.attributes,
             size: circleSize,
             strokeWidth: strokeWidth,
-            gapWidth: 1.0,
+            gapWidth: 6.0,
             child: ClipOval(
               child: SvgPicture.string(
                 localSvgCopy,
@@ -191,8 +221,8 @@ class PoiMarkerWidget {
           // Match indicator - positioned at bottom right
           if (hasMatch)
             Positioned(
-              right: 30,
-              bottom: 30,
+              right: 35,
+              bottom: 35,
               child: Container(
                 width: 44.1,
                 height: 44.1,

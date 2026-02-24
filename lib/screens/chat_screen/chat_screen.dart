@@ -7,6 +7,7 @@ import 'package:barter_app/services/messaging/chat_notification_service.dart';
 import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:barter_app/services/file_transfer_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:barter_app/utils/back_button_handler.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/date_time_utils.dart';
@@ -19,6 +20,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -369,7 +371,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
+    // Wrap with BackButtonHandler to navigate back to chats list on mobile back button
+    Widget chatContent = Scaffold(
       appBar: widget.showAppBar
           ? AppBar(
         title: Text(widget.poiName ?? l10n.chat),
@@ -656,6 +659,26 @@ class _ChatScreenState extends State<ChatScreen> {
         },
       ),
     );
+
+    // On mobile (non-web), wrap with BackButtonHandler to navigate back to chats list
+    // instead of exiting the whole app
+    if (!kIsWeb) {
+      return BackButtonHandler(
+        onBackPressed: () async {
+          // Try to pop back to previous screen (chats list or map)
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            // Fallback: navigate to chats list if can't pop
+            AppRouter.navigateToChats();
+          }
+          return false; // Prevent default back behavior
+        },
+        child: chatContent,
+      );
+    }
+
+    return chatContent;
   }
 
 

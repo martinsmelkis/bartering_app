@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -522,9 +523,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           }
         }
         for (var poi in mainCluster.individualPoisWithinExpandedCluster) {
-          // Check if operation is still current
           if (!_isRenderOperationValid(currentOperation)) return;
-
           try {
             final poiMarker = await _createPoiMarker(poi, l10n);
             final position = GeoPoint(
@@ -541,9 +540,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         }
       } else {
         if (!_isRenderOperationValid(currentOperation)) return;
-
         try {
-          //await Future.delayed(const Duration(milliseconds: 100));
           final mainClusterMarker = mapOperationsCubit.createMainClusterMarker(mainCluster);
           final position = GeoPoint(latitude: mainCluster.centroid.latitude,
               longitude: mainCluster.centroid.longitude);
@@ -862,7 +859,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     onGeoPointClicked: _onGeoPointTapped,
                   ),
                   Positioned(
-                    top: kIsWeb ? 26 : topPadding ?? 26.0,
+                    top: kIsWeb ? 8.h : topPadding ?? 26.0,
                     left: 12 + MediaQuery.of(context).viewPadding.left,
                     child: PointerInterceptor(child: const MainNavigation()),
                   ),
@@ -879,7 +876,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
                   ),
                   Positioned(
-                    top: kIsWeb ? 22 : topPadding,
+                    top: kIsWeb ? 7.h : topPadding,
                     left: 64 + MediaQuery.of(context).viewPadding.left,
                     right: 100 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
@@ -894,7 +891,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   // Search filter checkboxes - positioned separately for full width control
                   Positioned(
-                    top: (kIsWeb ? 22 : topPadding ?? 0) + 56, // Below the search field
+                    top: (kIsWeb ? 8.h : topPadding ?? 0) + 56, // Below the search field
                     left: 16 + MediaQuery.of(context).viewPadding.left,
                     right: 16 + MediaQuery.of(context).viewPadding.right,
                     child: SearchFilterCheckboxes(
@@ -905,7 +902,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   // Chats button in top right
                   Positioned(
-                    top: kIsWeb ? 26 : topPadding ?? 26.0,
+                    top: kIsWeb ? 8.h : topPadding ?? 26.0,
                     right: 12 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
                       child: BlocBuilder<ChatsBadgeCubit, ChatsBadgeState>(
@@ -919,7 +916,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                   if (context.canShowSideBySide) {
                                     chatCubit.openChatsList();
                                   } else {
-                                    AppRouter.navigateToChats();
+                                    context.push("/chats");
                                   }
                                 },
                                 heroTag: "ChatsFab",
@@ -969,7 +966,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   // Search complementary users button (with fallback to nearby)
                   Positioned(
-                    top: kIsWeb ? 23 : (topPadding ?? 20.0),
+                    top: kIsWeb ? 8.h : (topPadding ?? 20.0),
                     right: 56 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
                       child: Container(
@@ -1356,11 +1353,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _noUsersMarkerPosition = mapCenter;
     // Load and create the special marker with path333.svg
     final svgString = await rootBundle.loadString('assets/icons/avatars/path333.svg');
-    
-    // Get device pixel ratio for sharp rendering on web high-DPI screens
-    final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;
-    
-    final marker = mapOperationsCubit.createNoUsersMarker(svgString, devicePixelRatio: pixelRatio);
+
+    final marker = mapOperationsCubit.createNoUsersMarker(svgString);
 
     await _mapController.addMarker(
       mapCenter,

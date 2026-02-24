@@ -1,3 +1,4 @@
+import 'package:barter_app/screens/map_screen/widgets/cluster_marker_widget.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/svg_utils.dart';
@@ -569,82 +570,22 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
 
   /// Creates a marker icon for a main cluster
   MarkerIcon createMainClusterMarker(PoiClusterOsm cluster) {
-    final poiCount = cluster.allPoisInCluster.length;
-
-    return MarkerIcon(
-      iconWidget: Container(
-        width: AppDimensions.mainClusterSize,
-        height: AppDimensions.mainClusterSize,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.9),
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: AppDimensions.mainClusterBorderWidth,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 3,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            poiCount.toString(),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: AppDimensions.mainClusterFontSize,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
+    return ClusterMarkerWidget.createMainClusterMarker(
+      poiCount: cluster.allPoisInCluster.length,
     );
   }
 
   /// Creates a marker icon for a sub cluster
   MarkerIcon createSubClusterMarker(PoiSubClusterOsm cluster) {
-    final poiCount = cluster.pois.length;
-
-    return MarkerIcon(
-      iconWidget: Container(
-        width: AppDimensions.subClusterSize,
-        height: AppDimensions.subClusterSize,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.8),
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: AppDimensions.subClusterBorderWidth,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 5,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            poiCount.toString(),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: AppDimensions.subClusterFontSize,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
+    return ClusterMarkerWidget.createSubClusterMarker(
+      poiCount: cluster.pois.length
     );
   }
 
   /// Creates a marker icon for when no users are nearby
   /// [svgString] - the SVG content loaded from assets
   /// [devicePixelRatio] - optional pixel ratio for sharp rendering on high-DPI screens
-  MarkerIcon createNoUsersMarker(String svgString, {double? devicePixelRatio}) {
+  MarkerIcon createNoUsersMarker(String svgString) {
     final markerSize = AppDimensions.mapPoiMarkerSize * 0.5;
 
     return MarkerIcon(
@@ -655,7 +596,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
             svgString: svgString,
             width: markerSize * 2,
             height: markerSize * 2,
-            devicePixelRatio: devicePixelRatio,
+            devicePixelRatio: 1,
             fit: BoxFit.contain,
             clipBehavior: kIsWeb ? Clip.antiAlias : Clip.none,
             key: const ValueKey('no_users_marker'),
