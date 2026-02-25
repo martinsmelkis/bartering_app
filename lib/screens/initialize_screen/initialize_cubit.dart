@@ -22,7 +22,6 @@ class InitializeCubit extends Cubit<InitializeState> {
   Future<void> startInitialization() async {
     try {
       emit(const InitializeLoading(message: 'Initializing app...'));
-
       emit(const InitializeLoading(message: 'Loading user data...'));
 
       var keyWordsFromStorage = await _userRepository.getProfileKeywordDataMap();

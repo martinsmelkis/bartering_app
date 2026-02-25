@@ -37,7 +37,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   late ChatsBadgeCubit _chatsBadgeCubit;
 
   // It is assumed that all messages contain a data field with the key 'type'
-  Future<void> setupInteractedMessage() async {
+  setupInteractedMessage() async {
     // Get any messages which caused the application to open from
     // a terminated state.
     RemoteMessage? initialMessage =
@@ -96,7 +96,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     AppRouter.navigateToChat(userId);
   }
 
-  Future<void> _initializeServices() async {
+  _initializeServices() async {
     // Initialize chat notification service
     try {
       _chatNotificationService = getIt<ChatNotificationService>();
@@ -162,7 +162,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
           },
         ),
         BlocProvider<NotificationsCubit>(
-          create: (context) => getIt<NotificationsCubit>()..loadMatchHistory(),
+          create: (context) => getIt<NotificationsCubit>(),
         ),
       ],
       child: ScreenUtilInit(

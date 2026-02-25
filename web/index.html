@@ -5,7 +5,7 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Bartering App">
 
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Barter App">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
@@ -25,11 +25,20 @@
 <body>
 
 <script src="flutter.js" defer></script>
-<script src="main.dart.js?v=0.0.16" type="application/javascript"></script>
+<script src="main.dart.js?v=0.0.20" type="application/javascript"></script>
 
 <script>
   window.addEventListener('load', function () {
     _flutter.loader.load({
+      buildConfig: {
+        builds: [
+          {
+            compileTarget: "dart2js",
+            renderer: "canvaskit",
+            mainUrl: "main.dart.js?v=0.0.16"
+          }
+        ]
+      },
       serviceWorkerSettings: {
         serviceWorkerVersion: null, // set to null to avoid fetching service_worker.js if not needed
       }

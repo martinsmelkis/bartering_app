@@ -158,7 +158,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
 
     final mapCenter = await _mapController.centerMap;
 
-    print('@@@@@@@@@@@@@ currentZoom ${currentZoom} @@@@@@@@@@@@@');
+    debugPrint('@@@@@@@@@@@@@ currentZoom ${currentZoom} @@@@@@@@@@@@@');
     // --- 1. Handle Auto-Collapse ---
     if (currentZoom < MAIN_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD) {
       for (var mainCluster in mainPoiClusters) {
@@ -496,7 +496,15 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     // Iterate through all potentially visible items
     for (var mainCluster in mainPoiClusters) {
       if (!mainCluster.isExpanded) {
+        // Main cluster is collapsed - check its centroid
         checkItem(mainCluster, mainCluster.centroid);
+        // Also check sub-clusters that are rendered as markers at low zoom
+        // (these are visually shown even when main cluster is collapsed)
+        for (var subCluster in mainCluster.subClusters) {
+          if (subCluster.pois.length >= MIN_POIS_FOR_SUB_CLUSTER_DISPLAY) {
+            checkItem(subCluster, subCluster.centroid);
+          }
+        }
       } else {
         for (var subCluster in mainCluster.subClusters) {
           if (!subCluster.isExpanded) {

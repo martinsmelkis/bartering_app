@@ -16,14 +16,14 @@ class ClusterMarkerWidget {
     final size = AppDimensions.mainClusterSize;
     final fontSize = AppDimensions.mainClusterFontSize;
     final borderWidth = AppDimensions.mainClusterBorderWidth;
-    final primaryColor = Colors.orange.shade500;
+    final primaryColor = Colors.orange.shade700;
 
     // For WEB platform: Use direct SVG string for sharp vector rendering
     if (kIsWeb) {
       final svgString = _buildMainClusterSvg(
         poiCount: poiCount,
         size: size,
-        fontSize: fontSize * 1.4,
+        fontSize: fontSize * 1.7,
         borderWidth: borderWidth,
         primaryColor: primaryColor,
       );
@@ -75,7 +75,7 @@ class ClusterMarkerWidget {
     final size = AppDimensions.subClusterSize;
     final fontSize = AppDimensions.subClusterFontSize;
     final borderWidth = AppDimensions.subClusterBorderWidth;
-    final primaryColor = Colors.orange.shade500;
+    final primaryColor = Colors.orange.shade700;
 
     // For WEB platform: Use direct SVG string for sharp vector rendering
     if (kIsWeb) {
