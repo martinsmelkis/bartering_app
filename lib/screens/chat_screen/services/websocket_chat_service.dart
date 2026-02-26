@@ -60,24 +60,66 @@ class WebSocketChatService {
   // Loads a contact's public key into cache if available
   // This is useful when initializing a chat session
   Future<void> loadContactPublicKey(String userId) async {
+    // Check if already cached under the provided ID or normalized form
     if (_publicKeyCache.containsKey(userId)) {
       logDebug('@@@@@@@@@@@@ Public key already cached for: $userId');
       return;
     }
+    
+    // Also check if normalized form is cached
+    final normalizedId = _normalizeUserId(userId);
+    if (normalizedId != userId && _publicKeyCache.containsKey(normalizedId)) {
+      // Copy from normalized to original form
+      _publicKeyCache[userId] = _publicKeyCache[normalizedId]!;
+      logDebug('@@@@@@@@@@@@ Public key copied from normalized cache ($normalizedId) to: $userId');
+      return;
+    }
 
+    // Try loading with the provided ID
     final publicKey = await secureStorage.getContactPublicKey(userId);
     if (publicKey != null) {
       _publicKeyCache[userId] = publicKey;
       logDebug('@@@@@@@@@@@@ Preloaded public key from storage for: $userId');
-    } else {
-      logDebug('@@@@@@@@@@@@ No cached public key found for: $userId');
+      return;
     }
+    
+    // Try loading with normalized ID
+    if (normalizedId != userId) {
+      final normalizedKey = await secureStorage.getContactPublicKey(normalizedId);
+      if (normalizedKey != null) {
+        _publicKeyCache[userId] = normalizedKey;
+        _publicKeyCache[normalizedId] = normalizedKey;
+        logDebug('@@@@@@@@@@@@ Preloaded public key from storage (normalized $normalizedId) for: $userId');
+        return;
+      }
+    }
+    
+    logDebug('@@@@@@@@@@@@ No cached public key found for: $userId');
   }
 
   // Gets a contact's public key from cache
   // Returns null if not found
   String? getContactPublicKey(String userId) {
-    return _publicKeyCache[userId];
+    // Try direct lookup first
+    if (_publicKeyCache.containsKey(userId)) {
+      return _publicKeyCache[userId];
+    }
+    // Try normalized form
+    final normalizedId = _normalizeUserId(userId);
+    if (normalizedId != userId && _publicKeyCache.containsKey(normalizedId)) {
+      return _publicKeyCache[normalizedId];
+    }
+    return null;
+  }
+
+  /// Normalize federated user ID by removing server suffix
+  /// e.g., "userId@serverId" -> "userId"
+  String _normalizeUserId(String userId) {
+    final atIndex = userId.indexOf('@');
+    if (atIndex != -1) {
+      return userId.substring(0, atIndex);
+    }
+    return userId;
   }
 
   Future<void> connect(String authToken) async {
@@ -101,10 +143,16 @@ class WebSocketChatService {
             final Map<String, dynamic> messageJson = jsonDecode(rawMessage as String);
 
             // Handle public key exchange (from server auth response)
-            if (messageJson['publicKey'] != null &&
-                messageJson['publicKey'] as String != "") {
+            if (messageJson['publicKey'] != null) {
               final receivedPublicKey = messageJson['publicKey'] as String;
               final senderId = messageJson['senderId'] as String?;
+              
+              // Log empty public key for debugging
+              if (receivedPublicKey.isEmpty) {
+                logDebug('⚠️ Empty public key received for sender: $senderId - federated relay may be missing key');
+                return; // Skip processing empty keys
+              }
+              
               logDebug('@@@@@@@@@@@@ received message with ids $senderId for $_currentUserId');
               if (_currentUserId == senderId) {
                 logDebug('@@@@@@@@@@ self-message received, skipping...');
@@ -115,15 +163,25 @@ class WebSocketChatService {
                   '${receivedPublicKey.substring(0, 20)}...');
 
               if (senderId != null && senderId.isNotEmpty) {
-                // Cache the public key in memory
+                // Cache the public key in memory (both original and normalized forms)
                 _publicKeyCache[senderId] = receivedPublicKey;
+                
+                // Also store under normalized ID for federated users
+                final normalizedSenderId = _normalizeUserId(senderId);
+                if (normalizedSenderId != senderId) {
+                  _publicKeyCache[normalizedSenderId] = receivedPublicKey;
+                }
 
-                // Also persist it for future sessions
+                // Persist with original federated ID - SecureStorageService handles the mapping
                 await secureStorage.saveContactPublicKey(senderId, receivedPublicKey);
                 logDebug('@@@@@@@@@@@@ Public key cached for user: $senderId');
 
                 // Notify callback so messages can be re-decrypted
                 onPublicKeyReceived?.call(senderId, receivedPublicKey);
+                // Also notify with normalized ID
+                if (normalizedSenderId != senderId) {
+                  onPublicKeyReceived?.call(normalizedSenderId, receivedPublicKey);
+                }
               }
 
               logDebug('@@@@@@@@@@@@ Public keys exchanged successfully');
@@ -288,7 +346,110 @@ class WebSocketChatService {
               }
             }
 
-            // Handle chat messages
+            // Handle federated chat messages (from other servers)
+            // These come wrapped in a "data" field with "encryptedPayload" instead of "text"
+            if (messageJson['messageType']?.toString().contains('ClientChatMessage') == true &&
+                messageJson['data'] != null) {
+              try {
+                final data = messageJson['data'] as Map<String, dynamic>;
+                final encryptedPayload = data['encryptedPayload'] as String?;
+                final senderId = data['senderId'] as String?;
+                final senderName = data['senderName'] as String?;
+                final recipientId = data['recipientId'] as String?;
+                final messageId = data['id'] as String?;
+                final timestampStr = data['timestamp'] as String?;
+                final senderPublicKey = data['senderPublicKey'] as String?;
+
+                if (encryptedPayload == null || senderId == null) {
+                  logDebug('⚠️ Federated message missing required fields');
+                  return;
+                }
+
+                // Normalize federated user IDs by removing server suffix
+                final normalizedSenderId = _normalizeUserId(senderId);
+                final normalizedRecipientId = recipientId != null 
+                    ? _normalizeUserId(recipientId) 
+                    : _currentUserId;
+
+                logDebug('📨 Federated message received from $senderId (normalized: $normalizedSenderId)');
+                
+                // Store the sender's public key if provided (new in protocol)
+                if (senderPublicKey != null && senderPublicKey.isNotEmpty) {
+                  logDebug('🔑 Received sender public key in federated message: ${senderPublicKey.substring(0, 20)}...');
+                  
+                  // Cache in memory under both forms
+                  _publicKeyCache[senderId] = senderPublicKey;
+                  _publicKeyCache[normalizedSenderId] = senderPublicKey;
+                  
+                  // Persist for future sessions
+                  await secureStorage.saveContactPublicKey(senderId, senderPublicKey);
+                  logDebug('✅ Stored public key for federated sender: $senderId');
+                  
+                  // Also store the federated ID mapping
+                  await secureStorage.saveFederatedIdMapping(senderId);
+                } else {
+                  // Fallback: store mapping without key (will need P2P exchange later)
+                  if (normalizedSenderId != senderId) {
+                    await secureStorage.saveFederatedIdMapping(senderId);
+                    logDebug('🌐 Stored federated mapping (no key): $normalizedSenderId -> $senderId');
+                  }
+                }
+
+                // Parse timestamp (comes as milliseconds string from federated messages)
+                DateTime timestamp;
+                if (timestampStr != null) {
+                  final millis = int.tryParse(timestampStr);
+                  timestamp = millis != null
+                      ? DateTime.fromMillisecondsSinceEpoch(millis)
+                      : DateTime.now();
+                } else {
+                  timestamp = DateTime.now();
+                }
+
+                // Decrypt using the sender's public key from cache
+                // Try with normalized ID first, then original
+                String? messageDecrypted;
+                messageDecrypted = await decryptMessageText(encryptedPayload, normalizedSenderId);
+                if (messageDecrypted == null && senderId != normalizedSenderId) {
+                  // Fallback to original senderId if different
+                  messageDecrypted = await decryptMessageText(encryptedPayload, senderId);
+                }
+                
+                // If decryption failed, log it - key will be fetched when chat is opened
+                if (messageDecrypted == null) {
+                  logDebug('🔑 Failed to decrypt federated message - public key will be fetched when chat opens');
+                }
+
+                final chatMsg = ChatMessage(
+                  id: messageId ?? DateTime.now().toIso8601String(),
+                  senderId: normalizedSenderId,
+                  recipientId: normalizedRecipientId,
+                  plainText: messageDecrypted,
+                  encryptedTextPayload: encryptedPayload,
+                  timestamp: timestamp,
+                  status: EChatMessageStatus.delivered,
+                  senderName: senderName,
+                );
+
+                // Show notification if user is not in this chat
+                if (_notificationService != null) {
+                  _notificationService!.handleIncomingMessage(
+                    chatMsg,
+                    senderName: senderName ?? normalizedSenderId,
+                  );
+                }
+
+                _messageController.add(chatMsg);
+                logDebug('✅ Federated message processed successfully');
+                return;
+              } catch (e) {
+                logDebug('❌ Error processing federated message: $e');
+                logDebug('Stack trace: ${StackTrace.current}');
+                return;
+              }
+            }
+
+            // Handle regular chat messages
             if (messageJson['text'] != null) {
               final encryptedText = messageJson['text'] as String;
               final senderId = messageJson['senderId'] as String?;
@@ -358,17 +519,34 @@ class WebSocketChatService {
   }
 
   Future<String?> decryptMessageText(String encryptedText, String senderId) async {
-
     String? messageDecrypted = null;
     String? senderPublicKeyBase64 = _publicKeyCache[senderId];
 
+    // If not in cache, try normalized sender ID
+    final normalizedSenderId = _normalizeUserId(senderId);
+    if (senderPublicKeyBase64 == null && normalizedSenderId != senderId) {
+      senderPublicKeyBase64 = _publicKeyCache[normalizedSenderId];
+      logDebug('@@@@@@@@@@@@@@ Trying normalized sender ID: $normalizedSenderId (original: $senderId)');
+    }
+
     // If not in cache, try loading from persistent storage
     if (senderPublicKeyBase64 == null) {
-      senderPublicKeyBase64 =
-          await secureStorage.getContactPublicKey(senderId);
-      if (senderPublicKeyBase64 != null) {
-        _publicKeyCache[senderId] = senderPublicKeyBase64;
+      senderPublicKeyBase64 = await secureStorage.getContactPublicKey(senderId);
+      if (senderPublicKeyBase64 == null && normalizedSenderId != senderId) {
+        senderPublicKeyBase64 = await secureStorage.getContactPublicKey(normalizedSenderId);
+        if (senderPublicKeyBase64 != null) {
+          logDebug('@@@@@@@@@@@@@@ Loaded public key from storage (normalized): $normalizedSenderId');
+        }
+      } else if (senderPublicKeyBase64 != null) {
         logDebug('@@@@@@@@@@@@@@ Loaded public key from storage for: $senderId');
+      }
+      
+      if (senderPublicKeyBase64 != null) {
+        // Cache under both forms
+        _publicKeyCache[senderId] = senderPublicKeyBase64;
+        if (normalizedSenderId != senderId) {
+          _publicKeyCache[normalizedSenderId] = senderPublicKeyBase64;
+        }
       }
     }
 

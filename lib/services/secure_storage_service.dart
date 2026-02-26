@@ -25,6 +25,7 @@ class SecureStorageService {
   static const _offeringsKey = '124667gfyfdrjH';
   static const _profileKeywordDataMapKey = '124668gfyfdrjH';
   static const _contactPublicKeyPrefix = 'contact_pubkey_';
+  static const _federatedIdMappingPrefix = 'federated_mapping_';
   static const _securityQuestionKey = 'security_question';
   static const _securityAnswerKey = 'security_answer_hash';
 
@@ -184,7 +185,18 @@ class SecureStorageService {
 
   /// Saves a contact's public key for persistent storage
   /// This allows the app to remember encryption keys across sessions
+  /// For federated users, stores mapping from normalized to original ID
   Future<void> saveContactPublicKey(String userId, String publicKey) async {
+    // For federated users, store mapping from normalized -> original
+    final normalizedId = _normalizeUserId(userId);
+    if (normalizedId != userId) {
+      await _secureStorage.write(
+        key: '$_federatedIdMappingPrefix$normalizedId',
+        value: userId, // Store original federated ID
+      );
+    }
+    
+    // Save key with original ID
     await _secureStorage.write(
       key: '$_contactPublicKeyPrefix$userId',
       value: publicKey,
@@ -192,13 +204,95 @@ class SecureStorageService {
   }
 
   /// Retrieves a contact's public key from persistent storage
+  /// For federated users, looks up the original ID first using the mapping
   Future<String?> getContactPublicKey(String userId) async {
-    return await _secureStorage.read(key: '$_contactPublicKeyPrefix$userId');
+    // Try direct lookup first
+    final key = await _secureStorage.read(key: '$_contactPublicKeyPrefix$userId');
+    if (key != null) {
+      return key;
+    }
+    
+    // Check if this is a federated ID (has @) - try finding key directly
+    if (userId.contains('@')) {
+      return null; // No key stored for this federated user
+    }
+    
+    // Check if there's a mapping for a federated version of this user
+    final federatedId = await _secureStorage.read(
+      key: '$_federatedIdMappingPrefix$userId'
+    );
+    
+    if (federatedId != null) {
+      // Look up key using the original federated ID
+      final key = await _secureStorage.read(
+        key: '$_contactPublicKeyPrefix$federatedId'
+      );
+      if (key != null) {
+        return key;
+      }
+    }
+    
+    // FALLBACK: Try to find any key that starts with this userId (for pre-fix keys)
+    // Read all keys and find one matching contact_pubkey_{userId}@
+    try {
+      final allKeys = await _secureStorage.readAll();
+      for (final entry in allKeys.entries) {
+        if (entry.key.startsWith('$_contactPublicKeyPrefix$userId@')) {
+          // Found a federated key matching this normalized userId
+          return entry.value;
+        }
+      }
+    } catch (e) {
+      logDebug('⚠️ Error reading secure storage keys: $e');
+    }
+    
+    return null;
   }
 
-  /// Removes a contact's public key from storage
+  /// Normalize federated user ID by removing server suffix
+  /// e.g., "userId@serverId" -> "userId"
+  String _normalizeUserId(String userId) {
+    final atIndex = userId.indexOf('@');
+    if (atIndex != -1) {
+      return userId.substring(0, atIndex);
+    }
+    return userId;
+  }
+
+  /// Gets the federated ID for a normalized user ID
+  /// Returns null if no mapping exists
+  Future<String?> getFederatedId(String normalizedUserId) async {
+    return await _secureStorage.read(
+      key: '$_federatedIdMappingPrefix$normalizedUserId'
+    );
+  }
+  
+  /// Saves just the federated ID mapping without a public key
+  /// This is used when we receive a federated message but don't have the key yet
+  Future<void> saveFederatedIdMapping(String federatedUserId) async {
+    final normalizedId = _normalizeUserId(federatedUserId);
+    if (normalizedId != federatedUserId) {
+      await _secureStorage.write(
+        key: '$_federatedIdMappingPrefix$normalizedId',
+        value: federatedUserId,
+      );
+      logDebug('🌐 Saved federated mapping: $normalizedId -> $federatedUserId');
+    }
+  }
+  
+  /// Also removes the federated ID mapping if present
   Future<void> deleteContactPublicKey(String userId) async {
+    // Delete with original ID
     await _secureStorage.delete(key: '$_contactPublicKeyPrefix$userId');
+    
+    // Delete any mapping for normalized ID
+    final normalizedId = _normalizeUserId(userId);
+    if (normalizedId != userId) {
+      await _secureStorage.delete(key: '$_federatedIdMappingPrefix$normalizedId');
+    } else {
+      // This is a normalized ID - try to find and delete the mapping too
+      await _secureStorage.delete(key: '$_federatedIdMappingPrefix$userId');
+    }
   }
 
   // --- Security Question Management ---

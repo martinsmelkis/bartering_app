@@ -34,6 +34,7 @@ class ChatCubit extends Cubit<ChatState> {
   String currentUserId;
   String currentUserName;
   String recipientUserId;
+  String? _federatedRecipientId; // Original federated ID for cross-server routing
   final List<ChatMessage> messages = [];
   String? recipientPublicKey; // Exposed recipient's public key
 
@@ -75,6 +76,12 @@ class ChatCubit extends Cubit<ChatState> {
   void setChatScreenActive(bool isActive) {
     _isChatScreenActive = isActive;
     logDebug('💬 Chat screen active state changed: $isActive');
+  }
+
+  /// Set the federated recipient ID for cross-server routing
+  void setFederatedRecipientId(String? federatedId) {
+    _federatedRecipientId = federatedId;
+    logDebug('🌐 Federated recipient ID set: $federatedId');
   }
 
   void _listenToMessages() {
@@ -162,10 +169,15 @@ class ChatCubit extends Cubit<ChatState> {
               // A message belongs to the current conversation if:
               // 1. It's FROM the recipientUserId (they sent it to us), OR
               // 2. It's TO the recipientUserId (we sent it to them)
-              final isFromCurrentRecipient = chatMessage.senderId ==
-                  recipientUserId;
-              final isToCurrentRecipient = chatMessage.recipientId ==
-                  recipientUserId;
+              // For federated users, normalize IDs before comparing
+              final normalizedMessageSender = _normalizeUserId(chatMessage.senderId);
+              final normalizedMessageRecipient = _normalizeUserId(chatMessage.recipientId);
+              final normalizedCurrentRecipient = _normalizeUserId(recipientUserId);
+              
+              final isFromCurrentRecipient = normalizedMessageSender ==
+                  normalizedCurrentRecipient;
+              final isToCurrentRecipient = normalizedMessageRecipient ==
+                  normalizedCurrentRecipient;
 
               if (isFromCurrentRecipient || isToCurrentRecipient) {
                 // Message belongs to CURRENT conversation
@@ -310,6 +322,24 @@ class ChatCubit extends Cubit<ChatState> {
         _currentConversationId = conversation?.conversationId;
           logDebug('✅ Conversation ID: $_currentConversationId');
 
+        // Try to get the federated ID for this recipient (for cross-server routing)
+        final federatedId = await secureStorage.getFederatedId(recipientUserId);
+        if (federatedId != null) {
+          _federatedRecipientId = federatedId;
+          logDebug('🌐 Found federated ID for $recipientUserId: $federatedId');
+        } else {
+          // Try reverse: check if recipientUserId IS a federated ID that was stored
+          final contactKey = await secureStorage.getContactPublicKey(recipientUserId);
+          if (contactKey != null) {
+            // The key exists, so recipientUserId might already be the federated ID
+            // Check if it has @ format
+            if (recipientUserId.contains('@')) {
+              _federatedRecipientId = recipientUserId;
+              logDebug('🌐 Recipient is already federated ID: $recipientUserId');
+            }
+          }
+        }
+
         // Load existing messages from database
         final existingMessages = await _chatRepository!.getRecentMessages(
           _currentConversationId!,
@@ -377,11 +407,14 @@ class ChatCubit extends Cubit<ChatState> {
       _listenToMessages();
 
       logDebug('@@@@@@@@@@@@@ Init chat session - Creating auth signature');
-      logDebug('Key: $pubKey, userId: $userId, recipientUserId: $recipientUserId');
+      logDebug('Key: $pubKey, userId: $userId, recipientUserId: $recipientUserId, federatedId: $_federatedRecipientId');
 
+      // Use federated ID for auth if available (for cross-server federation)
+      final effectivePeerUserId = _federatedRecipientId ?? recipientUserId;
+      
       // Create timestamp and signature for authentication
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final messageToSign = "$timestamp.$userId.$recipientUserId";
+      final messageToSign = "$timestamp.$userId.$effectivePeerUserId";
 
       logDebug('@@@@@@@@@@@@@ Message to sign: $messageToSign');
       final signature = cryptoService?.signMessage(messageToSign);
@@ -396,7 +429,7 @@ class ChatCubit extends Cubit<ChatState> {
       final authRequest = AuthRequest(
         userId: userId,
         userName: currentUserName,
-        peerUserId: recipientUserId,
+        peerUserId: effectivePeerUserId,
         publicKey: pubKey,
         timestamp: timestamp,
         signature: signature,
@@ -427,9 +460,10 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> sendFileNotification(ChatMessage chatMessage) async {
-
     await _chatRepository?.saveMessage(chatMessage, _currentConversationId ?? "Unknown");
-    _webSocketService?.sendMessage("", "", recipientUserId);
+    // Use federated ID if available for cross-server routing
+    final effectiveRecipientId = _federatedRecipientId ?? recipientUserId;
+    _webSocketService?.sendMessage("", "", effectiveRecipientId);
   }
 
   Future<void> sendMessage(String text) async {
@@ -487,7 +521,10 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     // 4. Send via WebSocket
-    _webSocketService?.sendMessage(text, encryptedPayload, recipientUserId);
+    // Use federated ID if available for cross-server routing
+    final effectiveRecipientId = _federatedRecipientId ?? recipientUserId;
+    logDebug('🌐 Sending message to recipient: $recipientUserId (effective: $effectiveRecipientId)');
+    _webSocketService?.sendMessage(text, encryptedPayload, effectiveRecipientId);
 
     // 5. Status will be updated automatically by server via MessageStatusUpdate
     // Don't hardcode status updates here - let the server notifications handle it
@@ -974,7 +1011,15 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-
+  /// Normalize federated user ID by removing server suffix
+  /// e.g., "userId@serverId" -> "userId"
+  String _normalizeUserId(String userId) {
+    final atIndex = userId.indexOf('@');
+    if (atIndex != -1) {
+      return userId.substring(0, atIndex);
+    }
+    return userId;
+  }
 
   @override
   Future<void> close() {

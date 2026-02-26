@@ -28,6 +28,7 @@ class ChatNotificationService with WidgetsBindingObserver {
   Function(String userId)? onNotificationTap;
   
   bool _isInitialized = false;
+  bool? _previousPermissionState;
 
   /// Constructor for dependency injection
   ChatNotificationService(this._apiClient);
@@ -117,6 +118,7 @@ class ChatNotificationService with WidgetsBindingObserver {
 
   /// Request notification permissions
   /// GDPR-compliant: Records user consent via updateNotificationContacts when permission granted
+  /// Only records consent when permission transitions from false/null to true
   Future<bool?> requestNotificationPermission() async {
     if (!kIsWeb) {
       final androidImplementation = _notificationService.plugin
@@ -125,9 +127,16 @@ class ChatNotificationService with WidgetsBindingObserver {
 
       final permissionGranted = await androidImplementation?.requestNotificationsPermission();
       
-      // GDPR: If permission granted, update backend to record user's explicit consent
-      if (permissionGranted == true) {
+      // GDPR: Only record consent when permission transitions from false/null to true
+      // This prevents redundant API calls and respects the "only on change" principle
+      final previousState = _previousPermissionState;
+      _previousPermissionState = permissionGranted;
+      
+      if (permissionGranted == true && previousState != true) {
+        logDebug('🔔 Notification permission granted (transitioned from $previousState to true)');
         await _recordNotificationConsent();
+      } else if (permissionGranted == true) {
+        logDebug('🔔 Notification permission already granted (no state change), skipping consent record');
       }
       
       return permissionGranted;
