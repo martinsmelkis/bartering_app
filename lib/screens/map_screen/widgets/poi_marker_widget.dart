@@ -276,12 +276,24 @@ class PoiMarkerWidget {
     // Calculate total weight for normalization
     final totalWeight = colorWeights.fold<double>(0.0, (sum, entry) => sum + entry.value);
 
+    // Reorder color weights for SVG: GREEN, RED, BLUE, PURPLE, YELLOW, TEAL, ORANGE
+    // Original order: GREEN(0), RED(1), BLUE(2), PURPLE(3), YELLOW(4), ORANGE(5), TEAL(6)
+    // SVG order: GREEN(0), RED(1), BLUE(2), PURPLE(3), YELLOW(4), TEAL(6), ORANGE(5)
+    // This ensures teal is not next to green, and yellow is not next to orange
+    final List<MapEntry<Color, double>> reorderedWeights = List.from(colorWeights);
+    if (reorderedWeights.length >= 7) {
+      // Swap ORANGE (index 5) and TEAL (index 6)
+      final tmp = reorderedWeights[5];
+      reorderedWeights[5] = reorderedWeights[6];
+      reorderedWeights[6] = tmp;
+    }
+
     // Build segmented border path
     String borderSegments = '';
     if (totalWeight > 0) {
       double currentAngle = -90; // Start at top
-      for (int i = 0; i < colorWeights.length; i++) {
-        final entry = colorWeights[i];
+      for (int i = 0; i < reorderedWeights.length; i++) {
+        final entry = reorderedWeights[i];
         final percentage = entry.value / totalWeight;
         final sweepAngle = percentage * 360;
 

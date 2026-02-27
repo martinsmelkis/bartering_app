@@ -1,5 +1,5 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // L10nMapperGenerator
@@ -29,18 +29,42 @@ extension AppLocalizationsExtension on AppLocalizations {
 }
 
 class L10nHelper {
+  // Cache to store localization maps per locale
+  static final Map<String, Map<String, dynamic>> _cache = {};
+
   static String parseL10n(
     AppLocalizations localizations,
     String translationKey, {
     List<Object>? arguments,
   }) {
-    const mapper = AppLocalizationsMapper();
-    final object = mapper.toLocalizationMap(localizations)[translationKey];
+    // Get or create cached map for this locale
+    final localeName = localizations.localeName;
+    final cachedMap = _cache[localeName];
+
+    final map =
+        cachedMap ??
+        () {
+          const mapper = AppLocalizationsMapper();
+          final newMap = mapper.toLocalizationMap(localizations);
+          _cache[localeName] = newMap;
+          return newMap;
+        }();
+
+    final object = map[translationKey];
     if (object == null) return 'Translation key not found!';
     if (object is String) return object;
     assert(arguments != null, 'Arguments should not be null!');
     assert(arguments!.isNotEmpty, 'Arguments should not be empty!');
-    return Function.apply(object, arguments);
+    return Function.apply(object as Function, arguments) as String;
+  }
+
+  /// Clear the cache for a specific locale or all locales
+  static void clearCache([String? localeName]) {
+    if (localeName != null) {
+      _cache.remove(localeName);
+    } else {
+      _cache.clear();
+    }
   }
 }
 
@@ -919,46 +943,55 @@ class AppLocalizationsMapper {
       'migrationTimedOut': localizations.migrationTimedOut,
       'failedToProcessMigration': localizations.failedToProcessMigration,
       'clear': localizations.clear,
+      'importExistingAccount': localizations.importExistingAccount,
       'targetStep1': localizations.targetStep1,
       'targetStep2': localizations.targetStep2,
       'targetStep3': localizations.targetStep3,
-      'errorWithMessage': (errorMessage) =>
+      'noUsersFound': localizations.noUsersFound,
+      'noPostingsFound': localizations.noPostingsFound,
+      'errorWithMessage': (Object errorMessage) =>
           localizations.errorWithMessage(errorMessage),
-      'questionsAnswered': (count) => localizations.questionsAnswered(count),
-      'errorFindingLocation': (error) =>
+      'questionsAnswered': (Object count) =>
+          localizations.questionsAnswered(count),
+      'errorFindingLocation': (Object error) =>
           localizations.errorFindingLocation(error),
-      'mockPoiNotFound': (id) => localizations.mockPoiNotFound(id),
-      'mockPoiNotFoundForUpdate': (id) =>
+      'mockPoiNotFound': (Object id) => localizations.mockPoiNotFound(id),
+      'mockPoiNotFoundForUpdate': (Object id) =>
           localizations.mockPoiNotFoundForUpdate(id),
-      'pinErrorIncorrect': (attempts) =>
+      'pinErrorIncorrect': (int attempts) =>
           localizations.pinErrorIncorrect(attempts),
-      'securityAnswerIncorrect': (attempts) =>
+      'securityAnswerIncorrect': (int attempts) =>
           localizations.securityAnswerIncorrect(attempts),
-      'styleNumber': (number) => localizations.styleNumber(number),
-      'matchingUsersFound': (count) => localizations.matchingUsersFound(count),
-      'matchingPostingsFound': (count) =>
+      'styleNumber': (Object number) => localizations.styleNumber(number),
+      'matchingUsersFound': (int count) =>
+          localizations.matchingUsersFound(count),
+      'matchingPostingsFound': (int count) =>
           localizations.matchingPostingsFound(count),
-      'reviewUser': (userName) => localizations.reviewUser(userName),
-      'downloadingFile': (filename) => localizations.downloadingFile(filename),
-      'downloadFailed': (error) => localizations.downloadFailed(error),
-      'fileSavedAt': (filePath) => localizations.fileSavedAt(filePath),
-      'fileNotFound': (filePath) => localizations.fileNotFound(filePath),
-      'errorOpeningFile': (message) => localizations.errorOpeningFile(message),
-      'couldNotOpenFile': (error) => localizations.couldNotOpenFile(error),
-      'errorCreatingTransaction': (error) =>
+      'reviewUser': (String userName) => localizations.reviewUser(userName),
+      'downloadingFile': (String filename) =>
+          localizations.downloadingFile(filename),
+      'downloadFailed': (String error) => localizations.downloadFailed(error),
+      'fileSavedAt': (String filePath) => localizations.fileSavedAt(filePath),
+      'fileNotFound': (String filePath) => localizations.fileNotFound(filePath),
+      'errorOpeningFile': (String message) =>
+          localizations.errorOpeningFile(message),
+      'couldNotOpenFile': (String error) =>
+          localizations.couldNotOpenFile(error),
+      'errorCreatingTransaction': (String error) =>
           localizations.errorCreatingTransaction(error),
-      'errorUpdatingTransaction': (error) =>
+      'errorUpdatingTransaction': (String error) =>
           localizations.errorUpdatingTransaction(error),
-      'inviteMessageShare': (appLink) =>
+      'inviteMessageShare': (String appLink) =>
           localizations.inviteMessageShare(appLink),
-      'reportUserTitle': (userName) => localizations.reportUserTitle(userName),
-      'blockUserConfirmationDetailed': (userName) =>
+      'reportUserTitle': (String userName) =>
+          localizations.reportUserTitle(userName),
+      'blockUserConfirmationDetailed': (String userName) =>
           localizations.blockUserConfirmationDetailed(userName),
-      'unblockUserConfirmationDetailed': (userName) =>
+      'unblockUserConfirmationDetailed': (String userName) =>
           localizations.unblockUserConfirmationDetailed(userName),
-      'errorWithException': (exception) =>
+      'errorWithException': (String exception) =>
           localizations.errorWithException(exception),
-      'expiresIn': (time) => localizations.expiresIn(time),
+      'expiresIn': (String time) => localizations.expiresIn(time),
     };
   }
 }
