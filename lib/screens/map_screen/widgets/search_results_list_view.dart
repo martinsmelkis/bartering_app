@@ -313,10 +313,11 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   }
 
   Widget _buildUsersListView(List<PointOfInterest> sortedPois) {
+    final l10n = AppLocalizations.of(context)!;
     if (sortedPois.isEmpty) {
       return Center(
         child: Text(
-          'No users found',
+          l10n.noUsersFound,
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey[600],
@@ -350,6 +351,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   }
 
   Widget _buildPostingsListView() {
+    final l10n = AppLocalizations.of(context)!;
     if (_isLoadingPostings) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -359,7 +361,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     if (_allPostings.isEmpty) {
       return Center(
         child: Text(
-          'No postings found',
+          l10n.noPostingsFound,
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey[600],
@@ -428,22 +430,22 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                         return CategoryStatsUtils.buildCategoryStatsCircle(
                           keywordMap: poi.profile.profileKeywordDataMap,
                           attributes: poi.profile.attributes,
-                          size: 32,
+                          size: 40,
                           strokeWidth: 2.0,
                           gapWidth: 0.5,
                           child: ClipOval(
                             child: SvgPicture.string(
                               snapshot.data!,
-                              width: 32,
-                              height: 32,
+                              width: 40,
+                              height: 40,
                               fit: BoxFit.contain,
                             ),
                           ),
                         );
                       }
                       return Container(
-                        width: 32,
-                        height: 32,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           color: Colors.grey.shade300,
                           shape: BoxShape.circle,
@@ -461,7 +463,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                               ? poi.profile.name.replaceFirst('User_', l10n.userPrefix + ' ')
                               : poi.profile.name,
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 12.6,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -1007,7 +1009,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                         ? poi.profile.name.replaceFirst('User_', l10n.userPrefix + ' ')
                         : poi.profile.name,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14.4,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1024,22 +1026,22 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                           return CategoryStatsUtils.buildCategoryStatsCircle(
                             keywordMap: poi.profile.profileKeywordDataMap,
                             attributes: poi.profile.attributes,
-                            size: 56,
+                            size: 68,
                             strokeWidth: 3.0,
                             gapWidth: 1.0,
                             child: ClipOval(
                               child: SvgPicture.string(
                                 snapshot.data!,
-                                width: 56,
-                                height: 56,
+                                width: 68,
+                                height: 68,
                                 fit: BoxFit.contain,
                               ),
                             ),
                           );
                         }
                         return Container(
-                          width: 56,
-                          height: 56,
+                          width: 68,
+                          height: 68,
                           decoration: BoxDecoration(
                             color: Colors.grey.shade300,
                             shape: BoxShape.circle,

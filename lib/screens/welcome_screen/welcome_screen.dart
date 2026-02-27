@@ -330,7 +330,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           }
                         },
                         child: Text(
-                          'Import Existing Account',
+                          l10n.importExistingAccount,
                           style: TextStyle(
                             fontSize: context.bodyFontSize / fontScale,
                             color: Colors.white.withValues(alpha: 0.9),

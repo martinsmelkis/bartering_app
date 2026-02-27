@@ -2737,6 +2737,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get clear => 'Notīrīt';
 
   @override
+  String get importExistingAccount => 'Importēt eksistējošu kontu';
+
+  @override
   String get targetStep1 => 'Atveriet lietotni savā citā ierīcē';
 
   @override
@@ -2744,4 +2747,10 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get targetStep3 => 'Ievadiet kodu, kas redzams uz šīs ierīces';
+
+  @override
+  String get noUsersFound => 'Nav atrasti lietotāji';
+
+  @override
+  String get noPostingsFound => 'Nav atrasti sludinājumi';
 }

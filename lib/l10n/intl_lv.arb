@@ -971,6 +971,7 @@
   "migrationStep2": "Atveriet lietotni jaunajā ierīcē",
   "migrationStep3": "Sākumekrānā pieskarieties \"Ievietot esošo kontu\"",
   "migrationStep4": "Ievadiet šo kodu jaunajā ierīcē",
+  "importExistingAccount": "Importēt eksistējošu kontu",
   "newDeviceDetected": "Jauna ierīce konstatēta",
   "newDeviceDetectedMessage": "Jauna ierīce vēlas importēt jūsu konta datus. Vai vēlaties to atļaut?",
   "deny": "Aizliegt",
@@ -993,6 +994,8 @@
   "targetStep3": "Ievadiet kodu, kas redzams uz šīs ierīces",
 
   "showMore": "Rādīt vairāk",
-  "showLess": "Rādīt mazāk"
+  "showLess": "Rādīt mazāk",
+  "noUsersFound": "Nav atrasti lietotāji",
+  "noPostingsFound": "Nav atrasti sludinājumi"
 
 }

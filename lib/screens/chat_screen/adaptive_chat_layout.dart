@@ -14,6 +14,10 @@ import 'package:barter_app/models/relationships/report_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:barter_app/l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:barter_app/configure_dependencies.dart';
+import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/router/app_router.dart';
 
 /// Adaptive chat layout that shows chat or chats list as a side panel on large screens
 /// and as a full screen on small screens
@@ -179,6 +183,31 @@ class _PanelHeaderState extends State<_PanelHeader> {
     if (widget.showMenu && widget.poiId != null) {
       _checkIfUserBlocked();
     }
+  }
+
+  Future<void> _handleViewProfile(BuildContext context) async {
+    if (widget.poiId == null) return;
+    
+    // Fetch profile info and navigate to map
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      PointOfInterest? poi;
+      try {
+        final apiClient = getIt<ApiClient>();
+        final userProfile = await apiClient.getProfileInfo(widget.poiId!);
+        poi = PointOfInterest(
+          profile: userProfile,
+          distanceKm: null,
+        );
+        logDebug('@@@@@@@@@ AdaptiveChatLayout view_profile - fetched profile for userId: ${widget.poiId}');
+      } catch (e) {
+        logDebugError('Failed to fetch profile for view_profile', e);
+      }
+      if (poi != null) {
+        final List<PointOfInterest> pois = List.empty(growable: true);
+        pois.add(poi);
+        AppRouter.navigateToMapWithPois(pois);
+      }
+    });
   }
 
   Future<void> _checkIfUserBlocked() async {
@@ -435,7 +464,9 @@ class _PanelHeaderState extends State<_PanelHeader> {
               child: PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, color: AppColors.background, size: 18),
                 onSelected: (value) {
-                  if (value == 'finish_transaction') {
+                  if (value == 'view_profile') {
+                    _handleViewProfile(context);
+                  } else if (value == 'finish_transaction') {
                     _handleFinishTransaction(context);
                   } else if (value == 'report_user') {
                     _handleReportUser(context);
@@ -446,6 +477,16 @@ class _PanelHeaderState extends State<_PanelHeader> {
                   }
                 },
                 itemBuilder: (BuildContext context) => [
+                  PopupMenuItem<String>(
+                    value: 'view_profile',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.person_outline),
+                        SizedBox(width: 8.w),
+                        Text(l10n.viewProfile),
+                      ],
+                    ),
+                  ),
                   PopupMenuItem<String>(
                     value: 'finish_transaction',
                     child: Row(

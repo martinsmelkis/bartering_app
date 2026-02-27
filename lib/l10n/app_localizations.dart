@@ -5168,6 +5168,12 @@ abstract class AppLocalizations {
   /// **'Clear'**
   String get clear;
 
+  /// No description provided for @importExistingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Existing Account'**
+  String get importExistingAccount;
+
   /// No description provided for @targetStep1.
   ///
   /// In en, this message translates to:
@@ -5185,6 +5191,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter the code shown on that device here'**
   String get targetStep3;
+
+  /// No description provided for @noUsersFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No users found'**
+  String get noUsersFound;
+
+  /// No description provided for @noPostingsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No postings found'**
+  String get noPostingsFound;
 }
 
 class _AppLocalizationsDelegate

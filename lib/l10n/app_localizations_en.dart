@@ -2700,6 +2700,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clear => 'Clear';
 
   @override
+  String get importExistingAccount => 'Import Existing Account';
+
+  @override
   String get targetStep1 => 'Open the app on your other device';
 
   @override
@@ -2707,4 +2710,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get targetStep3 => 'Enter the code shown on that device here';
+
+  @override
+  String get noUsersFound => 'No users found';
+
+  @override
+  String get noPostingsFound => 'No postings found';
 }

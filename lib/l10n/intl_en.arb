@@ -989,8 +989,12 @@
   "migrationTimedOut": "Migration timed out. Please try again with a new code.",
   "failedToProcessMigration": "Failed to process migration data",
   "clear": "Clear",
+  "importExistingAccount": "Import Existing Account",
   "targetStep1": "Open the app on your other device",
   "targetStep2": "Go to Settings → Account → Migrate Device",
-  "targetStep3": "Enter the code shown on that device here"
+  "targetStep3": "Enter the code shown on that device here",
+
+  "noUsersFound": "No users found",
+  "noPostingsFound": "No postings found"
 
 }
