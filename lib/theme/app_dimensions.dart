@@ -13,7 +13,7 @@ class AppDimensions {
   // ============================================================================
 
   /// Size for POI markers on the map
-  static double get mapPoiMarkerSize => kIsWeb ? 90 : (174 * 1.155);
+  static double get mapPoiMarkerSize => kIsWeb ? 90 : 120;
 
   /// Size for user avatar FAB
   static double get userAvatarSize => kIsWeb ? 88.4 : 90.0;
@@ -29,22 +29,22 @@ class AppDimensions {
   // ============================================================================
 
   /// Container size for main cluster markers
-  static double get mainClusterSize => kIsWeb ? 80.0 : 133;
+  static double get mainClusterSize => kIsWeb ? 80.0 : 85;
 
   /// Font size for main cluster marker text
-  static double get mainClusterFontSize => kIsWeb ? 25.0 : 35;
+  static double get mainClusterFontSize => kIsWeb ? 25.0 : 20;
 
   /// Border width for main cluster markers
   static double get mainClusterBorderWidth => kIsWeb ? 2.0 : 4.0;
 
   /// Container size for sub-cluster markers
-  static double get subClusterSize => kIsWeb ? 60.0 : 110;
+  static double get subClusterSize => kIsWeb ? 60.0 : 75;
 
   /// Font size for sub-cluster marker text
-  static double get subClusterFontSize => kIsWeb ? 22 : 30;
+  static double get subClusterFontSize => kIsWeb ? 22 : 17;
 
   /// Border width for sub-cluster markers
-  static double get subClusterBorderWidth => kIsWeb ? 2.0 : 2.0;
+  static double get subClusterBorderWidth => kIsWeb ? 2.0 : 3.0;
 
   // ============================================================================
   // TEXT SIZES

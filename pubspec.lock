@@ -511,8 +511,8 @@ packages:
     dependency: transitive
     description:
       path: flutter_osm_interface
-      ref: "7c03122e82f806046b0aab72eebd2578f6ee308c"
-      resolved-ref: "7c03122e82f806046b0aab72eebd2578f6ee308c"
+      ref: a9672af3997770722cc9c232c81fd8c04ccfe148
+      resolved-ref: a9672af3997770722cc9c232c81fd8c04ccfe148
       url: "https://github.com/martinsmelkis/osm_flutter.git"
     source: git
     version: "1.4.0"
@@ -520,8 +520,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: svg-marker-support
-      resolved-ref: "7c03122e82f806046b0aab72eebd2578f6ee308c"
+      ref: add-markers-batch
+      resolved-ref: a9672af3997770722cc9c232c81fd8c04ccfe148
       url: "https://github.com/martinsmelkis/osm_flutter.git"
     source: git
     version: "1.4.2"
@@ -529,8 +529,8 @@ packages:
     dependency: transitive
     description:
       path: flutter_osm_web
-      ref: "7c03122e82f806046b0aab72eebd2578f6ee308c"
-      resolved-ref: "7c03122e82f806046b0aab72eebd2578f6ee308c"
+      ref: a9672af3997770722cc9c232c81fd8c04ccfe148
+      resolved-ref: a9672af3997770722cc9c232c81fd8c04ccfe148
       url: "https://github.com/martinsmelkis/osm_flutter.git"
     source: git
     version: "1.4.2"

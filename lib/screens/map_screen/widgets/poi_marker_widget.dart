@@ -47,7 +47,7 @@ class PoiMarkerWidget {
 
     // Calculate sizes using original AppDimensions.mapPoiMarkerSize
     final circleSize = AppDimensions.mapPoiMarkerSize;
-    final strokeWidth = kIsWeb ? 7.2 : 11.0;
+    final strokeWidth = kIsWeb ? 7.5 : 7.0;
     final gap = strokeWidth + 2;
     final svgSize = circleSize - gap;
 
@@ -172,8 +172,8 @@ class PoiMarkerWidget {
           // Glow effect for relevant POIs
           if (glowColor != null)
             Positioned(
-              left: 42,
-              top: 42,
+              left: 25,
+              top: 25,
               child: Container(
                 width: circleSize - circleSize / 2.4,
                 height: circleSize - circleSize / 2.4,
@@ -195,7 +195,7 @@ class PoiMarkerWidget {
             attributes: poi.profile.attributes,
             size: circleSize,
             strokeWidth: strokeWidth,
-            gapWidth: 6.0,
+            gapWidth: 8.0,
             child: ClipOval(
               child: SvgPicture.string(
                 localSvgCopy,
@@ -213,19 +213,19 @@ class PoiMarkerWidget {
           PositionedOnlineStatusBadge(
             isOnline: poi.isOnline,
             isAway: poi.isAway,
-            size: 26.25,
-            right: 34.65,
-            top: 34.65,
+            size: 21,
+            right: 23,
+            top: 23,
             borderWidth: 2.625,
           ),
           // Match indicator - positioned at bottom right
           if (hasMatch)
             Positioned(
-              right: 35,
-              bottom: 35,
+              right: 20,
+              bottom: 20,
               child: Container(
-                width: 44.1,
-                height: 44.1,
+                width: 29,
+                height: 29,
                 decoration: BoxDecoration(
                   color: AppColors.secondary,
                   shape: BoxShape.circle,
@@ -243,7 +243,7 @@ class PoiMarkerWidget {
                 ),
                 child: Icon(
                   Icons.handshake,
-                  size: 31.5,
+                  size: 18,
                   color: Colors.white,
                 ),
               ),

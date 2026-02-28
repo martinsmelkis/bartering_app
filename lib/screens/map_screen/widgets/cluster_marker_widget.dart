@@ -107,8 +107,8 @@ class ClusterMarkerWidget {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.7),
-              blurRadius: 5,
-              offset: const Offset(0, 4),
+              blurRadius: 1,
+              offset: const Offset(0, 1),
             ),
           ],
         ),
