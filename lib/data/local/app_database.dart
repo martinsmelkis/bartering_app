@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:barter_app/data/local/tables.dart';
 import 'package:barter_app/data/local/platform/platform.dart' as platform;
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:drift/drift.dart';
 
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 part 'app_database.g.dart';
 
@@ -12,10 +17,42 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase._(QueryExecutor e) : super(e);
 
   static Future<AppDatabase> create() async {
-    final executor = await _openDatabase();
-    // Create an instance AppDatabase using the private constructor.
-    final db = AppDatabase._(executor);
-    return db;
+    try {
+      final executor = await _openDatabase();
+      // Create an instance AppDatabase using the private constructor.
+      final db = AppDatabase._(executor);
+      return db;
+    } catch (e) {
+      final errorString = e.toString().toLowerCase();
+      // Check for SQLCipher decryption errors
+      if (errorString.contains('decryption') || 
+          errorString.contains('not a database') ||
+          errorString.contains('hmac check failed') ||
+          errorString.contains('file is not a database') ||
+          errorString.contains('sqliteexception(26)')) {
+        logDebug('🔄 Database decryption failed. Deleting corrupted database and recreating...');
+        logDebug('Error details: $e');
+        
+        // Delete the corrupted database file
+        final path = await getApplicationDocumentsDirectory();
+        final dbFile = File(p.join(path.path, 'app.db.enc'));
+        if (await dbFile.exists()) {
+          await dbFile.delete();
+          logDebug('✅ Corrupted database file deleted');
+        }
+        
+        // Retry creating the database
+        logDebug('🔄 Retrying database creation...');
+        final executor = await _openDatabase();
+        final db = AppDatabase._(executor);
+        logDebug('✅ Fresh database created successfully');
+        return db;
+      }
+      
+      // Re-throw other errors
+      logDebugError('Unexpected database error', e);
+      rethrow;
+    }
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
@@ -16,7 +17,18 @@ import '../../../services/secure_storage_service.dart';
 class PlatformInterface {
   static Future<QueryExecutor> createDatabaseConnection(String databaseName) async {
     final secureStorage = SecureStorageService();
-    final privateKey = await secureStorage.getOwnPrivateKey();
+    var privateKey = await secureStorage.getOwnPrivateKey();
+
+    // If no private key exists, generate one via CryptoService
+    // This handles first app launch where database is needed before full init
+    if (privateKey == null || privateKey.isEmpty) {
+      print('🔐 No private key found for database encryption, generating...');
+      final cryptoService = await CryptoService.create();
+      if (cryptoService.isReady) {
+        privateKey = await secureStorage.getOwnPrivateKey();
+        print('✅ Private key generated successfully');
+      }
+    }
 
     if (privateKey == null || privateKey.length < 10) {
       throw Exception('Private key not found or is too short for database encryption.');
@@ -26,70 +38,44 @@ class PlatformInterface {
     final path = await getApplicationDocumentsDirectory();
     final dbFile = File(p.join(path.path, 'app.db.enc'));
 
-    try {
-      return NativeDatabase.createInBackground(
-        dbFile,
-        isolateSetup: () async {
-          open..overrideFor(
-              OperatingSystem.android, openCipherOnAndroid)..overrideFor(
-              OperatingSystem.linux,
-                  () => DynamicLibrary.open('libsqlcipher.so'))..overrideFor(
-              OperatingSystem.windows,
-                  () => DynamicLibrary.open('sqlcipher.dll'));
-        },
-        setup: (db) {
-          // Check that we're actually running with SQLCipher by quering the
-          // cipher_version pragma.
-          final result = db.select('pragma cipher_version');
-          if (result.isEmpty) {
-            throw UnsupportedError(
-              'This database needs to run with SQLCipher, but that library is '
-                  'not available!',
-            );
-          }
-
-          // Then, apply the key to encrypt the database. Unfortunately, this
-          // pragma doesn't seem to support prepared statements so we inline the
-          // key.
-          final escapedKey = encryptionPassword.replaceAll("'", "''");
-          db.execute("pragma key = '$escapedKey'");
-
-          // Test that the key is correct by selecting from a table
-          try {
-            db.execute('select count(*) from sqlite_master');
-          } catch (e) {
-            // If the key is incorrect (database corrupted or wrong key),
-            // throw error so we can delete and recreate
-            throw Exception('Database decryption failed: $e');
-          }
-        },
-      );
-    } catch (e) {
-      // If database connection fails due to decryption error, delete and recreate
-      final errorString = e.toString().toLowerCase();
-      if (errorString.contains('decryption') || 
-          errorString.contains('not a database') ||
-          errorString.contains('hmac check failed') ||
-          errorString.contains('file is not a database') ||
-          errorString.contains('sqliteexception(26)')) {
-        logDebug('Database corrupted or key mismatch. Deleting and recreating...');
-        logDebug('Error details: $e');
-        
-        // Delete the corrupted database file
-        if (await dbFile.exists()) {
-          await dbFile.delete();
-          logDebug('✅ Corrupted database file deleted');
-        }
-        
-        // Recursively call to create a fresh database
-        logDebug('🔄 Creating fresh database with new encryption key...');
-        return createDatabaseConnection(databaseName);
-      }
-      
-      // Re-throw other errors
-      logDebugError('Unexpected database error', e);
-      rethrow;
+    // Check if database file exists - if not, we're creating fresh (no decryption needed)
+    final isNewDatabase = !await dbFile.exists();
+    if (isNewDatabase) {
+      print('🆕 Database file does not exist, will create new encrypted database');
     }
+
+    return NativeDatabase.createInBackground(
+      dbFile,
+      isolateSetup: () async {
+        open..overrideFor(
+            OperatingSystem.android, openCipherOnAndroid)..overrideFor(
+            OperatingSystem.linux,
+                () => DynamicLibrary.open('libsqlcipher.so'))..overrideFor(
+            OperatingSystem.windows,
+                () => DynamicLibrary.open('sqlcipher.dll'));
+      },
+      setup: (db) {
+        // Check that we're actually running with SQLCipher by quering the
+        // cipher_version pragma.
+        final result = db.select('pragma cipher_version');
+        if (result.isEmpty) {
+          throw UnsupportedError(
+            'This database needs to run with SQLCipher, but that library is '
+                'not available!',
+          );
+        }
+
+        // Then, apply the key to encrypt the database. Unfortunately, this
+        // pragma doesn't seem to support prepared statements so we inline the
+        // key.
+        final escapedKey = encryptionPassword.replaceAll("'", "''");
+        db.execute("pragma key = '$escapedKey'");
+
+        // Test that the key is correct by selecting from a table
+        // This will throw an exception if the key is wrong (decryption fails)
+        db.execute('select count(*) from sqlite_master');
+      },
+    );
   }
 
   /// Stub method - browser storage clearing only applies to web platform

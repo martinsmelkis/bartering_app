@@ -19,6 +19,7 @@ import 'package:barter_app/models/user/user_onboarding_data.dart';
 import 'package:barter_app/models/user/user_registration_data.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pointycastle/asn1/primitives/asn1_integer.dart' as pc;
 import 'package:pointycastle/asn1/primitives/asn1_sequence.dart' as pc;
@@ -36,7 +37,15 @@ part 'api_client.g.dart';
 @injectable
 @RestApi() // Base URL can be set here or when creating Dio instance
 abstract class ApiClient {
-  static String serviceBaseUrl = getIt<String>(instanceName: 'serviceBaseUrl');
+  static String? _serviceBaseUrl;
+  static String get serviceBaseUrl {
+    _serviceBaseUrl ??= kIsWeb ?
+      dotenv.env['SERVICE_BASE_URL_WEB'] ?? 'http://localhost:8081'
+    :
+      dotenv.env['SERVICE_BASE_URL_MOBILE'] ?? 'http://10.0.2.2:8081';
+    ;
+    return _serviceBaseUrl!;
+  }
   factory ApiClient(Dio dio, {String baseUrl}) = _ApiClient;
 
   // --- Static method to create an instance, allowing mock switching ---

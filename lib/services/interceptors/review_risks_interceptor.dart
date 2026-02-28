@@ -6,7 +6,12 @@ import '../device_fingerprint_service.dart';
 
 class ReviewRiskTrackingInterceptor extends Interceptor {
   final DeviceFingerprintService _deviceService = DeviceFingerprintService();
-  final UserRepository _userRepository = getIt<UserRepository>();
+  UserRepository? _userRepository;
+
+  UserRepository get userRepository {
+    _userRepository ??= getIt<UserRepository>();
+    return _userRepository!;
+  }
 
   /// Actions that should include risk tracking headers
   final _trackedActions = {
@@ -31,8 +36,8 @@ class ReviewRiskTrackingInterceptor extends Interceptor {
       final fingerprint = await _deviceService.getDeviceFingerprint();
       options.headers['X-Device-Fingerprint'] = fingerprint;
 
-      options.headers['X-Latitude'] = _userRepository.latitude;
-      options.headers['X-Longitude'] = _userRepository.longitude;
+      options.headers['X-Latitude'] = userRepository.latitude;
+      options.headers['X-Longitude'] = userRepository.longitude;
 
       // User agent is automatically added by Dio
       // but we can enhance it with app version

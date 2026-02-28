@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
@@ -40,19 +41,63 @@ class CryptoService {
 
   // Singleton instance
   static CryptoService? _instance;
+  
+  // Static lock to prevent concurrent initialization
+  static Future<CryptoService>? _creatingInstance;
 
   CryptoService._();
 
   static Future<CryptoService> create({String curveName = 'secp256r1'}) async {
+    logDebug("@@@@@@@@@@@ CryptoService.create() called - _instance=${_instance != null}, _creatingInstance=${_creatingInstance != null}");
+    
+    // Fast path: already initialized
     if (_instance != null && _instance!.isReady) {
-      logDebug("@@@@@@@@@@@ Returning existing CryptoService instance");
+      logDebug("@@@@@@@@@@@ Returning existing ready CryptoService instance");
       return _instance!;
     }
-
-    final service = CryptoService._();
-    await service.initializeKeyPair(curveName: curveName);
-    _instance = service;
-    return service;
+    
+    // CRITICAL: Check again after any potential async gaps
+    // This handles the race condition where two calls arrive simultaneously
+    while (_creatingInstance != null) {
+      logDebug("@@@@@@@@@@@ Another initialization in progress, waiting...");
+      final result = await _creatingInstance!;
+      // Double-check: did the completed initialization succeed?
+      if (_instance != null && _instance!.isReady) {
+        logDebug("@@@@@@@@@@@ Wait complete, returning ready instance");
+        return _instance!;
+      }
+      // If the initialization failed, loop and try again
+      logDebug("@@@@@@@@@@@ Previous initialization failed or incomplete, retrying...");
+      if (_creatingInstance == null) break;
+    }
+    
+    // If we get here, we're the one who should initialize
+    // Check one more time in case another thread just completed
+    if (_instance != null && _instance!.isReady) {
+      return _instance!;
+    }
+    
+    // Create a completer to act as our lock - this is synchronous
+    logDebug("@@@@@@@@@@@ Acquiring creation lock");
+    final completer = Completer<CryptoService>();
+    _creatingInstance = completer.future;
+    
+    try {
+      logDebug("@@@@@@@@@@@ Creating new CryptoService instance...");
+      final service = CryptoService._();
+      await service.initializeKeyPair(curveName: curveName);
+      _instance = service;
+      logDebug("@@@@@@@@@@@ CryptoService instance created: ${service.hashCode}");
+      completer.complete(service);
+      return service;
+    } catch (e, stackTrace) {
+      logDebugError("CryptoService creation failed", e);
+      completer.completeError(e, stackTrace);
+      rethrow;
+    } finally {
+      _creatingInstance = null;
+      logDebug("@@@@@@@@@@@ Creation lock released");
+    }
   }
 
   // Method to get the singleton instance if it exists
@@ -60,6 +105,26 @@ class CryptoService {
 
   // Helper method to avoid code duplication
   Future<void> _generateAndSaveNewKeyPair(String curveName) async {
+    // Double-check: another instance might have saved keys while we were waiting
+    final existingKey = await secureStorage.getOwnPrivateKey();
+    if (existingKey != null && existingKey.isNotEmpty) {
+      logDebug("@@@@@@@@@@@ Keys already exist in storage (race condition detected), skipping generation");
+      // Re-initialize with existing key
+      try {
+        final privateKey = ecPrivateKeyFromString(existingKey);
+        _domainParameters ??= pc.ECDomainParameters(curveName);
+        final Q = _domainParameters!.G * privateKey.d!;
+        final publicKey = pc.ECPublicKey(Q, _domainParameters);
+        _keyPair = pc.AsymmetricKeyPair<pc.ECPublicKey, pc.ECPrivateKey>(publicKey, privateKey);
+        _isInitialized = true;
+        logDebug("@@@@@@@@@@@ Loaded existing keys instead of generating new ones");
+        return;
+      } catch (e) {
+        logDebug("Failed to load existing key, will generate new: $e");
+        // Fall through to generate new key
+      }
+    }
+    
     _keyPair = await compute(_generateEcKeyPairInBackground, {'curveName': curveName});
     _isInitialized = true;
 
@@ -73,6 +138,12 @@ class CryptoService {
 
   Future<void> initializeKeyPair({String curveName = 'secp256r1'}) async {
     if (_isInitialized) return;
+    
+    // Prevent re-initialization on disposed instances
+    if (_instance != this && _instance != null) {
+      logDebug("@@@@@@@@@@@ WARNING: initializeKeyPair() called on non-singleton instance, aborting");
+      throw StateError('Cannot initializeKeyPair() on a disposed CryptoService instance. Use CryptoService.create() instead.');
+    }
 
     _domainParameters = pc.ECDomainParameters(curveName);
 
@@ -576,6 +647,15 @@ class CryptoService {
       await secureStorage.saveOwnPublicKey("");
       _instance!.dispose();
     }
+  }
+
+  /// Static method to clear singleton without async (for atomic reset operations)
+  static void disposeSingletonStatic() {
+    if (_instance != null) {
+      _instance!.dispose();
+    }
+    _creatingInstance = null;
+    logDebug("@@@@@@@@@@@ CryptoService singleton statically cleared");
   }
 
 }

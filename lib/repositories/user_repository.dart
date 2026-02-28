@@ -132,8 +132,14 @@ class UserRepository {
   }
 
   Future<void> resetUserId() async {
+    await _secureStorageService.saveOwnPrivateKey("");
+    await _secureStorageService.saveOwnPublicKey("");
     userId = const Uuid().v4().toString();
     await _secureStorageService.saveOwnUserId(userId!);
+  }
+
+  Future<void> clearStorage() async {
+    await _secureStorageService.clearStorage();
   }
 
 }

@@ -1,5 +1,5 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -26,6 +26,7 @@ import 'package:barter_app/screens/onboarding_screen/cubit/onboarding_cubit.dart
     as _i12;
 import 'package:barter_app/services/api_client.dart' as _i205;
 import 'package:barter_app/services/app_module.dart' as _i716;
+import 'package:barter_app/services/crypto/crypto_service.dart' as _i452;
 import 'package:barter_app/services/device_fingerprint_service.dart' as _i749;
 import 'package:barter_app/services/device_migration_service.dart' as _i529;
 import 'package:barter_app/services/messaging/chat_notification_service.dart'
@@ -45,37 +46,35 @@ extension GetItInjectableX on _i174.GetIt {
   }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final appModule = _$AppModule();
-    gh.factory<_i607.SecureStorageService>(
-      () => _i607.SecureStorageService.new(),
-    );
-    gh.factory<String>(
-      () => appModule.serviceBaseUrl,
-      instanceName: 'serviceBaseUrl',
-    );
-    gh.lazySingleton<_i33.UserRepository>(
-      () => _i33.UserRepository(gh<_i607.SecureStorageService>()),
-    );
     gh.factory<_i205.ApiClient>(() => _i205.ApiClient.create());
+    await gh.factoryAsync<_i452.CryptoService>(
+      () => appModule.cryptoService,
+      preResolve: true,
+    );
+    gh.factory<_i607.SecureStorageService>(() => _i607.SecureStorageService());
     await gh.singletonAsync<_i397.AppDatabase>(
       () => appModule.appDatabase,
       preResolve: true,
     );
     gh.singleton<_i749.DeviceFingerprintService>(
-      () => _i749.DeviceFingerprintService.new(),
-    );
-    gh.singleton<_i935.ChatNotificationService>(
-      () => _i935.ChatNotificationService(gh<_i205.ApiClient>()),
+      () => _i749.DeviceFingerprintService(),
     );
     gh.singleton<_i651.GlobalChatService>(() => _i651.GlobalChatService());
     gh.singleton<_i627.SettingsService>(() => _i627.SettingsService());
     gh.factory<_i568.NotificationsCubit>(
       () => _i568.NotificationsCubit(gh<_i205.ApiClient>()),
     );
+    gh.singleton<_i935.ChatNotificationService>(
+      () => _i935.ChatNotificationService(gh<_i205.ApiClient>()),
+    );
     gh.factory<_i529.DeviceMigrationService>(
       () => _i529.DeviceMigrationService(
         gh<_i607.SecureStorageService>(),
         gh<_i205.ApiClient>(),
       ),
+    );
+    gh.lazySingleton<_i33.UserRepository>(
+      () => _i33.UserRepository(gh<_i607.SecureStorageService>()),
     );
     gh.factory<_i838.InterestsCubit>(
       () => _i838.InterestsCubit(

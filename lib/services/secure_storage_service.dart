@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
@@ -29,8 +30,26 @@ class SecureStorageService {
   static const _securityQuestionKey = 'security_question';
   static const _securityAnswerKey = 'security_answer_hash';
 
+  /// Safely reads from secure storage, handling keystore errors
+  /// Returns null if key not found or keystore error occurs
+  Future<String?> _safeRead(String key) async {
+    try {
+      return await _secureStorage.read(key: key);
+    } on PlatformException catch (e) {
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('key_not_found') ||
+          errorStr.contains('badpaddingexception') ||
+          errorStr.contains('bad_decrypt') ||
+          (e.code?.toLowerCase() == 'read' && e.message == null)) {
+        logDebug('Keystore error reading key $key - key may be invalidated. Returning null.');
+        return null;
+      }
+      rethrow;
+    }
+  }
+
   Future<String> getDatabasePassword() async {
-    var password = await _secureStorage.read(key: _dbPasswordKey);
+    var password = await _safeRead(_dbPasswordKey);
     if (password == null) {
       final random = Random.secure();
       final passwordBytes = List<int>.generate(32, (_) => random.nextInt(256));
@@ -45,7 +64,7 @@ class SecureStorageService {
   }
 
   Future<String?> getOwnPublicKey() async {
-    return await _secureStorage.read(key: _ownPublicKeyKey);
+    return await _safeRead(_ownPublicKeyKey);
   }
 
   Future<void> saveOwnPrivateKey(String publicKey) async {
@@ -53,7 +72,7 @@ class SecureStorageService {
   }
 
   Future<String?> getOwnPrivateKey() async {
-    return await _secureStorage.read(key: _ownPrivateKeyKey);
+    return await _safeRead(_ownPrivateKeyKey);
   }
 
   Future<void> saveOwnUserId(String userId) async {
@@ -61,7 +80,7 @@ class SecureStorageService {
   }
 
   Future<String?> getOwnUserId() async {
-    final key = await _secureStorage.read(key: _ownUserIdKey);
+    final key = await _safeRead(_ownUserIdKey);
     return key;
   }
 
@@ -70,7 +89,7 @@ class SecureStorageService {
   }
 
   Future<String?> getOwnUserName() async {
-    final key = await _secureStorage.read(key: _ownUserNameKey);
+    final key = await _safeRead(_ownUserNameKey);
     return key;
   }
 
@@ -79,7 +98,7 @@ class SecureStorageService {
   }
 
   Future<String?> getOwnLocation() async {
-    return await _secureStorage.read(key: _ownLocationKey);
+    return await _safeRead(_ownLocationKey);
   }
 
   Future<void> savePIN(String hashedPin) async {
@@ -87,7 +106,7 @@ class SecureStorageService {
   }
 
   Future<String?> getPIN(String hashedPin) async {
-    return await _secureStorage.read(key: _pinKey);
+    return await _safeRead(_pinKey);
   }
 
   /// Saves interests with full metadata (attribute, relevancy, uiStyleHint)
@@ -99,7 +118,7 @@ class SecureStorageService {
 
   /// Retrieves interests with full metadata
   Future<List<ParsedAttributeData>?> getOwnInterestsAttributes() async {
-    final jsonString = await _secureStorage.read(key: _interestsKey);
+    final jsonString = await _safeRead(_interestsKey);
     if (jsonString == null || jsonString.isEmpty) return null;
 
     try {
@@ -121,7 +140,7 @@ class SecureStorageService {
 
   /// Retrieves offerings with full metadata
   Future<List<ParsedAttributeData>?> getOwnOfferingsAttributes() async {
-    final jsonString = await _secureStorage.read(key: _offeringsKey);
+    final jsonString = await _safeRead(_offeringsKey);
     if (jsonString == null || jsonString.isEmpty) return null;
 
     try {
@@ -145,8 +164,7 @@ class SecureStorageService {
 
   /// Retrieves profile keyword data map
   Future<Map<String, double>?> getProfileKeywordDataMap() async {
-    final jsonString = await _secureStorage.read(
-        key: _profileKeywordDataMapKey);
+    final jsonString = await _safeRead(_profileKeywordDataMapKey);
     if (jsonString == null || jsonString.isEmpty) return null;
 
     try {
@@ -173,7 +191,7 @@ class SecureStorageService {
 
   /// Reads a value directly from secure storage
   Future<String?> read({required String key}) async {
-    return await _secureStorage.read(key: key);
+    return await _safeRead(key);
   }
 
   /// Deletes a value from secure storage
@@ -207,7 +225,7 @@ class SecureStorageService {
   /// For federated users, looks up the original ID first using the mapping
   Future<String?> getContactPublicKey(String userId) async {
     // Try direct lookup first
-    final key = await _secureStorage.read(key: '$_contactPublicKeyPrefix$userId');
+    final key = await _safeRead('$_contactPublicKeyPrefix$userId');
     if (key != null) {
       return key;
     }
@@ -218,14 +236,14 @@ class SecureStorageService {
     }
     
     // Check if there's a mapping for a federated version of this user
-    final federatedId = await _secureStorage.read(
-      key: '$_federatedIdMappingPrefix$userId'
+    final federatedId = await _safeRead(
+      '$_federatedIdMappingPrefix$userId'
     );
     
     if (federatedId != null) {
       // Look up key using the original federated ID
-      final key = await _secureStorage.read(
-        key: '$_contactPublicKeyPrefix$federatedId'
+      final key = await _safeRead(
+        '$_contactPublicKeyPrefix$federatedId'
       );
       if (key != null) {
         return key;
@@ -262,9 +280,7 @@ class SecureStorageService {
   /// Gets the federated ID for a normalized user ID
   /// Returns null if no mapping exists
   Future<String?> getFederatedId(String normalizedUserId) async {
-    return await _secureStorage.read(
-      key: '$_federatedIdMappingPrefix$normalizedUserId'
-    );
+    return await _safeRead('$_federatedIdMappingPrefix$normalizedUserId');
   }
   
   /// Saves just the federated ID mapping without a public key
@@ -304,7 +320,7 @@ class SecureStorageService {
 
   /// Get security question
   Future<String?> getSecurityQuestion() async {
-    return await _secureStorage.read(key: _securityQuestionKey);
+    return await _safeRead(_securityQuestionKey);
   }
 
   /// Save security answer (hashed)
@@ -314,7 +330,7 @@ class SecureStorageService {
 
   /// Get security answer (hashed)
   Future<String?> getSecurityAnswer() async {
-    return await _secureStorage.read(key: _securityAnswerKey);
+    return await _safeRead(_securityAnswerKey);
   }
 
   /// Check if security question is set up
