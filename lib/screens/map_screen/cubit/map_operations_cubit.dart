@@ -46,7 +46,15 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
 
   MapOperationsCubit() : super(MapOperationsInitial());
 
-  void performMainClustering(List<PointOfInterest> _allPois) {
+  void performMainClustering(List<PointOfInterest> _allPois, {bool emitUpdate = true}) {
+    // Save current cluster counts for comparison
+    final int previousMainClusterCount = mainPoiClusters.length;
+    final int previousLooseSubClusterCount = looseSubClusters.length;
+    final int previousIndividualPoiCount = individualPois.length;
+
+    // Save current clusters for state preservation
+    List<PoiClusterOsm> previousClusters = List.from(mainPoiClusters);
+    
     List<PointOfInterest> remainingPois = List.from(_allPois);
     List<PoiClusterOsm> newMainClusters = [];
     List<PointOfInterest> poisNotFormingMainClusters = [];
@@ -75,7 +83,26 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
         }
         GeoPoint centroid = GeoPoint(latitude: sumLat / currentMainClusterGroup.length, longitude: sumLon / currentMainClusterGroup.length);
         String clusterId = "main_cluster_${centroid.latitude}_${centroid.longitude}_${clusterCounter++}";
+        
+        // Check if this cluster matches a previously expanded one by centroid proximity
         bool isCurrentlyExpanded = expandedMainClusterId == clusterId;
+        
+        // Also check if any previous cluster with similar centroid was expanded
+        if (!isCurrentlyExpanded) {
+          for (var prevCluster in previousClusters) {
+            if (prevCluster.isExpanded) {
+              double distance = GeoUtils.calculateDistance(
+                centroid.latitude, centroid.longitude,
+                prevCluster.centroid.latitude, prevCluster.centroid.longitude
+              );
+              if (distance < 0.1) { // Within 100m, treat as same cluster
+                isCurrentlyExpanded = true;
+                expandedMainClusterId = clusterId; // Update to new ID
+                break;
+              }
+            }
+          }
+        }
 
         var mainCluster = PoiClusterOsm(
           id: clusterId,
@@ -86,7 +113,6 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
         if (isCurrentlyExpanded) {
           performSubClusteringWithinMainCluster(mainCluster);
         }
-        // mainCluster.isExpanded = false?
         newMainClusters.add(mainCluster);
       } else {
         poisNotFormingMainClusters.addAll(currentMainClusterGroup);
@@ -98,7 +124,15 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     looseSubClusters = result.$1;
     individualPois = result.$2;
 
-    emit(MapOperationsClusterUpdateSuccess(currentZoom));
+    // Only emit if clustering results have changed
+    final bool clustersChanged = 
+        mainPoiClusters.length != previousMainClusterCount ||
+        looseSubClusters.length != previousLooseSubClusterCount ||
+        individualPois.length != previousIndividualPoiCount;
+
+    if (clustersChanged && emitUpdate) {
+      emit(MapOperationsClusterUpdateSuccess(currentZoom));
+    }
   }
 
   void performSubClusteringWithinMainCluster(PoiClusterOsm mainCluster) {
@@ -136,12 +170,37 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
         }
         GeoPoint centroid = GeoPoint(latitude: sumLat / currentSubClusterGroup.length, longitude: sumLon / currentSubClusterGroup.length);
         String subClusterId = "${idPrefix}sub_cluster_${centroid.latitude}_${centroid.longitude}_${subClusterCounter++}";
+        
+        // Check by ID match first
+        bool isExpanded = expandedSubClusterIds.contains(subClusterId);
+        
+        // Also check by centroid proximity for sub-clusters from expanded main clusters
+        if (!isExpanded && idPrefix.startsWith("main_")) {
+          for (var mainCluster in mainPoiClusters) {
+            if (mainCluster.isExpanded) {
+              for (var prevSub in mainCluster.subClusters) {
+                if (prevSub.isExpanded) {
+                  double distance = GeoUtils.calculateDistance(
+                    centroid.latitude, centroid.longitude,
+                    prevSub.centroid.latitude, prevSub.centroid.longitude
+                  );
+                  if (distance < 0.05) { // Within 50m
+                    isExpanded = true;
+                    expandedSubClusterIds.add(subClusterId);
+                    break;
+                  }
+                }
+              }
+            }
+            if (isExpanded) break;
+          }
+        }
 
         newSubClusters.add(PoiSubClusterOsm(
           id: subClusterId,
           centroid: centroid,
           pois: List.from(currentSubClusterGroup),
-          isExpanded: expandedSubClusterIds.contains(subClusterId),
+          isExpanded: isExpanded,
         ));
       } else {
         individualPoisAfterSub.addAll(currentSubClusterGroup);
@@ -151,7 +210,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
   }
 
 
-  Future<void> handleZoomBasedClusterChanges(MapController _mapController) async {
+  Future<void> handleZoomBasedClusterChanges(MapController _mapController, {bool emitUpdate = true}) async {
     bool visualsNeedUpdate = false;
     final BoundingBox? currentBounds = await _mapController.bounds;
     if (currentBounds == null) return;
@@ -162,11 +221,12 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     // --- 1. Handle Auto-Collapse ---
     if (currentZoom < MAIN_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD) {
       for (var mainCluster in mainPoiClusters) {
+        double distanceToCenter = GeoUtils.calculateDistance(
+            mapCenter.latitude, mapCenter.longitude,
+            mainCluster.centroid.latitude, mainCluster.centroid.longitude
+        );
+        print("Checking if can Auto-collapse NEARBY main cluster '${mainCluster.id} ${mainCluster.isExpanded}' due to zoom out ($currentZoom). Dist: $distanceToCenter km");
         if (mainCluster.isExpanded) {
-          double distanceToCenter = GeoUtils.calculateDistance(
-              mapCenter.latitude, mapCenter.longitude,
-              mainCluster.centroid.latitude, mainCluster.centroid.longitude
-          );
           if (distanceToCenter <= MAX_DISTANCE_FOR_AUTO_ACTION_KM) {
             print("Auto-collapsing NEARBY main cluster '${mainCluster.id}' due to zoom out ($currentZoom). Dist: $distanceToCenter km");
             mainCluster.isExpanded = false;
@@ -258,13 +318,14 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     // --- 2. Handle Auto-Expand (No longer checks direct screen visibility, but checks proximity to center) ---
     if (currentZoom >= MAIN_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD) {
       for (var mainCluster in mainPoiClusters) {
+        debugPrint("Check if can Auto-expand MAIN cluster '${mainCluster.id} ${mainCluster.isExpanded}' due to zoom level ($currentZoom).");
         if (!mainCluster.isExpanded) {
           double distanceToCenter = GeoUtils.calculateDistance(
               mapCenter.latitude, mapCenter.longitude,
               mainCluster.centroid.latitude, mainCluster.centroid.longitude
           );
           if (distanceToCenter <= MAX_DISTANCE_FOR_AUTO_ACTION_KM) {
-            print("Auto-expanding NEARBY main cluster '${mainCluster.id}' due to zoom level ($currentZoom). Dist: $distanceToCenter km");
+            debugPrint("Auto-expanding NEARBY main cluster '${mainCluster.id}' due to zoom level ($currentZoom). Dist: $distanceToCenter km");
             mainCluster.isExpanded = true;
             if (expandedMainClusterId == null) {
               expandedMainClusterId = mainCluster.id;
@@ -276,7 +337,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
             for (var sub in mainCluster.subClusters) {
               if (!sub.isExpanded && currentZoom >= SUB_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD) {
                 // Sub-cluster's distance is implicitly handled by its parent main cluster's distance check here
-                print("Auto-expanding sub-cluster '${sub.id}' (part of NEARBY main '${mainCluster.id}') due to main expand & zoom.");
+                debugPrint("Auto-expanding sub-cluster '${sub.id}' (part of NEARBY main '${mainCluster.id}') due to main expand & zoom.");
                 sub.isExpanded = true;
                 expandedSubClusterIds.add(sub.id);
                 lastAutoCollapsedSubClusterIds.remove(sub.id);
@@ -336,7 +397,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     List<PoiSubClusterOsm> allSubClustersForSync = [];
     allSubClustersForSync.addAll(looseSubClusters);
     mainPoiClusters.forEach((mc) => allSubClustersForSync.addAll(mc.subClusters));
-    print('@@@@@@@@@ allSubClustersForSync ${allSubClustersForSync}');
+    debugPrint('@@@@@@@@@ allSubClustersForSync ${allSubClustersForSync}');
     for(var sub in allSubClustersForSync) {
       if (sub.isExpanded) {
         validExpandedSubClusterIds.add(sub.id);
@@ -348,8 +409,8 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
       visualsNeedUpdate = true;
     }
 
-    print('@@@@@@@@@@ try emit MapOperationsClusterUpdateSuccess ${visualsNeedUpdate}');
-    if (visualsNeedUpdate) {
+    debugPrint('@@@@@@@@@@ try emit MapOperationsClusterUpdateSuccess ${visualsNeedUpdate}');
+    if (visualsNeedUpdate && emitUpdate) {
       emit(MapOperationsClusterUpdateSuccess(currentZoom));
     }
   }
@@ -408,7 +469,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
 
     // Check if zoom level has changed significantly (more than 1.0 level)
     // Increased threshold to avoid re-clustering on small zoom changes
-    if ((_lastClusteringZoom - currentZoom).abs() > 1.0) {
+    if ((_lastClusteringZoom - currentZoom).abs() > 0.5) {
       logDebug('@@@@@@@@@ Zoom changed significantly: $_lastClusteringZoom -> $currentZoom');
       return true;
     }
@@ -427,14 +488,18 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
   void resetClusteringTracking() {
     _lastClusteredPoiIds = [];
     _lastClusteringZoom = -1.0;
+    individualPois = [];
   }
+
+  /// Get the last zoom level used for clustering
+  double getLastClusteringZoom() => _lastClusteringZoom;
 
   /// Calculates which POIs are truly individual (not part of any cluster)
   /// by filtering out POIs that are already rendered in clusters
   List<PointOfInterest> calculateTrulyIndividualPois(List<PointOfInterest> allPois) {
     Set<String> renderedPoiIds = {};
 
-    print('@@@@@@@@@@@ Calculating truly individual POIs...');
+    debugPrint('@@@@@@@@@@@ Calculating truly individual POIs...');
     // Collect all POIs that have been rendered (either as individual or in clusters)
     for (var mc in mainPoiClusters) {
       if (mc.isExpanded) {
@@ -466,7 +531,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     List<PointOfInterest> trulyIndividualPois =
         allPois.where((p) => !renderedPoiIds.contains(p.profile.userId)).toList();
 
-    print('@@@@@@@@@@@ Truly individual POIs: ${trulyIndividualPois.length}');
+    debugPrint('@@@@@@@@@@@ Truly individual POIs: ${trulyIndividualPois.length}');
     return trulyIndividualPois;
   }
 

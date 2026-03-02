@@ -395,17 +395,16 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       return;
     }
 
-    //if (zoomLevelNotifier.value <= 14) {
-      logDebug('@@@@@@@@@ Performing main clustering for ${_allPois.length} POIs at zoom ${mapOperationsCubit.currentZoom}');
-      mapOperationsCubit.performMainClustering(_allPois);
-      await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
-      //mapOperationsCubit.updateClusteringTracking(_allPois, mapOperationsCubit.currentZoom);
-    //}
-
     // Only update visuals if map is ready (clustering is already populated above)
     if (_isMapReady && _mapController.isAllLayersVisible) {
       logDebug('@@@@@@@@@@@@ updateVisuals from _processPois');
-      _updateMapVisuals();
+
+      _cleanUpMarkers();
+
+      mapOperationsCubit.resetClusteringTracking();
+      mapOperationsCubit.performMainClustering(_allPois);
+      await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
+      await _updateMapVisuals();
     } else {
       logDebug('Map not ready yet, POIs stored. Will display when map is ready.');
     }
@@ -460,16 +459,15 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       return;
     }
     _cleanUpMarkers();
-    mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
 
     _isUpdatingVisuals = true;
+
     // Increment operation counter to invalidate any ongoing operations
     _currentRenderOperation++;
     final currentOperation = _currentRenderOperation;
     logDebug('@@@@@@@@@@@ Starting render operation #$currentOperation vs ${_currentRenderOperation}');
 
     logDebug('@@@@@@@@@@@ Updating map visuals with ${_allPois.length} POIs');
-    logDebug('@@@@@@@@@@@ mainPoiClusters: ${mapOperationsCubit.mainPoiClusters.length}, looseSubClusters: ${mapOperationsCubit.looseSubClusters.length}, individualPois: ${mapOperationsCubit.individualPois.length}');
     final l10n = AppLocalizations.of(context)!;
 
     // Collect all markers to be added in batch
@@ -479,7 +477,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     })> markersToAdd = [];
 
     for (var mainCluster in mapOperationsCubit.mainPoiClusters) {
-      // Check if operation is still current
       if (!_isRenderOperationValid(currentOperation)) return;
       logDebug('@@@@@@@@@@@ Processing main cluster ${mainCluster.id}, isExpanded=${mainCluster.isExpanded}, pois=${mainCluster.allPoisInCluster.length}');
 
@@ -489,7 +486,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           if (subCluster.isExpanded || subCluster.pois.length <
               MapOperationsCubit.MIN_POIS_FOR_SUB_CLUSTER_DISPLAY) {
             for (var poi in subCluster.pois) {
-              // Check if operation is still current before processing
               if (!_isRenderOperationValid(currentOperation)) return;
               try {
                 logDebug('@@@@@@@@@@@ Preparing POI marker: ${poi.profile.userId}');
@@ -537,7 +533,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           final position = GeoPoint(latitude: mainCluster.centroid.latitude,
               longitude: mainCluster.centroid.longitude);
           markersToAdd.add((point: position, icon: mainClusterMarker));
-          mainCluster.isExpanded = false;
           _currentMarkerPositions.add(position);
         } catch (e) {
           logDebugError('Failed to prepare main cluster marker', e);
@@ -626,6 +621,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       }
     }
 
+    mapOperationsCubit.updateClusteringTracking(_allPois, zoomLevelNotifier.value.toDouble());
     logDebug('@@@@@@@@@@@ _updateMapVisuals completed successfully, added ${_currentMarkerPositions.length} markers');
     _isUpdatingVisuals = false;
   }
@@ -665,30 +661,17 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   void _onMainClusterTap(PoiClusterOsm tappedCluster) async {
-    tappedCluster.isExpanded = true;
-    mapOperationsCubit.expandedMainClusterId = tappedCluster.id;
-    mapOperationsCubit.performSubClusteringWithinMainCluster(tappedCluster);
     await _mapController.moveTo(tappedCluster.centroid);
     await Future.delayed(Duration(milliseconds: 200));
-    await _mapController.setZoom(zoomLevel: MapOperationsCubit.MAIN_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD + 0.3);
-    if (!kIsWeb) {
-      await Future.delayed(Duration(milliseconds: 1000), () async => {
-        await _updateMapVisuals()
-      });
-    }
+    await _mapController.setZoom(zoomLevel: MapOperationsCubit.MAIN_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD + 0.5);
+    mapOperationsCubit.currentZoom = MapOperationsCubit.MAIN_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD + 0.5;
   }
 
   void _onSubClusterTap(PoiSubClusterOsm tappedSubCluster) async {
-    tappedSubCluster.isExpanded = true;
-    mapOperationsCubit.expandedSubClusterIds.add(tappedSubCluster.id);
     await _mapController.moveTo(tappedSubCluster.centroid);
     await Future.delayed(Duration(milliseconds: 200));
-    await _mapController.setZoom(zoomLevel: MapOperationsCubit.SUB_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD + 0.3);
-    if (!kIsWeb) {
-      await Future.delayed(Duration(milliseconds: 1000), () async => {
-        await _updateMapVisuals()
-      });
-    }
+    await _mapController.setZoom(zoomLevel: MapOperationsCubit.SUB_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD + 0.5);
+    mapOperationsCubit.currentZoom = MapOperationsCubit.SUB_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD + 0.5;
   }
 
   /// Opens chat adaptively based on screen size using ChatPanelCubit
@@ -851,32 +834,49 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     onMapIsReady: _onMapReady,
                     onMapMoved: (event) {
                       // Track if zoom changed significantly (more than 0.5 levels)
-                      _mapController.getZoom().then((v) {
+                      _mapController.getZoom().then((v) async {
                         final newZoom = v.toDouble();
                         final zoomChanged = (newZoom - mapOperationsCubit.currentZoom).abs() > 0.5;
                         final positionChanged = (((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs() > 0.0004
                             || ((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs() > 0.0004);
-                        
+
                         // Process if either position or zoom changed
-                        if (positionChanged || zoomChanged) {
+                        if (mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom) || positionChanged || zoomChanged) {
                           zoomLevelNotifier.value = v.toInt();
                           mapOperationsCubit.currentZoom = newZoom;
-
                           // Check if main clustering is needed due to zoom change
-                          // Only perform if we have POIs and zoom is in clustering range
-                          if (_allPois.isNotEmpty && newZoom <= 14) {
-                            if (mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom)) {
+                          // Only perform if we have POIs and zoom changed significantly (> 1.0 level)
+                          await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
+                          if (_allPois.isNotEmpty && mapOperationsCubit.currentZoom <= 14) {
+                            // Check if zoom changed significantly enough to warrant re-clustering
+                            // by comparing with the stored clustering zoom level
+                            final lastClusteringZoom = mapOperationsCubit.getLastClusteringZoom();
+                            final zoomChangedSignificantly = lastClusteringZoom < 0 || (newZoom - lastClusteringZoom).abs() > 0.5;
+                            
+                            if (zoomChangedSignificantly || mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom)) {
                               logDebug('@@@@@@@@@ Zoom changed to $newZoom - performing main clustering');
-                              mapOperationsCubit.performMainClustering(_allPois);
-                              mapOperationsCubit.updateClusteringTracking(_allPois, newZoom);
+                              if (!kIsWeb) {
+                                await Future.delayed(Duration(milliseconds: 1200), () async => {
+                                  mapOperationsCubit.performMainClustering(_allPois)
+                                });
+                              } else {
+                                mapOperationsCubit.performMainClustering(_allPois);
+                              }
                             }
-                          } else if (newZoom > 14) {
+                          } else if (mapOperationsCubit.currentZoom > 14) {
                             // Zoomed in past clustering threshold - reset tracking
                             logDebug('@@@@@@@@@ Zoomed past clustering threshold - resetting tracking');
-                            mapOperationsCubit.resetClusteringTracking();
+                            if (!kIsWeb) {
+                              await Future.delayed(Duration(milliseconds: 1200), () async => {
+                                await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController, emitUpdate: false),
+                                mapOperationsCubit.performMainClustering(_allPois),
+                              });
+                            } else {
+                              mapOperationsCubit.resetClusteringTracking();
+                              await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController, emitUpdate: false);
+                              mapOperationsCubit.performMainClustering(_allPois);
+                            }
                           }
-
-                          mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
                         }
                         _previousMapRegion = event;
                       });
@@ -1015,9 +1015,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                           ),
                           onPressed: () async {
                             mapOperationsCubit.reset();
-                            //for (var c in mapOperationsCubit.mainPoiClusters) {
-                            //  c.isExpanded = false;
-                            //}
 
                             // Close POI panel when performing new search
                             final poiPanelCubit = context.read<PoiPanelCubit>();
