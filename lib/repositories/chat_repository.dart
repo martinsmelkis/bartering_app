@@ -19,28 +19,41 @@ class ChatRepository {
   // ==================== USER PROFILES ====================
 
   /// Ensure user profile exists in database (required for foreign keys)
+  /// Handles race conditions gracefully when called concurrently
   Future<void> ensureUserProfileExists(String userId) async {
+    if (userId.isEmpty) {
+      logDebug('⚠️ Cannot create profile for empty userId');
+      return;
+    }
+    
+    // Fast path: check if exists first
     final existing = await (_database.select(_database.profiles)
       ..where((tbl) => tbl.userId.equals(userId)))
         .getSingleOrNull();
 
-    if (existing == null) {
-      logDebug('📝 Creating profile for user: $userId');
-      try {
-        // Create a minimal profile entry for this user
-        await _database.into(_database.profiles).insert(
-          ProfilesCompanion(
-            userId: Value(userId),
-            onboardingData: Value('{}'), // Empty JSON for now
-          ),
-        );
-        logDebug('✅ Profile created for user: $userId');
-      } catch (e) {
-        logDebugError('Error creating profile for user $userId', e);
-        rethrow;
+    if (existing != null) {
+      return; // Already exists, quick return
+    }
+
+    // Create profile with conflict handling for race conditions
+    try {
+      await _database.into(_database.profiles).insert(
+        ProfilesCompanion(
+          userId: Value(userId),
+          onboardingData: const Value('{}'),
+        ),
+        mode: InsertMode.insertOrIgnore, // ✅ Key: ignore if already exists
+      );
+      logDebug('✅ Profile ensured for user: $userId');
+    } catch (e) {
+      // If insertOrIgnore still fails (shouldn't happen), check again
+      if (e.toString().contains('UNIQUE constraint')) {
+        logDebug('⚠️ Profile race condition resolved for: $userId');
+        return; // Someone else created it, that's fine
       }
-    } else {
-      logDebug('✅ Profile already exists for user: $userId');
+      // Re-throw actual unexpected errors
+      logDebugError('Error creating profile for user $userId', e);
+      rethrow;
     }
   }
 
@@ -268,6 +281,7 @@ class ChatRepository {
   // ==================== MESSAGES ====================
 
   /// Save a message to the database
+  /// Handles missing profiles/conversations gracefully
   Future<int> saveMessage(ChatMessage message, String conversationId) async {
     try {
       // Get current user ID to determine if this message is sent by current user
@@ -275,6 +289,24 @@ class ChatRepository {
 
       if (currentUserId.isEmpty) {
         throw Exception('Current user ID not found');
+      }
+
+      // Validate conversationId is not empty or "Unknown"
+      if (conversationId.isEmpty || conversationId == 'Unknown') {
+        logDebug('⚠️ Invalid conversationId: $conversationId. Attempting to determine correct ID...');
+        
+        // Try to determine the correct conversation ID from message
+        final otherUserId = message.senderId == currentUserId 
+            ? message.recipientId 
+            : message.senderId;
+            
+        if (otherUserId.isNotEmpty) {
+          final sortedIds = [currentUserId, otherUserId]..sort();
+          conversationId = 'direct_${sortedIds[0]}_${sortedIds[1]}';
+          logDebug('🔧 Determined conversation ID: $conversationId');
+        } else {
+          throw Exception('Cannot determine conversation ID - no valid recipient');
+        }
       }
 
       // Determine if this message is sent by the current user
@@ -380,6 +412,23 @@ class ChatRepository {
 
       logDebug('✅ All profiles verified, inserting message...');
 
+      // Check if message already exists to avoid duplicate insert attempts
+      final existingMessage = await (_database.select(_database.userChats)
+        ..where((tbl) => tbl.messageId.equals(message.id)))
+          .getSingleOrNull();
+      
+      if (existingMessage != null) {
+        logDebug('⚠️ Message ${message.id} already exists, updating instead of inserting');
+        // Update existing message (e.g., status might have changed)
+        await _database.update(_database.userChats)
+          ..where((tbl) => tbl.messageId.equals(message.id))
+          ..write(UserChatsCompanion(
+            status: Value(_statusToString(message.status ?? EChatMessageStatus.sending)),
+            updatedAt: Value(DateTime.now()),
+          ));
+        return existingMessage.id;
+      }
+
       final messageData = UserChatsCompanion(
         messageId: Value(message.id),
         conversationId: Value(conversationId),
@@ -425,7 +474,7 @@ class ChatRepository {
             : const Value.absent(),
       );
 
-      final id = await _database.into(_database.userChats).insert(messageData);
+      final id = await _database.into(_database.userChats).insert(messageData, mode: InsertMode.insertOrReplace);
 
       // Update conversation last message
       String lastMessageText;

@@ -4,6 +4,8 @@ import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/back_button_handler.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
+import 'package:barter_app/widgets/image_viewer_dialog.dart';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +47,16 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
   @override
   void initState() {
     super.initState();
+    // Defer initialization to avoid build-phase issues on web
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _initializeForm();
+      });
+    }
+  }
+
+  void _initializeForm() {
     if (widget.existingPosting != null) {
       _titleController.text = widget.existingPosting!.title;
       _descriptionController.text = widget.existingPosting!.description;
@@ -83,8 +95,13 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
       );
 
       if (image != null) {
-        setState(() {
-          _selectedImages.add(image);
+        // Defer setState to avoid build-phase issues on WASM
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _selectedImages.add(image);
+            });
+          }
         });
       }
     } catch (e) {
@@ -98,8 +115,13 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
   }
 
   void _removeImage(int index) {
-    setState(() {
-      _selectedImages.removeAt(index);
+    // Defer setState to avoid build-phase issues on WASM
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _selectedImages.removeAt(index);
+        });
+      }
     });
   }
 
@@ -144,8 +166,13 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
     );
 
     if (picked != null) {
-      setState(() {
-        _selectedExpirationDate = picked;
+      // Defer setState to avoid build-phase issues on WASM
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _selectedExpirationDate = picked;
+          });
+        }
       });
     }
   }
@@ -299,6 +326,8 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Cache MediaQuery values to avoid repeated lookups during build
+    final viewPadding = MediaQuery.of(context).viewPadding;
 
     return BackButtonHandler(
       onBackPressed: () {
@@ -587,7 +616,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                   ),
                 ),
                 // Add bottom padding to account for system navigation bar
-                SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
+                SizedBox(height: viewPadding.bottom),
               ],
             ),
           ),

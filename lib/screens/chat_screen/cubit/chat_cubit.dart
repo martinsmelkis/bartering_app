@@ -941,10 +941,21 @@ class ChatCubit extends Cubit<ChatState> {
       for (var i = 0; i < imagesToDownload.length; i++) {
         final message = imagesToDownload[i];
         final attachment = message.fileAttachment!;
-        
+
+        // CRITICAL: Skip if no recipient public key (can't decrypt)
+        final key = recipientPublicKey;
+        if (key == null || key.isEmpty) {
+          logDebug('⚠️ Cannot download image ${attachment.filename}: no recipient public key');
+          _updateMessageAttachment(
+            message.id,
+            attachment.copyWith(isDownloading: false),
+          );
+          continue;
+        }
+
         // Mark as downloading to avoid duplicates
         _downloadingFiles.add(attachment.fileId);
-        
+
         // Update UI to show download in progress
         _updateMessageAttachment(
           message.id,
@@ -957,7 +968,7 @@ class ChatCubit extends Cubit<ChatState> {
             fileId: attachment.fileId,
             userId: currentUserId,
             filename: attachment.filename,
-            senderPublicKey: recipientPublicKey!,
+            senderPublicKey: key,  // Use the validated local variable
             saveToFile: false, // Only get bytes for preview
           );
 
