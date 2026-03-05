@@ -302,12 +302,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const Spacer(),
                   InkWell(
                     onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                          const CreatePostingScreen(isOffer: false),
-                        ),
-                      );
+                      if (!context.mounted) return;
+                      try {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                            const CreatePostingScreen(isOffer: false),
+                          ),
+                        );
+                      } catch (e) {
+                        debugPrint('Navigation error: $e');
+                      }
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(
@@ -417,12 +422,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   SizedBox(width: 8.w),
                   InkWell(
                     onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                          const CreatePostingScreen(isOffer: true),
-                        ),
-                      );
+                      if (!context.mounted) return;
+                      try {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                            const CreatePostingScreen(isOffer: true),
+                          ),
+                        );
+                      } catch (e) {
+                        debugPrint('Navigation error: $e');
+                      }
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(
@@ -596,8 +606,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                   SizedBox(width: 12),
                   // Match History Button
+                  // Use existing NotificationsCubit - don't reload match history here
+                  // Match history will be loaded when user actually opens the match history screen
                   BlocBuilder<NotificationsCubit, NotificationsState>(
-                    bloc: getIt<NotificationsCubit>()..loadMatchHistory(),
+                    bloc: getIt<NotificationsCubit>(),
                     builder: (context, notificationState) {
                       final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
 

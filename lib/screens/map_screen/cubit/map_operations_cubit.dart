@@ -1,5 +1,4 @@
 import 'package:barter_app/screens/map_screen/widgets/cluster_marker_widget.dart';
-import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/svg_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -54,7 +53,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
 
     // Save current clusters for state preservation
     List<PoiClusterOsm> previousClusters = List.from(mainPoiClusters);
-    
+
     List<PointOfInterest> remainingPois = List.from(_allPois);
     List<PoiClusterOsm> newMainClusters = [];
     List<PointOfInterest> poisNotFormingMainClusters = [];
@@ -83,17 +82,17 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
         }
         GeoPoint centroid = GeoPoint(latitude: sumLat / currentMainClusterGroup.length, longitude: sumLon / currentMainClusterGroup.length);
         String clusterId = "main_cluster_${centroid.latitude}_${centroid.longitude}_${clusterCounter++}";
-        
+
         // Check if this cluster matches a previously expanded one by centroid proximity
         bool isCurrentlyExpanded = expandedMainClusterId == clusterId;
-        
+
         // Also check if any previous cluster with similar centroid was expanded
         if (!isCurrentlyExpanded) {
           for (var prevCluster in previousClusters) {
             if (prevCluster.isExpanded) {
               double distance = GeoUtils.calculateDistance(
-                centroid.latitude, centroid.longitude,
-                prevCluster.centroid.latitude, prevCluster.centroid.longitude
+                  centroid.latitude, centroid.longitude,
+                  prevCluster.centroid.latitude, prevCluster.centroid.longitude
               );
               if (distance < 0.1) { // Within 100m, treat as same cluster
                 isCurrentlyExpanded = true;
@@ -125,10 +124,10 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     individualPois = result.$2;
 
     // Only emit if clustering results have changed
-    final bool clustersChanged = 
+    final bool clustersChanged =
         mainPoiClusters.length != previousMainClusterCount ||
-        looseSubClusters.length != previousLooseSubClusterCount ||
-        individualPois.length != previousIndividualPoiCount;
+            looseSubClusters.length != previousLooseSubClusterCount ||
+            individualPois.length != previousIndividualPoiCount;
 
     if (clustersChanged && emitUpdate) {
       emit(MapOperationsClusterUpdateSuccess(currentZoom));
@@ -170,10 +169,9 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
         }
         GeoPoint centroid = GeoPoint(latitude: sumLat / currentSubClusterGroup.length, longitude: sumLon / currentSubClusterGroup.length);
         String subClusterId = "${idPrefix}sub_cluster_${centroid.latitude}_${centroid.longitude}_${subClusterCounter++}";
-        
+
         // Check by ID match first
         bool isExpanded = expandedSubClusterIds.contains(subClusterId);
-        
         // Also check by centroid proximity for sub-clusters from expanded main clusters
         if (!isExpanded && idPrefix.startsWith("main_")) {
           for (var mainCluster in mainPoiClusters) {
@@ -181,8 +179,8 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
               for (var prevSub in mainCluster.subClusters) {
                 if (prevSub.isExpanded) {
                   double distance = GeoUtils.calculateDistance(
-                    centroid.latitude, centroid.longitude,
-                    prevSub.centroid.latitude, prevSub.centroid.longitude
+                      centroid.latitude, centroid.longitude,
+                      prevSub.centroid.latitude, prevSub.centroid.longitude
                   );
                   if (distance < 0.05) { // Within 50m
                     isExpanded = true;
@@ -449,10 +447,10 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     if (_lastClusteredPoiIds.isEmpty) {
       return true;
     }
-    
+
     // Get current POI IDs
     final currentPoiIds = pois.map((poi) => poi.profile.userId).toList()..sort();
-    
+
     // Check if POIs have changed (different set or different count)
     if (currentPoiIds.length != _lastClusteredPoiIds.length) {
       logDebug('@@@@@@@@@ POI count changed: ${_lastClusteredPoiIds.length} -> ${currentPoiIds.length}');
@@ -473,7 +471,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
       logDebug('@@@@@@@@@ Zoom changed significantly: $_lastClusteringZoom -> $currentZoom');
       return true;
     }
-    
+
     // POIs and zoom are essentially the same, skip clustering
     return false;
   }
@@ -529,7 +527,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     }
 
     List<PointOfInterest> trulyIndividualPois =
-        allPois.where((p) => !renderedPoiIds.contains(p.profile.userId)).toList();
+    allPois.where((p) => !renderedPoiIds.contains(p.profile.userId)).toList();
 
     debugPrint('@@@@@@@@@@@ Truly individual POIs: ${trulyIndividualPois.length}');
     return trulyIndividualPois;
@@ -539,9 +537,9 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
   /// Returns a record with (closestItem, distance in km)
   /// Returns null if no items exist
   (dynamic, double)? findClosestItemToPoint(
-    GeoPoint tappedPoint,
-    List<PointOfInterest>? additionalPois,
-  ) {
+      GeoPoint tappedPoint,
+      List<PointOfInterest>? additionalPois,
+      ) {
     double minDistance = double.infinity;
     dynamic closestItem;
 
@@ -651,7 +649,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
   /// Creates a marker icon for a sub cluster
   MarkerIcon createSubClusterMarker(PoiSubClusterOsm cluster) {
     return ClusterMarkerWidget.createSubClusterMarker(
-      poiCount: cluster.pois.length
+        poiCount: cluster.pois.length
     );
   }
 

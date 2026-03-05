@@ -1,5 +1,7 @@
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
+import 'package:barter_app/widgets/image_viewer_dialog.dart';
 import 'package:barter_app/widgets/webp_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +47,7 @@ class SearchResultsListView extends StatefulWidget {
     this.isLargeScreen = false,
     this.selectedPoi,
     this.onClosePoiPanel,
-    this.onChatWithSelectedPoi
+    this.onChatWithSelectedPoi,
   });
 
   @override
@@ -56,26 +58,26 @@ enum ViewMode { users, postings }
 
 class _SearchResultsListViewState extends State<SearchResultsListView> {
   final Set<String> _expandedUserIds = {};
-  
+
   // Current user's attributes for matching (normalized/translated)
   List<String> _currentUserInterestIds = [];
   List<String> _currentUserOfferIds = [];
   bool _isLoadingUserAttributes = true;
-  
+
   // View mode toggle
   ViewMode _viewMode = ViewMode.users;
-  
+
   // Postings data
   final Map<String, UserPostingData> _postingsCache = {};
   final Map<String, List<UserPostingData>> _userPostingsMap = {};
   bool _isLoadingPostings = false;
-  
+
   // Flattened list of all postings with user info
   List<PostingWithUser> _allPostings = [];
-  
+
   // Controllers for expandable postings (auto-expanded by default)
   final Map<String, ExpandableController> _postingControllers = {};
-  
+
   // Chat panel state
   bool _showChatPanel = false;
   PointOfInterest? _chatWithPoi;
@@ -100,7 +102,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       // Clear stale postings data when search results change
       _userPostingsMap.clear();
       _allPostings.clear();
-      
+
       // Reset to users view when search results change
       setState(() {
         _viewMode = ViewMode.users;
@@ -109,26 +111,27 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       _loadAllPostings();
     }
   }
-  
+
   Future<void> _loadAllPostings() async {
     if (widget.pois.isEmpty) return;
-    
+
     setState(() {
       _isLoadingPostings = true;
     });
-    
+
     try {
       final apiClient = getIt<ApiClient>();
       final List<PostingWithUser> allPostings = [];
-      
+
       for (final poi in widget.pois) {
-        if (poi.profile.activePostingIds == null || poi.profile.activePostingIds!.isEmpty) {
+        if (poi.profile.activePostingIds == null ||
+            poi.profile.activePostingIds!.isEmpty) {
           continue;
         }
-        
+
         final postingIds = poi.profile.activePostingIds!;
         final userPostings = <UserPostingData>[];
-        
+
         for (final postingId in postingIds) {
           // Check cache first
           if (_postingsCache.containsKey(postingId)) {
@@ -145,18 +148,15 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             }
           }
         }
-        
+
         _userPostingsMap[poi.profile.userId] = userPostings;
-        
+
         // Add to flattened list with user info
         for (final posting in userPostings) {
-          allPostings.add(PostingWithUser(
-            posting: posting,
-            poi: poi,
-          ));
+          allPostings.add(PostingWithUser(posting: posting, poi: poi));
         }
       }
-      
+
       if (mounted) {
         setState(() {
           _allPostings = allPostings;
@@ -179,8 +179,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
 
   Future<void> _loadCurrentUserAttributes() async {
     try {
-      final userMatch = await AttributeMatchingUtils.loadUserAttributes(context);
-      
+      final userMatch = await AttributeMatchingUtils.loadUserAttributes(
+        context,
+      );
+
       if (mounted) {
         setState(() {
           _currentUserInterestIds = userMatch.interestIds;
@@ -207,14 +209,16 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       }
     });
   }
-  
+
   ExpandableController _getPostingController(String postingId) {
     if (!_postingControllers.containsKey(postingId)) {
-      _postingControllers[postingId] = ExpandableController(initialExpanded: true);
+      _postingControllers[postingId] = ExpandableController(
+        initialExpanded: true,
+      );
     }
     return _postingControllers[postingId]!;
   }
-  
+
   @override
   void dispose() {
     // Dispose all controllers
@@ -223,7 +227,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     }
     super.dispose();
   }
-  
+
   /// Open chat panel below search results (for large screens)
   void _openChatPanel(PointOfInterest poi) {
     if (widget.isLargeScreen) {
@@ -237,7 +241,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       widget.onChatTap?.call(poi);
     }
   }
-  
+
   /// Close the inline chat panel
   void _closeChatPanel() {
     setState(() {
@@ -318,10 +322,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       return Center(
         child: Text(
           l10n.noUsersFound,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
         ),
       );
     }
@@ -341,7 +342,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         itemCount: sortedPois.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 10,),
+        separatorBuilder: (context, index) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
           final poi = sortedPois[index];
           return _buildPoiListItem(context, poi);
@@ -353,19 +354,14 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   Widget _buildPostingsListView() {
     final l10n = AppLocalizations.of(context)!;
     if (_isLoadingPostings) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_allPostings.isEmpty) {
       return Center(
         child: Text(
           l10n.noPostingsFound,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
         ),
       );
     }
@@ -394,7 +390,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     );
   }
 
-  Widget _buildPostingCard(BuildContext context, PostingWithUser postingWithUser) {
+  Widget _buildPostingCard(
+    BuildContext context,
+    PostingWithUser postingWithUser,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final posting = postingWithUser.posting;
     final poi = postingWithUser.poi;
@@ -460,7 +459,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                       children: [
                         Text(
                           poi.profile.name.startsWith('User_')
-                              ? poi.profile.name.replaceFirst('User_', l10n.userPrefix + ' ')
+                              ? poi.profile.name.replaceFirst(
+                                  'User_',
+                                  l10n.userPrefix + ' ',
+                                )
                               : poi.profile.name,
                           style: const TextStyle(
                             fontSize: 12.6,
@@ -496,7 +498,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           ),
           // Posting content
           ExpandablePanel(
-            controller: _getPostingController(posting.id ?? '${poi.profile.userId}_${posting.title}'),
+            controller: _getPostingController(
+              posting.id ?? '${poi.profile.userId}_${posting.title}',
+            ),
             theme: const ExpandableThemeData(
               headerAlignment: ExpandablePanelHeaderAlignment.center,
               tapBodyToCollapse: true,
@@ -508,7 +512,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               child: Row(
                 children: [
                   Icon(
-                    posting.isOffer ? Icons.add_circle : Icons.add_circle_outline,
+                    posting.isOffer
+                        ? Icons.add_circle
+                        : Icons.add_circle_outline,
                     color: posting.isOffer ? Colors.green : Colors.blue,
                     size: 20,
                   ),
@@ -547,7 +553,11 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                   if (posting.value != null) ...[
                     Row(
                       children: [
-                        const Icon(Icons.monetization_on, size: 16, color: Colors.green),
+                        const Icon(
+                          Icons.monetization_on,
+                          size: 16,
+                          color: Colors.green,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${l10n.valuePrefix}: \$${posting.value!.toStringAsFixed(2)}',
@@ -560,7 +570,11 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                   if (posting.expiresAt != null) ...[
                     Row(
                       children: [
-                        const Icon(Icons.calendar_today, size: 16, color: Colors.orange),
+                        const Icon(
+                          Icons.calendar_today,
+                          size: 16,
+                          color: Colors.orange,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${l10n.expiresPrefix}: ${dateFormat.format(posting.expiresAt!)}',
@@ -572,7 +586,11 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                   ],
                   Row(
                     children: [
-                      const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                      const Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '${l10n.postedPrefix}: ${dateFormat.format(posting.createdAt)}',
@@ -580,7 +598,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                       ),
                     ],
                   ),
-                  if (posting.imageUrls != null && posting.imageUrls!.isNotEmpty) ...[
+                  if (posting.imageUrls != null &&
+                      posting.imageUrls!.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     SizedBox(
                       height: 100,
@@ -611,7 +630,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   Widget _buildPostingImage(UserPostingData posting, int index) {
     final baseUrl = getIt<String>(instanceName: 'serviceBaseUrl');
     final filename = posting.imageUrls![index];
-    
+
     // Use thumbnail for list view (300x300, ~5-20KB)
     final thumbnailUrl = ImageUtils.buildThumbnailUrl(
       baseUrl: baseUrl,
@@ -622,22 +641,34 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       onTap: () {
         // Create list of all FULL RESOLUTION image URLs for the viewer
         final allFullImageUrls = posting.imageUrls!
-            .map((file) => ImageUtils.buildFullImageUrl(
-                  baseUrl: baseUrl,
-                  imagePath: file,
-                ))
+            .map(
+              (file) => ImageUtils.buildFullImageUrl(
+                baseUrl: baseUrl,
+                imagePath: file,
+              ),
+            )
             .toList();
 
         // Open full-screen image viewer with full resolution images
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => FullScreenImageViewer(
-              imageUrls: allFullImageUrls,
-              initialIndex: index,
-              heroTag: 'posting_${posting.id}_image',
+        // Use dialog on web to prevent map iframe destruction, navigation on native
+        if (kIsWeb) {
+          ImageViewerDialog.show(
+            context: context,
+            imageUrls: allFullImageUrls,
+            initialIndex: index,
+            heroTag: 'posting_${posting.id}_image',
+          );
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => FullScreenImageViewer(
+                imageUrls: allFullImageUrls,
+                initialIndex: index,
+                heroTag: 'posting_${posting.id}_image',
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Hero(
         tag: 'posting_${posting.id}_image_$index',
@@ -656,7 +687,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 child: CircularProgressIndicator(
                   value: loadingProgress.expectedTotalBytes != null
                       ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
+                            loadingProgress.expectedTotalBytes!
                       : null,
                   strokeWidth: 2,
                 ),
@@ -679,18 +710,18 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Sort POIs with online users getting a 10% boost to their relevancy score
     final sortedPois = List<PointOfInterest>.from(widget.pois);
     sortedPois.sort((a, b) {
       // Calculate effective scores with online boost
       final aScore = (a.matchRelevancyScore ?? 0.0) * (a.isOnline ? 1.1 : 1.0);
       final bScore = (b.matchRelevancyScore ?? 0.0) * (b.isOnline ? 1.1 : 1.0);
-      
+
       // Sort in descending order (highest score first)
       return bScore.compareTo(aScore);
     });
-    
+
     // Build the main search results container
     final searchResultsContainer = Container(
       decoration: BoxDecoration(
@@ -702,7 +733,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 topRight: Radius.circular(16),
               ),
         boxShadow: widget.isLargeScreen
-            ? null  // Shadow handled by parent container in Row layout
+            ? null // Shadow handled by parent container in Row layout
             : [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -712,9 +743,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               ],
       ),
       child: Column(
-          children: [
-            // Header
-            const SizedBox(height: 4),
+        children: [
+          // Header
+          const SizedBox(height: 4),
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: widget.isLargeScreen ? 16 : 12,
@@ -730,7 +761,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                             Text(
                               _viewMode == ViewMode.users
                                   ? l10n.matchingUsersFound(sortedPois.length)
-                                  : l10n.matchingPostingsFound(_allPostings.length),
+                                  : l10n.matchingPostingsFound(
+                                      _allPostings.length,
+                                    ),
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -762,7 +795,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                                       _buildToggleButton(
                                         icon: Icons.article,
                                         label: l10n.postings,
-                                        isSelected: _viewMode == ViewMode.postings,
+                                        isSelected:
+                                            _viewMode == ViewMode.postings,
                                         onTap: () {
                                           setState(() {
                                             _viewMode = ViewMode.postings;
@@ -777,7 +811,11 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                                 if (!_isLoadingUserAttributes)
                                   Row(
                                     children: [
-                                      Icon(Icons.info_outline, size: 14, color: Colors.grey[600]),
+                                      Icon(
+                                        Icons.info_outline,
+                                        size: 14,
+                                        color: Colors.grey[600],
+                                      ),
                                       const SizedBox(width: 6),
                                       _buildLegendItem(
                                         color: AppColors.secondary,
@@ -803,10 +841,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                           canRequestFocus: false,
                           child: Padding(
                             padding: const EdgeInsets.all(4.0),
-                            child: Icon(
-                              Icons.close,
-                              color: Colors.grey[700],
-                            ),
+                            child: Icon(Icons.close, color: Colors.grey[700]),
                           ),
                         ),
                       ),
@@ -821,7 +856,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                             child: Text(
                               _viewMode == ViewMode.users
                                   ? l10n.matchingUsersFound(sortedPois.length)
-                                  : l10n.matchingPostingsFound(_allPostings.length),
+                                  : l10n.matchingPostingsFound(
+                                      _allPostings.length,
+                                    ),
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -863,7 +900,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                               children: [
                                 _buildToggleButton(
                                   icon: Icons.people,
-                                        label: l10n.users,
+                                  label: l10n.users,
                                   isSelected: _viewMode == ViewMode.users,
                                   onTap: () {
                                     setState(() {
@@ -873,7 +910,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                                 ),
                                 _buildToggleButton(
                                   icon: Icons.article,
-                                        label: l10n.postings,
+                                  label: l10n.postings,
                                   isSelected: _viewMode == ViewMode.postings,
                                   onTap: () {
                                     setState(() {
@@ -889,7 +926,11 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.info_outline, size: 14, color: Colors.grey[600]),
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 14,
+                                  color: Colors.grey[600],
+                                ),
                                 const SizedBox(width: 4),
                                 _buildLegendItem(
                                   color: AppColors.secondary,
@@ -978,7 +1019,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         },
       );
     }
-    
+
     // For small screens, return the search results container directly
     return searchResultsContainer;
   }
@@ -986,7 +1027,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   Widget _buildPoiListItem(BuildContext context, PointOfInterest poi) {
     final l10n = AppLocalizations.of(context)!;
     final isExpanded = _expandedUserIds.contains(poi.profile.userId);
-    
+
     return InkWell(
       onTap: () => widget.onPoiTap(poi),
       borderRadius: BorderRadius.circular(12),
@@ -1006,7 +1047,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 Expanded(
                   child: Text(
                     poi.profile.name.startsWith('User_')
-                        ? poi.profile.name.replaceFirst('User_', l10n.userPrefix + ' ')
+                        ? poi.profile.name.replaceFirst(
+                            'User_',
+                            l10n.userPrefix + ' ',
+                          )
                         : poi.profile.name,
                     style: const TextStyle(
                       fontSize: 14.4,
@@ -1064,14 +1108,12 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 // User rating display
                 _buildRatingDisplay(poi),
                 const SizedBox(width: 4),
-                const Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey,
-                ),
+                const Icon(Icons.chevron_right, color: Colors.grey),
               ],
             ),
             // Interests and Offerings separated
-            if (poi.profile.attributes != null && poi.profile.attributes!.isNotEmpty) ...[
+            if (poi.profile.attributes != null &&
+                poi.profile.attributes!.isNotEmpty) ...[
               _buildAttributesSection(context, poi, isExpanded),
             ],
             // Distance, relevancy score, and chat button
@@ -1084,16 +1126,12 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
 
   Widget _buildBottomRow(BuildContext context, PointOfInterest poi) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Row(
       children: [
         // Distance
         if (poi.distanceKm != null) ...[
-          Icon(
-            Icons.location_on,
-            size: 16,
-            color: Colors.blue[700],
-          ),
+          Icon(Icons.location_on, size: 16, color: Colors.blue[700]),
           const SizedBox(width: 4),
           Text(
             '${poi.distanceKm!.toStringAsFixed(1)} km',
@@ -1107,11 +1145,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         // Relevancy score
         if (poi.matchRelevancyScore != null) ...[
           if (poi.distanceKm != null) const SizedBox(width: 16),
-          Icon(
-            Icons.star,
-            size: 16,
-            color: Colors.amber[700],
-          ),
+          Icon(Icons.star, size: 16, color: Colors.amber[700]),
           const SizedBox(width: 4),
           Text(
             'Match: ${(poi.matchRelevancyScore! * 100).toStringAsFixed(2)}%',
@@ -1134,7 +1168,10 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 onTap: () => _openChatPanel(poi),
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -1162,17 +1199,24 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     );
   }
 
-  Widget _buildAttributesSection(BuildContext context, PointOfInterest poi, bool isExpanded) {
+  Widget _buildAttributesSection(
+    BuildContext context,
+    PointOfInterest poi,
+    bool isExpanded,
+  ) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Separate interests (type != 1) and offerings (type == 1)
-    final interests = poi.profile.attributes?.where((a) => a.type != 1).toList() ?? [];
-    final offerings = poi.profile.attributes?.where((a) => a.type == 1).toList() ?? [];
+    final interests =
+        poi.profile.attributes?.where((a) => a.type != 1).toList() ?? [];
+    final offerings =
+        poi.profile.attributes?.where((a) => a.type == 1).toList() ?? [];
     final postings = poi.profile.activePostingIds ?? [];
-    
+
     // Check if there are more items to show
-    final hasMoreItems = interests.length > 4 || offerings.length > 4 || postings.isNotEmpty;
-    
+    final hasMoreItems =
+        interests.length > 4 || offerings.length > 4 || postings.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1191,9 +1235,12 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             spacing: 6,
             runSpacing: 6,
             children: (isExpanded ? interests : interests.take(4)).map((attr) {
-              final normalizedAttr = TextUtils.getTranslatedOrNormalizedAttribute(
-                  attr.attributeId, context);
-              
+              final normalizedAttr =
+                  TextUtils.getTranslatedOrNormalizedAttribute(
+                    attr.attributeId,
+                    context,
+                  );
+
               // Use utility to determine match type
               final matchType = AttributeMatchingUtils.getMatchType(
                 normalizedAttribute: normalizedAttr,
@@ -1201,7 +1248,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 currentUserOfferIds: _currentUserOfferIds,
                 isPoiInterest: true, // This is POI's interest
               );
-              
+
               return AttributeBubble(
                 attribute: attr,
                 matchType: matchType,
@@ -1229,9 +1276,12 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             spacing: 6,
             runSpacing: 6,
             children: (isExpanded ? offerings : offerings.take(4)).map((attr) {
-              final normalizedAttr = TextUtils.getTranslatedOrNormalizedAttribute(
-                  attr.attributeId, context);
-              
+              final normalizedAttr =
+                  TextUtils.getTranslatedOrNormalizedAttribute(
+                    attr.attributeId,
+                    context,
+                  );
+
               // Use utility to determine match type
               final matchType = AttributeMatchingUtils.getMatchType(
                 normalizedAttribute: normalizedAttr,
@@ -1239,7 +1289,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 currentUserOfferIds: _currentUserOfferIds,
                 isPoiInterest: false, // This is POI's offering
               );
-              
+
               return AttributeBubble(
                 attribute: attr,
                 matchType: matchType,
@@ -1346,11 +1396,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.star,
-                    size: 12,
-                    color: Colors.white,
-                  ),
+                  const Icon(Icons.star, size: 12, color: Colors.white),
                   const SizedBox(width: 2),
                   Text(
                     rating.toStringAsFixed(1),
@@ -1367,10 +1413,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         ),
         Text(
           '($reviewCount)',
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 10, color: Colors.grey[600]),
         ),
       ],
     );
@@ -1396,11 +1439,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.star,
-                size: 10,
-                color: Colors.white,
-              ),
+              const Icon(Icons.star, size: 10, color: Colors.white),
               const SizedBox(width: 1),
               Text(
                 rating.toStringAsFixed(1),
@@ -1416,10 +1455,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         const SizedBox(width: 2),
         Text(
           '($reviewCount)',
-          style: TextStyle(
-            fontSize: 9,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 9, color: Colors.grey[600]),
         ),
       ],
     );
@@ -1436,9 +1472,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   /// Build inline chat panel that appears below search results
   Widget _buildInlineChatPanel() {
     if (_chatWithPoi == null) return const SizedBox.shrink();
-    
+
     final poi = _chatWithPoi!;
-    
+
     return Container(
       color: AppColors.background,
       child: Column(
@@ -1447,7 +1483,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           ChatPanelHeader(
             chatPoiName: poi.profile.name,
             chatPoiId: poi.profile.userId,
-            onClose: _closeChatPanel
+            onClose: _closeChatPanel,
           ),
           // Chat content
           Expanded(
@@ -1467,7 +1503,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     final userIdHashCode = poi.profile.userId.hashCode;
     final index = userIdHashCode.abs() % 29; // Assuming 29 avatars
     final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
-    
+
     // Load SVG without color modification
     return await rootBundle.loadString(selectedIconPath);
   }
@@ -1478,8 +1514,5 @@ class PostingWithUser {
   final UserPostingData posting;
   final PointOfInterest poi;
 
-  PostingWithUser({
-    required this.posting,
-    required this.poi,
-  });
+  PostingWithUser({required this.posting, required this.poi});
 }

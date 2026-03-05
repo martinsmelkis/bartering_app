@@ -18,6 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -36,10 +37,12 @@ import '../chat_screen/cubit/chat_cubit.dart';
 import '../../models/chat/chat_message.dart';
 import '../../models/chat/file_attachment.dart';
 import '../map_screen/map_screen.dart';
+import '../../widgets/image_viewer_dialog.dart';
 
 class ChatScreen extends StatefulWidget {
   final String? poiId; // Optional: ID of the POI that initiated the chat
-  final String? poiName; // Optional: Name of the POI (for display when POI object not available)
+  final String?
+  poiName; // Optional: Name of the POI (for display when POI object not available)
   final PointOfInterest? poi; // Optional: Full POI object when available
   final bool showAppBar; // Whether to show the app bar (false for panel mode)
 
@@ -48,7 +51,7 @@ class ChatScreen extends StatefulWidget {
     this.poiId,
     this.poiName,
     this.poi,
-    this.showAppBar = true
+    this.showAppBar = true,
   });
 
   @override
@@ -97,24 +100,27 @@ class _ChatScreenState extends State<ChatScreen> {
     var recipientPublicKey = _chatCubit.recipientPublicKey;
 
     logDebug(
-        '@@@@@@@@@ _pickAndSendFile - recipientPublicKey from cubit: ${recipientPublicKey !=
-            null ? "${recipientPublicKey.substring(0, 20)}..." : "null"}');
-    logDebug('@@@@@@@@@ _pickAndSendFile - recipientUserId: ${_chatCubit
-        .recipientUserId}');
+      '@@@@@@@@@ _pickAndSendFile - recipientPublicKey from cubit: ${recipientPublicKey != null ? "${recipientPublicKey.substring(0, 20)}..." : "null"}',
+    );
+    logDebug(
+      '@@@@@@@@@ _pickAndSendFile - recipientUserId: ${_chatCubit.recipientUserId}',
+    );
     logDebug('@@@@@@@@@ _pickAndSendFile - widget.poiId: ${widget.poiId}');
 
     // If not available from cubit, try loading directly from secure storage
     if (recipientPublicKey == null) {
       logDebug(
-          '@@@@@@@@@ Attempting to load recipient public key from storage...');
+        '@@@@@@@@@ Attempting to load recipient public key from storage...',
+      );
       final secureStorage = SecureStorageService();
-      recipientPublicKey =
-      await secureStorage.getContactPublicKey(_chatCubit.recipientUserId);
+      recipientPublicKey = await secureStorage.getContactPublicKey(
+        _chatCubit.recipientUserId,
+      );
 
       if (recipientPublicKey != null) {
         logDebug(
-            '@@@@@@@@@ ✅ Loaded recipient public key from storage: ${recipientPublicKey
-                .substring(0, 20)}...');
+          '@@@@@@@@@ ✅ Loaded recipient public key from storage: ${recipientPublicKey.substring(0, 20)}...',
+        );
         // Update cubit with the loaded key
         _chatCubit.recipientPublicKey = recipientPublicKey;
       } else {
@@ -142,29 +148,28 @@ class _ChatScreenState extends State<ChatScreen> {
       // Show bottom sheet with file options
       final source = await showModalBottomSheet<ImageSource>(
         context: context,
-        builder: (context) =>
-            PointerInterceptor(
-              child: SafeArea(
-                child: Wrap(
-                  children: [
-                    PointerInterceptor(
-                      child: ListTile(
-                        leading: Icon(Icons.photo_library),
-                        title: Text(l10n.gallery),
-                        onTap: () => Navigator.pop(context, ImageSource.gallery),
-                      ),
-                    ),
-                    PointerInterceptor(
-                      child: ListTile(
-                        leading: Icon(Icons.camera_alt),
-                        title: Text(l10n.camera),
-                        onTap: () => Navigator.pop(context, ImageSource.camera),
-                      ),
-                    ),
-                  ],
+        builder: (context) => PointerInterceptor(
+          child: SafeArea(
+            child: Wrap(
+              children: [
+                PointerInterceptor(
+                  child: ListTile(
+                    leading: Icon(Icons.photo_library),
+                    title: Text(l10n.gallery),
+                    onTap: () => Navigator.pop(context, ImageSource.gallery),
+                  ),
                 ),
-              ),
+                PointerInterceptor(
+                  child: ListTile(
+                    leading: Icon(Icons.camera_alt),
+                    title: Text(l10n.camera),
+                    onTap: () => Navigator.pop(context, ImageSource.camera),
+                  ),
+                ),
+              ],
             ),
+          ),
+        ),
       );
 
       if (source == null) return;
@@ -209,12 +214,15 @@ class _ChatScreenState extends State<ChatScreen> {
       );
 
       // Upload file
-      final fileTransferService = FileTransferService(getIt<ApiClient>(), CryptoService.instance!);
+      final fileTransferService = FileTransferService(
+        getIt<ApiClient>(),
+        CryptoService.instance!,
+      );
       final userRepository = getIt<UserRepository>();
       final currentUserId = await userRepository.getUserId();
 
       FileAttachment? fileAttachment;
-      
+
       if (kIsWeb) {
         // On web, use the bytes we read immediately after picking
         fileAttachment = await fileTransferService.uploadFileFromBytes(
@@ -332,18 +340,25 @@ class _ChatScreenState extends State<ChatScreen> {
   /// Mark unread messages from the other user as read
   void _markVisibleMessagesAsRead() {
     if (!mounted) return;
-    
+
     try {
       // Get unread messages from other users (not sent by me)
-      final unreadMessages = _chatCubit.messages.where(
-        (msg) => !msg.isSentByCurrentUser && 
-                 msg.status != EChatMessageStatus.read
-      ).toList();
-      
+      final unreadMessages = _chatCubit.messages
+          .where(
+            (msg) =>
+                !msg.isSentByCurrentUser &&
+                msg.status != EChatMessageStatus.read,
+          )
+          .toList();
+
       if (unreadMessages.isNotEmpty) {
-        logDebug('📖 Marking ${unreadMessages.length} unread message(s) as read');
+        logDebug(
+          '📖 Marking ${unreadMessages.length} unread message(s) as read',
+        );
         for (final msg in unreadMessages) {
-          logDebug('   - Message ${msg.id.substring(0, 20)}... from ${msg.senderId.substring(0, 20)}... status: ${msg.status}');
+          logDebug(
+            '   - Message ${msg.id.substring(0, 20)}... from ${msg.senderId.substring(0, 20)}... status: ${msg.status}',
+          );
         }
         _chatCubit.markMessagesAsRead(unreadMessages);
       } else {
@@ -356,11 +371,21 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _checkBlockedStatus() async {
     if (widget.poiId != null) {
-      final isBlocked = await _chatCubit.isUserBlocked(widget.poiId!);
-      if (mounted) {
-        setState(() {
-          _isUserBlocked = isBlocked;
-        });
+      try {
+        final isBlocked = await _chatCubit.isUserBlocked(widget.poiId!);
+        if (mounted) {
+          setState(() {
+            _isUserBlocked = isBlocked;
+          });
+        }
+      } catch (e) {
+        logDebugError('Failed to check blocked status', e.toString());
+        // Don't crash - assume not blocked if API fails
+        if (mounted) {
+          setState(() {
+            _isUserBlocked = false;
+          });
+        }
       }
     }
   }
@@ -375,157 +400,154 @@ class _ChatScreenState extends State<ChatScreen> {
     Widget chatContent = Scaffold(
       appBar: widget.showAppBar
           ? AppBar(
-        title: Text(widget.poiName ?? l10n.chat),
-        backgroundColor: Theme
-            .of(context)
-            .primaryColor,
-        foregroundColor: AppColors.background,
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) async {
-              if (value == 'view_profile') {
-                // Fetch profile info if POI is not available, then navigate to map
-                WidgetsBinding.instance.addPostFrameCallback((_) async {
-                  PointOfInterest? poi = widget.poi;
-                  
-                  if (poi == null && widget.poiId != null) {
-                    // Fetch profile info from API
-                    try {
-                      final apiClient = getIt<ApiClient>();
-                      final userProfile = await apiClient.getProfileInfo(widget.poiId!);
-                      poi = PointOfInterest(
-                        profile: userProfile,
-                        distanceKm: null,
-                      );
-                      logDebug('@@@@@@@@@ ChatScreen view_profile - fetched profile for userId: ${widget.poiId}');
-                    } catch (e) {
-                      logDebugError('Failed to fetch profile for view_profile', e);
+              title: Text(widget.poiName ?? l10n.chat),
+              backgroundColor: Theme.of(context).primaryColor,
+              foregroundColor: AppColors.background,
+              actions: [
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (value) async {
+                    if (value == 'view_profile') {
+                      // Fetch profile info if POI is not available, then navigate to map
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                        PointOfInterest? poi = widget.poi;
+
+                        if (poi == null && widget.poiId != null) {
+                          // Fetch profile info from API
+                          try {
+                            final apiClient = getIt<ApiClient>();
+                            final userProfile = await apiClient.getProfileInfo(
+                              widget.poiId!,
+                            );
+                            poi = PointOfInterest(
+                              profile: userProfile,
+                              distanceKm: null,
+                            );
+                            logDebug(
+                              '@@@@@@@@@ ChatScreen view_profile - fetched profile for userId: ${widget.poiId}',
+                            );
+                          } catch (e) {
+                            logDebugError(
+                              'Failed to fetch profile for view_profile',
+                              e,
+                            );
+                          }
+                        }
+
+                        if (poi != null) {
+                          final List<PointOfInterest> pois = List.empty(
+                            growable: true,
+                          );
+                          pois.add(poi);
+                          AppRouter.navigateToMapWithPois(pois);
+                        }
+                      });
+                    } else if (value == 'finish_transaction') {
+                      _handleFinishTransaction(context);
+                    } else if (value == 'report_user') {
+                      _handleReportUser(context);
+                    } else if (value == 'block_user') {
+                      _handleBlockUser(context);
+                    } else if (value == 'unblock_user') {
+                      _handleUnblockUser(context);
                     }
-                  }
-                  
-                  if (poi != null) {
-                    final List<PointOfInterest> pois = List.empty(growable: true);
-                    pois.add(poi);
-                    AppRouter.navigateToMapWithPois(pois);
-                  }
-                });
-              } else if (value == 'finish_transaction') {
-                _handleFinishTransaction(context);
-              } else if (value == 'report_user') {
-                _handleReportUser(context);
-              } else if (value == 'block_user') {
-                _handleBlockUser(context);
-              } else if (value == 'unblock_user') {
-                _handleUnblockUser(context);
-              }
-            },
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                value: 'view_profile',
-                child: Row(
-                  children: [
-                    const Icon(Icons.person_outline),
-                    SizedBox(width: 8.w),
-                    Text(l10n.viewProfile),
+                  },
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem<String>(
+                      value: 'view_profile',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.person_outline),
+                          SizedBox(width: 8.w),
+                          Text(l10n.viewProfile),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'finish_transaction',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.check_circle_outline),
+                          SizedBox(width: 8.w),
+                          Text(l10n.finishTransaction),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'report_user',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.report_outlined),
+                          SizedBox(width: 8.w),
+                          Text(l10n.reportUser),
+                        ],
+                      ),
+                    ),
+                    if (_isUserBlocked)
+                      PopupMenuItem<String>(
+                        value: 'unblock_user',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.check_circle),
+                            SizedBox(width: 8.w),
+                            Text(l10n.unblockUser),
+                          ],
+                        ),
+                      )
+                    else
+                      PopupMenuItem<String>(
+                        value: 'block_user',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.block),
+                            SizedBox(width: 8.w),
+                            Text(l10n.blockUser),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
-              ),
-              PopupMenuItem<String>(
-                value: 'finish_transaction',
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle_outline),
-                    SizedBox(width: 8.w),
-                    Text(l10n.finishTransaction),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'report_user',
-                child: Row(
-                  children: [
-                    const Icon(Icons.report_outlined),
-                    SizedBox(width: 8.w),
-                    Text(l10n.reportUser),
-                  ],
-                ),
-              ),
-              if (_isUserBlocked)
-                PopupMenuItem<String>(
-                  value: 'unblock_user',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.check_circle),
-                      SizedBox(width: 8.w),
-                      Text(l10n.unblockUser),
-                    ],
-                  ),
-                )
-              else
-                PopupMenuItem<String>(
-                  value: 'block_user',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.block),
-                      SizedBox(width: 8.w),
-                      Text(l10n.blockUser),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ],
-      )
+              ],
+            )
           : null,
-      body: BlocConsumer<ChatCubit, ChatState>(
+      body: BlocListener<ChatCubit, ChatState>(
         listener: (context, state) {
-          // Update _messages for any state that carries message data
-          if (state is ChatMessagesLoaded ||
-              state is ChatMessagesLoading ||
-              state is ChatMessageSending ||
-              state is ChatMessageSent) {
-            if (state.messages.isNotEmpty) {
-              logDebug('🔄 ${state.runtimeType} state received with ${state.messages.length} messages');
-              setState(() {
-                _messages = state.messages;
-                logDebug('✅ UI _messages updated, triggering rebuild');
-              });
-            }
-          }
+          // Handle scroll to bottom for message states
           if (state is ChatMessagesLoaded ||
               state is ChatMessageSent ||
               state is ChatMessageSending) {
-            WidgetsBinding.instance
-                .addPostFrameCallback((_) => _scrollToBottom());
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => _scrollToBottom(),
+            );
           }
           if (state is ChatKeysExchanged) {
             logDebug('@@@@@@@@@@ Chat Keys Exchanged');
-            // Public key is already updated in the cubit
-            // Force UI refresh if needed
-            setState(() {});
+            // Cubit already updated, rebuild will happen through BlocBuilder
           }
           if (state is ChatTransactionInProgress) {
             // Show loading dialog
             showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (context) => const Center(
-                child: CircularProgressIndicator(),
-              ),
+              builder: (context) =>
+                  const Center(child: CircularProgressIndicator()),
             );
           }
           if (state is ChatTransactionCompleted) {
-            // Close loading dialog
-            Navigator.of(context).pop();
+            // Close loading dialog only if dialog is showing
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
             // Show success message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.transactionCompleted),
-                backgroundColor: Colors.green,
-                duration: const Duration(seconds: 3),
-              ),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(l10n.transactionCompleted),
+                  backgroundColor: Colors.green,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
             // Navigate back on web after showing snackbar
             if (kIsWeb && !widget.showAppBar) {
               Future.delayed(const Duration(milliseconds: 500), () {
@@ -536,26 +558,28 @@ class _ChatScreenState extends State<ChatScreen> {
             }
           }
           if (state is ChatTransactionError) {
-            // Close loading dialog
-            Navigator.of(context).pop();
+            // Close loading dialog only if showing
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
             // Show error message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.errorCreatingTransaction(state.error)),
-                backgroundColor: Colors.red,
-                duration: const Duration(seconds: 4),
-              ),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(l10n.errorCreatingTransaction(state.error)),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 4),
+                ),
+              );
+            }
           }
           if (state is ChatError) {
             logDebugError('Chat Error', state.message);
-            var errorText = state.message.contains("chatError_") ?
-              Text(context.parseL10n(state.message)) : Text(state.message);
+            var errorText = state.message.contains("chatError_")
+                ? Text(context.parseL10n(state.message))
+                : Text(state.message);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: errorText,
-                backgroundColor: Colors.red,
-              ),
+              SnackBar(content: errorText, backgroundColor: Colors.red),
             );
           }
           // Block user states
@@ -563,9 +587,8 @@ class _ChatScreenState extends State<ChatScreen> {
             showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (context) => const Center(
-                child: CircularProgressIndicator(),
-              ),
+              builder: (context) =>
+                  const Center(child: CircularProgressIndicator()),
             );
           }
           if (state is ChatUserBlockSuccess) {
@@ -599,9 +622,8 @@ class _ChatScreenState extends State<ChatScreen> {
             showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (context) => const Center(
-                child: CircularProgressIndicator(),
-              ),
+              builder: (context) =>
+                  const Center(child: CircularProgressIndicator()),
             );
           }
           if (state is ChatUserReportSuccess) {
@@ -625,38 +647,40 @@ class _ChatScreenState extends State<ChatScreen> {
             );
           }
         },
-        builder: (context, state) {
-          // Use smaller padding for web side-by-side view
-          final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
-              context.canShowSideBySide;
-          final double listPadding = isWebSideBySide ? 4 : 12;
+        child: BlocBuilder<ChatCubit, ChatState>(
+          builder: (context, state) {
+            // Use smaller padding for web side-by-side view
+            final bool isWebSideBySide =
+                kIsWeb && !widget.showAppBar && context.canShowSideBySide;
+            final double listPadding = isWebSideBySide ? 4 : 12;
 
-          // Use state.messages if it has content, otherwise fall back to _messages
-          // This ensures messages are displayed during all states (sending, sent, loaded, etc.)
-          final displayMessages = state.messages.isNotEmpty 
-              ? state.messages 
-              : _messages;
+            // Use state.messages directly - rebuild through BlocBuilder
+            final displayMessages = state.messages.isNotEmpty
+                ? state.messages
+                : _messages;
 
-          return Column(
-            children: [
-              if (state is ChatMessagesLoading && _messages.isEmpty)
-                const Expanded(
-                  child: Center(child: CircularProgressIndicator()),
+            return Column(
+              children: [
+                if (state is ChatMessagesLoading && _messages.isEmpty)
+                  const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                Expanded(
+                  child: ListView(
+                    controller: _scrollController,
+                    padding: EdgeInsets.all(listPadding),
+                    children: _buildMessageListWithHeaders(displayMessages),
+                    // Optimize for long lists
+                    addAutomaticKeepAlives:
+                        true, // Keep alive to prevent rebuilds
+                    addRepaintBoundaries: true, // Additional repaint boundaries
+                  ),
                 ),
-              Expanded(
-                child: ListView(
-                  controller: _scrollController,
-                  padding: EdgeInsets.all(listPadding),
-                  children: _buildMessageListWithHeaders(displayMessages),
-                  // Optimize for long lists
-                  addAutomaticKeepAlives: true, // Keep alive to prevent rebuilds
-                  addRepaintBoundaries: true, // Additional repaint boundaries
-                ),
-              ),
-              _buildMessageInputField(),
-            ],
-          );
-        },
+                _buildMessageInputField(),
+              ],
+            );
+          },
+        ),
       ),
     );
 
@@ -681,12 +705,10 @@ class _ChatScreenState extends State<ChatScreen> {
     return chatContent;
   }
 
-
-
   /// Build date header widget
   Widget _buildDateHeader(DateTime date) {
-    final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
-        context.canShowSideBySide;
+    final bool isWebSideBySide =
+        kIsWeb && !widget.showAppBar && context.canShowSideBySide;
     final double fontSize = isWebSideBySide ? 11.7 : 12;
     final double verticalMargin = isWebSideBySide ? 10.4 : 16;
 
@@ -745,7 +767,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (message.id.contains('system_transaction')) {
       return _buildSystemMessage(message);
     }
-    
+
     // Check if message is from current user by comparing sender ID
     final bool isMe = message.senderId == _chatCubit.currentUserId;
     final alignment = isMe ? Alignment.centerRight : Alignment.centerLeft;
@@ -753,8 +775,8 @@ class _ChatScreenState extends State<ChatScreen> {
     final textColor = isMe ? Colors.grey[100] : Colors.black87;
 
     // Use much smaller sizes for web side-by-side view
-    final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
-        context.canShowSideBySide;
+    final bool isWebSideBySide =
+        kIsWeb && !widget.showAppBar && context.canShowSideBySide;
     final double messageFontSize = isWebSideBySide ? 18.2 : 16;
     final double timeFontSize = isWebSideBySide ? 11.7 : 11;
     final double verticalMargin = isWebSideBySide ? 5.2 : 4.h;
@@ -768,36 +790,47 @@ class _ChatScreenState extends State<ChatScreen> {
       alignment: alignment,
       child: Container(
         margin: EdgeInsets.symmetric(
-            vertical: verticalMargin, horizontal: horizontalMargin),
+          vertical: verticalMargin,
+          horizontal: horizontalMargin,
+        ),
         padding: EdgeInsets.symmetric(
-            vertical: verticalPadding, horizontal: horizontalPadding),
+          vertical: verticalPadding,
+          horizontal: horizontalPadding,
+        ),
         decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(borderRadius),
-              topRight: Radius.circular(borderRadius),
-              bottomLeft: isMe ? Radius.circular(borderRadius) : Radius
-                  .circular(0),
-              bottomRight: isMe ? Radius.circular(0) : Radius.circular(
-                  borderRadius),
+          color: color,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(borderRadius),
+            topRight: Radius.circular(borderRadius),
+            bottomLeft: isMe
+                ? Radius.circular(borderRadius)
+                : Radius.circular(0),
+            bottomRight: isMe
+                ? Radius.circular(0)
+                : Radius.circular(borderRadius),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              spreadRadius: 1,
+              blurRadius: 2,
+              offset: const Offset(0, 1),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                spreadRadius: 1,
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              )
-            ]),
+          ],
+        ),
         constraints: BoxConstraints(maxWidth: isWebSideBySide ? 325 : 0.75.sw),
         child: Column(
-          crossAxisAlignment:
-          isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: isMe
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             // File attachment if present
             if (message.fileAttachment != null)
               _buildFileAttachment(
-                  message.fileAttachment!, isMe, isWebSideBySide),
+                message.fileAttachment!,
+                isMe,
+                isWebSideBySide,
+              ),
             // Text message
             if (message.plainText != null && message.plainText!.isNotEmpty) ...[
               if (message.fileAttachment != null) SizedBox(height: spacing),
@@ -815,7 +848,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     editableTextState: editableTextState,
                   );
                 },
-              )
+              ),
             ],
             SizedBox(height: spacing),
             // Show status indicator for sent messages, simple timestamp for received
@@ -831,10 +864,7 @@ class _ChatScreenState extends State<ChatScreen> {
             else
               Text(
                 DateTimeUtils.formatTime(message.timestamp), // Example: 14:35
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: timeFontSize,
-                ),
+                style: TextStyle(color: Colors.black54, fontSize: timeFontSize),
               ),
           ],
         ),
@@ -844,8 +874,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildSystemMessage(ChatMessage message) {
     // Use much smaller sizes for web side-by-side view
-    final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
-        context.canShowSideBySide;
+    final bool isWebSideBySide =
+        kIsWeb && !widget.showAppBar && context.canShowSideBySide;
     final double messageFontSize = isWebSideBySide ? 15.6 : 14;
     final double verticalMargin = isWebSideBySide ? 10.4 : 16;
 
@@ -873,17 +903,18 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildFileAttachment(FileAttachment attachment, bool isMe,
-      bool isWebSideBySide) {
+  Widget _buildFileAttachment(
+    FileAttachment attachment,
+    bool isMe,
+    bool isWebSideBySide,
+  ) {
     final iconSize = isWebSideBySide ? 41.6 : 40.0;
     final fontSize = isWebSideBySide ? 13.0 : 12.0;
 
     return GestureDetector(
       onTap: () => _handleFileAttachmentTap(attachment),
       child: Container(
-        constraints: BoxConstraints(
-          maxWidth: isWebSideBySide ? 260 : 0.6.sw,
-        ),
+        constraints: BoxConstraints(maxWidth: isWebSideBySide ? 260 : 0.6.sw),
         decoration: BoxDecoration(
           color: isMe
               ? Colors.white.withValues(alpha: 0.2)
@@ -896,55 +927,65 @@ class _ChatScreenState extends State<ChatScreen> {
             // Image preview for images (check global cache first, then local file)
             if (attachment.isImage && _imageCache.isCached(attachment.fileId))
               RepaintBoundary(
-                key: ValueKey('image_${attachment.fileId}'), // Stable key prevents rebuilds
+                key: ValueKey(
+                  'image_${attachment.fileId}',
+                ), // Stable key prevents rebuilds
                 child: ClipRRect(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
                   child: Image.memory(
-                  _imageCache.getImage(attachment.fileId)!,
-                  key: ValueKey('img_mem_${attachment.fileId}'), // Unique key for caching
-                  width: double.infinity,
-                  height: isWebSideBySide ? 195 : 200,
-                  fit: BoxFit.cover,
-                  // CRITICAL: Decode at lower resolution to prevent UI freeze
-                  // This is especially important on web where image decoding blocks the main thread
-                  cacheWidth: kIsWeb ? 600 : null, // Limit decoded width on web
-                  cacheHeight: kIsWeb ? 400 : null, // Limit decoded height on web
-                  // Use gapless playback for smoother loading
-                  gaplessPlayback: true,
-                  // Enable image cache to prevent re-decoding
-                  isAntiAlias: false, // Disable anti-aliasing for better performance
-                  filterQuality: FilterQuality.low, // Low quality = faster rendering
-                  // Show loading indicator while decoding
-                  frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                    if (wasSynchronouslyLoaded) return child;
-                    return AnimatedOpacity(
-                      opacity: frame == null ? 0.0 : 1.0,
-                      duration: const Duration(milliseconds: 200),
-                      child: frame == null 
-                        ? Container(
-                            width: double.infinity,
-                            height: isWebSideBySide ? 195 : 200,
-                            color: Colors.grey[300],
-                            child: Center(
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    isMe ? Colors.white70 : Colors.grey[600]!,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        : child,
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildFileIcon(attachment, iconSize, fontSize, isMe, isWebSideBySide);
-                  },
-                ),
+                    _imageCache.getImage(attachment.fileId)!,
+                    key: ValueKey(
+                      'img_mem_${attachment.fileId}',
+                    ), // Unique key for caching
+                    width: double.infinity,
+                    height: isWebSideBySide ? 195 : 200,
+                    fit: BoxFit.cover,
+                    // CRITICAL: Decode at lower resolution to prevent UI freeze
+                    cacheWidth: kIsWeb ? 600 : null,
+                    cacheHeight: kIsWeb ? 400 : null,
+                    gaplessPlayback: true,
+                    isAntiAlias: false,
+                    filterQuality: FilterQuality.low,
+                    // Handle image errors gracefully
+                    errorBuilder: (context, error, stackTrace) {
+                      logDebugError('Image load error', error.toString());
+                      return Container(
+                        width: double.infinity,
+                        height: isWebSideBySide ? 195 : 200,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.broken_image, color: Colors.grey),
+                      );
+                    },
+                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                      if (wasSynchronouslyLoaded) return child;
+                      return AnimatedOpacity(
+                        opacity: frame == null ? 0.0 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                            child: frame == null
+                                ? Container(
+                                    width: double.infinity,
+                                    height: isWebSideBySide ? 195 : 200,
+                                    color: Colors.grey[300],
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                isMe
+                                                    ? Colors.white70
+                                                    : Colors.grey[600]!,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : child,
+                          );
+                        },
+                  ),
                 ),
               )
             else if (attachment.isImage && attachment.localPath != null)
@@ -965,13 +1006,25 @@ class _ChatScreenState extends State<ChatScreen> {
                     isAntiAlias: false,
                     filterQuality: FilterQuality.low,
                     errorBuilder: (context, error, stackTrace) {
-                      return _buildFileIcon(attachment, iconSize, fontSize, isMe, isWebSideBySide);
+                      return _buildFileIcon(
+                        attachment,
+                        iconSize,
+                        fontSize,
+                        isMe,
+                        isWebSideBySide,
+                      );
                     },
                   ),
                 ),
               )
             else
-              _buildFileIcon(attachment, iconSize, fontSize, isMe, isWebSideBySide),
+              _buildFileIcon(
+                attachment,
+                iconSize,
+                fontSize,
+                isMe,
+                isWebSideBySide,
+              ),
 
             // File info
             Padding(
@@ -1009,26 +1062,24 @@ class _ChatScreenState extends State<ChatScreen> {
                           size: fontSize,
                           color: Colors.green,
                         ),
-                      ] else
-                        if (attachment.isUploading) ...[
-                          SizedBox(width: 8),
-                          SizedBox(
-                            width: fontSize,
-                            height: fontSize,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              value: attachment.uploadProgress,
-                            ),
+                      ] else if (attachment.isUploading) ...[
+                        SizedBox(width: 8),
+                        SizedBox(
+                          width: fontSize,
+                          height: fontSize,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            value: attachment.uploadProgress,
                           ),
-                        ] else
-                          ...[
-                            SizedBox(width: 8),
-                            Icon(
-                              Icons.download,
-                              size: fontSize,
-                              color: isMe ? Colors.white70 : Colors.blue,
-                            ),
-                          ],
+                        ),
+                      ] else ...[
+                        SizedBox(width: 8),
+                        Icon(
+                          Icons.download,
+                          size: fontSize,
+                          color: isMe ? Colors.white70 : Colors.blue,
+                        ),
+                      ],
                     ],
                   ),
                 ],
@@ -1040,8 +1091,13 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildFileIcon(FileAttachment attachment, double iconSize,
-      double fontSize, bool isMe, bool isWebSideBySide) {
+  Widget _buildFileIcon(
+    FileAttachment attachment,
+    double iconSize,
+    double fontSize,
+    bool isMe,
+    bool isWebSideBySide,
+  ) {
     IconData icon;
     Color iconColor;
 
@@ -1072,12 +1128,25 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  /// Build file URL for viewing images
+  String _buildFileUrl(String fileId) {
+    final serviceBaseUrl = kIsWeb ? dotenv.env['SERVICE_BASE_URL_WEB']
+        ?? 'http://localhost:8081' :
+    dotenv.env['SERVICE_BASE_URL_MOBILE'] ?? 'http://10.0.2.2:8081';
+    return '$serviceBaseUrl/api/v1/chat/files/download/$fileId';
+  }
+
   Future<void> _handleFileAttachmentTap(FileAttachment attachment) async {
     if (attachment.isDownloaded && attachment.localPath != null) {
       // File already downloaded, open it
-      logDebug('@@@@@@@@@ File already downloaded, opening: ${attachment
-          .localPath}');
-      await _openFile(attachment.localPath!);
+      logDebug(
+        '@@@@@@@@@ File already downloaded, opening: ${attachment.localPath}',
+      );
+      await _openFile(
+        attachment.localPath!,
+        isImage: attachment.isImage,
+        imageUrl: _buildFileUrl(attachment.fileId),
+      );
     } else if (!attachment.isUploading) {
       // Download the file
       logDebug('@@@@@@@@@ File not downloaded, downloading...');
@@ -1120,15 +1189,16 @@ class _ChatScreenState extends State<ChatScreen> {
       // We need sender's public key to derive the shared secret
       final secureStorage = SecureStorageService();
       final senderPublicKey = await secureStorage.getContactPublicKey(
-          _chatCubit.recipientUserId);
+        _chatCubit.recipientUserId,
+      );
 
       if (senderPublicKey == null) {
         throw Exception('Sender public key not found. Cannot decrypt file.');
       }
 
       logDebug(
-          '@@@@@@@@@ Downloading file with sender public key: ${senderPublicKey
-              .substring(0, 20)}...');
+        '@@@@@@@@@ Downloading file with sender public key: ${senderPublicKey.substring(0, 20)}...',
+      );
 
       final downloadResult = await fileTransferService.downloadFile(
         fileId: attachment.fileId,
@@ -1144,26 +1214,36 @@ class _ChatScreenState extends State<ChatScreen> {
         // Mobile/Desktop: File saved locally
         // Add to global image cache for preview
         if (attachment.isImage) {
-          _imageCache.cacheImage(attachment.fileId, downloadResult.decryptedBytes);
+          _imageCache.cacheImage(
+            attachment.fileId,
+            downloadResult.decryptedBytes,
+          );
         }
-        
+
         // Update the message with local path
         final message = _chatCubit.messages.firstWhere(
           (msg) => msg.fileAttachment?.fileId == attachment.fileId,
         );
-        
-        _chatCubit.messages[_chatCubit.messages.indexOf(message)] = 
-          message.copyWith(
-            fileAttachment: attachment.copyWith(
-              localPath: downloadResult.localPath,
-              isDownloaded: true,
-            ),
-          );
 
-        setState(() {}); // Refresh UI
+        _chatCubit.messages[_chatCubit.messages.indexOf(message)] = message
+            .copyWith(
+              fileAttachment: attachment.copyWith(
+                localPath: downloadResult.localPath,
+                isDownloaded: true,
+              ),
+            );
+
+        // Defer setState to avoid calling during build phase
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() {});
+        });
 
         // Automatically open the file
-        await _openFile(downloadResult.localPath!);
+        await _openFile(
+          downloadResult.localPath!,
+          isImage: attachment.isImage,
+          imageUrl: _buildFileUrl(attachment.fileId),
+        );
       } else {
         // Web: Browser handles the download automatically
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1186,13 +1266,40 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<void> _openFile(String filePath) async {
+  Future<void> _openFile(
+    String filePath, {
+    bool isImage = false,
+    String? imageUrl,
+  }) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
+    // On web, use dialog-based image viewer for images to prevent map iframe destruction
+    // This is CRITICAL: navigation destroys the OSM map's iframe on web
+    if (kIsWeb &&
+        (isImage ||
+            (filePath.endsWith('.jpg') ||
+                filePath.endsWith('.jpeg') ||
+                filePath.endsWith('.png') ||
+                filePath.endsWith('.webp')))) {
+      final url = imageUrl ?? filePath;
+      if (mounted) {
+        // Use dialog instead of navigation - keeps widget tree intact
+        await ImageViewerDialog.show(
+          context: context,
+          imageUrls: [url],
+          initialIndex: 0,
+          heroTag: null,
+        );
+      }
+      return;
+    }
+
     try {
       logDebug('@@@@@@@@@ Opening file: $filePath');
       final result = await OpenFilex.open(filePath);
-      logDebug('@@@@@@@@@ OpenFilex result: ${result.type} - ${result.message}');
+      logDebug(
+        '@@@@@@@@@ OpenFilex result: ${result.type} - ${result.message}',
+      );
 
       if (result.type == ResultType.done) {
         // File opened successfully
@@ -1257,7 +1364,7 @@ class _ChatScreenState extends State<ChatScreen> {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text(l10n.fileSavedAt(filePath)),
+                  content: Text(l10n.fileSavedAt(filePath)),
                   duration: Duration(seconds: 5),
                 ),
               );
@@ -1308,9 +1415,8 @@ class _ChatScreenState extends State<ChatScreen> {
     // Show report dialog with reason selection
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (dialogContext) => ReportUserDialog(
-        targetUserName: widget.poiName ?? l10n.unknownUser,
-      ),
+      builder: (dialogContext) =>
+          ReportUserDialog(targetUserName: widget.poiName ?? l10n.unknownUser),
     );
 
     if (result == null || !mounted) return;
@@ -1371,7 +1477,11 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n.blockUser),
-        content: Text(l10n.blockUserConfirmationDetailed(widget.poiName ?? l10n.unknownUser)),
+        content: Text(
+          l10n.blockUserConfirmationDetailed(
+            widget.poiName ?? l10n.unknownUser,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -1415,7 +1525,11 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n.unblockUser),
-        content: Text(l10n.unblockUserConfirmationDetailed(widget.poiName ?? l10n.unknownUser)),
+        content: Text(
+          l10n.unblockUserConfirmationDetailed(
+            widget.poiName ?? l10n.unknownUser,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -1445,7 +1559,7 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         _isUserBlocked = false;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.userUnblocked),
@@ -1466,8 +1580,8 @@ class _ChatScreenState extends State<ChatScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     // Use much smaller sizes for web side-by-side view
-    final bool isWebSideBySide = kIsWeb && !widget.showAppBar &&
-        context.canShowSideBySide;
+    final bool isWebSideBySide =
+        kIsWeb && !widget.showAppBar && context.canShowSideBySide;
     final double horizontalPadding = isWebSideBySide ? 7.8 : 16;
     final double verticalPadding = isWebSideBySide ? 5.2 : 8.h;
     final double borderRadius = isWebSideBySide ? 15.6 : 24;
@@ -1499,10 +1613,10 @@ class _ChatScreenState extends State<ChatScreen> {
           // Attachment button
           IconButton(
             iconSize: iconSize,
-            icon: Icon(Icons.attach_file,
-                color: Theme
-                    .of(context)
-                    .primaryColor),
+            icon: Icon(
+              Icons.attach_file,
+              color: Theme.of(context).primaryColor,
+            ),
             onPressed: _pickAndSendFile,
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
@@ -1538,8 +1652,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   filled: true,
                   fillColor: Colors.white,
                   contentPadding: EdgeInsets.symmetric(
-                      horizontal: contentHorizontalPadding,
-                      vertical: contentVerticalPadding),
+                    horizontal: contentHorizontalPadding,
+                    vertical: contentVerticalPadding,
+                  ),
                   isDense: isWebSideBySide,
                 ),
                 textInputAction: TextInputAction.newline,
@@ -1551,8 +1666,7 @@ class _ChatScreenState extends State<ChatScreen> {
           SizedBox(width: spacing),
           IconButton(
             iconSize: iconSize,
-            icon: Icon(Icons.send,
-                color: Theme.of(context).primaryColor),
+            icon: Icon(Icons.send, color: Theme.of(context).primaryColor),
             onPressed: _sendMessage,
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,

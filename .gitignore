@@ -35,6 +35,7 @@ private.properties
 .pub-cache/
 .pub/
 /build/
+_backend
 
 # Symbolication related
 app.*.symbols

@@ -49,12 +49,15 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
 
   // Fetch user location and fallback to Paris if not available
   late PickerMapController controller = PickerMapController(
-      initPosition: GeoPoint(latitude: 48.8584, longitude: 2.2945),
-      /*initMapWithUserPosition: const UserTrackingOption(
+    initPosition: GeoPoint(latitude: 48.8584, longitude: 2.2945),
+    /*initMapWithUserPosition: const UserTrackingOption(
         enableTracking: true,
         unFollowUser: false,
       ),*/
-  )..customTile = CustomTile(
+  );
+  
+  // Store custom tile config for later application when map is ready
+  late final CustomTile _customTile = CustomTile(
     sourceName: "osmDeu", // for caching | osmDeu, osmFrance
     tileExtension: ".png",
     minZoomLevel: 2,
@@ -152,8 +155,18 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
   }
 
   void _onMapReady(bool isReady) async {
-    await controller.osmBaseController.setZoom(zoomLevel: 6);
-    await controller.goToLocation(GeoPoint(latitude: 48.8584, longitude: 2.2945));
+    if (isReady) {
+      // Apply custom tile after map is fully initialized (avoids timing issues)
+      try {
+        controller.customTile = _customTile;
+      } catch (e) {
+        // If custom tile fails, map will use default - not critical
+        debugPrint('[LocationPicker] Failed to set custom tile: $e');
+      }
+      
+      await controller.osmBaseController.setZoom(zoomLevel: 6);
+      await controller.goToLocation(GeoPoint(latitude: 48.8584, longitude: 2.2945));
+    }
   }
 
   @override

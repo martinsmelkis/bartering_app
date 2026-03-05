@@ -52,6 +52,7 @@ class ChatPanelCubit extends Cubit<ChatPanelState> {
   }
 
   /// Open chat with a specific POI
+  /// If chat is already open for a different POI, it will be replaced
   void openChat(String poiId, String poiName, {PointOfInterest? poi}) {
     emit(
       ChatPanelState(
@@ -61,6 +62,11 @@ class ChatPanelCubit extends Cubit<ChatPanelState> {
         selectedPoi: poi,
       ),
     );
+  }
+
+  /// Check if a specific POI chat is already open
+  bool isPoiChatOpen(String poiId) {
+    return state.isChatOpen && state.selectedPoiId == poiId;
   }
 
   /// Close the chat panel
