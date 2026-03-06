@@ -324,8 +324,10 @@ class _ChatScreenState extends State<ChatScreen> {
       if (widget.poiId != null) {
         await notificationService.cancelNotificationsForUser(widget.poiId!);
       }
-      // Request notification permission for Android 13+
-      await notificationService.requestNotificationPermission();
+      // Request notification permission for Android 13+ (skip on web)
+      if (!kIsWeb) {
+        await notificationService.requestNotificationPermission();
+      }
     } catch (e) {
       // Service might not be registered yet
       logDebug('⚠️ Could not set active chat or cancel notifications: $e');
@@ -939,10 +941,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     ), // Unique key for caching
                     width: double.infinity,
                     height: isWebSideBySide ? 195 : 200,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                     // CRITICAL: Decode at lower resolution to prevent UI freeze
-                    cacheWidth: kIsWeb ? 600 : null,
-                    cacheHeight: kIsWeb ? 400 : null,
+                    //cacheWidth: kIsWeb ? 600 : null,
+                    //cacheHeight: kIsWeb ? 400 : null,
                     gaplessPlayback: true,
                     isAntiAlias: false,
                     filterQuality: FilterQuality.low,
@@ -998,10 +1000,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     key: ValueKey('img_file_${attachment.fileId}'),
                     width: double.infinity,
                     height: isWebSideBySide ? 195 : 200,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                     // Also optimize local file images
-                    cacheWidth: kIsWeb ? 600 : null,
-                    cacheHeight: kIsWeb ? 400 : null,
+                    //cacheWidth: kIsWeb ? 600 : null,
+                    //cacheHeight: kIsWeb ? 400 : null,
                     gaplessPlayback: true,
                     isAntiAlias: false,
                     filterQuality: FilterQuality.low,
@@ -1136,7 +1138,16 @@ class _ChatScreenState extends State<ChatScreen> {
     return '$serviceBaseUrl/api/v1/chat/files/download/$fileId';
   }
 
+  // Track active downloads to prevent duplicate requests
+  final Set<String> _activeDownloads = {};
+
   Future<void> _handleFileAttachmentTap(FileAttachment attachment) async {
+    // Prevent duplicate downloads
+    if (_activeDownloads.contains(attachment.fileId)) {
+      logDebug('@@@@@@@@@ Download already in progress for ${attachment.fileId}, ignoring tap');
+      return;
+    }
+
     if (attachment.isDownloaded && attachment.localPath != null) {
       // File already downloaded, open it
       logDebug(
@@ -1157,10 +1168,25 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _downloadFile(FileAttachment attachment) async {
+    // Prevent duplicate downloads
+    if (_activeDownloads.contains(attachment.fileId)) {
+      logDebug('@@@@@@@@@ Download already in progress for ${attachment.fileId}, skipping');
+      return;
+    }
+    
+    _activeDownloads.add(attachment.fileId);
+    
     final l10n = AppLocalizations.of(context)!;
 
+    // Track download progress for UI feedback
+    double downloadProgress = 0.0;
+
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
+      // Show initial downloading progress
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+      
+      // Simple progress snackbar without StatefulBuilder
+      scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Row(
             children: [
@@ -1170,7 +1196,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
               SizedBox(width: 12),
-              Text(l10n.downloadingFile(attachment.filename)),
+              Expanded(
+                child: Text(l10n.downloadingFile(attachment.filename)),
+              ),
             ],
           ),
           duration: Duration(hours: 1),
@@ -1206,6 +1234,30 @@ class _ChatScreenState extends State<ChatScreen> {
         filename: attachment.filename,
         senderPublicKey: senderPublicKey,
         saveToFile: true, // Save to file for user download
+        onProgress: (progress) {
+          // Progress updates disabled to prevent stack overflow on WASM
+          // Show decrypting message once at 50%
+          if (progress > 0.5 && progress < 0.6 && mounted) {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(l10n.decryptingFile(attachment.filename)),
+                    ),
+                  ],
+                ),
+                duration: Duration(hours: 1),
+              ),
+            );
+          }
+        },
       );
 
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -1246,6 +1298,28 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       } else {
         // Web: Browser handles the download automatically
+        // BUT still cache the image for preview in chat
+        if (attachment.isImage) {
+          _imageCache.cacheImage(
+            attachment.fileId,
+            downloadResult.decryptedBytes,
+          );
+          // Update message state to show cached image
+          final message = _chatCubit.messages.firstWhere(
+                (msg) => msg.fileAttachment?.fileId == attachment.fileId,
+          );
+          _chatCubit.messages[_chatCubit.messages.indexOf(message)] = message
+              .copyWith(
+            fileAttachment: attachment.copyWith(
+              isDownloaded: true,
+            ),
+          );
+          // Trigger rebuild to show cached image
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() {});
+          });
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.downloadStarted),
@@ -1263,6 +1337,15 @@ class _ChatScreenState extends State<ChatScreen> {
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      // Remove from active downloads and ensure snackbar is dismissed
+      _activeDownloads.remove(attachment.fileId);
+      // Delayed hide to ensure it works even if called during build
+      Future.delayed(Duration(milliseconds: 50), () {
+        if (mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        }
+      });
     }
   }
 

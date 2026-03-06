@@ -1,8 +1,10 @@
-import 'package:barter_app/application.dart';
-import 'package:barter_app/flavor_config.dart';
-import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
-import 'package:barter_app/services/messaging/firebase_service.dart';
-import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+import 'application.dart';
+import 'flavor_config.dart';
+import 'screens/initialize_screen/initialize_screen.dart';
+import 'services/messaging/firebase_service.dart';
+import 'utils/debug_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -26,6 +28,12 @@ void main() async {
   await dotenv.load(fileName: flavor.envFileName);
   logDebug('✅ Environment variables loaded');
 
+  FlutterError.onError = (FlutterErrorDetails details) {
+    print('🔴 FLUTTER ERROR: ${details.exception}');
+    print('Stack: ${details.stack}');
+    FlutterError.presentError(details);
+  };
+
   // TODO eventually, in release version, run security tests
   //if (!kDebugMode) {
   //  await SecurityTestHelper.runAllTests();
@@ -35,21 +43,26 @@ void main() async {
   await configureDependencies();
   logDebug('✅ Dependencies configured');
 
-  // Initialize Firebase (safe to call multiple times)
-  logDebug('⏳ Initializing Firebase...');
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    logDebug('✅ Firebase initialized in main()');
-  } catch (e) {
-    logDebug('⚠️ Firebase already initialized (probably by background handler): $e');
+  // Initialize Firebase only on non-web platforms
+  // Web uses WebSocket-based messaging instead of FCM
+  if (!kIsWeb) {
+    logDebug('⏳ Initializing Firebase...');
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      logDebug('✅ Firebase initialized in main()');
+    } catch (e) {
+      logDebug('⚠️ Firebase already initialized (probably by background handler): $e');
+    }
+    
+    // Initialize Firebase and FCM
+    logDebug('⏳ Initializing FirebaseService...');
+    await FirebaseService().initialize();
+    logDebug('✅ FirebaseService initialized');
+  } else {
+    logDebug('🔔 Skipping Firebase/FCM initialization on web (using WebSocket messaging)');
   }
-  
-  // Initialize Firebase and FCM
-  logDebug('⏳ Initializing FirebaseService...');
-  await FirebaseService().initialize();
-  logDebug('✅ FirebaseService initialized');
 
   logDebug('⏳ Running Application widget...');
   runApp(const Application());

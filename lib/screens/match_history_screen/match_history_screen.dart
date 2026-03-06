@@ -17,7 +17,7 @@ class MatchHistoryScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return BlocProvider(
-      create: (context) => getIt<NotificationsCubit>()..loadMatchHistory(),
+      create: (context) => getIt<NotificationsCubit>(),
       child: Scaffold(
         appBar: showAppBar
             ? AppBar(

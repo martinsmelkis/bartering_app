@@ -1,13 +1,14 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:barter_app/models/postings/posting_data_response.dart';
 import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/back_button_handler.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
 import 'package:barter_app/widgets/image_viewer_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart' as dio;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -40,6 +41,8 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
 
   DateTime? _selectedExpirationDate;
   final List<XFile> _selectedImages = [];
+  // On web, store bytes immediately as Blob URLs expire quickly on mobile web
+  final Map<String, Uint8List> _webImageBytes = {};
   final ImagePicker _picker = ImagePicker();
   bool _isSubmitting = false;
   bool get _isEditing => widget.existingPosting != null;
@@ -72,6 +75,8 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
     _titleController.dispose();
     _descriptionController.dispose();
     _valueController.dispose();
+    // Clear web image bytes cache to free memory
+    _webImageBytes.clear();
     super.dispose();
   }
 
@@ -95,6 +100,18 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
       );
 
       if (image != null) {
+        // On web, read bytes immediately to prevent Blob URL from being revoked
+        // This is crucial for mobile web browsers where Blob URLs expire quickly
+        if (kIsWeb) {
+          try {
+            final bytes = await image.readAsBytes();
+            _webImageBytes[image.path] = bytes;
+            debugPrint('✅ Stored ${_webImageBytes.length} web images in memory');
+          } catch (e) {
+            debugPrint('❌ Failed to read image bytes on web: $e');
+          }
+        }
+
         // Defer setState to avoid build-phase issues on WASM
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -115,11 +132,16 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
   }
 
   void _removeImage(int index) {
+    final removedImage = _selectedImages[index];
     // Defer setState to avoid build-phase issues on WASM
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() {
           _selectedImages.removeAt(index);
+          // Also remove from web bytes cache if present
+          if (kIsWeb) {
+            _webImageBytes.remove(removedImage.path);
+          }
         });
       }
     });
@@ -127,7 +149,17 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
 
   Widget _buildImagePreview(XFile imageFile) {
     if (kIsWeb) {
-      // On web, use Image.network with the XFile path (which is a blob URL)
+      // On web, prefer using cached bytes if available (more reliable on mobile web)
+      final cachedBytes = _webImageBytes[imageFile.path];
+      if (cachedBytes != null) {
+        return Image.memory(
+          cachedBytes,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        );
+      }
+      // Fallback to network (blob URL) if bytes not cached
       return Image.network(
         imageFile.path,
         fit: BoxFit.cover,
@@ -198,12 +230,28 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
           dio.MultipartFile multipartFile;
 
           if (kIsWeb) {
-            // On web, read bytes directly from XFile
-            final bytes = await xFile.readAsBytes();
-            multipartFile = dio.MultipartFile.fromBytes(
-              bytes,
-              filename: xFile.name,
-            );
+            // On web, use pre-cached bytes to avoid Blob URL expiration issues
+            // Bytes were read immediately after picking in _pickImage()
+            final bytes = _webImageBytes[xFile.path];
+            if (bytes == null) {
+              debugPrint('❌ Web image bytes not found for ${xFile.path}, attempting to read...');
+              // Fallback: try to read directly (may fail on mobile web due to Blob URL expiration)
+              try {
+                final freshBytes = await xFile.readAsBytes();
+                multipartFile = dio.MultipartFile.fromBytes(
+                  freshBytes,
+                  filename: xFile.name,
+                );
+              } catch (e) {
+                debugPrint('❌ Failed to read image bytes: $e');
+                throw Exception('Failed to read image. Please re-select the image.');
+              }
+            } else {
+              multipartFile = dio.MultipartFile.fromBytes(
+                bytes,
+                filename: xFile.name,
+              );
+            }
           } else {
             // On mobile, use file path
             final file = File(xFile.path);

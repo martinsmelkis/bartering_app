@@ -1,6 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <meta name="description" content="Bartering App">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Barter App">
+    <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+    <link rel="icon" type="image/png" href="favicon.png"/>
+
+    <title>Barter App</title>
+    <link rel="manifest" href="manifest.json">
+
+    <script>
+        // The value below is injected by the flutter tool from --dart-define
+        // or from the FLUTTER_WEB_CANVASKIT_URL environment variable.
+        // var canvasKitBaseUrl = "https://unpkg.com/canvaskit-wasm@0.33.0/bin/";
+        var canvasKitBaseUrl = "canvaskit/";
+    </script>
+</head>
+<body>
+
+<script src="flutter.js" defer></script>
+<script src="main.dart.js?v=0.0.33" type="application/javascript"></script>
+
+<script>
+    window.addEventListener('load', function () {
+      _flutter.loader.load({
+        buildConfig: {
+          builds: [
+            {
+              compileTarget: "dart2js",
+              renderer: "canvaskit",
+              mainUrl: "main.dart.js?v=0.0.33"
+            }
+          ]
+        },
+        serviceWorkerSettings: {
+          serviceWorkerVersion: null, // set to null to avoid fetching service_worker.js if not needed
+        }
+      }).then(function(engineInitializer) {
+        return engineInitializer.initializeEngine();
+      }).then(function(appRunner) {
+        appRunner.runApp();
+      });
+    });
+</script>
+</body>
+</html>
+<!-- For WASM-only builds, enable when stable
+<!DOCTYPE html>
+<html>
+<head>
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Bartering App">
@@ -15,39 +69,10 @@
   <title>Barter App</title>
   <link rel="manifest" href="manifest.json">
 
-  <script>
-    // The value below is injected by the flutter tool from --dart-define
-    // or from the FLUTTER_WEB_CANVASKIT_URL environment variable.
-    // var canvasKitBaseUrl = "https://unpkg.com/canvaskit-wasm@0.33.0/bin/";
-    var canvasKitBaseUrl = "canvaskit/";
-  </script>
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+  <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
 </head>
 <body>
-
-<script src="flutter.js" defer></script>
-<script src="main.dart.js?v=0.0.22" type="application/javascript"></script>
-
-<script>
-  window.addEventListener('load', function () {
-    _flutter.loader.load({
-      buildConfig: {
-        builds: [
-          {
-            compileTarget: "dart2js",
-            renderer: "canvaskit",
-            mainUrl: "main.dart.js?v=0.0.16"
-          }
-        ]
-      },
-      serviceWorkerSettings: {
-        serviceWorkerVersion: null, // set to null to avoid fetching service_worker.js if not needed
-      }
-    }).then(function(engineInitializer) {
-      return engineInitializer.initializeEngine();
-    }).then(function(appRunner) {
-      appRunner.runApp();
-    });
-  });
-</script>
+  <script src="flutter_bootstrap.js" async></script>
 </body>
-</html>
+</html>-->

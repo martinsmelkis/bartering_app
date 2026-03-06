@@ -757,6 +757,14 @@
       }
     }
   },
+  "decryptingFile": "Decrypting {filename}...",
+  "@decryptingFile": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
+  },
   "downloadFailed": "Download failed: {error}",
   "@downloadFailed": {
     "placeholders": {

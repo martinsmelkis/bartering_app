@@ -758,6 +758,14 @@
       }
     }
   },
+  "decryptingFile": "Atšifrē {filename}...",
+  "@decryptingFile": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
+  },
   "downloadFailed": "Lejupielāde neizdevās: {error}",
   "@downloadFailed": {
     "placeholders": {

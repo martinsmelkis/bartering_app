@@ -1,8 +1,11 @@
 import 'dart:ui' as ui show Codec, ImmutableBuffer;
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
+// Platform-conditional imports for HTTP
+import 'webp_network_image_http.dart' if (dart.library.js_interop) 'webp_network_image_web.dart';
 
 /// Custom ImageProvider that adds Accept: image/webp header to requests
 /// This allows the server to automatically serve WebP images when available
@@ -36,7 +39,7 @@ class WebPNetworkImage extends ImageProvider<WebPNetworkImage> {
       debugLabel: key.url,
       informationCollector: () => <DiagnosticsNode>[
         DiagnosticsProperty<ImageProvider>('Image provider', this),
-        DiagnosticsProperty<WebPNetworkImage>('Image key', key),
+        DiagnosticsProperty<WebPNetworkImage>('Image key', this),
       ],
     );
   }
@@ -46,23 +49,16 @@ class WebPNetworkImage extends ImageProvider<WebPNetworkImage> {
 
     // Build headers with WebP support
     final Map<String, String> requestHeaders = <String, String>{
-      'Accept': 'image/webp,image/*,*/*;q=0.8',
+      'Accept': 'image/webp,image/*,*/*;q=1.0',
       ...?headers,
     };
 
     try {
       final Uri resolved = Uri.base.resolve(key.url);
-      final http.Response response = await http.get(resolved, headers: requestHeaders);
+      // Use platform-specific HTTP fetch (web uses Fetch API via package:web)
+      final Uint8List bytes = await fetchImageBytes(resolved, requestHeaders);
 
-      if (response.statusCode != 200) {
-        throw NetworkImageLoadException(
-          statusCode: response.statusCode,
-          uri: resolved,
-        );
-      }
-
-      final Uint8List bytes = response.bodyBytes;
-      if (bytes.lengthInBytes == 0) {
+      if (bytes.isEmpty) {
         throw Exception('NetworkImage is an empty file: $resolved');
       }
 
@@ -128,8 +124,16 @@ class WebPImage extends StatelessWidget {
       height: height,
       fit: fit,
       loadingBuilder: loadingBuilder,
-      errorBuilder: errorBuilder,
+      errorBuilder: errorBuilder ?? _defaultErrorBuilder,
       frameBuilder: frameBuilder,
+    );
+  }
+
+  Widget _defaultErrorBuilder(BuildContext context, Object error, StackTrace? stackTrace) {
+    debugPrint('❌ WebPImage error: $error');
+    return Container(
+      color: Colors.grey[300],
+      child: const Icon(Icons.broken_image, color: Colors.grey),
     );
   }
 }

@@ -1,8 +1,11 @@
-import 'dart:html' as html;
+import 'dart:async';
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/wasm.dart';
+import 'package:web/web.dart' as web;
 
 class PlatformInterface {
   static Future<QueryExecutor> createDatabaseConnection(String databaseName) async {
@@ -29,7 +32,7 @@ class PlatformInterface {
   static Future<void> clearAllBrowserStorage() async {
     try {
       // Clear localStorage
-      html.window.localStorage.clear();
+      web.window.localStorage.clear();
       logDebug('✅ localStorage cleared');
     } catch (e) {
       logDebug('⚠️ Failed to clear localStorage: $e');
@@ -37,7 +40,7 @@ class PlatformInterface {
 
     try {
       // Clear sessionStorage
-      html.window.sessionStorage.clear();
+      web.window.sessionStorage.clear();
       logDebug('✅ sessionStorage cleared');
     } catch (e) {
       logDebug('⚠️ Failed to clear sessionStorage: $e');
@@ -48,8 +51,14 @@ class PlatformInterface {
       final databases = ['app.db', 'app.db.enc', 'drift_worker'];
       for (final dbName in databases) {
         try {
-          await html.window.indexedDB?.deleteDatabase(dbName);
-          logDebug('✅ IndexedDB database deleted: $dbName');
+          // Use JS interop to call deleteDatabase
+          final idb = web.window.indexedDB;
+          if (idb != null) {
+            final request = idb.deleteDatabase(dbName);
+            // Wait for the request to complete using a completer
+            await _awaitRequest(request);
+            logDebug('✅ IndexedDB database deleted: $dbName');
+          }
         } catch (e) {
           logDebug('⚠️ Failed to delete IndexedDB database $dbName: $e');
         }
@@ -57,5 +66,24 @@ class PlatformInterface {
     } catch (e) {
       logDebug('⚠️ Failed to clear IndexedDB: $e');
     }
+  }
+
+  /// Helper to await an IDBRequest using JS interop
+  static Future<void> _awaitRequest(web.IDBRequest request) {
+    final completer = Completer<void>();
+    
+    // Use inline JS function for event handling
+    final successHandler = (web.Event event) {
+      completer.complete();
+    }.toJS;
+    
+    final errorHandler = (web.Event event) {
+      completer.completeError('IndexedDB operation failed');
+    }.toJS;
+    
+    request.addEventListener('success', successHandler);
+    request.addEventListener('error', errorHandler);
+    
+    return completer.future;
   }
 }

@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/screens/chat_screen/cubit/chat_cubit.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
@@ -8,6 +10,7 @@ import 'package:barter_app/screens/map_screen/cubit/profile_panel_cubit.dart';
 import 'package:barter_app/screens/map_screen/cubit/map_operations_cubit.dart';
 import 'package:barter_app/screens/map_screen/cubit/map_screen_api_cubit.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
+import 'package:barter_app/screens/user_profile_screen/cubit/nested_panel_cubit.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/messaging/chat_notification_service.dart';
 import 'package:barter_app/services/messaging/firebase_service.dart';
@@ -38,6 +41,12 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
 
   // It is assumed that all messages contain a data field with the key 'type'
   setupInteractedMessage() async {
+    // Skip FCM message setup on web - uses WebSocket instead
+    if (kIsWeb) {
+      logDebug('🔔 Skipping FCM message handlers on web (using WebSocket messaging)');
+      return;
+    }
+
     // Get any messages which caused the application to open from
     // a terminated state.
     RemoteMessage? initialMessage =
@@ -97,6 +106,13 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   }
 
   _initializeServices() async {
+    // Skip chat notification service initialization on web
+    // Web uses WebSocket-based messaging instead of local notifications
+    if (kIsWeb) {
+      logDebug('🔔 Skipping chat notification service on web (using WebSocket messaging)');
+      return;
+    }
+
     // Initialize chat notification service
     try {
       _chatNotificationService = getIt<ChatNotificationService>();
@@ -153,11 +169,16 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         BlocProvider<ProfilePanelCubit>(
           create: (context) => ProfilePanelCubit(),
         ),
+        BlocProvider<NestedPanelCubit>(
+          create: (context) => NestedPanelCubit(),
+        ),
         BlocProvider<ChatsBadgeCubit>(
           create: (context) {
             _chatsBadgeCubit = ChatsBadgeCubit();
             // Register with FirebaseService for FCM updates
-            FirebaseService().setChatsBadgeCubit(_chatsBadgeCubit);
+            if (!kIsWeb) {
+              FirebaseService().setChatsBadgeCubit(_chatsBadgeCubit);
+            }
             return _chatsBadgeCubit;
           },
         ),
@@ -179,33 +200,31 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               builder: (context, materialAppChild) {
-                // Get responsive text scale factor based on device size
-                final deviceSize = ResponsiveBreakpoints.getDeviceSize(context);
-                double textScaleFactor = 1.0;
+                // Use LayoutBuilder to avoid MediaQuery dependency storm on resize
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Get responsive text scale factor based on device width
+                    final screenWidth = constraints.maxWidth;
+                    double textScaleFactor = 1.0;
 
-                switch (deviceSize) {
-                  case DeviceSize.compact:
-                    textScaleFactor = 1.0; // Normal size for phones
-                    break;
-                  case DeviceSize.medium:
-                    textScaleFactor = 1.05; // 5% larger for tablets in portrait
-                    break;
-                  case DeviceSize.expanded:
-                    textScaleFactor =
-                    1.1; // 10% larger for tablets in landscape
-                    break;
-                  case DeviceSize.large:
-                    textScaleFactor = 1.15; // 15% larger for desktops
-                    break;
-                  case DeviceSize.extraLarge:
-                    textScaleFactor = 1.2; // 20% larger for ultra-wide
-                    break;
-                }
+                    if (screenWidth >= 1600) {
+                      textScaleFactor = 1.2; // 20% larger for ultra-wide
+                    } else if (screenWidth >= 1200) {
+                      textScaleFactor = 1.15; // 15% larger for desktops
+                    } else if (screenWidth >= 840) {
+                      textScaleFactor = 1.1; // 10% larger for tablets in landscape
+                    } else if (screenWidth >= 600) {
+                      textScaleFactor = 1.05; // 5% larger for tablets in portrait
+                    } else {
+                      textScaleFactor = 1.0; // Normal size for phones
+                    }
 
-                return MediaQuery(
-                  data: MediaQuery.of(context)
-                      .copyWith(textScaler: TextScaler.linear(textScaleFactor)),
-                  child: materialAppChild!,
+                    return MediaQuery(
+                      data: MediaQuery.of(context)
+                          .copyWith(textScaler: TextScaler.linear(textScaleFactor)),
+                      child: materialAppChild!,
+                    );
+                  },
                 );
               }
           );

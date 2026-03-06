@@ -1,4 +1,5 @@
 // lib/utils/responsive_breakpoints.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Responsive breakpoints and utilities for adaptive design
@@ -40,56 +41,55 @@ class ResponsiveBreakpoints {
   static const double threeColumns = 1200;
 
   // ============================================================================
-  // DEVICE TYPE CHECKS
+  // DEVICE TYPE CHECKS - WASM-safe versions
   // ============================================================================
 
-  /// Check if device is a phone (compact)
+  /// Check if device is a phone (compact) - WASM-safe
   static bool isPhone(BuildContext context) {
-    return MediaQuery
-        .of(context)
-        .size
-        .width < compact;
+    return _safeGetWidth(context) < compact;
   }
 
-  /// Check if device is a tablet
+  /// Check if device is a tablet - WASM-safe
   static bool isTablet(BuildContext context) {
-    final width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final width = _safeGetWidth(context);
     return width >= compact && width < expanded;
   }
 
-  /// Check if device is a desktop
+  /// Check if device is a desktop - WASM-safe
   static bool isDesktop(BuildContext context) {
-    return MediaQuery
-        .of(context)
-        .size
-        .width >= expanded;
+    return _safeGetWidth(context) >= expanded;
   }
 
-  /// Check if device has sufficient width for side-by-side layouts
+  /// Check if device has sufficient width for side-by-side layouts - WASM-safe
   static bool canShowSideBySide(BuildContext context) {
-    return MediaQuery
-        .of(context)
-        .size
-        .width >= masterDetail;
+    return _safeGetWidth(context) >= masterDetail;
   }
 
-  /// Check if device can show 2 columns
+  /// Check if device can show 2 columns - WASM-safe
   static bool canShowTwoColumns(BuildContext context) {
-    return MediaQuery
-        .of(context)
-        .size
-        .width >= twoColumns;
+    return _safeGetWidth(context) >= twoColumns;
   }
 
-  /// Check if device can show 3 columns
+  /// Check if device can show 3 columns - WASM-safe
   static bool canShowThreeColumns(BuildContext context) {
-    return MediaQuery
-        .of(context)
-        .size
-        .width >= threeColumns;
+    return _safeGetWidth(context) >= threeColumns;
+  }
+
+  /// WASM-SAFE width getter: Use inherited widget cache first, fall back to MediaQuery
+  /// This prevents stack overflow during window resize on Flutter Web WASM
+  static double _safeGetWidth(BuildContext context) {
+    // Try to get from inherited widget cache first (if wrapped in MediaQueryCache)
+    final cache = context.dependOnInheritedWidgetOfExactType<_MediaQueryCache>();
+    if (cache != null) {
+      return cache.screenWidth;
+    }
+    // Fallback to MediaQuery - may cause stack issues on WASM during rapid resize
+    return MediaQuery.of(context).size.width;
+  }
+
+  /// Get screen width safely for WASM - prefer using with MediaQueryCache widget
+  static double getScreenWidth(BuildContext context) {
+    return _safeGetWidth(context);
   }
 
   // ============================================================================
@@ -98,10 +98,7 @@ class ResponsiveBreakpoints {
 
   /// Get the current device size category
   static DeviceSize getDeviceSize(BuildContext context) {
-    final width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final width = _safeGetWidth(context);
     if (width < compact) return DeviceSize.compact;
     if (width < medium) return DeviceSize.medium;
     if (width < expanded) return DeviceSize.expanded;
@@ -199,10 +196,7 @@ class ResponsiveBreakpoints {
 
   /// Get panel width for side panels (e.g., chat, navigation)
   static double getPanelWidth(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = getScreenWidth(context);
     if (screenWidth >= extraLarge) return 600.0;
     if (screenWidth >= large) return 530.0;
     if (screenWidth >= expanded) return 465.0;
@@ -216,7 +210,7 @@ class ResponsiveBreakpoints {
 
   /// Get panel width for profile panel (25% max, 400 min on large screens)
   static double getProfilePanelWidth(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = getScreenWidth(context);
     // On large screens, use 26% of screen width
     if (screenWidth >= medium) {
       final calculatedWidth = screenWidth * 0.26;
@@ -224,6 +218,18 @@ class ResponsiveBreakpoints {
     }
     // On small screens, keep original behavior
     return getSettingsPanelWidth(context) * 0.85;
+  }
+
+  /// Get panel width for left side panels (Profile, Settings)
+  /// Uses profile panel width as the base for consistency
+  static double getLeftPanelWidth(BuildContext context) {
+    return getProfilePanelWidth(context);
+  }
+
+  /// Get panel width for right side panels (POI, Chat)
+  /// Uses standard panel width
+  static double getRightPanelWidth(BuildContext context) {
+    return getPanelWidth(context);
   }
 
   /// Get whether to show navigation rail vs bottom nav
@@ -342,6 +348,63 @@ enum DeviceSize {
   extraLarge,
 }
 
+// ============================================================================
+// WASM-SAFE MEDIAQUERY CACHE WIDGET
+// ============================================================================
+
+/// Inherited widget that caches MediaQuery size to prevent stack overflow on WASM
+/// during window resize. Wrap your app or specific screens with this widget.
+///
+/// Usage:
+/// ```dart
+/// MediaQueryCache(
+///   child: YourWidget(),
+/// )
+/// ```
+class MediaQueryCache extends StatefulWidget {
+  final Widget child;
+
+  const MediaQueryCache({super.key, required this.child});
+
+  @override
+  State<MediaQueryCache> createState() => _MediaQueryCacheState();
+}
+
+class _MediaQueryCacheState extends State<MediaQueryCache> {
+  late double _screenWidth;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Cache the width once per build cycle
+    _screenWidth = MediaQuery.of(context).size.width;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _MediaQueryCache(
+      screenWidth: _screenWidth,
+      child: widget.child,
+    );
+  }
+}
+
+/// Private inherited widget that holds the cached screen width
+class _MediaQueryCache extends InheritedWidget {
+  final double screenWidth;
+
+  const _MediaQueryCache({
+    required this.screenWidth,
+    required super.child,
+  });
+
+  @override
+  bool updateShouldNotify(_MediaQueryCache old) {
+    // Only notify if width changes significantly (> 10px)
+    return (screenWidth - old.screenWidth).abs() > 10;
+  }
+}
+
 /// Extension methods on BuildContext for convenience
 extension ResponsiveExtensions on BuildContext {
   /// Check if device is a phone
@@ -370,6 +433,12 @@ extension ResponsiveExtensions on BuildContext {
 
   /// Get profile panel width (slightly narrower than settings panel)
   double get profilePanelWidth => ResponsiveBreakpoints.getProfilePanelWidth(this);
+
+  /// Get left panel width (for Profile and Settings panels)
+  double get leftPanelWidth => ResponsiveBreakpoints.getLeftPanelWidth(this);
+
+  /// Get right panel width (for POI and Chat panels)
+  double get rightPanelWidth => ResponsiveBreakpoints.getRightPanelWidth(this);
 
   // Font size getters
   /// Get responsive font size with custom base size

@@ -2265,6 +2265,11 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String decryptingFile(String filename) {
+    return 'Atšifrē $filename...';
+  }
+
+  @override
   String downloadFailed(String error) {
     return 'Lejupielāde neizdevās: $error';
   }

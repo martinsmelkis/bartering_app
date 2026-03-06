@@ -53,6 +53,7 @@ class UserProfileScreen extends StatefulWidget {
   final List<ParsedAttributeData>? offerings;
   final bool showAppBar; // Whether to show the app bar (false for panel mode)
   final Function(bool)? onNestedPanelChanged; // Callback when nested panel opens/closes
+  final bool skipNestedPanelLayout; // When true, external layout handles nested panel (prevents double rendering)
 
   const UserProfileScreen({
     super.key,
@@ -62,6 +63,7 @@ class UserProfileScreen extends StatefulWidget {
     this.offerings,
     this.showAppBar = true,
     this.onNestedPanelChanged,
+    this.skipNestedPanelLayout = false,
   });
 
   @override
@@ -106,683 +108,688 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         Navigator.pop(context);
         return Future.value(false);
       },
-      child: BlocProvider(
-        create: (context) => NestedPanelCubit(),
-        child: BlocListener<NestedPanelCubit, NestedPanelState>(
+      child: BlocListener<NestedPanelCubit, NestedPanelState>(
           listener: (context, nestedPanelState) {
             // Notify parent when nested panel state changes (for panel expansion)
             widget.onNestedPanelChanged?.call(nestedPanelState.isOpen);
           },
           child: BlocBuilder<NestedPanelCubit, NestedPanelState>(
             builder: (context, nestedPanelState) {
+              // When skipNestedPanelLayout is true, render just the profile content
+              // When false, wrap with AdaptiveNestedPanelLayout for side-by-side nested panels
+              if (widget.skipNestedPanelLayout) {
+                return _buildProfileContent(context, l10n, isWebPanel);
+              }
+              
               return AdaptiveNestedPanelLayout(
                 panelType: nestedPanelState.panelType,
                 userId: nestedPanelState.userId,
                 onClose: () => context.read<NestedPanelCubit>().closePanel(),
-                mainContent: Scaffold(
-        appBar: widget.showAppBar
-            ? AppBar(
-                title: Text(l10n.accountSetupSuccess),
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-              )
-            : null,
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // User Info Card
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  elevation: 2,
-                  child: Stack(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.userName,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            Text(
-                              l10n.userId,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[800],
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              widget.userId,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontFamily: 'Courier',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: PointerInterceptor(
-                          child: IconButton(
-                            onPressed: () => _showDeleteProfileDialog(context),
-                            icon: Icon(
-                              Icons.delete_forever,
-                              color: Colors.red,
-                              size: 24,
-                            ),
-                            padding: EdgeInsets.all(8),
-                            constraints: const BoxConstraints(),
-                            tooltip: l10n.deleteProfile,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 16.h),
+                mainContent: _buildProfileContent(context, l10n, isWebPanel),
+              );
+            },
+          ),
+        ),
+      );
+  }
 
-              // Location Section
-              Card(
-                elevation: 1,
+  /// Builds the main profile content widget
+  Widget _buildProfileContent(BuildContext context, AppLocalizations l10n, bool isWebPanel) {
+    return Scaffold(
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: Text(l10n.accountSetupSuccess),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            )
+          : null,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // User Info Card
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                elevation: 2,
                 child: Stack(
                   children: [
                     Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Row(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.location_on,
-                            color: AppColors.primary,
-                            size: 20,
-                          ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              _userLocation ?? l10n.notSet,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontFamily: 'Courier',
-                                color: _userLocation != null
-                                    ? Colors.black87
-                                    : Colors.grey,
-                              ),
+                          Text(
+                            widget.userName,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(width: 40), // Space for the edit icon
+                          SizedBox(height: 8.h),
+                          Text(
+                            l10n.userId,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[800],
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            widget.userId,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'Courier',
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     Positioned(
-                      top: kIsWeb ? 6 : -2,
-                      right: kIsWeb ? 6 : -2,
+                      top: 8,
+                      right: 8,
                       child: PointerInterceptor(
                         child: IconButton(
-                          onPressed: () async {
-                            // Navigate to location picker
-                            // If in full-screen mode, the location picker will handle navigation back
-                            // If in panel mode, just reload data when done
-                            if (widget.showAppBar) {
-                              // Full-screen mode: use go navigation
-                              context.push('/location-picker');
-                            } else {
-                              // Panel mode: use push and reload on return
-                              await context.push('/location-picker');
-                              if (mounted) {
-                                await _loadProfileKeywordData();
-                              }
-                            }
-                          },
+                          onPressed: () => _showDeleteProfileDialog(context),
                           icon: Icon(
-                            Icons.edit,
-                            size: AppDimensions.editIconSize,
-                            color: AppColors.primary,
+                            Icons.delete_forever,
+                            color: Colors.red,
+                            size: 24,
                           ),
-                          padding: EdgeInsets.all(4),
+                          padding: EdgeInsets.all(8),
                           constraints: const BoxConstraints(),
-                          tooltip: l10n.editLocation,
+                          tooltip: l10n.deleteProfile,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 20.h),
+            ),
+            SizedBox(height: 16.h),
 
-              // Interests Section
-              Row(
-                mainAxisSize: MainAxisSize.max,
+            // Location Section
+            Card(
+              elevation: 1,
+              child: Stack(
                 children: [
-                  Text(
-                    l10n.userInterestedIn,
-                    style: TextStyle(
-                      fontSize: isWebPanel
-                          ? AppDimensions.headingTextSize * 1.1
-                          : AppDimensions.headingTextSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  InkWell(
-                    onTap: () async {
-                      final locale = Localizations.localeOf(context);
-                      await getIt<OnboardingCubit>().completeOnboarding(
-                          locale.languageCode);
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              InterestsScreen(isInitialOnboarding: false),
+                  Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          color: AppColors.primary,
+                          size: 20,
                         ),
-                      );
-
-                      // Reload data after returning from interests screen
-                      // The InterestsScreen will pop back when done, so we just reload
-                      if (mounted) {
-                        await _loadProfileKeywordData();
-                      }
-                    },
-                    child: Icon(
-                      Icons.edit,
-                      size: AppDimensions.editIconSize,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    onTap: () async {
-                      if (!context.mounted) return;
-                      try {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                            const CreatePostingScreen(isOffer: false),
-                          ),
-                        );
-                      } catch (e) {
-                        debugPrint('Navigation error: $e');
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4.h),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.add,
-                            size: 18,
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            l10n.addNewPosting,
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _userLocation ?? l10n.notSet,
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 10,
+                              fontFamily: 'Courier',
+                              color: _userLocation != null
+                                  ? Colors.black87
+                                  : Colors.grey,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12.h),
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  elevation: 1,
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        widget.interests == null || widget.interests!.isEmpty
-                            ? const SizedBox()
-                            : Wrap(
-                          spacing: 7.2,
-                          runSpacing: 7.2,
-                          children: widget.interests!
-                              .where((interest) => interest != null)
-                              .map((interest) {
-                            try {
-                              return AttributeBubble(
-                                attribute: interest,
-                                matchType: AttributeMatchType.none,
-                                scaleFactor: 1.2,
-                              );
-                            } catch (e) {
-                              logDebug('Error rendering interest bubble: $e');
-                              return const SizedBox.shrink();
-                            }
-                          }).toList(),
                         ),
+                        SizedBox(width: 40), // Space for the edit icon
                       ],
                     ),
                   ),
-                ),
-              ),
-              SizedBox(height: isWebPanel ? 24.h : 12.h),
-
-              // Offerings Section
-              Row(
-                children: [
-                  Text(
-                    l10n.userOffers,
-                    style: TextStyle(
-                      fontSize: isWebPanel
-                          ? AppDimensions.headingTextSize * 1.1
-                          : AppDimensions.headingTextSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  InkWell(
-                    onTap: () async {
-                      final locale = Localizations.localeOf(context);
-                      (await getIt<InterestsCubit>().submitInterests(
-                          locale.languageCode, false));
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              OffersScreen(isInitialOnboarding: false),
+                  Positioned(
+                    top: kIsWeb ? 6 : -2,
+                    right: kIsWeb ? 6 : -2,
+                    child: PointerInterceptor(
+                      child: IconButton(
+                        onPressed: () async {
+                          // Navigate to location picker
+                          // If in full-screen mode, the location picker will handle navigation back
+                          // If in panel mode, just reload data when done
+                          if (widget.showAppBar) {
+                            // Full-screen mode: use go navigation
+                            context.push('/location-picker');
+                          } else {
+                            // Panel mode: use push and reload on return
+                            context.pushReplacement('/location-picker');
+                            //if (mounted) {
+                            //  await _loadProfileKeywordData();
+                            //}
+                          }
+                        },
+                        icon: Icon(
+                          Icons.edit,
+                          size: AppDimensions.editIconSize,
+                          color: AppColors.primary,
                         ),
-                      );
-
-                      // Reload data after returning from offers screen
-                      // The OffersScreen will pop back when done, so we just reload
-                      if (mounted) {
-                        await _loadProfileKeywordData();
-                      }
-                    },
-                    child: Icon(
-                      Icons.edit,
-                      size: AppDimensions.editIconSize,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const Spacer(),
-                  SizedBox(width: 8.w),
-                  InkWell(
-                    onTap: () async {
-                      if (!context.mounted) return;
-                      try {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                            const CreatePostingScreen(isOffer: true),
-                          ),
-                        );
-                      } catch (e) {
-                        debugPrint('Navigation error: $e');
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4.h),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.add,
-                            size: 18,
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            l10n.addNewPosting,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                        padding: EdgeInsets.all(4),
+                        constraints: const BoxConstraints(),
+                        tooltip: l10n.editLocation,
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 12.h),
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  elevation: 1,
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        widget.offerings == null || widget.offerings!.isEmpty
-                            ? const SizedBox()
-                            : Wrap(
-                          spacing: 7.2,
-                          runSpacing: 7.2,
-                          children: widget.offerings!
-                              .where((offering) => offering != null)
-                              .map((offering) {
-                            try {
-                              return AttributeBubble(
-                                attribute: offering,
-                                matchType: AttributeMatchType.none,
-                                scaleFactor: 1.2,
-                              );
-                            } catch (e) {
-                              logDebug('Error rendering offering bubble: $e');
-                              return const SizedBox.shrink();
-                            }
-                          }).toList(),
-                        ),
-                      ],
-                    ),
+            ),
+            SizedBox(height: 20.h),
+
+            // Interests Section
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Text(
+                  l10n.userInterestedIn,
+                  style: TextStyle(
+                    fontSize: isWebPanel
+                        ? AppDimensions.headingTextSize * 1.1
+                        : AppDimensions.headingTextSize,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              SizedBox(height: 12.h),
-
-              // Keywords Section
-              Row(
-                children: [
-                  Text(
-                    l10n.editKeywords,
-                    style: TextStyle(
-                      fontSize: AppDimensions.mediumHeadingTextSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  InkWell(
-                    onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              OnboardingScreen(isInitialOnboarding: false),
-                        ),
-                      );
-
-                      // Reload data after returning from onboarding screen
-                      if (mounted) {
-                        await _loadProfileKeywordData();
-
-                        // Navigate back to MapScreenV2 after editing (only in full-screen mode)
-                        // In panel mode, just stay on the current screen
-                        if (mounted && widget.showAppBar) {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (_) => const MapScreenV2(),
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    child: Icon(
-                      Icons.edit,
-                      size: AppDimensions.editIconSize,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12.h),
-
-              // Category Stats Bar
-              if (_profileKeywordDataMap != null)
-                CategoryStatsUtils.buildCategoryStatsBar(
-                  keywordMap: _profileKeywordDataMap,
-                  attributes: [
-                    ...?(widget.interests?.where((i) => i != null)),
-                    ...?(widget.offerings?.where((o) => o != null)),
-                  ],
-                ),
-              SizedBox(height: 20.h),
-
-              // Notification Preferences and Match History Buttons
-              Row(
-                children: [
-                  // Notification Preferences Button
-                  InkWell(
-                    onTap: () async {
-                      // Use adaptive behavior: panel within profile on web, full-screen on mobile
-                      if (isWebPanel) {
-                        // Open as nested panel within profile on web
-                        context.read<NestedPanelCubit>().openNotifications();
-                      } else {
-                        // Navigate to full-screen on mobile
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const NotificationsScreen(),
-                          ),
-                        );
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4.h),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.notifications_active,
-                            size: 18,
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            l10n.notificationPreferences,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  // Match History Button
-                  // Use existing NotificationsCubit - don't reload match history here
-                  // Match history will be loaded when user actually opens the match history screen
-                  BlocBuilder<NotificationsCubit, NotificationsState>(
-                    bloc: getIt<NotificationsCubit>(),
-                    builder: (context, notificationState) {
-                      final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
-
-                      return Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          InkWell(
-                            onTap: () async {
-                              // Use adaptive behavior: panel within profile on web, full-screen on mobile
-                              if (isWebPanel) {
-                                // Open as nested panel within profile on web
-                                context.read<NestedPanelCubit>().openMatchHistory();
-                              } else {
-                                // Navigate to full-screen on mobile
-                                await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => const MatchHistoryScreen(),
-                                  ),
-                                );
-                              }
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 4.h),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.history,
-                                    size: 18,
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    l10n.matchHistory,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          if (unreadCount > 0)
-                            Positioned(
-                              top: -6,
-                              right: -6,
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                constraints: const BoxConstraints(
-                                  minWidth: 28,
-                                  minHeight: 28,
-                                ),
-                                child: Text(
-                                  unreadCount > 99 ? '99+' : '$unreadCount',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 12),
-              InkWell(
-                onTap: () async {
-                  // Use adaptive behavior: panel within profile on web, full-screen on mobile
-                  if (isWebPanel) {
-                    // Open as nested panel within profile on web
-                    context.read<NestedPanelCubit>().openManagePostings(widget.userId);
-                  } else {
-                    // Navigate to full-screen on mobile
+                SizedBox(width: 8),
+                InkWell(
+                  onTap: () async {
+                    final locale = Localizations.localeOf(context);
+                    await getIt<OnboardingCubit>().completeOnboarding(
+                        locale.languageCode);
                     await Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => ManagePostingsScreen(userId: widget.userId),
+                        builder: (_) =>
+                            InterestsScreen(isInitialOnboarding: false),
                       ),
                     );
-                  }
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary,
-                    borderRadius: BorderRadius.circular(8.r),
+
+                    // Reload data after returning from interests screen
+                    // The InterestsScreen will pop back when done, so we just reload
+                    if (mounted) {
+                      await _loadProfileKeywordData();
+                    }
+                  },
+                  child: Icon(
+                    Icons.edit,
+                    size: AppDimensions.editIconSize,
+                    color: AppColors.primary,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.manage_accounts,
-                        size: 18,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        l10n.managePostings,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                ),
+                const Spacer(),
+                InkWell(
+                  onTap: () async {
+                    if (!context.mounted) return;
+                    try {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                          const CreatePostingScreen(isOffer: false),
                         ),
+                      );
+                    } catch (e) {
+                      debugPrint('Navigation error: $e');
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.add,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          l10n.addNewPosting,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                elevation: 1,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      widget.interests == null || widget.interests!.isEmpty
+                          ? const SizedBox()
+                          : Wrap(
+                        spacing: 7.2,
+                        runSpacing: 7.2,
+                        children: widget.interests!
+                            .where((interest) => interest != null)
+                            .map((interest) {
+                          try {
+                            return AttributeBubble(
+                              attribute: interest,
+                              matchType: AttributeMatchType.none,
+                              scaleFactor: 1.2,
+                            );
+                          } catch (e) {
+                            logDebug('Error rendering interest bubble: $e');
+                            return const SizedBox.shrink();
+                          }
+                        }).toList(),
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 4,),
-              InkWell(
-                onTap: () async {
-                  // Navigate to source device migration screen
+            ),
+            SizedBox(height: isWebPanel ? 24.h : 12.h),
+
+            // Offerings Section
+            Row(
+              children: [
+                Text(
+                  l10n.userOffers,
+                  style: TextStyle(
+                    fontSize: isWebPanel
+                        ? AppDimensions.headingTextSize * 1.1
+                        : AppDimensions.headingTextSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(width: 8),
+                InkWell(
+                  onTap: () async {
+                    final locale = Localizations.localeOf(context);
+                    (await getIt<InterestsCubit>().submitInterests(
+                        locale.languageCode, false));
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            OffersScreen(isInitialOnboarding: false),
+                      ),
+                    );
+
+                    // Reload data after returning from offers screen
+                    // The OffersScreen will pop back when done, so we just reload
+                    if (mounted) {
+                      await _loadProfileKeywordData();
+                    }
+                  },
+                  child: Icon(
+                    Icons.edit,
+                    size: AppDimensions.editIconSize,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const Spacer(),
+                SizedBox(width: 8.w),
+                InkWell(
+                  onTap: () async {
+                    if (!context.mounted) return;
+                    try {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                          const CreatePostingScreen(isOffer: true),
+                        ),
+                      );
+                    } catch (e) {
+                      debugPrint('Navigation error: $e');
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.add,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          l10n.addNewPosting,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                elevation: 1,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      widget.offerings == null || widget.offerings!.isEmpty
+                          ? const SizedBox()
+                          : Wrap(
+                        spacing: 7.2,
+                        runSpacing: 7.2,
+                        children: widget.offerings!
+                            .where((offering) => offering != null)
+                            .map((offering) {
+                          try {
+                            return AttributeBubble(
+                              attribute: offering,
+                              matchType: AttributeMatchType.none,
+                              scaleFactor: 1.2,
+                            );
+                          } catch (e) {
+                            logDebug('Error rendering offering bubble: $e');
+                            return const SizedBox.shrink();
+                          }
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 12.h),
+
+            // Keywords Section
+            Row(
+              children: [
+                Text(
+                  l10n.editKeywords,
+                  style: TextStyle(
+                    fontSize: AppDimensions.mediumHeadingTextSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(width: 8),
+                InkWell(
+                  onTap: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            OnboardingScreen(isInitialOnboarding: false),
+                      ),
+                    );
+
+                    // Reload data after returning from onboarding screen
+                    if (mounted) {
+                      await _loadProfileKeywordData();
+
+                      // Navigate back to map after editing (only in full-screen mode)
+                      // In panel mode, just stay on the current screen
+                      if (mounted && widget.showAppBar) {
+                        // Include pinVerified flag for web to prevent router double-creation
+                        context.pushReplacement('/map', extra: {'pinVerified': true});
+                      }
+                    }
+                  },
+                  child: Icon(
+                    Icons.edit,
+                    size: AppDimensions.editIconSize,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+
+            // Category Stats Bar
+            if (_profileKeywordDataMap != null)
+              CategoryStatsUtils.buildCategoryStatsBar(
+                keywordMap: _profileKeywordDataMap,
+                attributes: [
+                  ...?(widget.interests?.where((i) => i != null)),
+                  ...?(widget.offerings?.where((o) => o != null)),
+                ],
+              ),
+            SizedBox(height: 20.h),
+
+            // Notification Preferences and Match History Buttons
+            Row(
+              children: [
+                // Notification Preferences Button
+                InkWell(
+                  onTap: () async {
+                    // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                    if (isWebPanel) {
+                      // Open as nested panel within profile on web
+                      context.read<NestedPanelCubit>().openNotifications();
+                    } else {
+                      // Navigate to full-screen on mobile
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationsScreen(),
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.notifications_active,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          l10n.notificationPreferences,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+                // Match History Button
+                // Use existing NotificationsCubit - don't reload match history here
+                // Match history will be loaded when user actually opens the match history screen
+                BlocBuilder<NotificationsCubit, NotificationsState>(
+                  bloc: getIt<NotificationsCubit>(),
+                  builder: (context, notificationState) {
+                    final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
+
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        InkWell(
+                          onTap: () async {
+                            // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                            if (isWebPanel) {
+                              // Open as nested panel within profile on web
+                              context.read<NestedPanelCubit>().openMatchHistory();
+                            } else {
+                              // Navigate to full-screen on mobile
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const MatchHistoryScreen(),
+                                ),
+                              );
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 4.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.history,
+                                  size: 18,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  l10n.matchHistory,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (unreadCount > 0)
+                          Positioned(
+                            top: -6,
+                            right: -6,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                ),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 28,
+                                minHeight: 28,
+                              ),
+                              child: Text(
+                                unreadCount > 99 ? '99+' : '$unreadCount',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            InkWell(
+              onTap: () async {
+                // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                if (isWebPanel) {
+                  // Open as nested panel within profile on web
+                  context.read<NestedPanelCubit>().openManagePostings(widget.userId);
+                } else {
+                  // Navigate to full-screen on mobile
                   await Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => const SourceMigrationScreen(),
+                      builder: (_) => ManagePostingsScreen(userId: widget.userId),
                     ),
                   );
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.8),
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.phonelink_setup,
-                        size: 18,
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.manage_accounts,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      l10n.managePostings,
+                      style: TextStyle(
+                        fontSize: 12,
                         color: Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        l10n.migrateToNewDevice,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
+            ),
+            SizedBox(height: 4,),
+            InkWell(
+              onTap: () async {
+                // Navigate to source device migration screen
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const SourceMigrationScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.phonelink_setup,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      l10n.migrateToNewDevice,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            );
-          },
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -823,10 +830,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     } else {
                       Navigator.of(dialogContext).pop();
                     }
-                    await _deleteProfile(context);
+
+                    // Delete profile
+                    await _deleteProfile(dialogContext);
                   },
                   child: Text(
-                    l10n.delete,
+                    l10n.deleteProfile,
                     style: const TextStyle(color: Colors.red),
                   ),
                 ),
@@ -839,11 +848,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<void> _deleteProfile(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(this.context)!;
     
     try {
-      // Show loading indicator
-      if (!mounted) return;
+      // Show loading dialog
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -910,42 +918,32 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       
       // Navigate to welcome screen and clear navigation stack
       if (!mounted) return;
-      
-      // Use addPostFrameCallback to avoid navigator lock issues
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          if (kIsWeb) {
-            // On web with page-based navigation, use SystemNavigator to exit
-            // and let the app restart, which will show InitializeScreen
-            SystemNavigator.pop();
-          } else {
-            // On mobile, use standard navigation
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (_) => const InitializeScreen(),
-              ),
-              (route) => false,
-            );
-          }
-        }
-      });
-    } catch (e) {
-      // Dismiss loading dialog
-      if (!mounted) return;
       if (kIsWeb) {
-        Navigator.of(context, rootNavigator: true).pop();
+        // On web, use SystemNavigator to exit and let the app restart
+        SystemNavigator.pop();
       } else {
-        Navigator.of(context).pop();
+        // On mobile, navigate to InitializeScreen
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => const InitializeScreen(),
+          ),
+          (route) => false,
+        );
       }
-      
-      // Show error message
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${l10n.errorDeletingProfile}: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+    } catch (e) {
+      logDebugError('Error deleting profile', e);
+      if (mounted) {
+        // Dismiss loading dialog if showing
+        Navigator.of(context, rootNavigator: true).pop();
+        
+        ScaffoldMessenger.of(this.context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorDeletingProfile),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
+
 }

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Utility class for calculating and displaying category statistics
@@ -164,22 +165,41 @@ class CategoryStatsUtils {
       );
     }
 
+    // Try CustomPaint first, fall back to simple border on Skia WASM errors
+    Widget categoryCircle;
+    try {
+      categoryCircle = CustomPaint(
+        size: Size(size/2 + 5, size/2 + 5),
+        painter: _CategoryCirclePainter(
+          colorWeights: colorWeights,
+          totalWeight: totalWeight,
+          strokeWidth: strokeWidth,
+          gapWidth: gapWidth,
+        ),
+      );
+    } catch (e) {
+      // Fallback for Skia WASM crashes - simple grey circle border
+      categoryCircle = Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.grey.shade300,
+            width: strokeWidth,
+          ),
+        ),
+      );
+    }
+
     return SizedBox(
       width: size,
       height: size,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Circular border with colored segments
-          CustomPaint(
-            size: Size(size/2 + 5, size/2 + 5),
-            painter: _CategoryCirclePainter(
-              colorWeights: colorWeights,
-              totalWeight: totalWeight,
-              strokeWidth: strokeWidth,
-              gapWidth: gapWidth,
-            ),
-          ),
+          // Circular border with colored segments (or fallback)
+          categoryCircle,
           // Avatar/child centered inside
           SizedBox(
             width: size - (strokeWidth * 2) - 4,

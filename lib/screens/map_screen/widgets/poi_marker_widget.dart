@@ -27,7 +27,6 @@ class PoiMarkerWidget {
     required PointOfInterest poi,
     required List<ParsedAttributeData>? userInterests,
     required List<ParsedAttributeData>? userOfferings,
-    double? devicePixelRatio,
   }) async {
     // Use the POI's userId to get a consistent random icon
     final userIdHashCode = poi.profile.userId.hashCode;

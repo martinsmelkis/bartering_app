@@ -4352,6 +4352,12 @@ abstract class AppLocalizations {
   /// **'Downloading {filename}...'**
   String downloadingFile(String filename);
 
+  /// No description provided for @decryptingFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrypting {filename}...'**
+  String decryptingFile(String filename);
+
   /// No description provided for @downloadFailed.
   ///
   /// In en, this message translates to:

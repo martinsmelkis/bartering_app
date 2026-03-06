@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:openpgp/openpgp.dart';
+//import 'package:openpgp/openpgp.dart';
 
 class CryptoServicePgp {
   // Store the armored representations of the keys
@@ -55,14 +55,14 @@ class CryptoServicePgp {
         // You might need to check PGPKeyHelper.generate or underlying OpenPGP settings
         // if you need specific key types (RSA vs ECC) or strengths.
         // For this example, we assume default generation parameters.
-        KeyPair keyPairEntity = await generateKeyPair();
+        /*KeyPair keyPairEntity = await generateKeyPair();
 
         _userPrivateKeyArmored = keyPairEntity.privateKey;
         userPublicKey = keyPairEntity.publicKey;
 
         await _secureStorage.write(key: _privateKeyStorageKey, value: _userPrivateKeyArmored);
         await _secureStorage.write(key: _publicKeyStorageKey, value: userPublicKey);
-        logDebug("New User PGP key pair generated and stored.");
+        logDebug("New User PGP key pair generated and stored.");*/
       }
       return isInitialized;
     } catch (e) {
@@ -73,7 +73,7 @@ class CryptoServicePgp {
     }
   }
   
-  Future<KeyPair> generateKeyPair() async {
+  /*Future<KeyPair> generateKeyPair() async {
     var keyOptions = KeyOptions()
     ..rsaBits = 2048
     ..algorithm = Algorithm.EDDSA;
@@ -83,7 +83,7 @@ class CryptoServicePgp {
     ..email = 'test@test.com'
     //..passphrase = ''
     ..keyOptions = keyOptions);
-  }
+  }*/
 
    Future<String?> getMyPublicKeyArmored() async {
     if (!isInitialized) {
@@ -118,13 +118,13 @@ class CryptoServicePgp {
     try {
       // The encrypt method takes armored keys directly.
       // Signing is done by providing the signer's private key and passphrase.
-      logDebug('"@@@@@@@@@@@@@ pgp key of recipient ${recipientPublicKey}');
+      /*logDebug('"@@@@@@@@@@@@@ pgp key of recipient ${recipientPublicKey}');
       String encryptedMessage = await OpenPGP.encrypt(
         plainText,
         recipientPublicKey ?? "",
         //signed: new Entity()..publicKey = userPublicKey..privateKey = _userPrivateKeyArmored..passphrase = null,
-      );
-      return encryptedMessage; // This is already the armored encrypted string
+      );*/
+      return ""; //encryptedMessage; // This is already the armored encrypted string
     } catch (e) {
       debugPrintStack();
       logDebugError("PGP Encryption error", e);
@@ -146,9 +146,9 @@ class CryptoServicePgp {
 
     logDebug('@@@@@@@@@@@ message ${armoredEncryptedMessage}');
 
-    //try {
+    try {
       // The decrypt method handles both decryption and signature verification.
-      String decryptedResult = await OpenPGP.decrypt(
+      /*String decryptedResult = await OpenPGP.decrypt(
         armoredEncryptedMessage,
         _userPrivateKeyArmored!, // Decrypt with our key
         userPassphrase ?? "",    // Passphrase for our private key. API might expect empty string if no passphrase.
@@ -165,15 +165,15 @@ class CryptoServicePgp {
         plainText,
         _userPrivateKeyArmored!, // Decrypt with our key
         userPassphrase ?? "",    // Passphrase for our private key. API might expect empty string if no passphrase.
-      );
+      );*/
 
-      return decryptedResult; // This should be the plaintext string
-    //} catch (e) {
-      //print("PGP Decryption error: $e");
+      return null; //decryptedResult; // This should be the plaintext string
+    } catch (e) {
+      print("PGP Decryption error: $e");
       // The library might throw specific exceptions for incorrect passphrases or other issues.
       // e.g. if (e.toString().toLowerCase().contains("incorrect passphrase")) { ... }
-      //return null;
-    //}
+      return null;
+    }
   }
 
   Future<Uint8List?> decryptBytes(
@@ -188,13 +188,13 @@ class CryptoServicePgp {
 
     try {
       // The decrypt method handles both decryption and signature verification.
-      Uint8List decryptedResult = await OpenPGP.decryptBytes(
+      /*Uint8List decryptedResult = await OpenPGP.decryptBytes(
         armoredEncryptedMessage,
         _userPrivateKeyArmored!, // Decrypt with our key
         userPassphrase ?? "",    // Passphrase for our private key. API might expect empty string if no passphrase.
-      );
+      );*/
 
-      return decryptedResult; // This should be the plaintext string
+      return null; //decryptedResult; // This should be the plaintext string
     } catch (e) {
       logDebugError("PGP Decryption error", e);
       // The library might throw specific exceptions for incorrect passphrases or other issues.

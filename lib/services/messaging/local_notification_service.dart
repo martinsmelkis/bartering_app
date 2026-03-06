@@ -3,11 +3,13 @@ import 'dart:io' show Platform;
 
 import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// Singleton service to manage local notifications
 /// This ensures only ONE initialization of FlutterLocalNotificationsPlugin
+/// Note: Web is not supported by flutter_local_notifications
 class LocalNotificationService {
   static final LocalNotificationService _instance = LocalNotificationService._internal();
   factory LocalNotificationService() => _instance;
@@ -18,14 +20,23 @@ class LocalNotificationService {
 
   FlutterLocalNotificationsPlugin get plugin => _notifications;
 
+  /// Check if local notifications are supported on this platform
+  bool get isSupported => !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
+
   /// Initialize local notifications (call only once in app)
   Future<void> initialize() async {
+    // Skip on web - not supported
+    if (kIsWeb) {
+      logDebug('🔔 Local notifications not supported on web, skipping initialization');
+      return;
+    }
+
     if (_isInitialized) {
       logDebug('⚠️ Local notifications already initialized, skipping...');
       return;
     }
 
-      logDebug('🔔 Initializing local notifications...');
+    logDebug('🔔 Initializing local notifications...');
 
     const androidSettings = AndroidInitializationSettings('ic_notification');
     const iosSettings = DarwinInitializationSettings(
@@ -51,13 +62,13 @@ class LocalNotificationService {
 
       logDebug('🔔 Notification initialization result: $initialized');
 
-    // Create notification channels for Android
-    if (Platform.isAndroid) {
+    // Create notification channels for Android (not on web)
+    if (!kIsWeb && Platform.isAndroid) {
       await _createNotificationChannels();
     }
 
     _isInitialized = true;
-      logDebug('✅ Local notifications initialized successfully');
+    logDebug('✅ Local notifications initialized successfully');
   }
 
   /// Create Android notification channels

@@ -628,7 +628,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   }
 
   Widget _buildPostingImage(UserPostingData posting, int index) {
-    final baseUrl = getIt<String>(instanceName: 'serviceBaseUrl');
+    final baseUrl = ApiClient.serviceBaseUrl;
     final filename = posting.imageUrls![index];
 
     // Use thumbnail for list view (300x300, ~5-20KB)
@@ -958,7 +958,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         ],
       ),
     );
-    
+
     // For large screens, use BlocBuilder to show POI details or chat below the search results
     if (widget.isLargeScreen) {
       // If chat panel is open, show chat below search results
@@ -966,51 +966,20 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         return Column(
           children: [
             // Search results list - takes 60% of height
-            Expanded(
-              flex: 6,
-              child: searchResultsContainer,
-            ),
+            Expanded(flex: 6, child: searchResultsContainer),
             // Chat panel - takes 40% of height
-            Expanded(
-              flex: 4,
-              child: _buildInlineChatPanel(),
-            ),
+            Expanded(flex: 4, child: _buildInlineChatPanel()),
           ],
         );
       }
-      
+
       return BlocBuilder<PoiPanelCubit, PoiPanelState>(
         builder: (context, poiPanelState) {
           if (poiPanelState.isOpen && poiPanelState.selectedPoi != null) {
             // Show search results and POI details in a vertical split
             return Column(
               children: [
-                // Search results list - takes 50% of height
-                Expanded(
-                  flex: 1,
-                  child: searchResultsContainer,
-                ),
-                // POI details panel - takes 50% of height
-                Expanded(
-                  flex: 1,
-                  child: PoiDetailsBottomSheet(
-                    poi: poiPanelState.selectedPoi!,
-                    isLargeScreen: true,
-                    showChatButton: true,
-                    onClose: () {
-                      context.read<PoiPanelCubit>().closePanel();
-                    },
-                    onChatButtonPressed: () {
-                      // Open chat on the right side using ChatPanelCubit
-                      final poi = poiPanelState.selectedPoi!;
-                      context.read<ChatPanelCubit>().openChat(
-                        poi.profile.userId,
-                        poi.profile.name,
-                        poi: poi,
-                      );
-                    },
-                  ),
-                ),
+                Expanded(flex: 1, child: searchResultsContainer)
               ],
             );
           }

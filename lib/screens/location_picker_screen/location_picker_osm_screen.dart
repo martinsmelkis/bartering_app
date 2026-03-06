@@ -151,6 +151,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
   @override
   void dispose() {
     textEditingController.removeListener(textOnChanged);
+    controller.dispose(); // Dispose the map controller
     super.dispose();
   }
 
@@ -196,7 +197,9 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
                   ),
             );
           } else if (state.status == LocationPickerStatus.success) {
-            context.pushReplacement('/map');
+            // Navigate to map with pinVerified flag to prevent double-creation
+            // of the map screen (web PIN guard would redirect otherwise)
+            context.pushReplacement('/map', extra: {'pinVerified': true});
           }
         },
       child: CustomPickerLocation(

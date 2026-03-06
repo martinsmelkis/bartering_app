@@ -399,8 +399,8 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   }
 
   Widget _buildPostingImage(UserPostingData posting, int index) {
-    // Get the base URL from the service
-    final baseUrl = getIt<String>(instanceName: 'serviceBaseUrl');
+    // Get the base URL from ApiClient static getter
+    final baseUrl = ApiClient.serviceBaseUrl;
 
     // Extract the filename from the imageUrl (assuming it's stored as just the filename)
     final filename = posting.imageUrls![index];

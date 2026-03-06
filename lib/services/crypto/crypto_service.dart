@@ -125,7 +125,29 @@ class CryptoService {
       }
     }
     
-    _keyPair = await compute(_generateEcKeyPairInBackground, {'curveName': curveName});
+    // For web/WASM, run key generation directly (compute doesn't spawn threads on web)
+    // For native platforms, use compute to avoid blocking UI
+    if (kIsWeb) {
+      // Run directly on web - compute() doesn't help on WASM and may cause stack issues
+      final domainParams = pc.ECDomainParameters(curveName);
+      final secureRandom = pc.FortunaRandom();
+      final random = Random.secure();
+      final seed = List<int>.generate(32, (_) => random.nextInt(256));
+      secureRandom.seed(pc.KeyParameter(Uint8List.fromList(seed)));
+      
+      final keyGen = pc.ECKeyGenerator();
+      keyGen.init(pc.ParametersWithRandom(pc.ECKeyGeneratorParameters(domainParams), secureRandom));
+      
+      logDebug('@@@@@@@@@@@ Starting EC keyPair generation on web...');
+      final pair = keyGen.generateKeyPair();
+      logDebug('@@@@@@@@@@@ Finished EC keyPair generation on web');
+      
+      _keyPair = pc.AsymmetricKeyPair<pc.ECPublicKey, pc.ECPrivateKey>(
+          pair.publicKey as pc.ECPublicKey, pair.privateKey as pc.ECPrivateKey);
+    } else {
+      // Use isolate on native platforms
+      _keyPair = await compute(_generateEcKeyPairInBackground, {'curveName': curveName});
+    }
     _isInitialized = true;
 
     if (_keyPair != null) {
@@ -187,6 +209,11 @@ class CryptoService {
   pc.ECPrivateKey? getPrivateKey() => _keyPair?.privateKey;
 
   // --- ECDH Shared Secret ---
+  /// Derive shared secret using ECDH - exposed for FileTransferService chunked decryption
+  Uint8List? deriveSharedSecret(pc.ECPublicKey otherPublicKey) {
+    return _deriveSharedSecret(getPrivateKey()!, otherPublicKey);
+  }
+
   Uint8List? _deriveSharedSecret(pc.ECPrivateKey myPrivateKey, pc.ECPublicKey otherPublicKey) {
     if (!isReady) return null;
     try {

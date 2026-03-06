@@ -1,6 +1,5 @@
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
-import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
 import 'package:barter_app/screens/map_screen/widgets/drawer_main.dart';
 import 'package:barter_app/screens/map_screen/widgets/invite_friends_dialog.dart';
@@ -36,21 +35,16 @@ import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/messaging/firebase_service.dart';
 import '../../utils/geo_utils.dart';
 import '../../utils/responsive_breakpoints.dart';
-import '../chat_screen/chat_screen.dart';
-import '../chat_screen/adaptive_chat_layout.dart';
-import '../chat_screen/widgets/chat_panel_header.dart';
-import '../settings_screen/adaptive_settings_layout.dart';
-import '../user_profile_screen/adaptive_profile_layout.dart';
 import '../initialize_screen/initialize_screen.dart';
 import 'cubit/chat_panel_cubit.dart';
 import 'cubit/poi_panel_cubit.dart';
-import 'adaptive_poi_layout.dart';
 import 'cubit/settings_panel_cubit.dart';
 import 'cubit/profile_panel_cubit.dart';
 import 'cubit/map_operations_cubit.dart';
 import 'cubit/map_screen_api_cubit.dart';
 import 'models/poi_cluster_osm.dart';
 import 'models/poi_sub_cluster_osm.dart';
+import 'widgets/map_overlay_layout.dart';
 
 class MapScreenV2 extends StatefulWidget {
   final List<PointOfInterest>? initialPois;
@@ -62,24 +56,9 @@ class MapScreenV2 extends StatefulWidget {
 }
 
 class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
-  final MapController _mapController = MapController.customLayer(
-    initPosition: GeoPoint(latitude: 48.8584, longitude: 2.2945), // Paris
-    customTile: CustomTile(
-      sourceName: "osmDeu", // for caching | osmDeu, osmFrance
-      tileExtension: ".png",
-      minZoomLevel: 2,
-      maxZoomLevel: 19,
-      urlsServers: [
-        //TileURLs(url: "https://a.tile.openstreetmap.fr/hot/"),
-        //TileURLs(url: "https://b.tile.openstreetmap.fr/hot/"),
-        //TileURLs(url: "https://c.tile.openstreetmap.fr/hot/"),
-        TileURLs(url: "https://tile.openstreetmap.de/"),
-        TileURLs(url: "https://b.tile.openstreetmap.org"),
-        TileURLs(url: "https://c.tile.openstreetmap.org"),
-      ],
-      tileSize: 256,
-    ),
-  );
+  // Use late initialization to prevent controller creation during router redirects
+  // The controller is created in initState() only when the widget is actually mounted
+  late final MapController _mapController;
 
   List<PointOfInterest> _allPois = [];
   Set<GeoPoint> _currentMarkerPositions = {}; // Track all marker positions
@@ -125,6 +104,28 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   @override
   void initState() {
     super.initState();
+    
+    // Initialize controller here instead of eagerly as a final field
+    // This prevents controller creation during router redirects
+    _mapController = MapController.customLayer(
+      initPosition: GeoPoint(latitude: 48.8584, longitude: 2.2945), // Paris
+      customTile: CustomTile(
+        sourceName: "osmDeu", // for caching | osmDeu, osmFrance
+        tileExtension: ".png",
+        minZoomLevel: 3,
+        maxZoomLevel: 18,
+        urlsServers: [
+          //TileURLs(url: "https://a.tile.openstreetmap.fr/hot/"),
+          //TileURLs(url: "https://b.tile.openstreetmap.fr/hot/"),
+          //TileURLs(url: "https://c.tile.openstreetmap.fr/hot/"),
+          TileURLs(url: "https://tile.openstreetmap.de/"),
+          TileURLs(url: "https://b.tile.openstreetmap.org"),
+          TileURLs(url: "https://c.tile.openstreetmap.org"),
+        ],
+        tileSize: 256
+      )
+    );
+    
     poiCubit = context.read<PoiCubit>();
     mapOperationsCubit = context.read<MapOperationsCubit>();
     _mapController.addObserver(this);
@@ -137,14 +138,24 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
     // Handle any pending notification that opened the app when it was terminated
     // Add a delay to ensure the route is fully settled before attempting navigation
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 500), () {
+    // Skip on web - uses WebSocket instead of FCM
+    if (!kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            FirebaseService().handlePendingInitialMessage();
+            context.read<NotificationsCubit>().loadMatchHistory();
+          }
+        });
+      });
+    } else {
+      // On web, just load match history without FCM handling
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          FirebaseService().handlePendingInitialMessage();
           context.read<NotificationsCubit>().loadMatchHistory();
         }
       });
-    });
+    }
   }
 
   @override
@@ -153,9 +164,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
     // Handle when new initialPois are provided via navigation
     // This happens when using context.go() to navigate to an already-mounted map
-    if (widget.initialPois != null &&
-        widget.initialPois!.isNotEmpty &&
-        widget.initialPois != oldWidget.initialPois) {
+    if (widget.initialPois?.isNotEmpty == true && widget.initialPois != oldWidget.initialPois) {
       logDebug('@@@@@@@@@ didUpdateWidget - New initialPois detected: ${widget.initialPois!.length}');
 
       // If map is ready, process immediately
@@ -204,18 +213,28 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   void _autoOpenProfileOnWebLargeScreen() {
     if (!mounted) return;
 
-    // Check if we're on web/large screen (can show side-by-side)
-    if (kIsWeb && context.canShowSideBySide) {
-      // Wait for user profile to be loaded
-      if (_currentUserId != null && _currentUserName != null) {
-        context.read<ProfilePanelCubit>().openProfile(
-          userId: _currentUserId!,
-          userName: _currentUserName!,
-          interests: _userInterests,
-          offerings: _userOfferings,
-        );
+    // Defer to ensure layout is settled and context is valid
+    Future.microtask(() {
+      if (!mounted) return;
+
+      // Check if we're on web/large screen (can show side-by-side)
+      if (kIsWeb && context.canShowSideBySide) {
+        // Wait for user profile to be loaded
+        if (_currentUserId != null && _currentUserName != null) {
+          context.read<ProfilePanelCubit>().openProfile(
+            userId: _currentUserId!,
+            userName: _currentUserName!,
+            interests: _userInterests,
+            offerings: _userOfferings,
+          );
+          logDebug('✅ Auto-opened profile panel on web large screen');
+        } else {
+          logDebug('⚠️ Cannot auto-open profile: userId or userName is null');
+        }
+      } else {
+        logDebug('🔔 Skipping profile auto-open: kIsWeb=$kIsWeb, canShowSideBySide=${context.canShowSideBySide}');
       }
-    }
+    });
   }
 
   /// Perform default search based on settings
@@ -458,6 +477,17 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       logDebug('@@@@@@@@@@@ Already updating visuals, skipping');
       return;
     }
+    
+    // On native platforms, add a small delay to ensure the OSM widget is fully laid out
+    // This prevents the !debugNeedsPaint error when capturing marker images
+    if (!kIsWeb && _allPois.length == 1) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!mounted || !_mapController.isAllLayersVisible) {
+        logDebug('@@@@@@@@@@@ Skipping visual update - map not ready after delay');
+        return;
+      }
+    }
+    
     _cleanUpMarkers();
 
     _isUpdatingVisuals = true;
@@ -577,7 +607,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     List<PointOfInterest> trulyIndividualPois = mapOperationsCubit.calculateTrulyIndividualPois(_allPois);
     logDebug('@@@@@@@@@@@ Processing ${trulyIndividualPois.length} truly individual POIs');
     for (var poi in trulyIndividualPois) {
-      logDebug('@@@@@@@@@@@ Preparing truly individual POI marker: ${poi.profile.userId}');
       if (!_isRenderOperationValid(currentOperation)) return;
       try {
         final svg = await _createPoiMarker(poi, l10n);
@@ -593,7 +622,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
     // Batch add all markers at once for better performance
     if (markersToAdd.isNotEmpty) {
-      logDebug('@@@@@@@@@@@ Batch adding ${markersToAdd.length} markers');
       try {
         await _mapController.addMarkers(
           markersToAdd.map((m) => (
@@ -637,26 +665,33 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       // If search results list is open, POI will show below it
       // If not, POI will show as a side panel via AdaptivePoiLayout
     } else {
+      // Cache MediaQuery values BEFORE showing modal
+      final screenHeight = MediaQuery.of(context).size.height;
+      
       // On small screens, show as modal bottom sheet
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        isDismissible: true,
-        enableDrag: true,
-        backgroundColor: Colors.transparent,
-        useRootNavigator: false,
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.9,
-        ),
-        builder: (context) =>
-            PoiDetailsBottomSheet(
-              poi: poi,
-              onChatButtonPressed: () {
-                Navigator.of(context).pop(); // Close the bottom sheet
-                _openChat(poi.profile.userId, poi.profile.name);
-              },
-            ),
-      );
+      // Use microtask to defer modal display outside of layout phase
+      Future.microtask(() {
+        if (!mounted) return;
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          isDismissible: true,
+          enableDrag: true,
+          backgroundColor: Colors.transparent,
+          useRootNavigator: false,
+          constraints: BoxConstraints(
+            maxHeight: screenHeight * 0.9,
+          ),
+          builder: (context) =>
+              PoiDetailsBottomSheet(
+                poi: poi,
+                onChatButtonPressed: () {
+                  Navigator.of(context).pop(); // Close the bottom sheet
+                  _openChat(poi.profile.userId, poi.profile.name);
+                },
+              ),
+        );
+      });
     }
   }
 
@@ -693,16 +728,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       _userOfferings = await userRepository.getOfferings(loadFromStorage: true);
     }
 
-    // Get device pixel ratio for sharp rendering on web high-DPI screens
-    // On mobile web browsers (which often have 2x-4x pixel ratios), this ensures crisp markers
-    final pixelRatio = kIsWeb && mounted ? MediaQuery.of(context).devicePixelRatio : null;
-
-    // Delegate to the refactored widget class
     return await PoiMarkerWidget.createMarker(
       poi: poi,
       userInterests: _userInterests,
-      userOfferings: _userOfferings,
-      devicePixelRatio: pixelRatio,
+      userOfferings: _userOfferings
     );
   }
 
@@ -815,74 +844,30 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                 return const SizedBox.shrink();
               }
 
-              // Build the map Stack
+              // Build the map Stack - just map and UI overlays
+              final mapWidget = OSMFlutter(
+                controller: _mapController,
+                osmOption: _isGpsLocationEnabled ? OSMOption(
+                  zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 5, maxZoomLevel: 18),
+                  userTrackingOption: UserTrackingOption(
+                    enableTracking: true,
+                    unFollowUser: false,
+                  ),
+                  showContributorBadgeForOSM: true
+                ) : OSMOption(
+                  zoomOption: const ZoomOption(initZoom: 10, minZoomLevel: 5, maxZoomLevel: 18),
+                  showContributorBadgeForOSM: true
+                ),
+                onMapIsReady: _onMapReady,
+                onMapMoved: (event) {
+                  _handleMapMoved(event);
+                },
+                onGeoPointClicked: _onGeoPointTapped,
+              );
+
               final mapStack = Stack(
                 children: [
-                  OSMFlutter(
-                    controller: _mapController,
-                    osmOption: _isGpsLocationEnabled ? OSMOption(
-                        zoomOption: const ZoomOption(initZoom: 8, minZoomLevel: 5, maxZoomLevel: 18),
-                        userTrackingOption: UserTrackingOption(
-                          enableTracking: true,
-                          unFollowUser: false,
-                        ),
-                        showContributorBadgeForOSM: true
-                    ) : OSMOption(
-                        zoomOption: const ZoomOption(initZoom: 10, minZoomLevel: 5, maxZoomLevel: 18),
-                        showContributorBadgeForOSM: true
-                    ),
-                    onMapIsReady: _onMapReady,
-                    onMapMoved: (event) {
-                      // Track if zoom changed significantly (more than 0.5 levels)
-                      _mapController.getZoom().then((v) async {
-                        final newZoom = v.toDouble();
-                        final zoomChanged = (newZoom - mapOperationsCubit.currentZoom).abs() > 0.5;
-                        final positionChanged = (((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs() > 0.0004
-                            || ((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs() > 0.0004);
-
-                        // Process if either position or zoom changed
-                        if (mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom) || positionChanged || zoomChanged) {
-                          zoomLevelNotifier.value = v.toInt();
-                          mapOperationsCubit.currentZoom = newZoom;
-                          // Check if main clustering is needed due to zoom change
-                          // Only perform if we have POIs and zoom changed significantly (> 1.0 level)
-                          await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
-                          if (_allPois.isNotEmpty && mapOperationsCubit.currentZoom <= 14) {
-                            // Check if zoom changed significantly enough to warrant re-clustering
-                            // by comparing with the stored clustering zoom level
-                            final lastClusteringZoom = mapOperationsCubit.getLastClusteringZoom();
-                            final zoomChangedSignificantly = lastClusteringZoom < 0 || (newZoom - lastClusteringZoom).abs() > 0.5;
-                            
-                            if (zoomChangedSignificantly || mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom)) {
-                              logDebug('@@@@@@@@@ Zoom changed to $newZoom - performing main clustering');
-                              if (!kIsWeb) {
-                                await Future.delayed(Duration(milliseconds: 1200), () async => {
-                                  mapOperationsCubit.performMainClustering(_allPois)
-                                });
-                              } else {
-                                mapOperationsCubit.performMainClustering(_allPois);
-                              }
-                            }
-                          } else if (mapOperationsCubit.currentZoom > 14) {
-                            // Zoomed in past clustering threshold - reset tracking
-                            logDebug('@@@@@@@@@ Zoomed past clustering threshold - resetting tracking');
-                            if (!kIsWeb) {
-                              await Future.delayed(Duration(milliseconds: 1200), () async => {
-                                await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController, emitUpdate: false),
-                                mapOperationsCubit.performMainClustering(_allPois),
-                              });
-                            } else {
-                              mapOperationsCubit.resetClusteringTracking();
-                              await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController, emitUpdate: false);
-                              mapOperationsCubit.performMainClustering(_allPois);
-                            }
-                          }
-                        }
-                        _previousMapRegion = event;
-                      });
-                    },
-                    onGeoPointClicked: _onGeoPointTapped,
-                  ),
+                  mapWidget,
                   Positioned(
                     top: kIsWeb ? 8.h : topPadding ?? 26.0,
                     left: 12 + MediaQuery.of(context).viewPadding.left,
@@ -938,7 +923,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                               FloatingActionButton(
                                 onPressed: () {
                                   final chatCubit = context.read<ChatPanelCubit>();
+                                  final poiCubit = context.read<PoiPanelCubit>();
                                   if (context.canShowSideBySide) {
+                                    // Close POI panel if open, then open chat list
+                                    if (poiCubit.state.isOpen) {
+                                      poiCubit.closePanel();
+                                    }
                                     chatCubit.openChatsList();
                                   } else {
                                     context.push("/chats");
@@ -1097,191 +1087,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                 ]
               );
 
-              // Build the search results panel (always built but conditionally shown on large screens)
-              final searchResultsPanel = BlocBuilder<ChatPanelCubit, ChatPanelState>(
-                builder: (context, chatState) {
-                  final isChatOpen = chatState.isChatOpen;
-                  final isChatsListOpen = chatState.isChatsListOpen;
-                  final isPanelOpen = isChatOpen || isChatsListOpen;
-                  final l10n = AppLocalizations.of(context)!;
-                  
-                  return Container(
-                    width: context.panelWidth,
-                    color: Colors.white,
-                    child: isPanelOpen ? Column(
-                      children: [
-                        // Search results list takes 60% of vertical space
-                        Expanded(
-                          flex: 60,
-                          child: SearchResultsListView(
-                            key: ValueKey(_searchResultsKey),
-                            pois: _searchResults,
-                            isLargeScreen: true,
-                            onClose: () {
-                              setState(() {
-                                _showSearchResultsList = false;
-                                _searchResults = [];
-                              });
-                              // Clear markers from map when closing list
-                              if (_allPois.isNotEmpty) {
-                                mapOperationsCubit.reset();
-                                _updateMapVisuals();
-                              }
-                            },
-                            onPoiTap: (poi) async {
-                              // Navigate to the user's location first for smooth animation
-                              if (poi.profile.latitude != null && poi.profile.longitude != null) {
-                                //_mapController.setZoom(zoomLevel: 17.0);
-                                await _mapController.moveTo(
-                                  GeoPoint(
-                                    latitude: poi.profile.latitude!,
-                                    longitude: poi.profile.longitude!,
-                                  )
-                                );
-                              }
-
-                              Future.delayed(Duration(milliseconds: 200), () {
-                                // Then load POI details after animation completes
-                                context.read<PoiPanelCubit>().openPoiDetails(poi);
-                              });
-                            },
-                            onChatTap: (poi) {
-                              _openChat(poi.profile.userId, poi.profile.name);
-                            },
-                          ),
-                        ),
-                        // Chat/ChatsListpanel takes 40% of vertical space
-                        Expanded(
-                          flex: 40,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.background,
-                              border: Border(
-                                top: BorderSide(
-                                  color: Colors.grey.shade300,
-                                  width: 1,
-                                ),
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                // Panel header - use ChatPanelHeader for individual chats, simple header for chats list
-                                if (isChatsListOpen)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            l10n.chats,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.close, color: Colors.white, size: 18),
-                                          onPressed: () => context.read<ChatPanelCubit>().closePanel(),
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                else
-                                  ChatPanelHeader(
-                                    chatPoiName: chatState.selectedPoiName,
-                                    chatPoiId: chatState.selectedPoiId!,
-                                    onClose: () => context.read<ChatPanelCubit>().closePanel(),
-                                  ),
-                                // Panel content - either chats list or individual chat
-                                Expanded(
-                                  child: isChatsListOpen
-                                      ? ChatsListScreen(
-                                          showAppBar: false,
-                                          onChatSelected: (poi) {
-                                            context.read<ChatPanelCubit>().openChat(
-                                              poi.profile.userId,
-                                              poi.profile.name,
-                                              poi: poi,
-                                            );
-                                          },
-                                        )
-                                      : ChatScreen(
-                                          poiId: chatState.selectedPoiId,
-                                          poiName: chatState.selectedPoiName,
-                                          poi: chatState.selectedPoi,
-                                          showAppBar: false,
-                                        ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ) : SearchResultsListView(
-                      key: ValueKey(_searchResultsKey),
-                      pois: _searchResults,
-                      isLargeScreen: true,
-                      onClose: () {
-                        setState(() {
-                          _showSearchResultsList = false;
-                          _searchResults = [];
-                        });
-                        // Clear markers from map when closing list
-                        if (_allPois.isNotEmpty) {
-                          mapOperationsCubit.reset();
-                          _updateMapVisuals();
-                        }
-                      },
-                      onPoiTap: (poi) async {
-                        // Navigate to the user's location first for smooth animation
-                        if (poi.profile.latitude != null && poi.profile.longitude != null) {
-                          //_mapController.setZoom(zoomLevel: 17.0);
-                          await _mapController.moveTo(
-                            GeoPoint(
-                              latitude: poi.profile.latitude!,
-                              longitude: poi.profile.longitude!,
-                            )
-                          );
-                        }
-                        Future.delayed(Duration(milliseconds: 200), () {
-                          // Then load POI details after animation completes
-                          context.read<PoiPanelCubit>().openPoiDetails(poi);
-                        });
-
-                      },
-                      onChatTap: (poi) {
-                        _openChat(poi.profile.userId, poi.profile.name);
-                      },
-                    ),
-                  );
-                },
-              );
-
-              // On large screens, always use Row layout with Offstage to show/hide panel
-              // This prevents OSMFlutter from being destroyed when panel opens/closes
-              if (context.canShowSideBySide) {
-                return Row(
-                  children: [
-                    Expanded(child: mapStack),
-                    // Use Offstage to keep the panel widget in the tree
-                    // This prevents OSMFlutter from being recreated when panel visibility changes
-                    Offstage(
-                      offstage: !_showSearchResultsList,
-                      child: searchResultsPanel,
-                    ),
-                  ],
-                );
-              }
-
               return mapStack;
             },
           ),
@@ -1289,7 +1094,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       ),
     );
 
-    // Wrap with BlocBuilders for panels
+    // Wrap with Stack-based overlays - each panel is an independent overlay
     return BackButtonHandler(
       onBackPressed: () async {
         if (_showSearchResultsList) {
@@ -1302,76 +1107,49 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         // Allow normal navigation
         return true;
       },
-      child: BlocBuilder<PoiPanelCubit, PoiPanelState>(
-        builder: (context, poiPanelState) {
-          return BlocBuilder<ChatPanelCubit, ChatPanelState>(
-            builder: (context, chatState) {
-              return BlocBuilder<SettingsPanelCubit, SettingsPanelState>(
-                builder: (context, settingsState) {
-                  return BlocBuilder<ProfilePanelCubit, ProfilePanelState>(
-                    builder: (context, profileState) {
-                      return AdaptiveProfileLayout(
-                      showProfilePanel: profileState.isOpen,
-                      userId: profileState.userId,
-                      userName: profileState.userName,
-                      interests: profileState.interests,
-                      offerings: profileState.offerings,
-                      onClose: () => context.read<ProfilePanelCubit>().closeProfile(),
-                                                mainContent: AdaptiveSettingsLayout(
-                        showSettingsPanel: settingsState.isOpen,
-                        onClose: () => context.read<SettingsPanelCubit>().closeSettings(),
-                        mainContent: AdaptiveChatLayout(
-                          // Suppress chat panel when:
-                          // 1. POI panel is open in AdaptivePoiLayout (not in search results), OR
-                          // 2. Search results list is open (chat shows below it instead)
-                          suppressChatPanel: (poiPanelState.isOpen &&
-                              !_showSearchResultsList &&
-                              chatState.isChatOpen &&
-                              chatState.selectedPoiId == poiPanelState.selectedPoi?.profile.userId) ||
-                              (_showSearchResultsList && context.canShowSideBySide),
-                          panelView: chatState.view,
-                          selectedPoiId: chatState.selectedPoiId,
-                          selectedPoiName: chatState.selectedPoiName,
-                          onClose: () => context.read<ChatPanelCubit>().closePanel(),
-                          onChatSelected: (poi) {
-                            context.read<ChatPanelCubit>().openChat(
-                              poi.profile.userId,
-                              poi.profile.name,
-                              poi: poi,
-                            );
-                          },
-                          mainContent: AdaptivePoiLayout(
-                            // Only show POI panel here if search results list is NOT open
-                            // (if list is open, POI shows below the list instead)
-                            showPoiPanel: poiPanelState.isOpen && !_showSearchResultsList,
-                            selectedPoi: poiPanelState.selectedPoi,
-                            onClose: () => context.read<PoiPanelCubit>().closePanel(),
-                            onChatButtonPressed: () {
-                              final poi = poiPanelState.selectedPoi;
-                              if (poi != null) {
-                                if (context.canShowSideBySide) {
-                                  context.read<ChatPanelCubit>().openChat(
-                                    poi.profile.userId,
-                                    poi.profile.name,
-                                    poi: poi,
-                                  );
-                                } else {
-                                  context.read<PoiPanelCubit>().closePanel();
-                                  _openChat(poi.profile.userId, poi.profile.name, poi: poi);
-                                }
-                              }
-                            },
-                            mainContent: mapContent,
-                          ),
-                        ),
-                      ),
-                    );
-                    },
-                  );
-                },
-              );
-            },
-          );
+      child: MapOverlayLayout(
+        mapContent: mapContent,
+        showSearchResultsList: _showSearchResultsList,
+        searchResults: _searchResults,
+        searchResultsKey: _searchResultsKey,
+        onCloseSearchResults: () {
+          setState(() {
+            _showSearchResultsList = false;
+            _searchResults = [];
+          });
+          // Clear markers from map when closing list
+          if (_allPois.isNotEmpty) {
+            mapOperationsCubit.reset();
+            _updateMapVisuals();
+          }
+        },
+        onSearchPoiTap: (poi) async {
+          // Navigate to the user's location first for smooth animation
+          if (poi.profile.latitude != null && poi.profile.longitude != null) {
+            await _mapController.moveTo(
+              GeoPoint(
+                latitude: poi.profile.latitude!,
+                longitude: poi.profile.longitude!,
+              )
+            );
+          }
+          Future.delayed(const Duration(milliseconds: 200), () {
+            // Then load POI details after animation completes
+            context.read<PoiPanelCubit>().openPoiDetails(poi);
+          });
+        },
+        onSearchChatTap: (poi) {
+          // Close any existing chat first, then open new one
+          final chatCubit = context.read<ChatPanelCubit>();
+          chatCubit.closePanel();
+          // Small delay to ensure clean state
+          Future.delayed(const Duration(milliseconds: 50), () {
+            chatCubit.openChat(
+              poi.profile.userId,
+              poi.profile.name,
+              poi: poi,
+            );
+          });
         },
       ),
     );
@@ -1431,5 +1209,55 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   @override
   Future<void> mapIsReady(bool isReady) async {}
+
+  void _handleMapMoved(Region event) {
+    // Track if zoom changed significantly (more than 0.5 levels)
+    _mapController.getZoom().then((v) async {
+      final newZoom = v.toDouble();
+      final zoomChanged = (newZoom - mapOperationsCubit.currentZoom).abs() > 0.5;
+      final positionChanged = (((_previousMapRegion?.boundingBox.east ?? 0) - event.boundingBox.east).abs() > 0.0004
+          || ((_previousMapRegion?.boundingBox.north ?? 0) - event.boundingBox.north).abs() > 0.0004);
+
+      // Process if either position or zoom changed
+      if (mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom) || positionChanged || zoomChanged) {
+        zoomLevelNotifier.value = v.toInt();
+        mapOperationsCubit.currentZoom = newZoom;
+        // Check if main clustering is needed due to zoom change
+        // Only perform if we have POIs and zoom changed significantly (> 1.0 level)
+        await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController);
+        if (_allPois.isNotEmpty && mapOperationsCubit.currentZoom <= 14) {
+          // Check if zoom changed significantly enough to warrant re-clustering
+          // by comparing with the stored clustering zoom level
+          final lastClusteringZoom = mapOperationsCubit.getLastClusteringZoom();
+          final zoomChangedSignificantly = lastClusteringZoom < 0 || (newZoom - lastClusteringZoom).abs() > 0.5;
+
+          if (zoomChangedSignificantly || mapOperationsCubit.shouldPerformMainClustering(_allPois, newZoom)) {
+            logDebug('@@@@@@@@@ Zoom changed to $newZoom - performing main clustering');
+            if (!kIsWeb) {
+              await Future.delayed(Duration(milliseconds: 1200), () async => {
+                mapOperationsCubit.performMainClustering(_allPois)
+              });
+            } else {
+              mapOperationsCubit.performMainClustering(_allPois);
+            }
+          }
+        } else if (mapOperationsCubit.currentZoom > 14) {
+          // Zoomed in past clustering threshold - reset tracking
+          logDebug('@@@@@@@@@ Zoomed past clustering threshold - resetting tracking');
+          if (!kIsWeb) {
+            await Future.delayed(Duration(milliseconds: 1200), () async => {
+              await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController, emitUpdate: false),
+              mapOperationsCubit.performMainClustering(_allPois),
+            });
+          } else {
+            mapOperationsCubit.resetClusteringTracking();
+            await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController, emitUpdate: false);
+            mapOperationsCubit.performMainClustering(_allPois);
+          }
+        }
+      }
+      _previousMapRegion = event;
+    });
+  }
 
 }

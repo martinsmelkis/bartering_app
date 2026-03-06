@@ -2235,6 +2235,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String decryptingFile(String filename) {
+    return 'Decrypting $filename...';
+  }
+
+  @override
   String downloadFailed(String error) {
     return 'Download failed: $error';
   }

@@ -3,17 +3,30 @@ import 'dart:io';
 import 'package:barter_app/models/notifications/notification_models.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../configure_dependencies.dart';
 import 'firebase_service.dart';
 
 class FCMTokenService {
   final ApiClient _notificationApi = getIt<ApiClient>();
-  final FirebaseService _firebaseService = FirebaseService();
+  FirebaseService? _firebaseService;
+
+  FirebaseService? get _firebase {
+    if (kIsWeb) return null;
+    _firebaseService ??= FirebaseService();
+    return _firebaseService;
+  }
 
   Future<void> onSessionStarted(String userId) async {
+    // Skip FCM on web - uses WebSocket instead
+    if (kIsWeb) {
+      logDebug('🔔 Skipping FCM token registration on web (using WebSocket)');
+      return;
+    }
+
     // Get FCM token
-    final token = _firebaseService.fcmToken;
+    final token = _firebase?.fcmToken;
     if (token == null) {
       logDebug('⚠️ FCM token not available');
       return;
@@ -32,11 +45,14 @@ class FCMTokenService {
     }
 
     // Subscribe to user-specific topics if needed
-    await _firebaseService.subscribeToTopic('user_$userId');
+    await _firebase?.subscribeToTopic('user_$userId');
   }
 
   Future<void> onSessionEnded(String userId) async {
-    final token = _firebaseService.fcmToken;
+    // Skip FCM on web
+    if (kIsWeb) return;
+
+    final token = _firebase?.fcmToken;
     if (token != null) {
       await _notificationApi.removePushToken(
         token,
@@ -44,6 +60,6 @@ class FCMTokenService {
     }
 
     // Unsubscribe from topics
-    await _firebaseService.unsubscribeFromTopic('user_$userId');
+    await _firebase?.unsubscribeFromTopic('user_$userId');
   }
 }

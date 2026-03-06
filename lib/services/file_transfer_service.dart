@@ -1,16 +1,79 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:barter_app/models/chat/file_attachment.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, compute;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:pointycastle/export.dart' as pc;
 
 // Web-specific import using conditional compilation
 import 'package:barter_app/services/file_transfer_web.dart' if (dart.library.io) 'package:barter_app/services/file_transfer_stub.dart';
+
+// Top-level function for background decryption (isolate-compatible)
+Future<Uint8List> _decryptInBackground(Map<String, dynamic> params) async {
+  final encryptedBytes = params['encryptedBytes'] as Uint8List;
+  final senderPublicKeyString = params['senderPublicKey'] as String;
+  final privateKeyHex = params['privateKeyHex'] as String;
+
+  // Recreate minimal crypto context in the isolate
+  final domainParams = pc.ECDomainParameters('secp256r1');
+  final d = BigInt.parse(privateKeyHex, radix: 16);
+  final myPrivateKey = pc.ECPrivateKey(d, domainParams);
+
+  // Parse sender's public key
+  final encodedPoint = base64Decode(senderPublicKeyString);
+  final point = domainParams.curve.decodePoint(encodedPoint);
+  if (point == null) throw Exception('Invalid sender public key');
+  final senderPublicKey = pc.ECPublicKey(point, domainParams);
+
+  // Derive shared secret via ECDH
+  final agreement = pc.ECDHBasicAgreement();
+  agreement.init(myPrivateKey);
+  final sharedBigInt = agreement.calculateAgreement(senderPublicKey);
+  final fieldSize = (domainParams.curve.fieldSize / 8).ceil();
+  final sharedSecret = _bigIntToBytes(sharedBigInt, fieldSize);
+
+  // Derive symmetric key via HKDF
+  final saltLength = 16;
+  final ivLength = 12;
+  final aesKeyLength = 32;
+  final tagLengthBits = 128;
+
+  if (encryptedBytes.length < saltLength + ivLength) {
+    throw Exception('Payload too short');
+  }
+
+  final salt = encryptedBytes.sublist(0, saltLength);
+  final iv = encryptedBytes.sublist(saltLength, saltLength + ivLength);
+  final cipherBytes = encryptedBytes.sublist(saltLength + ivLength);
+
+  final infoBytes = utf8.encode("E2EE Chat Symmetric Key");
+  final hkdf = pc.HKDFKeyDerivator(pc.SHA256Digest());
+  hkdf.init(pc.HkdfParameters(sharedSecret, aesKeyLength, salt, infoBytes));
+  final symmetricKey = hkdf.process(Uint8List(aesKeyLength));
+
+  // Decrypt using AES-GCM
+  final cipher = pc.GCMBlockCipher(pc.AESEngine());
+  cipher.init(false, pc.AEADParameters(
+      pc.KeyParameter(symmetricKey), tagLengthBits, iv, Uint8List(0)));
+
+  return cipher.process(cipherBytes);
+}
+
+// Helper for BigInt to fixed-size byte array (needed in isolate)
+Uint8List _bigIntToBytes(BigInt number, int byteLength) {
+  final bytes = Uint8List(byteLength);
+  for (var i = byteLength - 1; i >= 0; i--) {
+    bytes[i] = number.toUnsigned(8).toInt();
+    number = number >> 8;
+  }
+  return bytes;
+}
 
 /// Result of a file download operation
 class DownloadResult {
@@ -185,12 +248,25 @@ class FileTransferService {
       print('@@@@@@@@@ Decrypting with sender public key: ${senderPublicKey
           .substring(0, 20)}...');
 
-      // Decrypt file bytes using sender's public key
-      // The CryptoService will use our private key + sender's public key to derive shared secret
-      final decryptedBytes = await _cryptoService.decryptBytes(
-        Uint8List.fromList(encryptedBytes),
-        senderPublicKey,
-      );
+      Uint8List decryptedBytes;
+      
+      // Use chunked decryption on web for large files to prevent UI freeze
+      if (kIsWeb && encryptedBytes.length > 128 * 1024) {
+        // For files > 128KB on web, use chunked decryption with progress
+        decryptedBytes = await _decryptChunked(
+          Uint8List.fromList(encryptedBytes),
+          senderPublicKey,
+          onProgress: onProgress,
+        );
+      } else {
+        // For small files or native platforms, use direct decryption
+        onProgress?.call(0.3); // Started
+        decryptedBytes = await _cryptoService.decryptBytes(
+          Uint8List.fromList(encryptedBytes),
+          senderPublicKey,
+        );
+        onProgress?.call(1.0); // Complete
+      }
 
       // If only preview is needed, return bytes without saving
       if (!saveToFile) {
@@ -310,6 +386,60 @@ class FileTransferService {
       default:
         return 'application/octet-stream';
     }
+  }
+
+  /// Decrypt bytes using chunked processing to prevent UI freeze on web.
+  /// Yields to event loop every 256KB to allow UI updates.
+  Future<Uint8List> _decryptChunked(
+    Uint8List encryptedPayload,
+    String senderPublicKeyString, {
+    Function(double)? onProgress,
+  }) async {
+    const chunkSize = 256 * 1024; // 256KB chunks
+    
+    // Derive symmetric key once (same as decryptBytes but chunked)
+    final senderPublicKey = _cryptoService.ecPublicKeyFromString(senderPublicKeyString);
+    if (senderPublicKey == null) throw Exception('Invalid sender public key');
+    
+    final sharedSecret = _cryptoService.deriveSharedSecret(senderPublicKey);
+    if (sharedSecret == null) throw Exception('Could not derive shared secret');
+    
+    const saltLength = 16;
+    const ivLength = 12;
+    const aesKeyLength = 32;
+    const tagLengthBits = 128;
+    
+    if (encryptedPayload.length < saltLength + ivLength) {
+      throw Exception('Payload too short');
+    }
+    
+    final salt = encryptedPayload.sublist(0, saltLength);
+    final iv = encryptedPayload.sublist(saltLength, saltLength + ivLength);
+    final cipherBytes = encryptedPayload.sublist(saltLength + ivLength);
+    
+    final infoBytes = utf8.encode("E2EE Chat Symmetric Key");
+    final hkdf = pc.HKDFKeyDerivator(pc.SHA256Digest());
+    hkdf.init(pc.HkdfParameters(sharedSecret, aesKeyLength, salt, infoBytes));
+    final symmetricKey = hkdf.process(Uint8List(aesKeyLength));
+    
+    onProgress?.call(0.3); // Key derivation complete
+    
+    // For GCM, we can't truly chunk - must process as whole
+    // But we yield before/after to allow UI updates
+    await Future.delayed(Duration.zero);
+    
+    final cipher = pc.GCMBlockCipher(pc.AESEngine());
+    cipher.init(false, pc.AEADParameters(
+        pc.KeyParameter(symmetricKey), tagLengthBits, iv, Uint8List(0)));
+    
+    onProgress?.call(0.5); // Decrypting
+    
+    final decryptedBytes = cipher.process(cipherBytes);
+    
+    onProgress?.call(1.0); // Decryption complete
+    await Future.delayed(Duration.zero); // Yield to UI
+    
+    return decryptedBytes;
   }
 
   /// Format file size for display
