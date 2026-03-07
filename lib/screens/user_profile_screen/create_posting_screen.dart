@@ -1,12 +1,9 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:barter_app/models/postings/posting_data_response.dart';
-import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/back_button_handler.dart';
-import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
-import 'package:barter_app/widgets/image_viewer_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
@@ -394,11 +391,16 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
         ),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+          child: Center(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: ResponsiveBreakpoints.getMaxContentWidth(context),
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                 // Title Field
                 TextFormField(
                   controller: _titleController,
@@ -560,64 +562,69 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
 
                 // Image Grid
                 if (_selectedImages.isNotEmpty)
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 8.w,
-                      mainAxisSpacing: 8.h,
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: kIsWeb ? 300 * 3 + 16 : double.infinity,
                     ),
-                    itemCount: _selectedImages.length,
-                    itemBuilder: (context, index) {
-                      return Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              // Open full-screen preview of selected images
-                              final imageUrls = _selectedImages
-                                  .map((xFile) => xFile.path)
-                                  .toList();
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => FullScreenImageViewer(
-                                    imageUrls: imageUrls,
-                                    initialIndex: index,
-                                    heroTag: 'create_posting_image',
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 8.w,
+                        mainAxisSpacing: 8.h,
+                      ),
+                      itemCount: _selectedImages.length,
+                      itemBuilder: (context, index) {
+                        return Stack(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                // Open full-screen preview of selected images
+                                final imageUrls = _selectedImages
+                                    .map((xFile) => xFile.path)
+                                    .toList();
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => FullScreenImageViewer(
+                                      imageUrls: imageUrls,
+                                      initialIndex: index,
+                                      heroTag: 'create_posting_image',
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Hero(
+                                tag: 'create_posting_image_$index',
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: _buildImagePreview(_selectedImages[index]),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: GestureDetector(
+                                onTap: () => _removeImage(index),
+                                child: Container(
+                                  padding: EdgeInsets.all(4.w),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 16,
                                   ),
                                 ),
-                              );
-                            },
-                            child: Hero(
-                              tag: 'create_posting_image_$index',
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.r),
-                                child: _buildImagePreview(_selectedImages[index]),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            top: 4,
-                            right: 4,
-                            child: GestureDetector(
-                              onTap: () => _removeImage(index),
-                              child: Container(
-                                padding: EdgeInsets.all(4.w),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.close,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 SizedBox(height: 12),
 
@@ -646,26 +653,27 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
-                  child: _isSubmitting
-                      ? SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: const CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  child: _isSubmitting ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Text(
+                        _isEditing ? l10n.updatePosting : l10n.createPosting,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  )
-                      : Text(
-                    _isEditing ? l10n.updatePosting : l10n.createPosting,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                    // Add bottom padding to account for system navigation bar
+                    SizedBox(height: viewPadding.bottom),
+                  ],
                 ),
-                // Add bottom padding to account for system navigation bar
-                SizedBox(height: viewPadding.bottom),
-              ],
+              ),
             ),
           ),
         ),

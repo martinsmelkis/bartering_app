@@ -185,6 +185,10 @@ class ResponsiveBreakpoints {
 
   /// Get maximum content width for readable content
   static double getMaxContentWidth(BuildContext context) {
+    // For web platform, always use 700 as max width
+    if (kIsWeb) {
+      return 700.0;
+    }
     return getValue(
       context: context,
       compact: double.infinity,

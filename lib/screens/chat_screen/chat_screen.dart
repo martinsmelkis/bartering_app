@@ -348,9 +348,9 @@ class _ChatScreenState extends State<ChatScreen> {
       final unreadMessages = _chatCubit.messages
           .where(
             (msg) =>
-                !msg.isSentByCurrentUser &&
-                msg.status != EChatMessageStatus.read,
-          )
+        !msg.isSentByCurrentUser &&
+            msg.status != EChatMessageStatus.read,
+      )
           .toList();
 
       if (unreadMessages.isNotEmpty) {
@@ -402,115 +402,115 @@ class _ChatScreenState extends State<ChatScreen> {
     Widget chatContent = Scaffold(
       appBar: widget.showAppBar
           ? AppBar(
-              title: Text(widget.poiName ?? l10n.chat),
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: AppColors.background,
-              actions: [
-                PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert),
-                  onSelected: (value) async {
-                    if (value == 'view_profile') {
-                      // Fetch profile info if POI is not available, then navigate to map
-                      WidgetsBinding.instance.addPostFrameCallback((_) async {
-                        PointOfInterest? poi = widget.poi;
+        title: Text(widget.poiName ?? l10n.chat),
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: AppColors.background,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) async {
+              if (value == 'view_profile') {
+                // Fetch profile info if POI is not available, then navigate to map
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  PointOfInterest? poi = widget.poi;
 
-                        if (poi == null && widget.poiId != null) {
-                          // Fetch profile info from API
-                          try {
-                            final apiClient = getIt<ApiClient>();
-                            final userProfile = await apiClient.getProfileInfo(
-                              widget.poiId!,
-                            );
-                            poi = PointOfInterest(
-                              profile: userProfile,
-                              distanceKm: null,
-                            );
-                            logDebug(
-                              '@@@@@@@@@ ChatScreen view_profile - fetched profile for userId: ${widget.poiId}',
-                            );
-                          } catch (e) {
-                            logDebugError(
-                              'Failed to fetch profile for view_profile',
-                              e,
-                            );
-                          }
-                        }
-
-                        if (poi != null) {
-                          final List<PointOfInterest> pois = List.empty(
-                            growable: true,
-                          );
-                          pois.add(poi);
-                          AppRouter.navigateToMapWithPois(pois);
-                        }
-                      });
-                    } else if (value == 'finish_transaction') {
-                      _handleFinishTransaction(context);
-                    } else if (value == 'report_user') {
-                      _handleReportUser(context);
-                    } else if (value == 'block_user') {
-                      _handleBlockUser(context);
-                    } else if (value == 'unblock_user') {
-                      _handleUnblockUser(context);
+                  if (poi == null && widget.poiId != null) {
+                    // Fetch profile info from API
+                    try {
+                      final apiClient = getIt<ApiClient>();
+                      final userProfile = await apiClient.getProfileInfo(
+                        widget.poiId!,
+                      );
+                      poi = PointOfInterest(
+                        profile: userProfile,
+                        distanceKm: null,
+                      );
+                      logDebug(
+                        '@@@@@@@@@ ChatScreen view_profile - fetched profile for userId: ${widget.poiId}',
+                      );
+                    } catch (e) {
+                      logDebugError(
+                        'Failed to fetch profile for view_profile',
+                        e,
+                      );
                     }
-                  },
-                  itemBuilder: (BuildContext context) => [
-                    PopupMenuItem<String>(
-                      value: 'view_profile',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.person_outline),
-                          SizedBox(width: 8.w),
-                          Text(l10n.viewProfile),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      value: 'finish_transaction',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.check_circle_outline),
-                          SizedBox(width: 8.w),
-                          Text(l10n.finishTransaction),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      value: 'report_user',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.report_outlined),
-                          SizedBox(width: 8.w),
-                          Text(l10n.reportUser),
-                        ],
-                      ),
-                    ),
-                    if (_isUserBlocked)
-                      PopupMenuItem<String>(
-                        value: 'unblock_user',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.check_circle),
-                            SizedBox(width: 8.w),
-                            Text(l10n.unblockUser),
-                          ],
-                        ),
-                      )
-                    else
-                      PopupMenuItem<String>(
-                        value: 'block_user',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.block),
-                            SizedBox(width: 8.w),
-                            Text(l10n.blockUser),
-                          ],
-                        ),
-                      ),
+                  }
+
+                  if (poi != null) {
+                    final List<PointOfInterest> pois = List.empty(
+                      growable: true,
+                    );
+                    pois.add(poi);
+                    AppRouter.navigateToMapWithPois(pois);
+                  }
+                });
+              } else if (value == 'finish_transaction') {
+                _handleFinishTransaction(context);
+              } else if (value == 'report_user') {
+                _handleReportUser(context);
+              } else if (value == 'block_user') {
+                _handleBlockUser(context);
+              } else if (value == 'unblock_user') {
+                _handleUnblockUser(context);
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem<String>(
+                value: 'view_profile',
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_outline),
+                    SizedBox(width: 8.w),
+                    Text(l10n.viewProfile),
                   ],
                 ),
-              ],
-            )
+              ),
+              PopupMenuItem<String>(
+                value: 'finish_transaction',
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle_outline),
+                    SizedBox(width: 8.w),
+                    Text(l10n.finishTransaction),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'report_user',
+                child: Row(
+                  children: [
+                    const Icon(Icons.report_outlined),
+                    SizedBox(width: 8.w),
+                    Text(l10n.reportUser),
+                  ],
+                ),
+              ),
+              if (_isUserBlocked)
+                PopupMenuItem<String>(
+                  value: 'unblock_user',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.check_circle),
+                      SizedBox(width: 8.w),
+                      Text(l10n.unblockUser),
+                    ],
+                  ),
+                )
+              else
+                PopupMenuItem<String>(
+                  value: 'block_user',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.block),
+                      SizedBox(width: 8.w),
+                      Text(l10n.blockUser),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ],
+      )
           : null,
       body: BlocListener<ChatCubit, ChatState>(
         listener: (context, state) {
@@ -519,7 +519,7 @@ class _ChatScreenState extends State<ChatScreen> {
               state is ChatMessageSent ||
               state is ChatMessageSending) {
             WidgetsBinding.instance.addPostFrameCallback(
-              (_) => _scrollToBottom(),
+                  (_) => _scrollToBottom(),
             );
           }
           if (state is ChatKeysExchanged) {
@@ -532,7 +532,7 @@ class _ChatScreenState extends State<ChatScreen> {
               context: context,
               barrierDismissible: false,
               builder: (context) =>
-                  const Center(child: CircularProgressIndicator()),
+              const Center(child: CircularProgressIndicator()),
             );
           }
           if (state is ChatTransactionCompleted) {
@@ -590,7 +590,7 @@ class _ChatScreenState extends State<ChatScreen> {
               context: context,
               barrierDismissible: false,
               builder: (context) =>
-                  const Center(child: CircularProgressIndicator()),
+              const Center(child: CircularProgressIndicator()),
             );
           }
           if (state is ChatUserBlockSuccess) {
@@ -625,7 +625,7 @@ class _ChatScreenState extends State<ChatScreen> {
               context: context,
               barrierDismissible: false,
               builder: (context) =>
-                  const Center(child: CircularProgressIndicator()),
+              const Center(child: CircularProgressIndicator()),
             );
           }
           if (state is ChatUserReportSuccess) {
@@ -674,7 +674,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     children: _buildMessageListWithHeaders(displayMessages),
                     // Optimize for long lists
                     addAutomaticKeepAlives:
-                        true, // Keep alive to prevent rebuilds
+                    true, // Keep alive to prevent rebuilds
                     addRepaintBoundaries: true, // Additional repaint boundaries
                   ),
                 ),
@@ -906,10 +906,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildFileAttachment(
-    FileAttachment attachment,
-    bool isMe,
-    bool isWebSideBySide,
-  ) {
+      FileAttachment attachment,
+      bool isMe,
+      bool isWebSideBySide,
+      ) {
     final iconSize = isWebSideBySide ? 41.6 : 40.0;
     final fontSize = isWebSideBySide ? 13.0 : 12.0;
 
@@ -963,30 +963,30 @@ class _ChatScreenState extends State<ChatScreen> {
                       return AnimatedOpacity(
                         opacity: frame == null ? 0.0 : 1.0,
                         duration: const Duration(milliseconds: 200),
-                            child: frame == null
-                                ? Container(
-                                    width: double.infinity,
-                                    height: isWebSideBySide ? 195 : 200,
-                                    color: Colors.grey[300],
-                                    child: Center(
-                                      child: SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                isMe
-                                                    ? Colors.white70
-                                                    : Colors.grey[600]!,
-                                              ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : child,
-                          );
-                        },
+                        child: frame == null
+                            ? Container(
+                          width: double.infinity,
+                          height: isWebSideBySide ? 195 : 200,
+                          color: Colors.grey[300],
+                          child: Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                AlwaysStoppedAnimation<Color>(
+                                  isMe
+                                      ? Colors.white70
+                                      : Colors.grey[600]!,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                            : child,
+                      );
+                    },
                   ),
                 ),
               )
@@ -1094,12 +1094,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildFileIcon(
-    FileAttachment attachment,
-    double iconSize,
-    double fontSize,
-    bool isMe,
-    bool isWebSideBySide,
-  ) {
+      FileAttachment attachment,
+      double iconSize,
+      double fontSize,
+      bool isMe,
+      bool isWebSideBySide,
+      ) {
     IconData icon;
     Color iconColor;
 
@@ -1173,9 +1173,9 @@ class _ChatScreenState extends State<ChatScreen> {
       logDebug('@@@@@@@@@ Download already in progress for ${attachment.fileId}, skipping');
       return;
     }
-    
+
     _activeDownloads.add(attachment.fileId);
-    
+
     final l10n = AppLocalizations.of(context)!;
 
     // Track download progress for UI feedback
@@ -1184,7 +1184,7 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       // Show initial downloading progress
       final scaffoldMessenger = ScaffoldMessenger.of(context);
-      
+
       // Simple progress snackbar without StatefulBuilder
       scaffoldMessenger.showSnackBar(
         SnackBar(
@@ -1274,16 +1274,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
         // Update the message with local path
         final message = _chatCubit.messages.firstWhere(
-          (msg) => msg.fileAttachment?.fileId == attachment.fileId,
+              (msg) => msg.fileAttachment?.fileId == attachment.fileId,
         );
 
         _chatCubit.messages[_chatCubit.messages.indexOf(message)] = message
             .copyWith(
-              fileAttachment: attachment.copyWith(
-                localPath: downloadResult.localPath,
-                isDownloaded: true,
-              ),
-            );
+          fileAttachment: attachment.copyWith(
+            localPath: downloadResult.localPath,
+            isDownloaded: true,
+          ),
+        );
 
         // Defer setState to avoid calling during build phase
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1350,10 +1350,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _openFile(
-    String filePath, {
-    bool isImage = false,
-    String? imageUrl,
-  }) async {
+      String filePath, {
+        bool isImage = false,
+        String? imageUrl,
+      }) async {
     final l10n = AppLocalizations.of(context)!;
 
     // On web, use dialog-based image viewer for images to prevent map iframe destruction
