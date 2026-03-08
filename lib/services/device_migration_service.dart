@@ -2,15 +2,19 @@
 // Handles cross-device user data synchronization with end-to-end encryption
 
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:barter_app/models/auth/device_management_models.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
+import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pointycastle/export.dart' as pc;
 
@@ -32,7 +36,8 @@ enum MigrationStatus {
 
 /// Represents a migration session between two devices
 class MigrationSession {
-  final String sessionId;
+  final String sessionId; // UUID for API calls
+  final String? sessionCode; // 10-char code for user display (nullable for email recovery)
   final String sourceDeviceId;
   final String targetDeviceId;
   final DateTime createdAt;
@@ -43,6 +48,7 @@ class MigrationSession {
 
   MigrationSession({
     required this.sessionId,
+    this.sessionCode,
     required this.sourceDeviceId,
     required this.targetDeviceId,
     required this.createdAt,
@@ -68,6 +74,7 @@ class MigrationData {
   final List<ParsedAttributeData> offerings;
   final Map<String, double> profileKeywordDataMap;
   final String publicKey;
+  final String privateKey; // Private key for authentication on target device
   final DateTime timestamp;
   final String deviceFingerprint;
 
@@ -79,6 +86,7 @@ class MigrationData {
     required this.offerings,
     required this.profileKeywordDataMap,
     required this.publicKey,
+    required this.privateKey,
     required this.timestamp,
     required this.deviceFingerprint,
   });
@@ -91,6 +99,7 @@ class MigrationData {
     'offerings': offerings.map((e) => e.toJson()).toList(),
     'profileKeywordDataMap': profileKeywordDataMap,
     'publicKey': publicKey,
+    'privateKey': privateKey,
     'timestamp': timestamp.toUtc().toIso8601String(),
     'deviceFingerprint': deviceFingerprint,
   };
@@ -109,6 +118,7 @@ class MigrationData {
       profileKeywordDataMap: (json['profileKeywordDataMap'] as Map<String, dynamic>)
           .map((k, v) => MapEntry(k, (v as num).toDouble())),
       publicKey: json['publicKey'] as String,
+      privateKey: json['privateKey'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String).toLocal(),
       deviceFingerprint: json['deviceFingerprint'] as String,
     );
@@ -177,6 +187,7 @@ class DeviceMigrationService {
 
   final SecureStorageService _secureStorage;
   final ApiClient _apiClient;
+  final UserRepository _userRepository;
   CryptoService? _cryptoService;
 
   MigrationSession? _currentSession;
@@ -184,14 +195,46 @@ class DeviceMigrationService {
   DeviceMigrationService(
     this._secureStorage,
     this._apiClient,
+    this._userRepository,
   );
+
+  /// Updates the current session to use UUID instead of sessionCode
+  /// This is called when target joins and we receive the UUID from backend
+  Future<void> updateSessionId(String sessionId) async {
+    if (_currentSession == null) return;
+    
+    // Only update if the sessionId is different (UUID vs sessionCode)
+    if (_currentSession!.sessionId != sessionId) {
+      logDebug('🔄 Updating session ID from ${_currentSession!.sessionId} to $sessionId');
+      
+      // Create updated session with UUID
+      final updatedSession = MigrationSession(
+        sessionId: sessionId, // Use UUID
+        sessionCode: _currentSession!.sessionCode ?? _currentSession!.sessionId, // Keep original code
+        sourceDeviceId: _currentSession!.sourceDeviceId,
+        targetDeviceId: _currentSession!.targetDeviceId,
+        createdAt: _currentSession!.createdAt,
+        expiresAt: _currentSession!.expiresAt,
+        status: _currentSession!.status,
+        attemptCount: _currentSession!.attemptCount,
+      );
+      
+      // Update current session
+      _currentSession = updatedSession;
+      
+      // Persist updated session
+      await _storeSession(updatedSession);
+      
+      logDebug('✅ Session ID updated to UUID: $sessionId');
+    }
+  }
 
   // ==========================================================================
   // PUBLIC API - Source Device (Export)
   // ==========================================================================
 
   /// Initiates a migration session from the source device
-  /// Returns a session ID that the user must enter on the target device
+  /// Returns a session code that the user must enter on the target device
   Future<MigrationInitiationResult> initiateMigration() async {
     try {
       logDebug('🔐 Initializing device migration...');
@@ -214,35 +257,50 @@ class DeviceMigrationService {
         );
       }
 
-      // 3. Generate unique session ID (10-character alphanumeric)
-      final sessionId = _generateSessionId();
-
-      // 4. Create device fingerprint for binding
+      // 3. Create device fingerprint and get source public key
       final deviceFingerprint = await _generateDeviceFingerprint();
+      final sourcePublicKey = _cryptoService!.ecPublicKeyToString(
+        _cryptoService!.getPublicKey()!,
+      );
+
+      // 4. Call backend to create migration session
+      final response = await _apiClient.initiateDeviceMigration({
+        'userId': userId,
+        'sourceDeviceId': deviceFingerprint,
+        'sourcePublicKey': sourcePublicKey,
+      });
+
+      if (!response.success || response.sessionCode == null) {
+        return MigrationInitiationResult.error(
+          response.errorMessage ?? 'Failed to initiate migration session',
+        );
+      }
+
+      final sessionCode = response.sessionCode!;
 
       // 5. Generate ephemeral key pair for this session
       final ephemeralKeyPair = await _generateEphemeralKeyPair();
 
       // 6. Create migration session
       final session = MigrationSession(
-        sessionId: sessionId,
+        sessionId: sessionCode, // Using session code as ID
         sourceDeviceId: deviceFingerprint,
         targetDeviceId: '', // Will be set when target connects
         createdAt: DateTime.now(),
-        expiresAt: DateTime.now().add(_sessionExpiry),
+        expiresAt: DateTime.parse(response.expiresAt!),
         status: MigrationStatus.initiating,
       );
 
       // 7. Store session data securely
       await _storeSession(session);
-      await _storeEphemeralKeys(sessionId, ephemeralKeyPair);
+      await _storeEphemeralKeys(sessionCode, ephemeralKeyPair);
 
       _currentSession = session;
 
-      logDebug('✅ Migration initiated. Session ID: $sessionId');
+      logDebug('✅ Migration initiated. Session Code: $sessionCode');
 
       return MigrationInitiationResult.success(
-        sessionId: sessionId,
+        sessionCode: sessionCode,
         expiresAt: session.expiresAt,
         deviceFingerprint: deviceFingerprint,
       );
@@ -271,16 +329,31 @@ class DeviceMigrationService {
       // 1. Gather all user data
       final migrationData = await _gatherMigrationData(session.sourceDeviceId);
 
-      // 2. Serialize and encrypt data
+      // 2. Serialize and encrypt data using target's public key
+      // Note: targetPublicKey may be URL-safe Base64, ecPublicKeyFromString handles both
+      final keyPreview = targetPublicKey.length > 30 
+          ? targetPublicKey.substring(0, 30) 
+          : targetPublicKey;
+      logDebug('🔑 Parsing target public key: $keyPreview... (${targetPublicKey.length} chars)');
+      
+      if (targetPublicKey.isEmpty) {
+        throw Exception('Target public key is empty - cannot encrypt payload');
+      }
+      
       final payload = await _encryptMigrationData(
         migrationData: migrationData,
         targetDeviceId: targetDeviceId,
         targetPublicKey: targetPublicKey,
       );
 
-      // 3. Update session status
+      // 3. Send payload using sessionId (UUID) if available, otherwise sessionCode
+      final apiSessionId = session.sessionId; // This is the UUID for API calls
+      logDebug('📤 Sending migration payload with sessionId: $apiSessionId');
+
+      // 4. Update session status
       final updatedSession = MigrationSession(
         sessionId: session.sessionId,
+        sessionCode: session.sessionCode,
         sourceDeviceId: session.sourceDeviceId,
         targetDeviceId: targetDeviceId,
         createdAt: session.createdAt,
@@ -303,9 +376,11 @@ class DeviceMigrationService {
   // ==========================================================================
 
   /// Attempts to join a migration session from the target device
-  Future<MigrationJoinResult> joinMigrationSession(String sessionId) async {
+  /// Uses session code (10-char alphanumeric) to identify the session
+  /// Stores sessionId (UUID) from response for API calls
+  Future<MigrationJoinResult> joinMigrationSession(String sessionCode) async {
     try {
-      logDebug('🔐 Joining migration session: $sessionId');
+      logDebug('🔐 Joining migration session: $sessionCode');
 
       // 1. Initialize crypto on target device
       _cryptoService = await CryptoService.create();
@@ -313,7 +388,7 @@ class DeviceMigrationService {
       // 2. Generate ephemeral key pair for this session (for ECDH)
       logDebug('🔑 Generating ephemeral key pair for session...');
       final ephemeralKeyPair = await _generateEphemeralKeyPair();
-      await _storeEphemeralKeys(sessionId, ephemeralKeyPair);
+      await _storeEphemeralKeys(sessionCode, ephemeralKeyPair);
       final ephemeralPublicKey = _cryptoService!.ecPublicKeyToString(
         ephemeralKeyPair.publicKey,
       );
@@ -321,23 +396,24 @@ class DeviceMigrationService {
       // 3. Generate target device fingerprint
       final deviceFingerprint = await _generateDeviceFingerprint();
 
-      // 4. Call API to register target device
-      // Note: We send the ephemeral public key (for ECDH), not the main device key
+      // 4. Call API to register target device with session code
       final response = await _apiClient.registerMigrationTarget({
-        'sessionId': sessionId,
+        'sessionCode': sessionCode,
         'targetDeviceId': deviceFingerprint,
         'targetPublicKey': ephemeralPublicKey,
       });
 
-      if (!response.success) {
+      if (!response.success || response.sessionId == null) {
         return MigrationJoinResult.error(
-          response.errorMessage ?? 'Failed to join session',
+          response.errorMessage ?? 'Failed to join session - no sessionId received',
         );
       }
 
-      // 5. Store session info locally
+      // 5. Store session info locally - use sessionId (UUID) for API calls
+      // but keep sessionCode for reference
       final session = MigrationSession(
-        sessionId: sessionId,
+        sessionId: response.sessionId!, // UUID for API calls
+        sessionCode: sessionCode, // 10-char code for display
         sourceDeviceId: response.sourceDeviceId!,
         targetDeviceId: deviceFingerprint,
         createdAt: DateTime.now(),
@@ -348,11 +424,14 @@ class DeviceMigrationService {
       _currentSession = session;
 
       logDebug('✅ Joined migration session successfully');
+      logDebug('   Session Code: $sessionCode');
+      logDebug('   Session ID (UUID): ${response.sessionId}');
 
       return MigrationJoinResult.success(
+        sessionId: response.sessionId!,
         sourceDeviceId: response.sourceDeviceId!,
         userId: response.userId!,
-        requiresConfirmation: response.requiresConfirmation,
+        requiresConfirmation: true,
       );
     } catch (e) {
       logDebugError('Failed to join migration session: $e');
@@ -388,13 +467,55 @@ class DeviceMigrationService {
       // 4. Import data to secure storage
       await _importMigrationData(migrationData);
 
-      // 5. Notify backend of successful migration
-      await _apiClient.confirmMigrationComplete({
-        'sessionId': payload.sessionId,
-        'targetDeviceId': payload.targetDeviceId,
+      // 5. Complete migration - use stored sessionId (UUID) for API call
+      // Get current device info
+      final deviceFingerprint = await _generateDeviceFingerprint();
+      
+      // Use the imported source device's public key for device registration
+      // This ensures the device key matches user_registration_data.public_key
+      final sourcePublicKey = migrationData.publicKey;
+      
+      // Use the stored sessionId (UUID) not the payload sessionId (which might be sessionCode)
+      final apiSessionId = _currentSession?.sessionId ?? payload.sessionId;
+      logDebug('📤 Completing migration with sessionId: $apiSessionId');
+      logDebug('   Using source public key for device registration: ${sourcePublicKey.substring(0, 30)}...');
+      
+      // Call complete migration and get the response with userId
+      final response = await _apiClient.completeMigration({
+        'sessionId': apiSessionId,
+        'newDeviceId': deviceFingerprint,
+        'devicePublicKey': sourcePublicKey, // Use imported source key, not new key
+        'deviceName': await _getDeviceName(),
       });
+      
+      // IMPORTANT: Use the userId from the server response, not from payload
+      // This ensures we use the canonical user ID from the database
+      final migratedUserId = response.userId;
+      if (migratedUserId != null && migratedUserId.isNotEmpty) {
+        logDebug('✅ Migration completed. User ID from server: $migratedUserId');
+        
+        // ALWAYS clear the UserRepository cache to ensure we load the correct userId
+        // This is critical for chat authentication to work
+        logDebug('🔄 Updating stored userId to: $migratedUserId');
+        await _secureStorage.saveOwnUserId(migratedUserId);
+        
+        // CRITICAL: Clear the UserRepository cache so it loads the new userId
+        // Must happen AFTER saving to storage, BEFORE any API calls
+        _userRepository.clearCache();
+        logDebug('🧹 UserRepository cache cleared - will reload from storage on next access');
+        
+        // Force immediate reload to verify
+        final reloadedUserId = await _userRepository.getUserId();
+        logDebug('🔄 UserRepository reloaded userId: $reloadedUserId');
+        
+        // Verify the update worked
+        final verifyUserId = await _secureStorage.getOwnUserId();
+        logDebug('✅ Verified stored userId: $verifyUserId');
+      } else {
+        logDebugError('⚠️ No userId in migration response - using payload userId');
+      }
 
-      return MigrationReceiveResult.success(migrationData);
+      return MigrationReceiveResult.success(migrationData, migratedUserId ?? migrationData.userId);
     } catch (e) {
       logDebugError('Failed to receive migration data: $e');
       return MigrationReceiveResult.error('Receive failed: $e');
@@ -556,30 +677,20 @@ class DeviceMigrationService {
       // Reconstruct what was signed
       final payloadToVerify = '${payload.sessionId}.${payload.targetDeviceId}.${base64Encode(encryptedBytes)}';
 
-      // We need the source device's public key - get it from the session
-      final session = await _getSession(payload.sessionId);
-      if (session == null) {
-        logDebugError('Signature verification: No session found');
+      // Get the source device's signing public key from the payload
+      // This was added by the source device during payload creation
+      final sourceSigningPublicKey = payload.sourceSigningPublicKey;
+      if (sourceSigningPublicKey == null) {
+        logDebugError('Signature verification: No source signing public key in payload');
         return false;
       }
 
-      // Get source device public key from backend
-      final sourcePublicKeyResponse = await _apiClient.getMigrationPublicKey(
-        payload.sessionId,
-        payload.sourceDeviceId,
-      );
-
-      if (!sourcePublicKeyResponse.success) {
-        logDebugError('Signature verification: Failed to get public key');
-        return false;
-      }
-
-      logDebug('🔑 Source public key from backend: ${sourcePublicKeyResponse.publicKey}');
+      logDebug('🔑 Source signing public key from payload: $sourceSigningPublicKey');
       logDebug('📝 Payload to verify: ${payloadToVerify.substring(0, min(50, payloadToVerify.length))}...');
       logDebug('✍️ Signature: ${payload.signature.substring(0, min(50, payload.signature.length))}...');
 
       final sourcePublicKey = _cryptoService!.ecPublicKeyFromString(
-        sourcePublicKeyResponse.publicKey!,
+        sourceSigningPublicKey,
       );
       if (sourcePublicKey == null) {
         logDebugError('Signature verification: Failed to parse public key');
@@ -642,6 +753,12 @@ class DeviceMigrationService {
     final offerings = await _secureStorage.getOwnOfferingsAttributes() ?? [];
     final keywordMap = await _secureStorage.getProfileKeywordDataMap() ?? {};
     final publicKey = (await _secureStorage.getOwnPublicKey())!;
+    
+    // Get private key from secure storage
+    final privateKey = await _secureStorage.getOwnPrivateKey();
+    if (privateKey == null) {
+      throw Exception('Private key not found - cannot migrate without authentication key');
+    }
 
     return MigrationData(
       userId: userId,
@@ -651,6 +768,7 @@ class DeviceMigrationService {
       offerings: offerings,
       profileKeywordDataMap: keywordMap,
       publicKey: publicKey,
+      privateKey: privateKey,
       timestamp: DateTime.now(),
       deviceFingerprint: deviceFingerprint,
     );
@@ -667,11 +785,18 @@ class DeviceMigrationService {
     await _secureStorage.saveOwnOfferingsAttributes(data.offerings);
     await _secureStorage.saveProfileKeywordDataMap(data.profileKeywordDataMap);
 
-    // Note: We DON'T import the private key - new keypair is generated
-    // The public key is stored for reference
+    // Import the source device's keys for authentication
+    // This allows the target device to act as the source user
     await _secureStorage.saveOwnPublicKey(data.publicKey);
-
+    await _secureStorage.saveOwnPrivateKey(data.privateKey);
+    
+    // CRITICAL: Reload CryptoService with the imported keys
+    // The singleton may still have old cached keys in memory
+    logDebug('🔄 Reloading CryptoService with imported keys...');
+    await _cryptoService!.reloadKeyPairFromStorage();
+    
     logDebug('✅ Migration data imported successfully');
+    logDebug('   Keys imported: publicKey present, privateKey present');
   }
 
   /// Validates migration data integrity
@@ -705,6 +830,23 @@ class DeviceMigrationService {
     }
 
     return true;
+  }
+
+  /// Gets a friendly device name
+  Future<String> _getDeviceName() async {
+    try {
+      String platformName;
+      if (kIsWeb) {
+        platformName = 'Web';
+      } else if (Platform.isIOS) {
+        platformName = 'iPhone';
+      } else {
+        platformName = 'Android';
+      }
+      return '$platformName Device';
+    } catch (e) {
+      return 'Mobile Device';
+    }
   }
 
   // ==========================================================================
@@ -771,6 +913,7 @@ class DeviceMigrationService {
     final key = '$_migrationSessionsKey${session.sessionId}';
     final json = jsonEncode({
       'sessionId': session.sessionId,
+      'sessionCode': session.sessionCode,
       'sourceDeviceId': session.sourceDeviceId,
       'targetDeviceId': session.targetDeviceId,
       'createdAt': session.createdAt.toIso8601String(),
@@ -791,6 +934,7 @@ class DeviceMigrationService {
       final map = jsonDecode(json) as Map<String, dynamic>;
       return MigrationSession(
         sessionId: map['sessionId'] as String,
+        sessionCode: map['sessionCode'] as String?,
         sourceDeviceId: map['sourceDeviceId'] as String,
         targetDeviceId: map['targetDeviceId'] as String,
         createdAt: DateTime.parse(map['createdAt'] as String),
@@ -826,10 +970,24 @@ class DeviceMigrationService {
   Future<pc.AsymmetricKeyPair<pc.ECPublicKey, pc.ECPrivateKey>> _loadEphemeralKeys(
     String sessionId,
   ) async {
+    // Try loading with sessionId first (could be UUID or sessionCode)
     final prefix = _migrationNonceKey + sessionId;
 
-    final privateKeyHex = await _secureStorage.read(key: '${prefix}_priv');
-    final publicKeyBase64 = await _secureStorage.read(key: '${prefix}_pub');
+    var privateKeyHex = await _secureStorage.read(key: '${prefix}_priv');
+    var publicKeyBase64 = await _secureStorage.read(key: '${prefix}_pub');
+    
+    // If not found and we have a session with sessionCode, try that
+    if ((privateKeyHex == null || publicKeyBase64 == null) && 
+        _currentSession?.sessionCode != null &&
+        _currentSession?.sessionCode != sessionId) {
+      final fallbackPrefix = _migrationNonceKey + _currentSession!.sessionCode!;
+      privateKeyHex = await _secureStorage.read(key: '${fallbackPrefix}_priv');
+      publicKeyBase64 = await _secureStorage.read(key: '${fallbackPrefix}_pub');
+      
+      if (privateKeyHex != null && publicKeyBase64 != null) {
+        logDebug('🔑 Loaded ephemeral keys using sessionCode fallback');
+      }
+    }
 
     if (privateKeyHex == null || publicKeyBase64 == null) {
       throw Exception('Ephemeral keys not found for session');
@@ -870,27 +1028,27 @@ class DeviceMigrationService {
 
 class MigrationInitiationResult {
   final bool success;
-  final String? sessionId;
+  final String? sessionCode;
   final DateTime? expiresAt;
   final String? deviceFingerprint;
   final String? errorMessage;
 
   MigrationInitiationResult._({
     required this.success,
-    this.sessionId,
+    this.sessionCode,
     this.expiresAt,
     this.deviceFingerprint,
     this.errorMessage,
   });
 
   factory MigrationInitiationResult.success({
-    required String sessionId,
+    required String sessionCode,
     required DateTime expiresAt,
     required String deviceFingerprint,
   }) {
     return MigrationInitiationResult._(
       success: true,
-      sessionId: sessionId,
+      sessionCode: sessionCode,
       expiresAt: expiresAt,
       deviceFingerprint: deviceFingerprint,
     );
@@ -906,6 +1064,7 @@ class MigrationInitiationResult {
 
 class MigrationJoinResult {
   final bool success;
+  final String? sessionId; // UUID for API calls
   final String? sourceDeviceId;
   final String? userId;
   final bool requiresConfirmation;
@@ -913,6 +1072,7 @@ class MigrationJoinResult {
 
   MigrationJoinResult._({
     required this.success,
+    this.sessionId,
     this.sourceDeviceId,
     this.userId,
     this.requiresConfirmation = true,
@@ -920,12 +1080,14 @@ class MigrationJoinResult {
   });
 
   factory MigrationJoinResult.success({
+    required String sessionId,
     required String sourceDeviceId,
     required String userId,
     required bool requiresConfirmation,
   }) {
     return MigrationJoinResult._(
       success: true,
+      sessionId: sessionId,
       sourceDeviceId: sourceDeviceId,
       userId: userId,
       requiresConfirmation: requiresConfirmation,
@@ -963,16 +1125,18 @@ class MigrationPayloadResult {
 class MigrationReceiveResult {
   final bool success;
   final MigrationData? data;
+  final String? userId; // User ID from completeMigration response
   final String? errorMessage;
 
   MigrationReceiveResult._({
     required this.success,
     this.data,
+    this.userId,
     this.errorMessage,
   });
 
-  factory MigrationReceiveResult.success(MigrationData data) {
-    return MigrationReceiveResult._(success: true, data: data);
+  factory MigrationReceiveResult.success(MigrationData data, String userId) {
+    return MigrationReceiveResult._(success: true, data: data, userId: userId);
   }
 
   factory MigrationReceiveResult.error(String message) {

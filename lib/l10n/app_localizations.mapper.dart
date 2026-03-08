@@ -970,6 +970,8 @@ class AppLocalizationsMapper {
       'reviewUser': (String userName) => localizations.reviewUser(userName),
       'downloadingFile': (String filename) =>
           localizations.downloadingFile(filename),
+      'decryptingFile': (String filename) =>
+          localizations.decryptingFile(filename),
       'downloadFailed': (String error) => localizations.downloadFailed(error),
       'fileSavedAt': (String filePath) => localizations.fileSavedAt(filePath),
       'fileNotFound': (String filePath) => localizations.fileNotFound(filePath),

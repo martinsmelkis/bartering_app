@@ -24,7 +24,8 @@ class SourceMigrationScreen extends StatefulWidget {
 }
 
 class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
-  String? _sessionId;
+  String? _sessionId; // 10-char session code for display
+  String? _sessionIdUuid; // UUID for API calls
   DateTime? _expiresAt;
   String? _errorMessage;
   bool _isGenerating = false;
@@ -100,13 +101,13 @@ class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
     }
   }
   
-  Future<void> _pollForTargetDevice(BuildContext context, String sessionId) async {
+  Future<void> _pollForTargetDevice(BuildContext context, String sessionCode) async {
     final cubit = context.read<DeviceMigrationCubit>();
     
     logDebug('⏳ Starting to poll for target device...');
     
     // Poll for target device (this will block until target joins or timeout)
-    final targetInfo = await cubit.pollForTargetDeviceAndWait(sessionId);
+    final targetInfo = await cubit.pollForTargetDeviceAndWait(sessionCode);
     
     if (targetInfo == null) {
       logDebug('⏳ Target device did not join in time');
@@ -118,6 +119,12 @@ class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
     }
     
     logDebug('✅ Target device joined: ${targetInfo['targetDeviceId']}');
+    logDebug('   Session ID (UUID): ${targetInfo['sessionId']}');
+    
+    // Store UUID for payload API calls
+    setState(() {
+      _sessionIdUuid = targetInfo['sessionId'];
+    });
     
     // Target device joined, emit state to show confirmation dialog
     cubit.emit(DeviceMigrationAwaitingConfirmation(
@@ -560,10 +567,14 @@ class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
                     _isSendingPayload = true;
                   });
                   
+                  // Use sessionId (UUID) for API calls, not sessionCode
+                  final sessionId = _sessionIdUuid ?? _sessionId;
+                  
                   final cubit = context.read<DeviceMigrationCubit>();
                   final success = await cubit.prepareAndSendMigrationPayload(
                     targetDeviceId,
                     targetPublicKey,
+                    sessionId!, // Use UUID for payload API call
                   );
                   
                   setState(() {

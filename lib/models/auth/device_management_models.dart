@@ -1,67 +1,166 @@
 // Device Migration and Management Response Models
 // These classes represent API responses for device management operations
 
+/// Response from initiating a device-to-device migration session
+class InitiateMigrationResponse {
+  final bool success;
+  final String? sessionCode;
+  final String? errorMessage;
+  final String? expiresAt;
+
+  InitiateMigrationResponse({
+    required this.success,
+    this.sessionCode,
+    this.errorMessage,
+    this.expiresAt,
+  });
+
+  factory InitiateMigrationResponse.fromJson(Map<String, dynamic> json) {
+    return InitiateMigrationResponse(
+      success: json['success'] as bool? ?? false,
+      sessionCode: json['sessionCode'] as String?,
+      errorMessage: json['errorMessage'] as String?,
+      expiresAt: json['expiresAt'] as String?,
+    );
+  }
+}
+
 /// Response from registering a migration target device
 class RegisterMigrationTargetResponse {
   final bool success;
+  final String? sessionId; // UUID for API calls
   final String? sourceDeviceId;
   final String? userId;
-  final bool requiresConfirmation;
   final String? errorMessage;
 
   RegisterMigrationTargetResponse({
     required this.success,
+    this.sessionId,
     this.sourceDeviceId,
     this.userId,
-    this.requiresConfirmation = true,
     this.errorMessage,
   });
 
   factory RegisterMigrationTargetResponse.fromJson(Map<String, dynamic> json) {
     return RegisterMigrationTargetResponse(
       success: json['success'] as bool? ?? false,
+      sessionId: json['sessionId'] as String?,
       sourceDeviceId: json['sourceDeviceId'] as String?,
       userId: json['userId'] as String?,
-      requiresConfirmation: json['requiresConfirmation'] as bool? ?? true,
       errorMessage: json['errorMessage'] as String?,
     );
   }
 }
 
-/// Response from getting a migration public key
-class GetMigrationPublicKeyResponse {
+/// Response from completing migration
+class CompleteMigrationResponse {
   final bool success;
-  final String? publicKey;
+  final String? userId;
+  final String? message;
+  final String? warning;
+
+  CompleteMigrationResponse({
+    required this.success,
+    this.userId,
+    this.message,
+    this.warning,
+  });
+
+  factory CompleteMigrationResponse.fromJson(Map<String, dynamic> json) {
+    return CompleteMigrationResponse(
+      success: json['success'] as bool? ?? false,
+      userId: json['userId'] as String?,
+      message: json['message'] as String?,
+      warning: json['warning'] as String?,
+    );
+  }
+}
+
+/// Response from cancelling migration
+class CancelMigrationResponse {
+  final bool success;
+  final String? message;
+
+  CancelMigrationResponse({
+    required this.success,
+    this.message,
+  });
+
+  factory CancelMigrationResponse.fromJson(Map<String, dynamic> json) {
+    return CancelMigrationResponse(
+      success: json['success'] as bool? ?? false,
+      message: json['message'] as String?,
+    );
+  }
+}
+
+/// Response from initiating email recovery
+class InitiateRecoveryResponse {
+  final bool success;
+  final String? sessionId;
+  final String? message;
+  final String? emailMasked;
+  final String? expiresAt;
   final String? errorMessage;
 
-  GetMigrationPublicKeyResponse({
+  InitiateRecoveryResponse({
     required this.success,
-    this.publicKey,
+    this.sessionId,
+    this.message,
+    this.emailMasked,
+    this.expiresAt,
     this.errorMessage,
   });
 
-  factory GetMigrationPublicKeyResponse.fromJson(Map<String, dynamic> json) {
-    return GetMigrationPublicKeyResponse(
+  factory InitiateRecoveryResponse.fromJson(Map<String, dynamic> json) {
+    return InitiateRecoveryResponse(
       success: json['success'] as bool? ?? false,
-      publicKey: json['publicKey'] as String?,
+      sessionId: json['sessionId'] as String?,
+      message: json['message'] as String?,
+      emailMasked: json['emailMasked'] as String?,
+      expiresAt: json['expiresAt'] as String?,
       errorMessage: json['errorMessage'] as String?,
     );
   }
 }
 
-/// Response from confirming migration completion
+/// Response from verifying recovery code
+class VerifyRecoveryCodeResponse {
+  final bool success;
+  final String? message;
+  final String? errorMessage;
+
+  VerifyRecoveryCodeResponse({
+    required this.success,
+    this.message,
+    this.errorMessage,
+  });
+
+  factory VerifyRecoveryCodeResponse.fromJson(Map<String, dynamic> json) {
+    return VerifyRecoveryCodeResponse(
+      success: json['success'] as bool? ?? false,
+      message: json['message'] as String?,
+      errorMessage: json['errorMessage'] as String?,
+    );
+  }
+}
+
+/// Simple confirm response for migration operations
 class ConfirmMigrationResponse {
   final bool success;
+  final String? message;
   final String? errorMessage;
 
   ConfirmMigrationResponse({
     required this.success,
+    this.message,
     this.errorMessage,
   });
 
   factory ConfirmMigrationResponse.fromJson(Map<String, dynamic> json) {
     return ConfirmMigrationResponse(
       success: json['success'] as bool? ?? false,
+      message: json['message'] as String?,
       errorMessage: json['errorMessage'] as String?,
     );
   }
@@ -71,22 +170,20 @@ class ConfirmMigrationResponse {
 class MigrationStatusResponse {
   final bool success;
   final String? sessionId;
+  final String? type; // 'device_to_device' or 'email_recovery'
   final String? status;
-  final String? sourceDeviceId;
-  final String? targetDeviceId;
-  final String? targetPublicKey;
-  final String? createdAt;
+  final String? targetPublicKey; // Target device's ephemeral public key for ECDH
+  final int? attemptsRemaining;
   final String? expiresAt;
   final String? errorMessage;
 
   MigrationStatusResponse({
     required this.success,
     this.sessionId,
+    this.type,
     this.status,
-    this.sourceDeviceId,
-    this.targetDeviceId,
     this.targetPublicKey,
-    this.createdAt,
+    this.attemptsRemaining,
     this.expiresAt,
     this.errorMessage,
   });
@@ -95,21 +192,20 @@ class MigrationStatusResponse {
     return MigrationStatusResponse(
       success: json['success'] as bool? ?? false,
       sessionId: json['sessionId'] as String?,
+      type: json['type'] as String?,
       status: json['status'] as String?,
-      sourceDeviceId: json['sourceDeviceId'] as String?,
-      targetDeviceId: json['targetDeviceId'] as String?,
       targetPublicKey: json['targetPublicKey'] as String?,
-      createdAt: json['createdAt'] as String?,
+      attemptsRemaining: json['attemptsRemaining'] as int?,
       expiresAt: json['expiresAt'] as String?,
       errorMessage: json['errorMessage'] as String?,
     );
   }
 
-  /// Returns true if target device has joined
+  /// Returns true if target device has joined (for device-to-device)
   bool get hasTargetJoined =>
-    targetDeviceId != null &&
-    targetDeviceId != 'PENDING' &&
-    targetPublicKey != null;
+    status == 'awaiting_confirmation' ||
+    status == 'transferring' ||
+    status == 'verified';
 }
 
 /// Encrypted migration payload response
@@ -121,6 +217,7 @@ class EncryptedMigrationPayloadResponse {
   final String targetDeviceId;
   final String sessionId;
   final int keyVersion;
+  final String? sourceSigningPublicKey;
 
   EncryptedMigrationPayloadResponse({
     required this.encryptedData,
@@ -130,17 +227,22 @@ class EncryptedMigrationPayloadResponse {
     required this.targetDeviceId,
     required this.sessionId,
     this.keyVersion = 1,
+    this.sourceSigningPublicKey,
   });
 
   factory EncryptedMigrationPayloadResponse.fromJson(Map<String, dynamic> json) {
+    // Backend wraps payload in 'encryptedPayload' object
+    final payload = json['encryptedPayload'] as Map<String, dynamic>? ?? json;
+    
     return EncryptedMigrationPayloadResponse(
-      encryptedData: json['encryptedData'] as String,
-      ephemeralPublicKey: json['ephemeralPublicKey'] as String,
-      signature: json['signature'] as String,
-      sourceDeviceId: json['sourceDeviceId'] as String,
-      targetDeviceId: json['targetDeviceId'] as String,
-      sessionId: json['sessionId'] as String,
-      keyVersion: json['keyVersion'] as int? ?? 1,
+      encryptedData: payload['encryptedData'] as String,
+      ephemeralPublicKey: payload['ephemeralPublicKey'] as String,
+      signature: payload['signature'] as String,
+      sourceDeviceId: payload['sourceDeviceId'] as String,
+      targetDeviceId: payload['targetDeviceId'] as String,
+      sessionId: payload['sessionId'] as String,
+      keyVersion: payload['keyVersion'] as int? ?? 1,
+      sourceSigningPublicKey: payload['sourceSigningPublicKey'] as String?,
     );
   }
 }

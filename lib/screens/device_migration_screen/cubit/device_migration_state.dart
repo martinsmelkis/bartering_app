@@ -31,6 +31,14 @@ class DeviceMigrationAwaitingConfirmation extends DeviceMigrationState {
   });
 }
 
+class DeviceMigrationAwaitingPayload extends DeviceMigrationState {
+  final String sessionId;
+
+  const DeviceMigrationAwaitingPayload({
+    required this.sessionId,
+  });
+}
+
 class DeviceMigrationTransferring extends DeviceMigrationState {
   const DeviceMigrationTransferring();
 }

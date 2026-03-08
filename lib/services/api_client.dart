@@ -438,21 +438,20 @@ abstract class ApiClient {
 
   ///////////// DEVICE MIGRATION ///////////////
 
+  /// Initiates a device-to-device migration session (source device)
+  @POST('/api/v1/migration/device/initiate')
+  Future<InitiateMigrationResponse> initiateDeviceMigration(
+    @Body() Map<String, dynamic> request,
+  );
+
   /// Registers a target device for a migration session
-  @POST('/api/v1/migration/target')
+  @POST('/api/v1/migration/device/target')
   Future<RegisterMigrationTargetResponse> registerMigrationTarget(
     @Body() Map<String, dynamic> request,
   );
 
-  /// Retrieves a device's signing public key for verification
-  @GET('/api/v1/migration/public-key')
-  Future<GetMigrationPublicKeyResponse> getMigrationPublicKey(
-    @Query('sessionId') String sessionId,
-    @Query('deviceId') String deviceId,
-  );
-
-  /// Relays encrypted migration payload from source to target
-  @POST('/api/v1/migration/payload')
+  /// Sends encrypted migration payload from source device
+  @POST('/api/v1/migration/device/payload')
   Future<ConfirmMigrationResponse> sendMigrationPayload(
     @Body() Map<String, dynamic> request,
   );
@@ -463,9 +462,9 @@ abstract class ApiClient {
     @Query('sessionId') String sessionId,
   );
 
-  /// Confirms successful migration and invalidates session
+  /// Completes migration and registers the new device
   @POST('/api/v1/migration/complete')
-  Future<ConfirmMigrationResponse> confirmMigrationComplete(
+  Future<CompleteMigrationResponse> completeMigration(
     @Body() Map<String, dynamic> request,
   );
 
@@ -473,6 +472,26 @@ abstract class ApiClient {
   @GET('/api/v1/migration/status')
   Future<MigrationStatusResponse> getMigrationStatus(
     @Query('sessionId') String sessionId,
+  );
+
+  /// Cancels an active migration session
+  @POST('/api/v1/migration/cancel')
+  Future<CancelMigrationResponse> cancelMigration(
+    @Body() Map<String, dynamic> request,
+  );
+
+  ///////////// EMAIL RECOVERY ///////////////
+
+  /// Initiates email recovery when source device is broken/lost
+  @POST('/api/v1/migration/recovery/initiate')
+  Future<InitiateRecoveryResponse> initiateEmailRecovery(
+    @Body() Map<String, dynamic> request,
+  );
+
+  /// Verifies recovery code sent via email
+  @POST('/api/v1/migration/recovery/verify')
+  Future<VerifyRecoveryCodeResponse> verifyRecoveryCode(
+    @Body() Map<String, dynamic> request,
   );
 
   ///////////// DEVICE MANAGEMENT ///////////////

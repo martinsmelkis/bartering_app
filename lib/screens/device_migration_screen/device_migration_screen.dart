@@ -88,13 +88,13 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
       _errorMessage = null;
     });
 
-    final sessionId = _sessionId;
+    final sessionCode = _sessionId; // 10-char code from user input
     final cubit = context.read<DeviceMigrationCubit>();
 
     // Step 1: Join the migration session
-    final joinResult = await cubit.joinMigrationSession(sessionId);
+    final joinResult = await cubit.joinMigrationSession(sessionCode);
 
-    if (!joinResult.success) {
+    if (!joinResult.success || joinResult.sessionId == null) {
       setState(() {
         _isSubmitting = false;
         _errorMessage = joinResult.errorMessage ?? l10n.failedToJoinMigration;
@@ -102,12 +102,15 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
       return;
     }
 
-    // Step 2: Poll for and receive migration payload from backend
-    // The source device sends the payload via sendMigrationPayload endpoint
-    // We poll the getMigrationPayload endpoint to retrieve it
+    // IMPORTANT: Use sessionId (UUID) for all API calls, not sessionCode!
+    final sessionId = joinResult.sessionId!;
+    logDebug('🔑 Joined session. Session Code: $sessionCode, Session ID: $sessionId');
+
+    // Step 2: Poll for payload to be available (wait for "transferring" status)
+    // Use sessionId (UUID) for payload retrieval, not sessionCode
     EncryptedMigrationPayloadResponse? payload;
     int pollAttempts = 0;
-    const maxPollAttempts = 30; // Poll for up to 5 minutes (10 seconds * 30)
+    const maxPollAttempts = 60; // Poll for up to 10 minutes (10 seconds * 60)
 
     while (payload == null && pollAttempts < maxPollAttempts) {
       await Future.delayed(const Duration(seconds: 10));
@@ -115,13 +118,33 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
       if (!mounted) return;
 
       try {
-        final response = await cubit.getMigrationPayload(sessionId);
-        // If we got here without exception, we have the payload
-        payload = response;
-        break;
+        // Check status first
+        final statusResponse = await cubit.getMigrationStatus(sessionCode);
+        
+        if (statusResponse.success) {
+          logDebug('📊 Poll ${pollAttempts + 1}: Status = ${statusResponse.status}');
+          
+          // Wait for status to become "transferring"
+          if (statusResponse.status == 'transferring') {
+            logDebug('✅ Payload ready! Fetching with sessionId...');
+            // Use sessionId (UUID) not sessionCode for payload retrieval
+            final response = await cubit.getMigrationPayload(sessionId);
+            payload = response;
+            break;
+          }
+          
+          // Check if session ended without payload
+          if (statusResponse.status == 'completed' || 
+              statusResponse.status == 'expired' || 
+              statusResponse.status == 'cancelled' ||
+              statusResponse.status == 'failed') {
+            logDebugError('❌ Session ended with status: ${statusResponse.status}');
+            break;
+          }
+        }
       } catch (e) {
         // Payload not ready yet, continue polling
-        logDebug('⏳ Payload not ready yet, attempt ${pollAttempts + 1}/$maxPollAttempts');
+        logDebug('⏳ Payload not ready yet, attempt ${pollAttempts + 1}/$maxPollAttempts: $e');
       }
 
       pollAttempts++;
@@ -136,6 +159,8 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
     }
 
     // Step 3: Decrypt and import the migration data
+    // Note: completeMigration is called inside receiveMigrationData
+    // We extract the userId from the result for use in the app
     final receiveResult = await cubit.receiveMigrationData(payload);
 
     setState(() {
@@ -149,12 +174,14 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
       return;
     }
 
-    // Step 4: Confirm migration completion
-    try {
-      await cubit.confirmMigrationComplete(sessionId);
-    } catch (e) {
-      logDebugError('Error confirming migration: $e');
-      // Continue even if confirmation fails - data is already imported
+    // Step 4: Use the migrated user ID for all future operations
+    final migratedUserId = receiveResult.userId;
+    if (migratedUserId != null && migratedUserId.isNotEmpty) {
+      logDebug('✅ Using migrated user ID: $migratedUserId');
+      // Store the migrated user ID - already done in receiveMigrationData
+      // But we log it here for confirmation
+    } else {
+      logDebugError('⚠️ No userId in migration result - chat may not work');
     }
 
     if (!mounted) return;
@@ -366,6 +393,16 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
   }
 
   Widget _buildCodeInput(double fontScale) {
+    // Check if we're on a mobile-sized screen (width < 600)
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
+    // Make input fields 25% bigger on mobile
+    final sizeMultiplier = isMobile ? 1.25 : 1.0;
+    
+    final boxWidth = 48 * sizeMultiplier;
+    final boxHeight = 55 * sizeMultiplier;
+    final inputFontSize = (21 / fontScale) * sizeMultiplier;
     return Column(
       children: [
         // First row: characters 0-4
@@ -376,8 +413,8 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
             return Row(
               children: [
                 SizedBox(
-                  width: 48,
-                  height: 55,
+                  width: boxWidth,
+                  height: boxHeight,
                   child: RawKeyboardListener(
                     focusNode: FocusNode(skipTraversal: true),
                     onKey: (event) => _onKeyPressed(index, event),
@@ -388,7 +425,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                       textCapitalization: TextCapitalization.characters,
                       maxLength: 1,
                       style: TextStyle(
-                        fontSize: 21 / fontScale,
+                        fontSize: inputFontSize,
                         fontWeight: FontWeight.bold,
                         color: isFilled ? AppColors.primary : Colors.grey,
                       ),
@@ -437,8 +474,8 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
             return Row(
               children: [
                 SizedBox(
-                  width: 48,
-                  height: 55,
+                  width: boxWidth,
+                  height: boxHeight,
                   child: RawKeyboardListener(
                     focusNode: FocusNode(skipTraversal: true),
                     onKey: (event) => _onKeyPressed(index, event),
@@ -449,7 +486,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                       textCapitalization: TextCapitalization.characters,
                       maxLength: 1,
                       style: TextStyle(
-                        fontSize: 21 / fontScale,
+                        fontSize: inputFontSize,
                         fontWeight: FontWeight.bold,
                         color: isFilled ? AppColors.primary : Colors.grey,
                       ),

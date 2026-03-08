@@ -1,5 +1,6 @@
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
+import 'package:barter_app/utils/debug_utils.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 
@@ -92,7 +93,20 @@ class UserRepository {
     double.tryParse(userLocation?.split(',')[1] ?? "") ?? 0.0 : 0.0;
 
   Future<String?> getUserId() async {
-    userId = userId ?? await _secureStorageService.getOwnUserId();
+    if (userId == null) {
+      logDebug('🔄 UserRepository: Loading userId from storage');
+      userId = await _secureStorageService.getOwnUserId();
+      logDebug('✅ UserRepository: Loaded userId: $userId');
+    } else {
+      // Verify cached value matches storage (in case of migration)
+      final storedUserId = await _secureStorageService.getOwnUserId();
+      if (storedUserId != userId) {
+        logDebug('⚠️ UserRepository: Cache mismatch! Cached: $userId, Stored: $storedUserId');
+        logDebug('🔄 UserRepository: Updating to stored value');
+        userId = storedUserId;
+      }
+      logDebug('📦 UserRepository: Using cached userId: $userId');
+    }
     return userId;
   }
 
@@ -136,6 +150,22 @@ class UserRepository {
     await _secureStorageService.saveOwnPublicKey("");
     userId = const Uuid().v4().toString();
     await _secureStorageService.saveOwnUserId(userId!);
+  }
+
+  /// Clears the in-memory cache, forcing reload from storage on next access
+  /// Call this after migration when user data has changed
+  void clearCache() {
+    logDebug('🧹 UserRepository.clearCache() called');
+    logDebug('   Previous userId: $userId');
+    userId = null;
+    userName = null;
+    publicKey = null;
+    email = null;
+    userLocation = null;
+    profileKeywordDataMap = null;
+    userInterests = null;
+    userOfferings = null;
+    logDebug('✅ UserRepository cache cleared');
   }
 
   Future<void> clearStorage() async {

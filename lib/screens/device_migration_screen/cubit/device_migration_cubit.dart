@@ -33,13 +33,13 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
     emit(const DeviceMigrationLoading());
     try {
       final result = await _migrationService.initiateMigration();
-      if (result.success && result.sessionId != null) {
+      if (result.success && result.sessionCode != null) {
         emit(DeviceMigrationReady(
-          sessionId: result.sessionId!,
+          sessionId: result.sessionCode!,
           expiresAt: result.expiresAt!,
         ));
         return MigrationSessionResult.success(
-          sessionId: result.sessionId!,
+          sessionId: result.sessionCode!,
           expiresAt: result.expiresAt!,
         );
       } else {
@@ -73,19 +73,39 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
   }
 
   /// Polls for target device and shows confirmation dialog
-  Future<Map<String, String>?> pollForTargetDeviceAndWait(String sessionId) async {
-    logDebug('⏳ Polling for target device to join session: $sessionId');
+  /// Uses session code (not UUID) to poll for status
+  /// Returns target device info and sessionId (UUID) when target joins
+  /// Also updates the migration service session to use UUID for signing
+  Future<Map<String, String>?> pollForTargetDeviceAndWait(String sessionCode) async {
+    logDebug('⏳ Polling for target device to join session: $sessionCode');
+    String? sessionId; // UUID for API calls
 
     for (int attempt = 0; attempt < 60; attempt++) {
       try {
         // Check session status to see if target device has joined
-        final response = await _apiClient.getMigrationStatus(sessionId);
-        if (response.success && response.hasTargetJoined) {
-          logDebug('✅ Target device found: ${response.targetDeviceId}');
-          return {
-            'targetDeviceId': response.targetDeviceId!,
-            'targetPublicKey': response.targetPublicKey!,
-          };
+        final response = await _apiClient.getMigrationStatus(sessionCode);
+        if (response.success) {
+          // Capture sessionId (UUID) from response for API calls
+          sessionId ??= response.sessionId;
+          
+          if (response.hasTargetJoined && sessionId != null) {
+            // Get target public key from response (needed for ECDH encryption)
+            final targetPublicKey = response.targetPublicKey ?? '';
+            
+            logDebug('✅ Target device has joined session: $sessionCode');
+            logDebug('   Session ID (UUID): $sessionId');
+            logDebug('   Target public key: ${targetPublicKey.isNotEmpty ? "present (${targetPublicKey.length} chars)" : "MISSING!"}');
+            
+            // IMPORTANT: Update the migration service session to use UUID for signing
+            // The payload must be signed with UUID (not sessionCode) so target can verify
+            await _migrationService.updateSessionId(sessionId);
+            
+            return {
+              'targetDeviceId': 'TARGET',
+              'targetPublicKey': targetPublicKey, // Return actual key from backend
+              'sessionId': sessionId, // Return UUID for payload API calls
+            };
+          }
         }
       } catch (e) {
         logDebug('⏳ Waiting for target device, attempt ${attempt + 1}/60: $e');
@@ -99,9 +119,11 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
 
   /// Prepares and sends migration payload from source device
   /// Called when source device confirms migration (clicks "Allow")
+  /// Uses sessionId (UUID) for API calls, not sessionCode
   Future<bool> prepareAndSendMigrationPayload(
     String targetDeviceId,
     String targetPublicKey,
+    String sessionId, // UUID for API calls
   ) async {
     emit(const DeviceMigrationTransferring());
     try {
@@ -119,17 +141,17 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
 
       final payload = payloadResult.payload!;
 
-      // Step 2: Send payload to backend
-      logDebug('📤 Sending migration payload to backend...');
+      // Step 2: Send payload to backend using sessionId (UUID), not sessionCode
+      logDebug('📤 Sending migration payload to backend with sessionId: $sessionId...');
       final response = await _apiClient.sendMigrationPayload({
-        'sessionId': payload.sessionId,
+        'sessionId': sessionId, // Use UUID here, not payload.sessionId
         'encryptedPayload': {
           'encryptedData': payload.encryptedData,
           'ephemeralPublicKey': payload.ephemeralPublicKey,
           'signature': payload.signature,
           'sourceDeviceId': payload.sourceDeviceId,
           'targetDeviceId': payload.targetDeviceId,
-          'sessionId': payload.sessionId,
+          'sessionId': sessionId, // Use UUID here too
           'keyVersion': payload.keyVersion,
           'sourceSigningPublicKey': payload.sourceSigningPublicKey,
         },
@@ -140,7 +162,7 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
         emit(const DeviceMigrationCompleted());
         return true;
       } else {
-        emit(DeviceMigrationError(response.errorMessage ?? 'Failed to send migration payload'));
+        emit(DeviceMigrationError(response.message ?? 'Failed to send migration payload'));
         return false;
       }
     } catch (e) {
@@ -161,29 +183,61 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
     }
   }
 
-  /// Polls for session status and returns target device info when available
-  Future<Map<String, dynamic>?> pollForTargetDevice(String sessionId, {
-    int maxAttempts = 60,
-    Duration pollInterval = const Duration(seconds: 5),
-  }) async {
-    for (int attempt = 0; attempt < maxAttempts; attempt++) {
+  /// Gets migration session status
+  Future<MigrationStatusResponse> getMigrationStatus(String sessionCode) async {
+    try {
+      final response = await _apiClient.getMigrationStatus(sessionCode);
+      return response;
+    } catch (e) {
+      logDebugError('Error getting migration status: $e');
+      rethrow;
+    }
+  }
+
+  /// Polls for session status and fetches payload when status is "transferring"
+  /// Uses sessionId (UUID) for payload retrieval, not sessionCode
+  Future<EncryptedMigrationPayloadResponse?> pollForMigrationPayload(
+    String sessionCode,
+    String sessionId, // UUID for API calls
+  ) async {
+    logDebug('⏳ Polling for migration payload with sessionId: $sessionId');
+
+    for (int attempt = 0; attempt < 120; attempt++) { // 10 minutes max
       try {
-        // Check session status via public key endpoint
-        // If target device has joined, we can get its public key
-        final response = await _apiClient.getMigrationPublicKey(sessionId, 'TARGET');
-        if (response.success && response.publicKey != null) {
-          // Target device has joined, return its info
-          return {
-            'targetPublicKey': response.publicKey,
-            'targetDeviceId': 'TARGET', // Will be resolved from session
-          };
+        // Check session status - can use either sessionCode or sessionId for status
+        final response = await _apiClient.getMigrationStatus(sessionCode);
+        
+        if (response.success) {
+          logDebug('📊 Migration status: ${response.status}');
+          
+          // Wait for payload to be available
+          if (response.status == 'transferring') {
+            logDebug('✅ Payload ready! Fetching...');
+            // Use sessionId (UUID) for payload retrieval, NOT sessionCode
+            final payload = await _apiClient.getMigrationPayload(sessionId);
+            return payload;
+          }
+          
+          // Session completed without payload
+          if (response.status == 'completed') {
+            logDebug('⚠️ Session completed but no payload transferred');
+            return null;
+          }
+          
+          // Session expired or failed
+          if (response.status == 'expired' || response.status == 'cancelled' || response.status == 'failed') {
+            logDebugError('❌ Session ended with status: ${response.status}');
+            return null;
+          }
         }
       } catch (e) {
-        logDebug('⏳ Target device not joined yet, attempt ${attempt + 1}/$maxAttempts');
+        logDebug('⏳ Waiting for payload, attempt ${attempt + 1}/120: $e');
       }
 
-      await Future.delayed(pollInterval);
+      await Future.delayed(const Duration(seconds: 5));
     }
+    
+    logDebugError('❌ Timeout waiting for migration payload');
     return null;
   }
 
@@ -202,26 +256,20 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
         targetDeviceId: payload.targetDeviceId,
         sessionId: payload.sessionId,
         keyVersion: payload.keyVersion,
+        sourceSigningPublicKey: payload.sourceSigningPublicKey,
       );
 
       final result = await _migrationService.receiveMigrationData(servicePayload);
       if (result.success && result.data != null) {
-        // Generate new key pair for this device after successful migration
-        final cryptoService = await CryptoService.create();
-        if (cryptoService.isReady) {
-          // Register this new device with the backend
-          await _registerNewDevice(
-            result.data!.userId,
-            cryptoService,
-          );
-        }
+        // Device registration is now handled by the completeMigration endpoint
+        // which is called inside receiveMigrationData
         emit(const DeviceMigrationCompleted());
       } else {
         emit(DeviceMigrationError(result.errorMessage ?? 'Failed to receive migration data'));
       }
       return MigrationReceiveResult(
         success: result.success,
-        userId: result.data?.userId,
+        userId: result.userId, // Use userId from server response
         userName: result.data?.userName,
         errorMessage: result.errorMessage,
       );
@@ -232,60 +280,6 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
         success: false,
         errorMessage: 'Failed to receive migration data: $e',
       );
-    }
-  }
-
-  /// Confirms successful migration and invalidates the session
-  Future<void> confirmMigrationComplete(String sessionId) async {
-    try {
-      final deviceId = await _getDeviceId();
-      await _apiClient.confirmMigrationComplete({
-        'sessionId': sessionId,
-        'targetDeviceId': deviceId,
-      });
-      logDebug('✅ Migration completion confirmed');
-    } catch (e) {
-      logDebugError('Error confirming migration: $e');
-      rethrow;
-    }
-  }
-
-  /// Registers the new device with the backend after migration
-  Future<void> _registerNewDevice(
-    String userId,
-    CryptoService cryptoService,
-  ) async {
-    try {
-      final publicKey = cryptoService.ecPublicKeyToString(cryptoService.getPublicKey()!);
-      final deviceId = await _getDeviceId();
-      final deviceName = await _getDeviceName();
-      
-      // Platform detection that works on web and mobile
-      String platform;
-      if (kIsWeb) {
-        platform = 'web';
-      } else if (Platform.isIOS) {
-        platform = 'ios';
-      } else {
-        platform = 'android';
-      }
-
-      final response = await _apiClient.registerDevice({
-        'userId': userId,
-        'deviceId': deviceId,
-        'publicKey': publicKey,
-        'deviceName': deviceName,
-        'deviceType': 'mobile',
-        'platform': platform,
-      });
-
-      if (response.success) {
-        logDebug('✅ Device registered successfully after migration');
-      } else {
-        logDebugError('Failed to register device: ${response.message}');
-      }
-    } catch (e) {
-      logDebugError('Error registering device: $e');
     }
   }
 
@@ -389,7 +383,7 @@ class MigrationJoinResult {
 /// Result of receiving migration data
 class MigrationReceiveResult {
   final bool success;
-  final String? userId;
+  final String? userId; // User ID from completeMigration response
   final String? userName;
   final String? errorMessage;
 

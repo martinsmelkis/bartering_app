@@ -208,6 +208,33 @@ class CryptoService {
   pc.ECPublicKey? getPublicKey() => _keyPair?.publicKey;
   pc.ECPrivateKey? getPrivateKey() => _keyPair?.privateKey;
 
+  /// Reloads the key pair from secure storage.
+  /// Call this after migration when keys have been updated in storage.
+  Future<void> reloadKeyPairFromStorage() async {
+    logDebug("@@@@@@@@@@@ Reloading key pair from storage...");
+    
+    final privateKeyHex = await secureStorage.getOwnPrivateKey();
+    if (privateKeyHex != null && privateKeyHex.isNotEmpty) {
+      try {
+        final privateKey = ecPrivateKeyFromString(privateKeyHex);
+        final Q = _domainParameters!.G * privateKey.d!;
+        final publicKey = pc.ECPublicKey(Q, _domainParameters);
+        
+        _keyPair = pc.AsymmetricKeyPair<pc.ECPublicKey, pc.ECPrivateKey>(publicKey, privateKey);
+        _isInitialized = true;
+        
+        logDebug("@@@@@@@@@@@ Key pair reloaded from storage.");
+        logDebug("@@@@@@@@@@@ Public key: ${ecPublicKeyToString(getPublicKey()!)}");
+      } catch (e) {
+        logDebugError("@@@@@@@@@@@ Failed to reload key pair from storage: $e");
+        throw StateError('Failed to reload key pair: $e');
+      }
+    } else {
+      logDebugError("@@@@@@@@@@@ No private key found in storage during reload");
+      throw StateError('No private key found in storage');
+    }
+  }
+
   // --- ECDH Shared Secret ---
   /// Derive shared secret using ECDH - exposed for FileTransferService chunked decryption
   Uint8List? deriveSharedSecret(pc.ECPublicKey otherPublicKey) {
@@ -371,11 +398,29 @@ class CryptoService {
 
   pc.ECPublicKey? ecPublicKeyFromString(String base64Str) {
     try {
-      Uint8List encodedPoint = base64Decode(base64Str);
+      // Handle both URL-safe Base64 (-, _) and standard Base64 (+, /)
+      // Convert URL-safe characters to standard Base64
+      String normalizedBase64 = base64Str
+          .replaceAll('-', '+')
+          .replaceAll('_', '/');
+      
+      // Add padding if necessary
+      while (normalizedBase64.length % 4 != 0) {
+        normalizedBase64 += '=';
+      }
+      
+      Uint8List encodedPoint = base64Decode(normalizedBase64);
       _domainParameters ??= pc.ECDomainParameters('secp256r1');
+      
+      // Log for debugging
+      logDebug('🔑 Decoding public key: ${encodedPoint.length} bytes');
+      
       // Create an ECPoint from the decoded bytes and the domain parameters (curve)
       pc.ECPoint? point = _domainParameters!.curve.decodePoint(encodedPoint);
-      if (point == null) return null;
+      if (point == null) {
+        logDebugError('Failed to decode EC point from bytes');
+        return null;
+      }
       return pc.ECPublicKey(point, _domainParameters);
     } catch (e) {
       logDebug("Error parsing EC public key from string: $e");
