@@ -328,6 +328,48 @@ class DeviceMigrationCubit extends Cubit<DeviceMigrationState> {
   void reset() {
     emit(const DeviceMigrationInitial());
   }
+
+  /// Initiates email-based recovery
+  Future<EmailRecoveryResult> initiateEmailRecovery(String email) async {
+    emit(const DeviceMigrationLoading());
+    try {
+      final result = await _migrationService.initiateEmailRecovery(email);
+      if (result.success) {
+        emit(const DeviceMigrationAwaitingConfirmation());
+        return EmailRecoveryResult.success(
+          maskedEmail: result.maskedEmail ?? '***@***.***',
+        );
+      } else {
+        emit(DeviceMigrationError(result.errorMessage ?? 'Failed to initiate recovery'));
+        return EmailRecoveryResult.error(result.errorMessage ?? 'Failed to initiate recovery');
+      }
+    } catch (e) {
+      logDebugError('Error initiating email recovery: $e');
+      emit(DeviceMigrationError('Failed to initiate recovery: $e'));
+      return EmailRecoveryResult.error('Failed to initiate recovery: $e');
+    }
+  }
+
+  /// Verifies recovery code and completes recovery
+  Future<EmailRecoveryResult> verifyRecoveryCodeAndRecover(String code) async {
+    emit(const DeviceMigrationLoading());
+    try {
+      final result = await _migrationService.verifyRecoveryCodeAndRecover(code);
+      if (result.success) {
+        emit(const DeviceMigrationCompleted());
+        return EmailRecoveryResult.success(
+          userId: result.userId,
+        );
+      } else {
+        emit(DeviceMigrationError(result.errorMessage ?? 'Invalid recovery code'));
+        return EmailRecoveryResult.error(result.errorMessage ?? 'Invalid recovery code');
+      }
+    } catch (e) {
+      logDebugError('Error verifying recovery code: $e');
+      emit(DeviceMigrationError('Failed to verify code: $e'));
+      return EmailRecoveryResult.error('Failed to verify code: $e');
+    }
+  }
 }
 
 /// Result of initiating a migration session
@@ -393,4 +435,37 @@ class MigrationReceiveResult {
     this.userName,
     this.errorMessage,
   });
+}
+
+/// Result of email recovery operations
+class EmailRecoveryResult {
+  final bool success;
+  final String? maskedEmail;
+  final String? userId;
+  final String? errorMessage;
+
+  EmailRecoveryResult({
+    required this.success,
+    this.maskedEmail,
+    this.userId,
+    this.errorMessage,
+  });
+
+  factory EmailRecoveryResult.success({
+    String? maskedEmail,
+    String? userId,
+  }) {
+    return EmailRecoveryResult(
+      success: true,
+      maskedEmail: maskedEmail,
+      userId: userId,
+    );
+  }
+
+  factory EmailRecoveryResult.error(String message) {
+    return EmailRecoveryResult(
+      success: false,
+      errorMessage: message,
+    );
+  }
 }

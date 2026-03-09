@@ -2695,6 +2695,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToJoinMigration => 'Failed to join migration session';
 
   @override
+  String get failedToSendCode => 'Failed to send recovery code';
+
+  @override
   String get migrationTimedOut =>
       'Migration timed out. Please try again with a new code.';
 
@@ -2715,6 +2718,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get targetStep3 => 'Enter the code shown on that device here';
+
+  @override
+  String get recoverViaEmail => 'Recover via Email';
+
+  @override
+  String get recoverAccount => 'Recover Account';
+
+  @override
+  String get recoverAccountDescription =>
+      'Enter your email address to receive a recovery code and restore your account on this device.';
+
+  @override
+  String get sendRecoveryCode => 'Send Recovery Code';
+
+  @override
+  String codeSentTo(Object email) {
+    return 'Recovery code sent to $email';
+  }
+
+  @override
+  String get resendCode => 'Resend Code';
+
+  @override
+  String resendCodeIn(Object seconds) {
+    return 'Resend code in ${seconds}s';
+  }
+
+  @override
+  String get verifyAndRecover => 'Verify & Recover';
+
+  @override
+  String get invalidCode => 'Invalid recovery code';
+
+  @override
+  String get recoveryFailed => 'Account recovery failed';
+
+  @override
+  String get recoverySuccess => 'Recovery Successful!';
+
+  @override
+  String get recoverySuccessMessage =>
+      'Your account has been successfully recovered on this device.';
 
   @override
   String get noUsersFound => 'No users found';

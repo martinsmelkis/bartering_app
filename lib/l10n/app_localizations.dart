@@ -5156,6 +5156,12 @@ abstract class AppLocalizations {
   /// **'Failed to join migration session'**
   String get failedToJoinMigration;
 
+  /// No description provided for @failedToSendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send recovery code'**
+  String get failedToSendCode;
+
   /// No description provided for @migrationTimedOut.
   ///
   /// In en, this message translates to:
@@ -5197,6 +5203,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter the code shown on that device here'**
   String get targetStep3;
+
+  /// No description provided for @recoverViaEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover via Email'**
+  String get recoverViaEmail;
+
+  /// No description provided for @recoverAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover Account'**
+  String get recoverAccount;
+
+  /// No description provided for @recoverAccountDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email address to receive a recovery code and restore your account on this device.'**
+  String get recoverAccountDescription;
+
+  /// No description provided for @sendRecoveryCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Recovery Code'**
+  String get sendRecoveryCode;
+
+  /// No description provided for @codeSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code sent to {email}'**
+  String codeSentTo(Object email);
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get resendCode;
+
+  /// No description provided for @resendCodeIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds}s'**
+  String resendCodeIn(Object seconds);
+
+  /// No description provided for @verifyAndRecover.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify & Recover'**
+  String get verifyAndRecover;
+
+  /// No description provided for @invalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid recovery code'**
+  String get invalidCode;
+
+  /// No description provided for @recoveryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Account recovery failed'**
+  String get recoveryFailed;
+
+  /// No description provided for @recoverySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery Successful!'**
+  String get recoverySuccess;
+
+  /// No description provided for @recoverySuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been successfully recovered on this device.'**
+  String get recoverySuccessMessage;
 
   /// No description provided for @noUsersFound.
   ///

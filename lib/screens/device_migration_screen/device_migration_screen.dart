@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:barter_app/l10n/app_localizations.dart';
 import 'package:barter_app/models/auth/device_management_models.dart';
 import 'package:barter_app/screens/device_migration_screen/cubit/device_migration_cubit.dart';
+import 'package:barter_app/screens/device_migration_screen/email_recovery_screen.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
@@ -215,7 +216,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(
                 horizontal: ResponsiveBreakpoints.getPadding(context),
-                vertical: 40,
+                vertical: ResponsiveBreakpoints.getPadding(context),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -226,7 +227,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                     child: IconButton(
                       onPressed: () => context.go('/welcome'),
                       icon: Icon(
-                        Icons.arrow_back_ios,
+                        Icons.arrow_back,
                         color: AppColors.primary,
                       ),
                     ),
@@ -347,6 +348,30 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: context.bodyFontSize / fontScale,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  // Email recovery option
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const EmailRecoveryScreen(),
+                        ),
+                      );
+                    },
+                    icon: Icon(
+                      Icons.email_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    label: Text(
+                      l10n.recoverViaEmail,
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: context.bodyFontSize / fontScale,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

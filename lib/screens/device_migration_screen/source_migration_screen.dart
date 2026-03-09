@@ -194,7 +194,7 @@ class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
                 foregroundColor: Colors.white,
                 leading: IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: Icon(Icons.arrow_back_ios),
+                  icon: Icon(Icons.arrow_back),
                 ),
               ),
               body: SafeArea(
@@ -202,7 +202,7 @@ class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
                   child: SingleChildScrollView(
                     padding: EdgeInsets.symmetric(
                       horizontal: ResponsiveBreakpoints.getPadding(context),
-                      vertical: 40,
+                      vertical: ResponsiveBreakpoints.getPadding(context),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

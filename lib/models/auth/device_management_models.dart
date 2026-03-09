@@ -127,11 +127,15 @@ class InitiateRecoveryResponse {
 /// Response from verifying recovery code
 class VerifyRecoveryCodeResponse {
   final bool success;
+  final String? sessionId;
+  final String? maskedEmail;
   final String? message;
   final String? errorMessage;
 
   VerifyRecoveryCodeResponse({
     required this.success,
+    this.sessionId,
+    this.maskedEmail,
     this.message,
     this.errorMessage,
   });
@@ -139,6 +143,8 @@ class VerifyRecoveryCodeResponse {
   factory VerifyRecoveryCodeResponse.fromJson(Map<String, dynamic> json) {
     return VerifyRecoveryCodeResponse(
       success: json['success'] as bool? ?? false,
+      sessionId: json['sessionId'] as String?,
+      maskedEmail: json['maskedEmail'] as String?,
       message: json['message'] as String?,
       errorMessage: json['errorMessage'] as String?,
     );
@@ -210,6 +216,7 @@ class MigrationStatusResponse {
 
 /// Encrypted migration payload response
 class EncryptedMigrationPayloadResponse {
+  final bool success;
   final String encryptedData;
   final String ephemeralPublicKey;
   final String signature;
@@ -220,6 +227,7 @@ class EncryptedMigrationPayloadResponse {
   final String? sourceSigningPublicKey;
 
   EncryptedMigrationPayloadResponse({
+    required this.success,
     required this.encryptedData,
     required this.ephemeralPublicKey,
     required this.signature,
@@ -233,8 +241,9 @@ class EncryptedMigrationPayloadResponse {
   factory EncryptedMigrationPayloadResponse.fromJson(Map<String, dynamic> json) {
     // Backend wraps payload in 'encryptedPayload' object
     final payload = json['encryptedPayload'] as Map<String, dynamic>? ?? json;
-    
+
     return EncryptedMigrationPayloadResponse(
+      success: json['success'] as bool? ?? false,
       encryptedData: payload['encryptedData'] as String,
       ephemeralPublicKey: payload['ephemeralPublicKey'] as String,
       signature: payload['signature'] as String,

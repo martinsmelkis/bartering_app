@@ -2731,6 +2731,9 @@ class AppLocalizationsLv extends AppLocalizations {
       'Neizdevās pievienoties pārcelšanas sesijai';
 
   @override
+  String get failedToSendCode => 'Neizdevās nosūtīt atjaunošanas kodu';
+
+  @override
   String get migrationTimedOut =>
       'Pārcelšanas laiks beidzies. Lūdzu, mēģiniet vēlreiz ar jaunu kodu.';
 
@@ -2752,6 +2755,48 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get targetStep3 => 'Ievadiet kodu, kas redzams uz šīs ierīces';
+
+  @override
+  String get recoverViaEmail => 'Atjaunot pa e-pastu';
+
+  @override
+  String get recoverAccount => 'Atjaunot kontu';
+
+  @override
+  String get recoverAccountDescription =>
+      'Ievadiet savu e-pasta adresi, lai saņemtu atjaunošanas kodu un atjaunotu savu kontu šajā ierīcē.';
+
+  @override
+  String get sendRecoveryCode => 'Nosūtīt atjaunošanas kodu';
+
+  @override
+  String codeSentTo(Object email) {
+    return 'Atjaunošanas kods nosūtīts uz $email';
+  }
+
+  @override
+  String get resendCode => 'Nosūtīt kodu vēlreiz';
+
+  @override
+  String resendCodeIn(Object seconds) {
+    return 'Nosūtīt kodu pēc ${seconds}s';
+  }
+
+  @override
+  String get verifyAndRecover => 'Verificēt un atjaunot';
+
+  @override
+  String get invalidCode => 'Nederīgs atjaunošanas kods';
+
+  @override
+  String get recoveryFailed => 'Konta atjaunošana neizdevās';
+
+  @override
+  String get recoverySuccess => 'Atjaunošana veiksmīga!';
+
+  @override
+  String get recoverySuccessMessage =>
+      'Jūsu konts ir veiksmīgi atjaunots šajā ierīcē.';
 
   @override
   String get noUsersFound => 'Nav atrasti lietotāji';

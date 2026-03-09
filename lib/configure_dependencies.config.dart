@@ -76,13 +76,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i33.UserRepository>(),
       ),
     );
-    gh.factory<_i529.DeviceMigrationService>(
-      () => _i529.DeviceMigrationService(
-        gh<_i607.SecureStorageService>(),
-        gh<_i205.ApiClient>(),
-        gh<_i33.UserRepository>(),
-      ),
-    );
     gh.factory<_i646.InitializeCubit>(
       () => _i646.InitializeCubit(
         gh<_i33.UserRepository>(),
@@ -93,6 +86,14 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i12.OnboardingCubit(
         gh<_i33.UserRepository>(),
         gh<_i205.ApiClient>(),
+        gh<_i749.DeviceFingerprintService>(),
+      ),
+    );
+    gh.factory<_i529.DeviceMigrationService>(
+      () => _i529.DeviceMigrationService(
+        gh<_i607.SecureStorageService>(),
+        gh<_i205.ApiClient>(),
+        gh<_i33.UserRepository>(),
         gh<_i749.DeviceFingerprintService>(),
       ),
     );

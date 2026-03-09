@@ -994,6 +994,7 @@
   "importAccount": "Import Account",
   "importAccountDescription": "Enter the 10-character migration code from your other device to import your account data.",
   "failedToJoinMigration": "Failed to join migration session",
+  "failedToSendCode": "Failed to send recovery code",
   "migrationTimedOut": "Migration timed out. Please try again with a new code.",
   "failedToProcessMigration": "Failed to process migration data",
   "clear": "Clear",
@@ -1001,6 +1002,19 @@
   "targetStep1": "Open the app on your other device",
   "targetStep2": "Go to Settings → Account → Migrate Device",
   "targetStep3": "Enter the code shown on that device here",
+
+  "recoverViaEmail": "Recover via Email",
+  "recoverAccount": "Recover Account",
+  "recoverAccountDescription": "Enter your email address to receive a recovery code and restore your account on this device.",
+  "sendRecoveryCode": "Send Recovery Code",
+  "codeSentTo": "Recovery code sent to {email}",
+  "resendCode": "Resend Code",
+  "resendCodeIn": "Resend code in {seconds}s",
+  "verifyAndRecover": "Verify & Recover",
+  "invalidCode": "Invalid recovery code",
+  "recoveryFailed": "Account recovery failed",
+  "recoverySuccess": "Recovery Successful!",
+  "recoverySuccessMessage": "Your account has been successfully recovered on this device.",
 
   "noUsersFound": "No users found",
   "noPostingsFound": "No postings found"

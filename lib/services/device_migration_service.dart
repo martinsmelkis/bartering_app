@@ -11,8 +11,10 @@ import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/crypto/crypto_service.dart';
+import 'package:barter_app/services/device_fingerprint_service.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
@@ -188,14 +190,17 @@ class DeviceMigrationService {
   final SecureStorageService _secureStorage;
   final ApiClient _apiClient;
   final UserRepository _userRepository;
+  final DeviceFingerprintService _fingerprintService;
   CryptoService? _cryptoService;
 
   MigrationSession? _currentSession;
+  String? _recoverySessionId; // Store sessionId from email recovery initiation
 
   DeviceMigrationService(
     this._secureStorage,
     this._apiClient,
     this._userRepository,
+    this._fingerprintService,
   );
 
   /// Updates the current session to use UUID instead of sessionCode
@@ -519,6 +524,245 @@ class DeviceMigrationService {
     } catch (e) {
       logDebugError('Failed to receive migration data: $e');
       return MigrationReceiveResult.error('Receive failed: $e');
+    }
+  }
+
+  // ==========================================================================
+  // EMAIL RECOVERY - For when source device is lost/broken
+  // ==========================================================================
+
+  /// Initiates email-based account recovery
+  Future<EmailRecoveryInitiationResult> initiateEmailRecovery(String email) async {
+    try {
+      logDebug('📧 Initiating email recovery for: $email');
+
+      // 1. Initialize crypto service on the new device
+      _cryptoService = await CryptoService.create();
+      if (!_cryptoService!.isReady) {
+        return EmailRecoveryInitiationResult.error('Crypto service not initialized');
+      }
+
+      // 2. Get device fingerprint and public key
+      final deviceFingerprint = await _getDeviceFingerprint();
+      final publicKey = _cryptoService!.ecPublicKeyToString(
+        _cryptoService!.getPublicKey()!,
+      );
+
+      logDebug('🔑 New device fingerprint: $deviceFingerprint');
+      logDebug('🔑 New device public key: ${publicKey.substring(0, 30)}...');
+
+      // 3. Call backend with email, device ID, and public key
+      final response = await _apiClient.initiateEmailRecovery({
+        'email': email,
+        'newDeviceId': deviceFingerprint,
+        'newDevicePublicKey': publicKey,
+      });
+
+      if (response.success) {
+        logDebug('✅ Recovery code sent to: ${response.emailMasked}');
+        // Store sessionId for verification step
+        _recoverySessionId = response.sessionId;
+        logDebug('🔑 Recovery sessionId stored: $_recoverySessionId');
+        return EmailRecoveryInitiationResult.success(
+          maskedEmail: response.emailMasked ?? '***@***.***',
+          expiresAt: response.expiresAt != null 
+              ? DateTime.parse(response.expiresAt!) 
+              : DateTime.now().add(Duration(minutes: 15)),
+        );
+      } else {
+        logDebugError('❌ Failed to initiate email recovery: ${response.message}');
+        return EmailRecoveryInitiationResult.error(response.message ?? 'Failed to initiate recovery');
+      }
+    } on DioException catch (e) {
+      // Handle DioException with user-friendly messages
+      String userMessage = _getUserFriendlyErrorMessage(e);
+      logDebugError('❌ Email recovery DioException: $userMessage');
+      return EmailRecoveryInitiationResult.error(userMessage);
+    } catch (e) {
+      logDebugError('❌ Error initiating email recovery: $e');
+      return EmailRecoveryInitiationResult.error('Failed to initiate recovery: $e');
+    }
+  }
+
+  /// Converts DioException to user-friendly error message
+  String _getUserFriendlyErrorMessage(DioException e) {
+    final response = e.response;
+    
+    // Try to extract server message first
+    if (response != null && response.data != null) {
+      try {
+        final data = response.data as Map<String, dynamic>?;
+        if (data != null && data['message'] != null) {
+          return data['message'] as String;
+        }
+      } catch (_) {
+        // Fall through to status code handling
+      }
+    }
+    
+    // Map status codes to user-friendly messages
+    switch (response?.statusCode) {
+      case 400:
+        return 'Invalid request. Please check your email address.';
+      case 404:
+        return 'No account found with this email address.';
+      case 429:
+        return 'Too many attempts. Please wait a few minutes and try again.';
+      case 500:
+      case 502:
+      case 503:
+      case 504:
+        return 'Server error. Please try again later.';
+      default:
+        return 'Connection error. Please check your internet connection.';
+    }
+  }
+
+  /// Verifies recovery code and completes account recovery
+  Future<EmailRecoveryCompleteResult> verifyRecoveryCodeAndRecover(String code) async {
+    try {
+      logDebug('🔐 Verifying recovery code...');
+
+      // Get device info for verification request
+      final deviceFingerprint = await _getDeviceFingerprint();
+      final publicKey = _cryptoService?.ecPublicKeyToString(
+        _cryptoService!.getPublicKey()!,
+      ) ?? await _secureStorage.getOwnPublicKey() ?? '';
+
+      logDebug('📱 Device ID: $deviceFingerprint');
+      logDebug('🔑 Public key: ${publicKey.substring(0, min(30, publicKey.length))}...');
+
+      // Step 1: Verify the recovery code with all required fields
+      final verifyResponse = await _apiClient.verifyRecoveryCode({
+        'sessionId': _recoverySessionId,
+        'recoveryCode': code,
+        'newDeviceId': deviceFingerprint,
+        'newDevicePublicKey': publicKey,
+      });
+
+      if (!verifyResponse.success) {
+        logDebugError('❌ Invalid recovery code');
+        return EmailRecoveryCompleteResult.error('Invalid recovery code');
+      }
+
+      logDebug('✅ Recovery code verified');
+      logDebug('   Session ID: $_recoverySessionId');
+
+      // Step 2: Complete the migration directly (no payload for email recovery)
+      // Email recovery doesn't have a payload since the old device is lost/broken
+      final deviceName = await _getDeviceName();
+      final completeResponse = await _apiClient.completeMigration({
+        'sessionId': _recoverySessionId,
+        'newDeviceId': deviceFingerprint,
+        'devicePublicKey': publicKey,
+        'deviceName': deviceName,
+      });
+
+      if (!completeResponse.success) {
+        logDebugError('❌ Failed to complete migration: ${completeResponse.message}');
+        return EmailRecoveryCompleteResult.error(
+          completeResponse.message ?? 'Failed to complete account recovery',
+        );
+      }
+
+      // Get userId from response - this is the recovered user's ID
+      final recoveredUserId = completeResponse.userId;
+      if (recoveredUserId == null || recoveredUserId.isEmpty) {
+        logDebugError('❌ No userId in complete migration response');
+        return EmailRecoveryCompleteResult.error('Recovery incomplete - no user data');
+      }
+
+      logDebug('✅ Email recovery completed successfully');
+      logDebug('   User ID: $recoveredUserId');
+
+      // Step 3: Set up the new device with recovered user data
+      // Save the user ID to secure storage
+      await _secureStorage.saveOwnUserId(recoveredUserId);
+
+      // Save the device's public key for authentication
+      await _secureStorage.saveOwnPublicKey(publicKey);
+
+      // Step 4: Fetch user profile from server and populate local storage
+      logDebug('🔄 Fetching user profile from server...');
+      try {
+        final profileData = await _apiClient.getProfileInfo(recoveredUserId);
+        
+        // Save profile data to secure storage
+        await _secureStorage.setOwnUserName(profileData.name);
+        
+        if (profileData.latitude != null && profileData.longitude != null) {
+          await _secureStorage.saveOwnLocation(
+            '${profileData.latitude},${profileData.longitude}',
+          );
+        }
+        
+        // Parse and save attributes (interests and offerings)
+        final attributes = profileData.attributes ?? [];
+        final interests = attributes
+            .where((a) => a.type == 0) // 0 = interest type
+            .map((a) => ParsedAttributeData(
+                  attributeKey: a.attributeId,
+                  attribute: a.description ?? a.attributeId,
+                  relevancyScore: a.relevancy,
+                  uiStyleHint: a.uiStyleHint ?? 'general',
+                ))
+            .toList();
+        final offerings = attributes
+            .where((a) => a.type == 1) // 1 = offering type
+            .map((a) => ParsedAttributeData(
+                  attributeKey: a.attributeId,
+                  attribute: a.description ?? a.attributeId,
+                  relevancyScore: a.relevancy,
+                  uiStyleHint: a.uiStyleHint ?? 'general',
+                ))
+            .toList();
+        
+        await _secureStorage.saveOwnInterestsAttributes(interests);
+        await _secureStorage.saveOwnOfferingsAttributes(offerings);
+        
+        // Save keyword data map
+        if (profileData.profileKeywordDataMap != null) {
+          await _secureStorage.saveProfileKeywordDataMap(
+            profileData.profileKeywordDataMap!,
+          );
+        }
+        
+        logDebug('✅ User profile loaded and saved:');
+        logDebug('   Name: ${profileData.name}');
+        logDebug('   Location: ${profileData.latitude}, ${profileData.longitude}');
+        logDebug('   Interests: ${interests.length}');
+        logDebug('   Offerings: ${offerings.length}');
+        
+        // Update repository cache with loaded data
+        _userRepository.userId = recoveredUserId;
+        _userRepository.userName = profileData.name;
+        _userRepository.userLocation = profileData.latitude != null 
+            ? '${profileData.latitude},${profileData.longitude}' 
+            : null;
+        _userRepository.userInterests = interests;
+        _userRepository.userOfferings = offerings;
+        _userRepository.profileKeywordDataMap = profileData.profileKeywordDataMap;
+        
+      } catch (e) {
+        logDebugError('⚠️ Failed to fetch user profile: $e');
+        // Continue with recovery even if profile fetch fails
+        // User can manually refresh later
+      }
+
+      // Clear the stored recovery sessionId
+      _recoverySessionId = null;
+
+      logDebug('✅ Email recovery completed successfully');
+      logDebug('   User ID: $recoveredUserId');
+
+      return EmailRecoveryCompleteResult.success(recoveredUserId);
+    } on DioException catch (e) {
+      String userMessage = _getUserFriendlyErrorMessage(e);
+      logDebugError('❌ Email recovery verification DioException: $userMessage');
+      return EmailRecoveryCompleteResult.error(userMessage);
+    } catch (e) {
+      logDebugError('❌ Error in email recovery verification: $e');
+      return EmailRecoveryCompleteResult.error('Recovery failed: $e');
     }
   }
 
@@ -849,6 +1093,24 @@ class DeviceMigrationService {
     }
   }
 
+  /// Gets the device fingerprint for identification
+  Future<String> _getDeviceFingerprint() async {
+    try {
+      return await _fingerprintService.getDeviceFingerprint();
+    } catch (e) {
+      logDebug('Using fallback device ID generation: $e');
+      // Fallback: generate a device ID based on timestamp
+      final existingId = await _secureStorage.getContactPublicKey('device_id');
+      if (existingId != null) return existingId;
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final random = base64Encode(List<int>.generate(8, (_) => timestamp % 256));
+      final deviceId = 'device_${timestamp}_$random';
+      await _secureStorage.saveContactPublicKey('device_id', deviceId);
+      return deviceId;
+    }
+  }
+
   // ==========================================================================
   // PRIVATE HELPERS - Key & Session Management
   // ==========================================================================
@@ -1141,5 +1403,56 @@ class MigrationReceiveResult {
 
   factory MigrationReceiveResult.error(String message) {
     return MigrationReceiveResult._(success: false, errorMessage: message);
+  }
+}
+
+/// Result of initiating email recovery
+class EmailRecoveryInitiationResult {
+  final bool success;
+  final String? maskedEmail;
+  final DateTime? expiresAt;
+  final String? errorMessage;
+
+  EmailRecoveryInitiationResult._({
+    required this.success,
+    this.maskedEmail,
+    this.expiresAt,
+    this.errorMessage,
+  });
+
+  factory EmailRecoveryInitiationResult.success({
+    required String maskedEmail,
+    required DateTime expiresAt,
+  }) {
+    return EmailRecoveryInitiationResult._(
+      success: true,
+      maskedEmail: maskedEmail,
+      expiresAt: expiresAt,
+    );
+  }
+
+  factory EmailRecoveryInitiationResult.error(String message) {
+    return EmailRecoveryInitiationResult._(success: false, errorMessage: message);
+  }
+}
+
+/// Result of email recovery (verify code + receive data)
+class EmailRecoveryCompleteResult {
+  final bool success;
+  final String? userId;
+  final String? errorMessage;
+
+  EmailRecoveryCompleteResult._({
+    required this.success,
+    this.userId,
+    this.errorMessage,
+  });
+
+  factory EmailRecoveryCompleteResult.success(String userId) {
+    return EmailRecoveryCompleteResult._(success: true, userId: userId);
+  }
+
+  factory EmailRecoveryCompleteResult.error(String message) {
+    return EmailRecoveryCompleteResult._(success: false, errorMessage: message);
   }
 }

@@ -940,6 +940,7 @@ class AppLocalizationsMapper {
       'importAccount': localizations.importAccount,
       'importAccountDescription': localizations.importAccountDescription,
       'failedToJoinMigration': localizations.failedToJoinMigration,
+      'failedToSendCode': localizations.failedToSendCode,
       'migrationTimedOut': localizations.migrationTimedOut,
       'failedToProcessMigration': localizations.failedToProcessMigration,
       'clear': localizations.clear,
@@ -947,6 +948,16 @@ class AppLocalizationsMapper {
       'targetStep1': localizations.targetStep1,
       'targetStep2': localizations.targetStep2,
       'targetStep3': localizations.targetStep3,
+      'recoverViaEmail': localizations.recoverViaEmail,
+      'recoverAccount': localizations.recoverAccount,
+      'recoverAccountDescription': localizations.recoverAccountDescription,
+      'sendRecoveryCode': localizations.sendRecoveryCode,
+      'resendCode': localizations.resendCode,
+      'verifyAndRecover': localizations.verifyAndRecover,
+      'invalidCode': localizations.invalidCode,
+      'recoveryFailed': localizations.recoveryFailed,
+      'recoverySuccess': localizations.recoverySuccess,
+      'recoverySuccessMessage': localizations.recoverySuccessMessage,
       'noUsersFound': localizations.noUsersFound,
       'noPostingsFound': localizations.noPostingsFound,
       'errorWithMessage': (Object errorMessage) =>
@@ -994,6 +1005,8 @@ class AppLocalizationsMapper {
       'errorWithException': (String exception) =>
           localizations.errorWithException(exception),
       'expiresIn': (String time) => localizations.expiresIn(time),
+      'codeSentTo': (Object email) => localizations.codeSentTo(email),
+      'resendCodeIn': (Object seconds) => localizations.resendCodeIn(seconds),
     };
   }
 }
