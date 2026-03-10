@@ -12,6 +12,7 @@ import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/avatar_color_utils.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:barter_app/widgets/count_badge.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -219,35 +220,17 @@ class UserAvatarFab extends StatelessWidget {
                           ),
                         ),
                         if (unreadCount > 0)
-                          Positioned(
+                          PositionedCountBadge(
+                            count: unreadCount,
                             top: kIsWeb ? -5.2 : -4,
                             right: kIsWeb ? -5.2 : -4,
-                            child: Container(
-                              padding: EdgeInsets.all(kIsWeb ? 5.2 : 4),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppColors.background,
-                                  width: kIsWeb ? 2.0 : 1.5,
-                                ),
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: kIsWeb ? 42.9 : 33,
-                                minHeight: kIsWeb ? 42.9 : 33,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  unreadCount > 99
-                                      ? '99+'
-                                      : unreadCount.toString(),
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: kIsWeb ? 14.3 : 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
+                            padding: EdgeInsets.all(kIsWeb ? 5.2 : 4),
+                            borderColor: AppColors.background,
+                            borderWidth: kIsWeb ? 2.0 : 1.5,
+                            fontSize: kIsWeb ? 14.3 : 11,
+                            constraints: BoxConstraints(
+                              minWidth: kIsWeb ? 42.9 : 33,
+                              minHeight: kIsWeb ? 42.9 : 33,
                             ),
                           ),
                       ],

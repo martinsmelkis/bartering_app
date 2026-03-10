@@ -132,6 +132,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       logDebug('@@@@@@@@@@@ API Result: $interestsList');
       logDebug('API Result: $interestsList');
 
+      // Save server-suggested offerings for quick search suggestions
+      if (interestsList != null && interestsList.isNotEmpty) {
+        await _userRepository.saveSuggestedInterests(interestsList);
+      }
+
       updateInterestsList(interestsList);
 
       // --- Register device only on initial onboarding ---

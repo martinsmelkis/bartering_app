@@ -166,6 +166,11 @@ class InterestsCubit extends Cubit<InterestsState> {
           interestsDataForApi, languageCode);
       updateOffersList(offersList ?? []);
 
+      // Save server-suggested offerings for quick search suggestions
+      if (offersList != null && offersList.isNotEmpty) {
+        await _userRepository.saveSuggestedOfferings(offersList);
+      }
+
       emit(state.copyWith(status: InterestsStatus.success,
           offersKeyList: offersList));
     } catch (e) {

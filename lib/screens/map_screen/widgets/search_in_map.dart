@@ -8,14 +8,14 @@ import '../../../l10n/app_localizations.dart';
 import '../../../services/settings_service.dart';
 import '../../../theme/app_colors.dart';
 
-class SearchInMap extends StatefulWidget {
+class SearchInMapTextField extends StatefulWidget {
   final MapController controller;
   final PoiCubit poiCubit;
   final ValueNotifier<bool> showCheckboxesNotifier;
   final ValueNotifier<bool> seekingCheckedNotifier;
   final ValueNotifier<bool> offeringCheckedNotifier;
 
-  const SearchInMap({
+  const SearchInMapTextField({
     super.key, 
     required this.controller, 
     required this.poiCubit,
@@ -25,10 +25,10 @@ class SearchInMap extends StatefulWidget {
   });
   
   @override
-  State<StatefulWidget> createState() => _SearchInMapState();
+  State<StatefulWidget> createState() => _SearchInMapTextFieldState();
 }
 
-class _SearchInMapState extends State<SearchInMap> {
+class _SearchInMapTextFieldState extends State<SearchInMapTextField> {
   final textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   late PickerMapController controller = PickerMapController(

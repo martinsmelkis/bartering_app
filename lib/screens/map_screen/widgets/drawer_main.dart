@@ -39,7 +39,9 @@ class DrawerMain extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: MediaQuery.viewPaddingOf(context).top),
+                // Complementary Profiles - Orange icon
                 ListTile(
+                  leading: const Icon(Icons.search, color: Colors.orange),
                   onTap: () async {
                     Scaffold.of(context).closeDrawer();
                     
@@ -64,8 +66,10 @@ class DrawerMain extends StatelessWidget {
                   },
                   title: Text(l10n?.drawer_menu_complementary_users ?? "Complementary Profiles"),
                 ),
+                // Similar Profiles - Blue icon
                 PointerInterceptor(
                   child: ListTile(
+                    leading: const Icon(Icons.search, color: Colors.blue),
                     onTap: () async {
                       Scaffold.of(context).closeDrawer();
                       
@@ -91,8 +95,10 @@ class DrawerMain extends StatelessWidget {
                     title: Text(l10n?.drawer_menu_similar_users ?? "Similar Profiles"),
                   ),
                 ),
+                // Favorite Profiles - Star icon
                 PointerInterceptor(
                   child: ListTile(
+                    leading: const Icon(Icons.star, color: Colors.amber),
                     onTap: () async {
                       Scaffold.of(context).closeDrawer();
                       await poiCubit.getFavoriteProfiles(poiCubit.userId ?? "");

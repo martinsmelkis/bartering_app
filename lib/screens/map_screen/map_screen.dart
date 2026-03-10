@@ -9,6 +9,7 @@ import 'package:barter_app/screens/map_screen/widgets/poi_marker_widget.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_in_map.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_filter_checkboxes.dart';
 import 'package:barter_app/screens/map_screen/widgets/search_results_list_view.dart';
+import 'package:barter_app/screens/map_screen/widgets/suggestion_keywords_list.dart';
 import 'package:barter_app/screens/map_screen/widgets/user_avatar_fab.dart';
 import 'package:barter_app/screens/map_screen/widgets/zoom_buttons.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
@@ -35,6 +36,7 @@ import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/messaging/firebase_service.dart';
 import '../../utils/geo_utils.dart';
 import '../../utils/responsive_breakpoints.dart';
+import '../../widgets/count_badge.dart';
 import '../initialize_screen/initialize_screen.dart';
 import 'cubit/chat_panel_cubit.dart';
 import 'cubit/poi_panel_cubit.dart';
@@ -97,7 +99,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   // Key to force SearchResultsListView to rebuild when attributes change
   int _searchResultsKey = 0;
-
   // GPS location tracking enabled state
   bool _isGpsLocationEnabled = false;
 
@@ -137,7 +138,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _loadUserProfile();
 
     // Handle any pending notification that opened the app when it was terminated
-    // Add a delay to ensure the route is fully settled before attempting navigation
     // Skip on web - uses WebSocket instead of FCM
     if (!kIsWeb) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -167,12 +167,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     if (widget.initialPois?.isNotEmpty == true && widget.initialPois != oldWidget.initialPois) {
       logDebug('@@@@@@@@@ didUpdateWidget - New initialPois detected: ${widget.initialPois!.length}');
 
-      // If map is ready, process immediately
       if (_isMapReady && _mapController.isAllLayersVisible) {
         final firstPoi = widget.initialPois!.first;
         logDebug('@@@@@@@@@ didUpdateWidget - Centering map on POI: ${firstPoi.profile.userId}');
 
-        //_mapController.setZoom(zoomLevel: 12.0);
         _mapController.moveTo(
           GeoPoint(
             latitude: firstPoi.profile.latitude ?? 0.0,
@@ -191,20 +189,15 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     final userRepository = getIt<UserRepository>();
 
     _currentUserId = await userRepository.getUserId();
-    _currentUserName = await userRepository.getUserName(); // Default to userId if no name
-
-    final interests = await userRepository.getInterests(loadFromStorage: true);
-    final offerings = await userRepository.getOfferings(loadFromStorage: true);
-    // Load interests and offerings
-    _userInterests = interests;
-    _userOfferings = offerings;
+    _currentUserName = await userRepository.getUserName();
+    _userInterests = await userRepository.getInterests(loadFromStorage: true);
+    _userOfferings = await userRepository.getOfferings(loadFromStorage: true);
 
     final tokenService = FCMTokenService();
     tokenService.onSessionStarted(_currentUserId ?? "");
 
     if (mounted) {
       setState(() {});
-      // Auto-open profile panel after user data is loaded
       _autoOpenProfileOnWebLargeScreen();
     }
   }
@@ -362,9 +355,26 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     logDebug('@@@@@@@@@ _processPois called with ${pois.length} POIs');
     _allPois = List.from(pois);
 
-    mapOperationsCubit.reset();
+    // Show snackbar with matching users count - only in map area (not under profile panel)
+    if (_allPois.isNotEmpty && mounted) {
+      final l10n = AppLocalizations.of(context)!;
+      // Get the map content's scaffold messenger (not the root one)
+      final mapScaffoldContext = _scaffoldKey.currentContext;
+      if (mapScaffoldContext != null && mapScaffoldContext.mounted) {
+        ScaffoldMessenger.of(mapScaffoldContext).showSnackBar(
+          SnackBar(
+            padding: const EdgeInsets.all(8.0),
+            backgroundColor: AppColors.primaryVariant,
+            content: Text(l10n.matchingUsersFound(_allPois.length),
+              textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+            duration: const Duration(seconds: 5),
+            behavior: SnackBarBehavior.fixed,
+          ),
+        );
+      }
+    }
 
-    // Remove the "no users" marker if POIs are now available
+    mapOperationsCubit.reset();
     if (_allPois.isNotEmpty && _noUsersMarkerPosition != null) {
       _removeNoUsersMarker();
     }
@@ -428,7 +438,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       logDebug('Map not ready yet, POIs stored. Will display when map is ready.');
     }
 
-    // If no POIs found, show the special "invite friends" marker
     if (_allPois.isEmpty && _isMapReady && _mapController.isAllLayersVisible) {
       _showNoUsersMarker();
       return;
@@ -456,7 +465,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   /// Checks if the current render operation is still valid
-  /// Returns true if operation should continue, false if it was cancelled
   bool _isRenderOperationValid(int currentOperation) {
     if (currentOperation != _currentRenderOperation) {
       logDebug('@@@@@@@@ Render operation #$currentOperation cancelled (new operation started)');
@@ -489,22 +497,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
     
     _cleanUpMarkers();
-
     _isUpdatingVisuals = true;
-
-    // Increment operation counter to invalidate any ongoing operations
     _currentRenderOperation++;
     final currentOperation = _currentRenderOperation;
     logDebug('@@@@@@@@@@@ Starting render operation #$currentOperation vs ${_currentRenderOperation}');
-
     logDebug('@@@@@@@@@@@ Updating map visuals with ${_allPois.length} POIs');
     final l10n = AppLocalizations.of(context)!;
-
     // Collect all markers to be added in batch
-    final List<({
-      GeoPoint point,
-      MarkerIcon icon,
-    })> markersToAdd = [];
+    final List<({GeoPoint point, MarkerIcon icon,})> markersToAdd = [];
 
     for (var mainCluster in mapOperationsCubit.mainPoiClusters) {
       if (!_isRenderOperationValid(currentOperation)) return;
@@ -625,10 +625,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       try {
         await _mapController.addMarkers(
           markersToAdd.map((m) => (
-            point: m.point,
-            icon: m.icon,
-            angle: null,
-            anchor: null,
+            point: m.point, icon: m.icon, angle: null, anchor: null,
           )).toList(),
         );
         logDebug('@@@@@@@@@@@ Successfully batch added ${markersToAdd.length} markers');
@@ -661,11 +658,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     if (context.canShowSideBySide) {
       final poiPanelCubit = context.read<PoiPanelCubit>();
       poiPanelCubit.openPoiDetails(poi);
-
       // If search results list is open, POI will show below it
       // If not, POI will show as a side panel via AdaptivePoiLayout
     } else {
-      // Cache MediaQuery values BEFORE showing modal
       final screenHeight = MediaQuery.of(context).size.height;
       
       // On small screens, show as modal bottom sheet
@@ -683,13 +678,13 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             maxHeight: screenHeight * 0.9,
           ),
           builder: (context) =>
-              PoiDetailsBottomSheet(
-                poi: poi,
-                onChatButtonPressed: () {
-                  Navigator.of(context).pop(); // Close the bottom sheet
-                  _openChat(poi.profile.userId, poi.profile.name);
-                },
-              ),
+            PoiDetailsBottomSheet(
+              poi: poi,
+              onChatButtonPressed: () {
+                Navigator.of(context).pop(); // Close the bottom sheet
+                _openChat(poi.profile.userId, poi.profile.name);
+              },
+            ),
         );
       });
     }
@@ -720,14 +715,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
   }
 
-  Future<MarkerIcon> _createPoiMarker(PointOfInterest poi, AppLocalizations l10n, {bool isSelfAvatar = false}) async {
-    // Load user interests/offerings if needed
-    if (isSelfAvatar) {
-      final userRepository = getIt<UserRepository>();
-      _userInterests = await userRepository.getInterests(loadFromStorage: true);
-      _userOfferings = await userRepository.getOfferings(loadFromStorage: true);
-    }
-
+  Future<MarkerIcon> _createPoiMarker(PointOfInterest poi, AppLocalizations l10n) async {
     return await PoiMarkerWidget.createMarker(
       poi: poi,
       userInterests: _userInterests,
@@ -779,18 +767,19 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
     // Build map content separately to avoid rebuilds
     // Using GlobalKey to preserve widget identity across rebuilds
-    final mapContent = KeyedSubtree(
-      key: _mapContentKey,
-      child: Scaffold(
-        key: _scaffoldKey, // Use persistent key to prevent rebuilds
-        drawer: PointerInterceptor(
-          child: DrawerMain(
-            poiCubit: poiCubit,
-            mapController: _mapController,
-            onAttributesChanged: _handleAttributesChanged,
-            onOpenSettingsPanel: () => context.read<SettingsPanelCubit>().openSettings(),
+    final mapContent = ScaffoldMessenger(
+      child: KeyedSubtree(
+        key: _mapContentKey,
+        child: Scaffold(
+          key: _scaffoldKey, // Use persistent key to prevent rebuilds
+          drawer: PointerInterceptor(
+            child: DrawerMain(
+              poiCubit: poiCubit,
+              mapController: _mapController,
+              onAttributesChanged: _handleAttributesChanged,
+              onOpenSettingsPanel: () => context.read<SettingsPanelCubit>().openSettings(),
+            ),
           ),
-        ),
         body: MultiBlocListener(
           listeners: [
             BlocListener<PoiCubit, PoiState>(
@@ -813,8 +802,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                             builder: (_) => const InitializeScreen(),
-                          ),
-                              (route) => false,
+                          ), (route) => false,
                         );
                       }
                     });
@@ -843,7 +831,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               if (!isVisible) {
                 return const SizedBox.shrink();
               }
-
               // Build the map Stack - just map and UI overlays
               final mapWidget = OSMFlutter(
                 controller: _mapController,
@@ -890,7 +877,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     left: 64 + MediaQuery.of(context).viewPadding.left,
                     right: 100 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
-                      child: SearchInMap(
+                      child: SearchInMapTextField(
                         controller: _mapController,
                         poiCubit: poiCubit,
                         showCheckboxesNotifier: _showCheckboxesNotifier,
@@ -899,9 +886,18 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                       ),
                     ),
                   ),
-                  // Search filter checkboxes - positioned separately for full width control
+                  // Suggestion keywords list - horizontally scrollable attribute bubbles (rendered first)
                   Positioned(
-                    top: (kIsWeb ? 8.h : topPadding ?? 0) + 56, // Below the search field
+                    top: (kIsWeb ? 8 : topPadding ?? 0) + 32,
+                    left: MediaQuery.of(context).viewPadding.left,
+                    right: MediaQuery.of(context).viewPadding.right,
+                    child: SuggestionKeywordsList(
+                      poiCubit: poiCubit,
+                    ),
+                  ),
+                  // Search filter checkboxes - positioned above/overlapping suggestion list (rendered on top)
+                  Positioned(
+                    top: (kIsWeb ? 8.h : topPadding ?? 0) + 46, // Just below search field
                     left: 16 + MediaQuery.of(context).viewPadding.left,
                     right: 16 + MediaQuery.of(context).viewPadding.right,
                     child: SearchFilterCheckboxes(
@@ -925,7 +921,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                   final chatCubit = context.read<ChatPanelCubit>();
                                   final poiCubit = context.read<PoiPanelCubit>();
                                   if (context.canShowSideBySide) {
-                                    // Close POI panel if open, then open chat list
                                     if (poiCubit.state.isOpen) {
                                       poiCubit.closePanel();
                                     }
@@ -943,35 +938,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                 child: const Icon(Icons.chat_bubble_outline),
                               ),
                               if (badgeState.unreadCount > 0)
-                                Positioned(
+                                PositionedCountBadge(
+                                  count: badgeState.unreadCount,
                                   top: -4,
                                   right: -4,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: AppColors.background,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    constraints: const BoxConstraints(
-                                      minWidth: 20,
-                                      minHeight: 20,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        badgeState.unreadCount > 99 ?
-                                        '99+' : badgeState.unreadCount.toString(),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                  borderColor: AppColors.background,
+                                  borderWidth: 2,
                                 ),
                             ],
                           );
@@ -1005,13 +977,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                           ),
                           onPressed: () async {
                             mapOperationsCubit.reset();
-
                             // Close POI panel when performing new search
                             final poiPanelCubit = context.read<PoiPanelCubit>();
                             if (poiPanelCubit.state.isOpen) {
                               poiPanelCubit.closePanel();
                             }
-
                             final settingsService = getIt<SettingsService>();
                             final useMapCenter = await settingsService.getUseMapCenterForSearch();
                             final radiusKm = await settingsService.getNearbyUsersRadius();
@@ -1092,19 +1062,13 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           ),
         ),
       ),
-    );
+    ),
+  );
 
     // Wrap with Stack-based overlays - each panel is an independent overlay
     return BackButtonHandler(
       onBackPressed: () async {
-        if (_showSearchResultsList) {
-          setState(() {
-            _showSearchResultsList = false;
-            _searchResults = [];
-          });
-          return false; // Prevent navigation
-        }
-        // Allow normal navigation
+        // Allow normal navigation, adjust if needed for specific screens
         return true;
       },
       child: MapOverlayLayout(
@@ -1163,7 +1127,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _noUsersMarkerPosition = mapCenter;
     // Load and create the special marker with path333.svg
     final svgString = await rootBundle.loadString('assets/icons/avatars/path333.svg');
-
     final marker = mapOperationsCubit.createNoUsersMarker(svgString);
 
     await _mapController.addMarker(
@@ -1171,10 +1134,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       markerIcon: marker,
     );
     _currentMarkerPositions.add(mapCenter);
-    // On web, give DOM time to process the marker iframe creation
-    if (kIsWeb) {
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
   }
 
   void _removeNoUsersMarker() {

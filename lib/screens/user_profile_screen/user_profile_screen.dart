@@ -25,6 +25,7 @@ import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/widgets/attribute_bubble.dart';
+import 'package:barter_app/widgets/count_badge.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -673,32 +674,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           ),
                         ),
                         if (unreadCount > 0)
-                          Positioned(
+                          PositionedCountBadge(
+                            count: unreadCount,
                             top: -6,
                             right: -6,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 1.5,
-                                ),
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 28,
-                                minHeight: 28,
-                              ),
-                              child: Text(
-                                unreadCount > 99 ? '99+' : '$unreadCount',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
+                            padding: const EdgeInsets.all(4),
+                            borderColor: Colors.white,
+                            borderWidth: 1.5,
+                            constraints: const BoxConstraints(
+                              minWidth: 28,
+                              minHeight: 28,
                             ),
                           ),
                       ],

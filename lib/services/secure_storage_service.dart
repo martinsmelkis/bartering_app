@@ -25,6 +25,8 @@ class SecureStorageService {
   static const _interestsKey = '1243344gfyfdrjH';
   static const _offeringsKey = '124667gfyfdrjH';
   static const _profileKeywordDataMapKey = '124668gfyfdrjH';
+  static const _suggestedInterestsKey = '124669gfyfdrjI'; // Server-suggested interests
+  static const _suggestedOfferingsKey = '124670gfyfdrjJ'; // Server-suggested offerings
   static const _contactPublicKeyPrefix = 'contact_pubkey_';
   static const _federatedIdMappingPrefix = 'federated_mapping_';
   static const _securityQuestionKey = 'security_question';
@@ -174,6 +176,72 @@ class SecureStorageService {
           MapEntry(key, (value as num).toDouble()));
     } catch (e) {
       logDebugError('Error parsing profile keyword data map: $e');
+      return null;
+    }
+  }
+
+  /// Saves server-suggested interests for quick search suggestions
+  Future<void> saveSuggestedInterests(List<ParsedAttributeData> suggestions) async {
+    final List<Map<String, dynamic>> jsonList = suggestions.map((attr) => {
+      'attributeKey': attr.attributeKey,
+      'attribute': attr.attribute,
+      'relevancyScore': attr.relevancyScore,
+      'uiStyleHint': attr.uiStyleHint,
+    }).toList();
+    await _secureStorage.write(
+      key: _suggestedInterestsKey,
+      value: jsonEncode(jsonList),
+    );
+  }
+
+  /// Retrieves server-suggested interests
+  Future<List<ParsedAttributeData>?> getSuggestedInterests() async {
+    final jsonString = await _safeRead(_suggestedInterestsKey);
+    if (jsonString == null || jsonString.isEmpty) return null;
+
+    try {
+      final List<dynamic> jsonList = jsonDecode(jsonString);
+      return jsonList.map((json) => ParsedAttributeData(
+        attributeKey: json['attributeKey'] as String?,
+        attribute: json['attribute'] as String,
+        relevancyScore: (json['relevancyScore'] as num).toDouble(),
+        uiStyleHint: json['uiStyleHint'] as String,
+      )).toList();
+    } catch (e) {
+      logDebugError('Error parsing suggested interests: $e');
+      return null;
+    }
+  }
+
+  /// Saves server-suggested offerings for quick search suggestions
+  Future<void> saveSuggestedOfferings(List<ParsedAttributeData> suggestions) async {
+    final List<Map<String, dynamic>> jsonList = suggestions.map((attr) => {
+      'attributeKey': attr.attributeKey,
+      'attribute': attr.attribute,
+      'relevancyScore': attr.relevancyScore,
+      'uiStyleHint': attr.uiStyleHint,
+    }).toList();
+    await _secureStorage.write(
+      key: _suggestedOfferingsKey,
+      value: jsonEncode(jsonList),
+    );
+  }
+
+  /// Retrieves server-suggested offerings
+  Future<List<ParsedAttributeData>?> getSuggestedOfferings() async {
+    final jsonString = await _safeRead(_suggestedOfferingsKey);
+    if (jsonString == null || jsonString.isEmpty) return null;
+
+    try {
+      final List<dynamic> jsonList = jsonDecode(jsonString);
+      return jsonList.map((json) => ParsedAttributeData(
+        attributeKey: json['attributeKey'] as String?,
+        attribute: json['attribute'] as String,
+        relevancyScore: (json['relevancyScore'] as num).toDouble(),
+        uiStyleHint: json['uiStyleHint'] as String,
+      )).toList();
+    } catch (e) {
+      logDebugError('Error parsing suggested offerings: $e');
       return null;
     }
   }

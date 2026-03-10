@@ -87,6 +87,26 @@ class UserRepository {
     await _secureStorageService.saveProfileKeywordDataMap(data);
   }
 
+  /// Saves server-suggested interests to storage
+  Future<void> saveSuggestedInterests(List<ParsedAttributeData> suggestions) async {
+    await _secureStorageService.saveSuggestedInterests(suggestions);
+  }
+
+  /// Retrieves server-suggested interests from storage
+  Future<List<ParsedAttributeData>?> getSuggestedInterests() async {
+    return await _secureStorageService.getSuggestedInterests();
+  }
+
+  /// Saves server-suggested offerings to storage
+  Future<void> saveSuggestedOfferings(List<ParsedAttributeData> suggestions) async {
+    await _secureStorageService.saveSuggestedOfferings(suggestions);
+  }
+
+  /// Retrieves server-suggested offerings from storage
+  Future<List<ParsedAttributeData>?> getSuggestedOfferings() async {
+    return await _secureStorageService.getSuggestedOfferings();
+  }
+
   double get latitude => userLocation?.isNotEmpty == true ?
     double.tryParse(userLocation?.split(',')[0] ?? "") ?? 0.0 : 0.0;
   double get longitude => userLocation?.isNotEmpty == true ?
