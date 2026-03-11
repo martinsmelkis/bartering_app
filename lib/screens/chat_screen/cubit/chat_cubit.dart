@@ -619,7 +619,7 @@ class ChatCubit extends Cubit<ChatState> {
       );
 
       final response = await apiClient.blockUser(request.toJson());
-      final success = response?.contains("error") == false;
+      final success = response.contains("error") == false;
       
       if (success) {
         emit(ChatUserBlockSuccess());
@@ -654,7 +654,7 @@ class ChatCubit extends Cubit<ChatState> {
       );
 
       final response = await apiClient.unblockUser(request.toJson());
-      final success = response?.contains("error") == false;
+      final success = response.contains("error") == false;
       
       if (success) {
         emit(ChatUserUnblockSuccess());
@@ -768,7 +768,7 @@ class ChatCubit extends Cubit<ChatState> {
 
       final response = await apiClient.createReport(request.toJson());
       
-      if (response != null && !response.contains("error")) {
+      if (!response.contains("error")) {
         emit(ChatUserReportSuccess(response));
       } else {
         emit(ChatUserReportError('Failed to submit report'));

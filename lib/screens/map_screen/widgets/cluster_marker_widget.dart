@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

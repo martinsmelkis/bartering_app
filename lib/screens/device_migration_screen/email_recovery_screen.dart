@@ -7,7 +7,6 @@ import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -83,8 +82,6 @@ class _EmailRecoveryScreenState extends State<EmailRecoveryScreen> {
       });
       return;
     }
-
-    final l10n = AppLocalizations.of(context)!;
 
     setState(() {
       _isSubmitting = true;

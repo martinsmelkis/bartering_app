@@ -68,7 +68,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
     }
   }
 
-  void _onKeyPressed(int index, RawKeyEvent event) {
+  void _onKeyPressed(int index, KeyEvent event) {
     if (event.logicalKey == LogicalKeyboardKey.backspace) {
       if (_controllers[index].text.isEmpty && index > 0) {
         _focusNodes[index - 1].requestFocus();
@@ -440,9 +440,9 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                 SizedBox(
                   width: boxWidth,
                   height: boxHeight,
-                  child: RawKeyboardListener(
+                  child: KeyboardListener(
                     focusNode: FocusNode(skipTraversal: true),
-                    onKey: (event) => _onKeyPressed(index, event),
+                    onKeyEvent: (event) => _onKeyPressed(index, event),
                     child: TextField(
                       controller: _controllers[index],
                       focusNode: _focusNodes[index],
@@ -501,9 +501,9 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                 SizedBox(
                   width: boxWidth,
                   height: boxHeight,
-                  child: RawKeyboardListener(
+                  child: KeyboardListener(
                     focusNode: FocusNode(skipTraversal: true),
-                    onKey: (event) => _onKeyPressed(index, event),
+                    onKeyEvent: (event) => _onKeyPressed(index, event),
                     child: TextField(
                       controller: _controllers[index],
                       focusNode: _focusNodes[index],

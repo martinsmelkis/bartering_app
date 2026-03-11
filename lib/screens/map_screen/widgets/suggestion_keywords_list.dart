@@ -2,6 +2,7 @@ import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/widgets/selectable_attribute_bubble.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -197,7 +198,7 @@ class _SuggestionKeywordsListState extends State<SuggestionKeywordsList> {
               final isSelected = _selectedAttributes.contains(suggestion.effectiveAttributeKey);
 
               return Padding(
-                padding: EdgeInsets.only(right: 4),
+                padding: EdgeInsets.only(right: kIsWeb ? 4 : 8),
                 child: SelectableAttributeBubble(
                   attribute: suggestion,
                   isSelected: isSelected,
@@ -205,7 +206,7 @@ class _SuggestionKeywordsListState extends State<SuggestionKeywordsList> {
                     suggestion.effectiveAttributeKey,
                     selected,
                   ),
-                  scaleFactor: 1.0,
+                  scaleFactor: kIsWeb ? 1.1 : 1.05,
                 ),
               );
             },

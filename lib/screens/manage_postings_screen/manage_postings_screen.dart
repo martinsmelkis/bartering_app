@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import '../../configure_dependencies.dart';
@@ -8,7 +7,6 @@ import '../../services/api_client.dart';
 import '../../services/secure_storage_service.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/debug_utils.dart';
-import '../../utils/responsive_breakpoints.dart';
 import '../user_profile_screen/create_posting_screen.dart';
 import 'package:intl/intl.dart';
 
@@ -162,9 +160,6 @@ class _ManagePostingsScreenState extends State<ManagePostingsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
-    // Check if we're in web panel mode
-    final bool isWebPanel = kIsWeb && !widget.showAppBar && context.canShowSideBySide;
 
     return Scaffold(
       appBar: widget.showAppBar

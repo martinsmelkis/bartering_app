@@ -888,7 +888,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   // Suggestion keywords list - horizontally scrollable attribute bubbles (rendered first)
                   Positioned(
-                    top: (kIsWeb ? 8 : topPadding ?? 0) + 32,
+                    top: (kIsWeb ? 8 : (32)) + 32,
                     left: MediaQuery.of(context).viewPadding.left,
                     right: MediaQuery.of(context).viewPadding.right,
                     child: SuggestionKeywordsList(

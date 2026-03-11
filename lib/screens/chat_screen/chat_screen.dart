@@ -36,7 +36,6 @@ import '../../services/secure_storage_service.dart';
 import '../chat_screen/cubit/chat_cubit.dart';
 import '../../models/chat/chat_message.dart';
 import '../../models/chat/file_attachment.dart';
-import '../map_screen/map_screen.dart';
 import '../../widgets/image_viewer_dialog.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -1178,14 +1177,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
     final l10n = AppLocalizations.of(context)!;
 
-    // Track download progress for UI feedback
-    double downloadProgress = 0.0;
-
     try {
       // Show initial downloading progress
       final scaffoldMessenger = ScaffoldMessenger.of(context);
-
-      // Simple progress snackbar without StatefulBuilder
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Row(

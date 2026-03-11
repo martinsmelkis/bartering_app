@@ -5,7 +5,6 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart';
 import 'package:barter_app/screens/interests_screen/interests_screen.dart';
-import 'package:barter_app/screens/map_screen/map_screen.dart';
 import 'package:barter_app/screens/match_history_screen/match_history_screen.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/screens/notifications_screen/notifications_screen.dart';
@@ -40,11 +39,9 @@ import '../../configure_dependencies.dart';
 import '../../data/local/platform/platform.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repositories/chat_repository.dart';
-import '../../router/app_router.dart';
 import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/settings_service.dart';
 import '../../theme/app_colors.dart';
-import '../../utils/text_utils.dart';
 import '../onboarding_screen/cubit/onboarding_cubit.dart';
 
 class UserProfileScreen extends StatefulWidget {

@@ -26,16 +26,10 @@ class SourceMigrationScreen extends StatefulWidget {
 class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
   String? _sessionId; // 10-char session code for display
   String? _sessionIdUuid; // UUID for API calls
-  DateTime? _expiresAt;
   String? _errorMessage;
   bool _isGenerating = false;
-  bool _isSendingPayload = false;
   Timer? _expiryTimer;
   Duration _remainingTime = Duration.zero;
-  
-  // Store target device info when it joins
-  String? _targetDeviceId;
-  String? _targetPublicKey;
 
   @override
   void dispose() {
@@ -46,7 +40,6 @@ class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
   void _startExpiryTimer(DateTime expiresAt) {
     _expiryTimer?.cancel();
     setState(() {
-      _expiresAt = expiresAt;
       _remainingTime = expiresAt.difference(DateTime.now());
     });
 
@@ -562,11 +555,7 @@ class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
               child: ElevatedButton(
                 onPressed: () async {
                   Navigator.of(dialogContext).pop();
-                  // Allow migration - prepare and send data
-                  setState(() {
-                    _isSendingPayload = true;
-                  });
-                  
+
                   // Use sessionId (UUID) for API calls, not sessionCode
                   final sessionId = _sessionIdUuid ?? _sessionId;
                   
@@ -576,11 +565,7 @@ class _SourceMigrationScreenState extends State<SourceMigrationScreen> {
                     targetPublicKey,
                     sessionId!, // Use UUID for payload API call
                   );
-                  
-                  setState(() {
-                    _isSendingPayload = false;
-                  });
-                  
+
                   if (success) {
                     // Show success message
                     if (mounted) {

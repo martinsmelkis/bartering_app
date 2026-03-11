@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:barter_app/models/map/point_of_interest.dart';
 import 'package:barter_app/screens/map_screen/cubit/poi_panel_cubit.dart';
