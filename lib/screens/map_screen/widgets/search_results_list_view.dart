@@ -1013,22 +1013,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             // Name with avatar
             Row(
               children: [
-                Expanded(
-                  child: Text(
-                    poi.profile.name.startsWith('User_')
-                        ? poi.profile.name.replaceFirst(
-                            'User_',
-                            l10n.userPrefix + ' ',
-                          )
-                        : poi.profile.name,
-                    style: const TextStyle(
-                      fontSize: 14.4,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Smaller Avatar with online badge
+                // Avatar with online badge
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -1078,6 +1063,23 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 _buildRatingDisplay(poi),
                 const SizedBox(width: 4),
                 const Icon(Icons.chevron_right, color: Colors.grey),
+                const SizedBox(width: 8),
+                // Username
+                Expanded(
+                  child: Text(
+                    poi.profile.name.startsWith('User_')
+                        ? poi.profile.name.replaceFirst(
+                            'User_',
+                            l10n.userPrefix + ' ',
+                          )
+                        : poi.profile.name,
+                    style: const TextStyle(
+                      fontSize: 14.4,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ),
               ],
             ),
             // Interests and Offerings separated

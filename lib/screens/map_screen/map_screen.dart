@@ -856,7 +856,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                 children: [
                   mapWidget,
                   Positioned(
-                    top: kIsWeb ? 8.h : topPadding ?? 26.0,
+                    top: kIsWeb ? 8.h : 26.h,
                     left: 12 + MediaQuery.of(context).viewPadding.left,
                     child: PointerInterceptor(child: const MainNavigation()),
                   ),
@@ -873,7 +873,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
                   ),
                   Positioned(
-                    top: kIsWeb ? 7.h : topPadding,
+                    top: kIsWeb ? 6.h : 28.h,
                     left: 64 + MediaQuery.of(context).viewPadding.left,
                     right: 100 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
@@ -888,7 +888,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   // Suggestion keywords list - horizontally scrollable attribute bubbles (rendered first)
                   Positioned(
-                    top: (kIsWeb ? 8 : (32)) + 32,
+                    top: kIsWeb ? 42 : 51.h,
                     left: MediaQuery.of(context).viewPadding.left,
                     right: MediaQuery.of(context).viewPadding.right,
                     child: SuggestionKeywordsList(
@@ -908,7 +908,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   // Chats button in top right
                   Positioned(
-                    top: kIsWeb ? 8.h : topPadding ?? 26.0,
+                    top: kIsWeb ? 8.h : 26.h,
                     right: 12 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
                       child: BlocBuilder<ChatsBadgeCubit, ChatsBadgeState>(
@@ -953,7 +953,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   // Search complementary users button (with fallback to nearby)
                   Positioned(
-                    top: kIsWeb ? 8.h : (topPadding ?? 20.0),
+                    top: kIsWeb ? 8.h : 26.h,
                     right: 56 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
                       child: Container(

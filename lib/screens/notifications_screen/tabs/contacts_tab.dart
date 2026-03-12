@@ -422,9 +422,11 @@ class _ContactsTabState extends State<ContactsTab> {
         minute: 0,
       ),
       builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
-          child: child!,
+        return PointerInterceptor(
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+            child: child!,
+          ),
         );
       },
     );
@@ -445,9 +447,11 @@ class _ContactsTabState extends State<ContactsTab> {
         minute: 0,
       ),
       builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
-          child: child!,
+        return PointerInterceptor(
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+            child: child!,
+          ),
         );
       },
     );
