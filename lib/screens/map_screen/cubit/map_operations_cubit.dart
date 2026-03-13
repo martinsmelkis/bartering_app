@@ -432,9 +432,15 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
     // If both are empty, nothing changed
     if (newPois.isEmpty && oldPois.isEmpty) return false;
 
-    // Compare POI user IDs in order
+    // Compare POI user IDs and match scores in order
     for (int i = 0; i < newPois.length; i++) {
       if (newPois[i].profile.userId != oldPois[i].profile.userId) {
+        return true;
+      }
+      // Also check if match relevancy score changed (for keyword search refresh)
+      final newScore = newPois[i].matchRelevancyScore ?? 0.0;
+      final oldScore = oldPois[i].matchRelevancyScore ?? 0.0;
+      if ((newScore - oldScore).abs() > 0.0001) { // Small tolerance for float comparison
         return true;
       }
     }

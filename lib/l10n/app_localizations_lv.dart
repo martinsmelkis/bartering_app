@@ -1569,7 +1569,7 @@ class AppLocalizationsLv extends AppLocalizations {
       count,
       locale: localeName,
       other: 'lietotāji',
-      one: 'lietotāji',
+      one: 'lietotājs',
     );
     return '$count $_temp0 $_temp1';
   }

@@ -515,7 +515,7 @@
   "noMessagesYet": "Vēl nav ziņojumu",
   "ninetyNinePlus": "99+",
   "userDetails": "Lietotāja informācija",
-  "matchingUsersFound": "{count} {count, plural, =1{atbilstošs} other{atbilstoši}} {count, plural, =1{lietotāji} other{lietotāji}}",
+  "matchingUsersFound": "{count} {count, plural, =1{atbilstošs} other{atbilstoši}} {count, plural, =1{lietotājs} other{lietotāji}}",
   "@matchingUsersFound": {
     "placeholders": {
       "count": {

@@ -873,7 +873,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
                   ),
                   Positioned(
-                    top: kIsWeb ? 6.h : 28.h,
+                    top: kIsWeb ? 6.h : 26.h,
                     left: 64 + MediaQuery.of(context).viewPadding.left,
                     right: 100 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
