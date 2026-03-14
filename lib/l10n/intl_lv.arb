@@ -1018,6 +1018,15 @@
   "showMore": "Rādīt vairāk",
   "showLess": "Rādīt mazāk",
   "noUsersFound": "Nav atrasti lietotāji",
-  "noPostingsFound": "Nav atrasti sludinājumi"
+  "noPostingsFound": "Nav atrasti sludinājumi",
+
+  "settingsGpsLocationTitle": "Iespējot GPS atrašanās vietu",
+  "settingsGpsLocationEnabledDescription": "GPS atrašanās vietas izsekošana ir iespējota",
+  "settingsGpsLocationDisabledDescription": "GPS atrašanās vietas izsekošana ir atspējota",
+  "settingsGpsLocationDescription": "Kad iespējots, varat pietuvināt karti līdz pašreizējai GPS atrašanās vietai. Lietotne pieprasīs atrašanās vietas atļaujas, kad nepieciešams.",
+  "locationPermissionRequiredDescription": "Atrašanās vietas atļauja ir nepieciešama, lai izmantotu GPS atrašanās vietas izsekošanu. Lūdzu, iespējojiet atrašanās vietas atļauju ierīces iestatījumos.",
+  "openSettings": "Atvērt iestatījumus",
+  "profilePanelTitle": "Profils",
+  "reviewsCount": "{count} atsauksmes"
 
 }

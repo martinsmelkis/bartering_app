@@ -8,13 +8,13 @@ class ProfilePanelState {
   final String? userName;
   final List<ParsedAttributeData>? interests;
   final List<ParsedAttributeData>? offerings;
-
+  
   const ProfilePanelState({
     this.isOpen = false,
     this.userId,
     this.userName,
     this.interests,
-    this.offerings,
+    this.offerings
   });
 
   ProfilePanelState copyWith({
@@ -22,14 +22,14 @@ class ProfilePanelState {
     String? userId,
     String? userName,
     List<ParsedAttributeData>? interests,
-    List<ParsedAttributeData>? offerings,
+    List<ParsedAttributeData>? offerings
   }) {
     return ProfilePanelState(
       isOpen: isOpen ?? this.isOpen,
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
       interests: interests ?? this.interests,
-      offerings: offerings ?? this.offerings,
+      offerings: offerings ?? this.offerings
     );
   }
 }
@@ -43,14 +43,14 @@ class ProfilePanelCubit extends Cubit<ProfilePanelState> {
     required String userId,
     required String userName,
     List<ParsedAttributeData>? interests,
-    List<ParsedAttributeData>? offerings,
+    List<ParsedAttributeData>? offerings
   }) {
     emit(ProfilePanelState(
       isOpen: true,
       userId: userId,
       userName: userName,
       interests: interests,
-      offerings: offerings,
+      offerings: offerings
     ));
   }
 

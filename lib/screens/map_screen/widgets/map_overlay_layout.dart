@@ -56,6 +56,25 @@ class MapOverlayLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSmallScreen = !ResponsiveBreakpoints.canShowSideBySide(context);
+    final hasSearchResults = showSearchResultsList && searchResults.isNotEmpty;
+    
+    // On small screens with search results, use overlay approach (no right panel in Row)
+    // The overlay is rendered in the map content itself
+    if (isSmallScreen && hasSearchResults) {
+      return Row(
+        children: [
+          // LEFT SIDE: Map with optional left panel (fills entire width)
+          Expanded(
+            child: _MainContentWithLeftPanel(
+              mapContent: mapContent,
+            ),
+          ),
+          // No right panel - search results are shown as overlay in map content
+        ],
+      );
+    }
+    
     return Row(
       children: [
         // LEFT SIDE: Map with optional left panel (Profile/Settings)
@@ -107,32 +126,60 @@ class _MainContentWithLeftPanel extends StatelessWidget {
               builder: (context, nestedState) {
                 final isLeftPanelOpen = profileState.isOpen || settingsState.isOpen;
                 final hasNestedPanel = nestedState.isOpen && profileState.isOpen;
+                final bothPanelsOpen = profileState.isOpen && settingsState.isOpen;
                 
                 // Calculate total left panel width:
                 // - Profile/Settings only: leftPanelWidth
                 // - Profile/Settings + nested panel: leftPanelWidth + nestedPanelWidth
+                // - Profile + Settings side by side: leftPanelWidth * 2
                 // Max cap to prevent overflow on very large screens
                 final baseWidth = context.leftPanelWidth;
                 final nestedWidth = baseWidth * 0.82;
-                final maxTotalWidth = 800.0; // Cap to prevent overflow
-                final totalLeftWidth = hasNestedPanel 
-                  ? (baseWidth + nestedWidth).clamp(0.0, maxTotalWidth)
-                  : baseWidth.clamp(0.0, maxTotalWidth);
+                final maxTotalWidth = 1000.0; // Cap to prevent overflow
+                
+                double totalLeftWidth;
+                if (bothPanelsOpen) {
+                  // Profile + Settings side by side
+                  totalLeftWidth = (baseWidth * 2).clamp(0.0, maxTotalWidth);
+                } else if (hasNestedPanel) {
+                  // Profile + nested panel
+                  totalLeftWidth = (baseWidth + nestedWidth).clamp(0.0, maxTotalWidth);
+                } else {
+                  // Single panel
+                  totalLeftWidth = baseWidth.clamp(0.0, maxTotalWidth);
+                }
 
                 return Row(
                   children: [
-                    // Left panel area - expands when nested panel is open
+                    // Left panel area - expands when nested panel is open or both panels are open
                     if (isLeftPanelOpen)
                       SizedBox(
                         width: totalLeftWidth,
-                        child: profileState.isOpen
-                          ? _ProfilePanelContent(
-                              state: profileState,
-                              nestedState: hasNestedPanel ? nestedState : null,
+                        child: bothPanelsOpen
+                          // Both Profile and Settings open - show side by side
+                          ? Row(
+                              children: [
+                                SizedBox(
+                                  width: baseWidth,
+                                  child: _ProfilePanelContent(
+                                    state: profileState,
+                                    nestedState: hasNestedPanel ? nestedState : null,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: baseWidth,
+                                  child: _SettingsPanelContent(state: settingsState),
+                                ),
+                              ],
                             )
-                          : settingsState.isOpen
-                            ? _SettingsPanelContent(state: settingsState)
-                            : const SizedBox.shrink(),
+                          : profileState.isOpen
+                            ? _ProfilePanelContent(
+                                state: profileState,
+                                nestedState: hasNestedPanel ? nestedState : null,
+                              )
+                            : settingsState.isOpen
+                              ? _SettingsPanelContent(state: settingsState)
+                              : const SizedBox.shrink(),
                       ),
                     // Map content fills remaining space
                     // When panel is open, map starts at right edge of panel
@@ -255,6 +302,7 @@ class _ProfilePanelContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasNestedPanel = nestedState?.isOpen == true;
     
     // Calculate widths that fit within the parent container
@@ -288,7 +336,7 @@ class _ProfilePanelContent extends StatelessWidget {
               children: [
                 // Header
                 _LeftPanelHeader(
-                  title: 'Profile',
+                  title: l10n.profilePanelTitle,
                   onClose: () => context.read<ProfilePanelCubit>().closeProfile(),
                 ),
                 // Content - takes all remaining space
@@ -299,7 +347,7 @@ class _ProfilePanelContent extends StatelessWidget {
                     interests: state.interests,
                     offerings: state.offerings,
                     showAppBar: false,
-                    skipNestedPanelLayout: true, // External layout handles nested panel
+                    skipNestedPanelLayout: true // External layout handles nested panel
                   ),
                 ),
               ],

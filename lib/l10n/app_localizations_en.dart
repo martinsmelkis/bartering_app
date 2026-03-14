@@ -2766,4 +2766,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noPostingsFound => 'No postings found';
+
+  @override
+  String get settingsGpsLocationTitle => 'Enable GPS Location';
+
+  @override
+  String get settingsGpsLocationEnabledDescription =>
+      'GPS location tracking is enabled';
+
+  @override
+  String get settingsGpsLocationDisabledDescription =>
+      'GPS location tracking is disabled';
+
+  @override
+  String get settingsGpsLocationDescription =>
+      'When enabled, you can zoom to your current GPS location on the map. The app will request location permissions when needed.';
+
+  @override
+  String get locationPermissionRequiredDescription =>
+      'Location permission is required to use GPS location tracking. Please enable location permission in your device settings.';
+
+  @override
+  String get openSettings => 'Open Settings';
+
+  @override
+  String get profilePanelTitle => 'Profile';
+
+  @override
+  String reviewsCount(int count) {
+    return '$count reviews';
+  }
 }

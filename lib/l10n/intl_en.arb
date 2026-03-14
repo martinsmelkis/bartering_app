@@ -1017,6 +1017,23 @@
   "recoverySuccessMessage": "Your account has been successfully recovered on this device.",
 
   "noUsersFound": "No users found",
-  "noPostingsFound": "No postings found"
+  "noPostingsFound": "No postings found",
+
+  "settingsGpsLocationTitle": "Enable GPS Location",
+  "settingsGpsLocationEnabledDescription": "GPS location tracking is enabled",
+  "settingsGpsLocationDisabledDescription": "GPS location tracking is disabled",
+  "settingsGpsLocationDescription": "When enabled, you can zoom to your current GPS location on the map. The app will request location permissions when needed.",
+  "locationPermissionRequiredDescription": "Location permission is required to use GPS location tracking. Please enable location permission in your device settings.",
+  "openSettings": "Open Settings",
+  "profilePanelTitle": "Profile",
+  "reviewsCount": "{count} reviews",
+  "@reviewsCount": {
+    "description": "Number of reviews count display",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 
 }

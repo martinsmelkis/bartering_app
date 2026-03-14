@@ -777,7 +777,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               poiCubit: poiCubit,
               mapController: _mapController,
               onAttributesChanged: _handleAttributesChanged,
-              onOpenSettingsPanel: () => context.read<SettingsPanelCubit>().openSettings(),
+              onOpenSettingsPanel: () {
+                // Open settings panel alongside profile panel (side by side)
+                context.read<SettingsPanelCubit>().openSettings();
+              },
             ),
           ),
         body: MultiBlocListener(

@@ -2803,4 +2803,34 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get noPostingsFound => 'Nav atrasti sludinājumi';
+
+  @override
+  String get settingsGpsLocationTitle => 'Iespējot GPS atrašanās vietu';
+
+  @override
+  String get settingsGpsLocationEnabledDescription =>
+      'GPS atrašanās vietas izsekošana ir iespējota';
+
+  @override
+  String get settingsGpsLocationDisabledDescription =>
+      'GPS atrašanās vietas izsekošana ir atspējota';
+
+  @override
+  String get settingsGpsLocationDescription =>
+      'Kad iespējots, varat pietuvināt karti līdz pašreizējai GPS atrašanās vietai. Lietotne pieprasīs atrašanās vietas atļaujas, kad nepieciešams.';
+
+  @override
+  String get locationPermissionRequiredDescription =>
+      'Atrašanās vietas atļauja ir nepieciešama, lai izmantotu GPS atrašanās vietas izsekošanu. Lūdzu, iespējojiet atrašanās vietas atļauju ierīces iestatījumos.';
+
+  @override
+  String get openSettings => 'Atvērt iestatījumus';
+
+  @override
+  String get profilePanelTitle => 'Profils';
+
+  @override
+  String reviewsCount(int count) {
+    return '$count atsauksmes';
+  }
 }

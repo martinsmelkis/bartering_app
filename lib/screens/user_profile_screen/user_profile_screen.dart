@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:barter_app/models/reviews/reputation_response.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
@@ -16,9 +17,11 @@ import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dar
 import 'package:barter_app/screens/user_profile_screen/cubit/nested_panel_cubit.dart';
 import 'package:barter_app/screens/user_profile_screen/adaptive_nested_panel_layout.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/services/reputation_cache.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/attribute_matching_utils.dart';
+import 'package:barter_app/utils/avatar_color_utils.dart';
 import 'package:barter_app/utils/back_button_handler.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/debug_utils.dart';
@@ -71,12 +74,94 @@ class UserProfileScreen extends StatefulWidget {
 class _UserProfileScreenState extends State<UserProfileScreen> {
   String? _userLocation;
   Map<String, double>? _profileKeywordDataMap;
+  
+  // Reputation data with caching
+  ReputationResponse? _reputationData;
+  List<BadgeDetail>? _userBadges;
+  bool _isLoadingReputation = false;
+  bool _isLoadingBadges = false;
+  
+  // Cache instance
+  final ReputationCache _reputationCache = ReputationCache();
 
   @override
   void initState() {
     super.initState();
     _loadUserLocation();
     _loadProfileKeywordData();
+    // Delay reputation and badges loading by 5 seconds
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) {
+        _loadReputationWithCache();
+        _loadBadgesWithCache();
+      }
+    });
+  }
+
+  /// Load reputation data with 10-minute caching
+  Future<void> _loadReputationWithCache() async {
+    // Check cache first
+    final cached = _reputationCache.getReputation(widget.userId);
+    if (cached != null) {
+      setState(() {
+        _reputationData = cached;
+      });
+      logDebug('✅ Using cached reputation data for ${widget.userId}');
+      return;
+    }
+
+    setState(() {
+      _isLoadingReputation = true;
+    });
+    try {
+      final apiClient = getIt<ApiClient>();
+      final reputation = await apiClient.getReputation(widget.userId);
+      // Cache the result
+      _reputationCache.setReputation(widget.userId, reputation);
+      setState(() {
+        _reputationData = reputation;
+        _isLoadingReputation = false;
+      });
+      logDebug('✅ Fetched and cached reputation for ${widget.userId}');
+    } catch (e) {
+      logDebug('Error loading reputation: $e');
+      setState(() {
+        _isLoadingReputation = false;
+      });
+    }
+  }
+
+  /// Load badges with 10-minute caching
+  Future<void> _loadBadgesWithCache() async {
+    // Check cache first
+    final cached = _reputationCache.getBadges(widget.userId);
+    if (cached != null) {
+      setState(() {
+        _userBadges = cached;
+      });
+      logDebug('✅ Using cached badges for ${widget.userId}');
+      return;
+    }
+
+    setState(() {
+      _isLoadingBadges = true;
+    });
+    try {
+      final apiClient = getIt<ApiClient>();
+      final badgesResponse = await apiClient.getUserBadges(widget.userId);
+      // Cache the result
+      _reputationCache.setBadges(widget.userId, badgesResponse.badges);
+      setState(() {
+        _userBadges = badgesResponse.badges;
+        _isLoadingBadges = false;
+      });
+      logDebug('✅ Fetched and cached badges for ${widget.userId}');
+    } catch (e) {
+      logDebug('Error loading user badges: $e');
+      setState(() {
+        _isLoadingBadges = false;
+      });
+    }
   }
 
   Future<void> _loadUserLocation() async {
@@ -166,22 +251,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             ),
                           ),
                           SizedBox(height: 8.h),
-                          Text(
-                            l10n.userId,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[800],
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            widget.userId,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontFamily: 'Courier',
-                            ),
-                          ),
+
+                          _buildRatingDisplay(l10n),
                         ],
                       ),
                     ),
@@ -733,7 +804,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 4,),
+            SizedBox(height: 12,),
             InkWell(
               onTap: () async {
                 // Navigate to source device migration screen
@@ -747,7 +818,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 padding: EdgeInsets.symmetric(
                     horizontal: 12, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.8),
+                  color: AppColors.secondary,
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Row(
@@ -774,6 +845,152 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  /// Build rating display widget for profile header with badges and balance
+  Widget _buildRatingDisplay(AppLocalizations l10n) {
+    // Use reputation data if available, otherwise default to 0.0 and 0
+    final rating = _reputationData?.averageRating ?? 0.0;
+    final reviewCount = _reputationData?.totalReviews ?? 0;
+    final ratingColor = AvatarColorUtils.getRatingColor(rating);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Rating badge
+        if (_isLoadingReputation)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+              ),
+            ),
+          )
+        else
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: ratingColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.star, size: 16, color: Colors.white),
+                const SizedBox(width: 4),
+                Text(
+                  rating.toStringAsFixed(1),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        const SizedBox(width: 8),
+        // Reviews count - only show when not loading
+        if (!_isLoadingReputation)
+          Text(
+            l10n.reviewsCount(reviewCount),
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        const SizedBox(width: 12),
+        // Badges display
+        if (_isLoadingBadges)
+          const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+            ),
+          )
+        else if (_userBadges != null && _userBadges!.isNotEmpty)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.emoji_events, size: 14, color: Colors.amber),
+              const SizedBox(width: 4),
+              Text(
+                '${_userBadges!.length}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          )
+        else
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.emoji_events, size: 14, color: Colors.grey[400]),
+              const SizedBox(width: 4),
+              Text(
+                '0',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[500],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        const SizedBox(width: 16),
+        // Account Balance placeholder
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.wallet,
+                size: 16,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '100.00',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

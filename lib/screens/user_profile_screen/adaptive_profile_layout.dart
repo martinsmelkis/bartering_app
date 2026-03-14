@@ -28,7 +28,7 @@ class AdaptiveProfileLayout extends StatelessWidget {
     this.interests,
     this.offerings,
     this.onClose,
-    this.hasNestedPanelOpen = false,
+    this.hasNestedPanelOpen = false
   });
 
   @override
@@ -44,7 +44,7 @@ class AdaptiveProfileLayout extends StatelessWidget {
             interests: interests,
             offerings: offerings,
             onClose: onClose,
-            hasNestedPanelOpen: hasNestedPanelOpen,
+            hasNestedPanelOpen: hasNestedPanelOpen
           ),
           // Main content takes remaining space
           Expanded(
@@ -75,7 +75,7 @@ class _ProfilePanel extends StatefulWidget {
     this.interests,
     this.offerings,
     this.onClose,
-    this.hasNestedPanelOpen = false,
+    this.hasNestedPanelOpen = false
   });
 
   @override

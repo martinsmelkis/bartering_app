@@ -174,4 +174,12 @@ class AvatarColorUtils {
       defaultColorHex: defaultColorHex,
     );
   }
+
+  /// Get rating color based on rating value
+  static Color getRatingColor(double rating) {
+    if (rating == 0.0) return Colors.grey.shade400;
+    if (rating >= 4.0) return Colors.green;
+    if (rating > 3.0) return Colors.amber;
+    return Colors.red;
+  }
 }

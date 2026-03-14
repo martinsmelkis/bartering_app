@@ -1,11 +1,12 @@
+// ignore_for_file: uri_does_not_exist
 /// Web-specific implementation using Fetch API
 /// Uses dart:js_util for proper constructor calling
+/// Note: This file is only used on web platforms (conditional import in webp_network_image.dart)
 
 import 'dart:async';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 import 'dart:js_util' as js_util;
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:web/web.dart' as web;
 
@@ -26,7 +27,7 @@ Future<Uint8List> fetchImageBytes(Uri url, Map<String, String> headers) async {
     );
 
     // Fetch the image
-    final response = await web.window.fetch(url.toString().toJS, requestInit).toDart as web.Response;
+    final response = await web.window.fetch(url.toString().toJS, requestInit).toDart;
 
     debugPrint('🔍 WebPNetworkImage: Response status ${response.status}');
 

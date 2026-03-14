@@ -3,6 +3,7 @@ import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:barter_app/utils/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -622,7 +623,10 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
                           children: [
                             Expanded(
                               child: Text(
-                                attr.attribute,
+                                TextUtils.getTranslatedOrNormalizedAttribute(
+                                  attr.attribute,
+                                  context,
+                                ),
                                 style: TextStyle(fontSize: 14),
                               ),
                             ),

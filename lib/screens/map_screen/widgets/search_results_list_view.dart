@@ -16,6 +16,7 @@ import '../../../models/postings/posting_data_response.dart';
 import '../../../services/api_client.dart';
 import '../../../theme/app_colors.dart';
 import '../../../utils/attribute_matching_utils.dart';
+import '../../../utils/avatar_color_utils.dart';
 import '../../../utils/category_stats_utils.dart';
 import '../../../utils/image_utils.dart';
 import '../../../utils/text_utils.dart';
@@ -1349,7 +1350,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     // Use rating data from POI fields, default to 0.0 and 0 if not available
     final rating = poi.averageRating ?? poi.profile.averageRating ?? 0.0;
     final reviewCount = poi.totalReviews ?? poi.profile.totalReviews ?? 0;
-    final ratingColor = _getRatingColor(rating);
+    final ratingColor = AvatarColorUtils.getRatingColor(rating);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1395,7 +1396,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     // Use rating data from POI fields, default to 0.0 and 0 if not available
     final rating = poi.averageRating ?? poi.profile.averageRating ?? 0.0;
     final reviewCount = poi.totalReviews ?? poi.profile.totalReviews ?? 0;
-    final ratingColor = _getRatingColor(rating);
+    final ratingColor = AvatarColorUtils.getRatingColor(rating);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -1430,14 +1431,6 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         ),
       ],
     );
-  }
-
-  /// Get rating color based on rating value (matches POI sheet styling)
-  Color _getRatingColor(double rating) {
-    if (rating == 0.0) return Colors.grey.shade400;
-    if (rating >= 4.0) return Colors.green;
-    if (rating > 3.0) return Colors.amber;
-    return Colors.red;
   }
 
   /// Build inline chat panel that appears below search results

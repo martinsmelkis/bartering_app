@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../application.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
@@ -86,6 +87,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _saveEnableGpsLocation(bool value) async {
+    // Skip permission requests on web - geolocation is handled by browser
+    if (!kIsWeb && value) {
+      // Requesting to enable GPS - ask for location permission
+      final status = await Permission.location.request();
+      
+      if (status.isDenied || status.isPermanentlyDenied) {
+        // Permission denied - show dialog explaining why we need it
+        if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
+          final bool openSettings = await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.settingsGpsLocationTitle),
+              content: Text(l10n.locationPermissionRequiredDescription),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(l10n.cancel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(l10n.openSettings),
+                ),
+              ],
+            ),
+          ) ?? false;
+          
+          if (openSettings) {
+            await openAppSettings();
+          }
+        }
+        // Don't enable the setting if permission was denied
+        return;
+      }
+    }
+    
     setState(() {
       _enableGpsLocation = value;
     });
@@ -438,23 +475,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Enable GPS Location',
-                                style: TextStyle(
+                              Text(
+                                l10n.settingsGpsLocationTitle,
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _enableGpsLocation
-                                    ? 'GPS location tracking is enabled'
-                                    : 'GPS location tracking is disabled',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                ),
+                              _enableGpsLocation
+                                  ? l10n.settingsGpsLocationEnabledDescription
+                                  : l10n.settingsGpsLocationDisabledDescription,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[600],
                               ),
+                            ),
                             ],
                           ),
                         ),
@@ -469,7 +506,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'When enabled, you can zoom to your current GPS location on the map. The app will request location permissions when needed.',
+                      l10n.settingsGpsLocationDescription,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[500],
@@ -584,7 +621,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 24),
 
             // Language Settings Section
-            _buildSectionHeader('Language'),
+            _buildSectionHeader(l10n.settingsLanguageSection),
             const SizedBox(height: 8),
             Card(
               elevation: 2,
@@ -593,16 +630,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'App Language',
-                      style: TextStyle(
+                    Text(
+                      l10n.settingsLanguageTitle,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Choose your preferred language for the app',
+                      l10n.settingsLanguageDescription,
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey[600],

@@ -5287,6 +5287,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No postings found'**
   String get noPostingsFound;
+
+  /// No description provided for @settingsGpsLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable GPS Location'**
+  String get settingsGpsLocationTitle;
+
+  /// No description provided for @settingsGpsLocationEnabledDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS location tracking is enabled'**
+  String get settingsGpsLocationEnabledDescription;
+
+  /// No description provided for @settingsGpsLocationDisabledDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS location tracking is disabled'**
+  String get settingsGpsLocationDisabledDescription;
+
+  /// No description provided for @settingsGpsLocationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, you can zoom to your current GPS location on the map. The app will request location permissions when needed.'**
+  String get settingsGpsLocationDescription;
+
+  /// No description provided for @locationPermissionRequiredDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is required to use GPS location tracking. Please enable location permission in your device settings.'**
+  String get locationPermissionRequiredDescription;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettings;
+
+  /// No description provided for @profilePanelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profilePanelTitle;
+
+  /// Number of reviews count display
+  ///
+  /// In en, this message translates to:
+  /// **'{count} reviews'**
+  String reviewsCount(int count);
 }
 
 class _AppLocalizationsDelegate

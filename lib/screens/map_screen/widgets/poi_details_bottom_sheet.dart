@@ -23,6 +23,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/map/point_of_interest.dart';
 import '../../../theme/app_colors.dart';
+import '../../../utils/avatar_color_utils.dart';
 
 class PoiDetailsBottomSheet extends StatefulWidget {
   final PointOfInterest poi;
@@ -851,7 +852,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                               vertical: 2,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: _getRatingColor(poiRating),
+                                              color: AvatarColorUtils.getRatingColor(poiRating),
                                               borderRadius:
                                                   BorderRadius.circular(8),
                                               border: Border.all(
@@ -1098,10 +1099,4 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     );
   }
 
-  Color _getRatingColor(double rating) {
-    if (rating == 0.0) return Colors.grey.shade400;
-    if (rating >= 4.0) return Colors.green;
-    if (rating > 3.0) return Colors.amber;
-    return Colors.red;
-  }
 }
