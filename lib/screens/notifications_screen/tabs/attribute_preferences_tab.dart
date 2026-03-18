@@ -63,7 +63,7 @@ class _AttributePreferenceCard extends StatelessWidget {
                   value: preference.notificationsEnabled,
                   onChanged: (value) =>
                       _toggleNotifications(context, preference, value),
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                 ),
                 PopupMenuButton<String>(
                   icon: const Icon(Icons.more_vert),
@@ -274,7 +274,7 @@ class _AttributePreferenceCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<NotificationFrequency>(
-                  value: selectedFrequency,
+                  initialValue: selectedFrequency,
                   decoration: InputDecoration(
                     labelText: l10n.frequency,
                     border: const OutlineInputBorder(),
@@ -541,7 +541,7 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
                         ),
                         SizedBox(height: 16),
                         DropdownButtonFormField<NotificationFrequency>(
-                          value: _frequency,
+                          initialValue: _frequency,
                           decoration: InputDecoration(
                             labelText: l10n.frequency,
                             border: const OutlineInputBorder(),

@@ -131,7 +131,15 @@ class AppTheme {
       ),
 
       // --- Responsive Text Theme ---
-      textTheme: getResponsiveTextTheme(),
+      textTheme: getResponsiveTextTheme().apply(
+        fontFamilyFallback: const [
+          // Keep broad Unicode coverage for web missing glyphs.
+          'Noto Sans',
+          'Noto Sans Symbols 2',
+          'Noto Color Emoji',
+          'sans-serif',
+        ],
+      ),
 
       // --- Add custom theme extensions if needed for very specific colors ---
       // extensions: <ThemeExtension<dynamic>>[

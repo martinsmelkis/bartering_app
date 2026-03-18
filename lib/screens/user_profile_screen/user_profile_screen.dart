@@ -926,37 +926,52 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               strokeWidth: 2,
             ),
           )
-        else if (_userBadges != null && _userBadges!.isNotEmpty)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.emoji_events, size: 14, color: Colors.amber),
-              const SizedBox(width: 4),
-              Text(
-                '${_userBadges!.length}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          )
         else
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.emoji_events, size: 14, color: Colors.grey[400]),
-              const SizedBox(width: 4),
-              Text(
-                '0',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                  fontWeight: FontWeight.w500,
+          PointerInterceptor(
+            child: InkWell(
+              onTap: _showBadgesInfoDialog,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: _userBadges != null && _userBadges!.isNotEmpty
+                            ? Colors.amber
+                            : Colors.orange[300],
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'B',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${_userBadges?.length ?? 0}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: (_userBadges != null && _userBadges!.isNotEmpty)
+                            ? Colors.grey[700]
+                            : Colors.grey[500],
+                        fontWeight: (_userBadges != null && _userBadges!.isNotEmpty)
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         const SizedBox(width: 16),
         // Account Balance placeholder
@@ -973,10 +988,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.wallet,
-                size: 16,
-                color: AppColors.primary,
+              Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                alignment: Alignment.center,
+                child: const Text(
+                  '₿',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
               const SizedBox(width: 4),
               Text(
@@ -991,6 +1018,93 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showBadgesInfoDialog() {
+    showDialog(
+      context: context,
+      useRootNavigator: kIsWeb,
+      builder: (dialogContext) {
+        final badges = _userBadges ?? const <BadgeDetail>[];
+
+        return PointerInterceptor(
+          child: AlertDialog(
+            title: const Text('Badges'),
+            content: SizedBox(
+              width: 360,
+              child: badges.isEmpty
+                  ? const Text('No badges earned yet. Keep trading to unlock badges.')
+                  : ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: badges.length,
+                      separatorBuilder: (_, __) => const Divider(height: 12),
+                      itemBuilder: (context, index) {
+                        final badge = badges[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.amber,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Text(
+                                    'B',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    badge.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              badge.description,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+            ),
+            actions: [
+              PointerInterceptor(
+                child: TextButton(
+                  onPressed: () {
+                    if (kIsWeb) {
+                      Navigator.of(dialogContext, rootNavigator: true).pop();
+                    } else {
+                      Navigator.of(dialogContext).pop();
+                    }
+                  },
+                  child: const Text('Close'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:injectable/injectable.dart';
+import 'dart:ui' as ui;
 
 /// Service for managing app settings using SharedPreferences
 /// This is more appropriate than SecureStorage for non-sensitive settings
@@ -157,16 +158,25 @@ class SettingsService {
   }
 
   /// Get whether to show search results as list
-  /// Defaults to true on web/large screens, false on mobile
+  /// Defaults to true on desktop web, false on mobile and mobile-sized web
   Future<bool> getShowSearchResultsAsList() async {
     final prefs = await _preferences;
-    return prefs.getBool(_showSearchResultsAsListKey) ?? kIsWeb;
+    return prefs.getBool(_showSearchResultsAsListKey) ?? _defaultShowSearchResultsAsList();
   }
 
   /// Get synchronously if already initialized
-  /// Defaults to true on web/large screens, false on mobile
+  /// Defaults to true on desktop web, false on mobile and mobile-sized web
   bool getShowSearchResultsAsListSync() {
-    return _prefs?.getBool(_showSearchResultsAsListKey) ?? kIsWeb;
+    return _prefs?.getBool(_showSearchResultsAsListKey) ?? _defaultShowSearchResultsAsList();
+  }
+
+  bool _defaultShowSearchResultsAsList() {
+    if (!kIsWeb) return false;
+
+    // Disable by default on mobile-sized web viewports.
+    final width = ui.PlatformDispatcher.instance.views.first.physicalSize.width /
+        ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
+    return width >= 840;
   }
 
   // --- Language Settings ---

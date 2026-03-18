@@ -386,9 +386,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       final showAsList = await settingsService.getShowSearchResultsAsList();
       final poiPanelCubit = context.read<PoiPanelCubit>();
 
-      // Disable list view by default on web + small/mobile screens
-      // Only show list if showAsList is enabled AND (not on web OR screen is large enough)
-      if (showAsList && _allPois.isNotEmpty && !(kIsWeb && !context.canShowSideBySide)) {
+      // Use native-like list behavior on mobile-sized web and small screens.
+      if (showAsList && _allPois.isNotEmpty) {
         // Update search results if list is already showing OR if POI panel is not open
         if (_showSearchResultsList || !poiPanelCubit.state.isOpen) {
           // Check if POIs have actually changed before updating
@@ -414,8 +413,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         } else {
           logDebug('@@@@@@@@@ NOT updating search results list - list not showing and POI panel is open');
         }
-      } else if (kIsWeb && !context.canShowSideBySide && showAsList) {
-        logDebug('@@@@@@@@@ NOT showing search results list - disabled by default on web + small screens');
       }
     }
 
@@ -723,6 +720,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     );
   }
 
+  bool _useMobileSearchResultsLayout(BuildContext context) {
+    // Match native/mobile UX on web for narrower widths.
+    return kIsWeb && ResponsiveBreakpoints.getScreenWidth(context) < ResponsiveBreakpoints.expanded;
+  }
+
   void _onGeoPointTapped(GeoPoint point) {
     // Check if the "no users nearby" marker was tapped
     if (_noUsersMarkerPosition != null) {
@@ -876,7 +878,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
                   ),
                   Positioned(
-                    top: kIsWeb ? 6.h : 26.h,
+                    top: kIsWeb ? 10 : 26.h,
                     left: 64 + MediaQuery.of(context).viewPadding.left,
                     right: 100 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
@@ -891,7 +893,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                   ),
                   // Suggestion keywords list - horizontally scrollable attribute bubbles (rendered first)
                   Positioned(
-                    top: kIsWeb ? 42 : 51.h,
+                    top: kIsWeb ? 46 : 51.h,
                     left: MediaQuery.of(context).viewPadding.left,
                     right: MediaQuery.of(context).viewPadding.right,
                     child: SuggestionKeywordsList(
@@ -1019,8 +1021,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                       zoomNotifier: zoomLevelNotifier,
                     ),
                   ),
-                  // Search results list view overlay (only for small screens)
-                  if (_showSearchResultsList && !context.canShowSideBySide)
+                  // Search results list view overlay (small screens + mobile-sized web)
+                  if (_showSearchResultsList && (!context.canShowSideBySide || _useMobileSearchResultsLayout(context)))
                     Positioned(
                       left: MediaQuery.of(context).viewPadding.left,
                       right: MediaQuery.of(context).viewPadding.right,
