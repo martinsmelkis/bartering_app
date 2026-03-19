@@ -2341,6 +2341,73 @@ class AppLocalizationsLv extends AppLocalizations {
   String get close => 'Aizvērt';
 
   @override
+  String get badgesTitle => 'Nozīmītes';
+
+  @override
+  String get noBadgesEarnedYet =>
+      'Vēl nav nopelnītu nozīmīšu. Turpiniet veikt maiņas, lai tās iegūtu.';
+
+  @override
+  String get badgeEarnedStatus => 'Nopelnīta';
+
+  @override
+  String get badgeNotEarnedStatus => 'Nav nopelnīta';
+
+  @override
+  String get badgeIdentityVerifiedTitle => 'Identitāte verificēta';
+
+  @override
+  String get badgeIdentityVerifiedDescription =>
+      'Lietotājs ir pabeidzis identitātes verifikāciju.';
+
+  @override
+  String get badgeVeteranTraderTitle => 'Pieredzējis tirgotājs';
+
+  @override
+  String get badgeVeteranTraderDescription =>
+      'Lietotājs ir pabeidzis 100+ veiksmīgas maiņas.';
+
+  @override
+  String get badgeTopRatedTitle => 'Top vērtēts';
+
+  @override
+  String get badgeTopRatedDescription =>
+      'Vidējais vērtējums 4.8+ ar vismaz 50 atsauksmēm.';
+
+  @override
+  String get badgeQuickResponderTitle => 'Ātrs atbildētājs';
+
+  @override
+  String get badgeQuickResponderDescription =>
+      'Parasti atbild 24 stundu laikā.';
+
+  @override
+  String get badgeCommunityConnectorTitle => 'Kopienas savienotājs';
+
+  @override
+  String get badgeCommunityConnectorDescription =>
+      'Augsta dažādība sadarbības partneros.';
+
+  @override
+  String get badgeVerifiedBusinessTitle => 'Verificēts bizness';
+
+  @override
+  String get badgeVerifiedBusinessDescription =>
+      'Biznesa reģistrācija ir verificēta.';
+
+  @override
+  String get badgeDisputeFreeTitle => 'Bez strīdiem';
+
+  @override
+  String get badgeDisputeFreeDescription => 'Nav bijuši strīdīgi darījumi.';
+
+  @override
+  String get badgeFastTraderTitle => 'Ātrs un uzticams';
+
+  @override
+  String get badgeFastTraderDescription => 'Pabeidz maiņas ātrāk nekā vidēji.';
+
+  @override
   String get showMore => 'Rādīt vairāk';
 
   @override

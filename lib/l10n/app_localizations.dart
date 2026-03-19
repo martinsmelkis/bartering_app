@@ -4466,6 +4466,126 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
+  /// No description provided for @badgesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Badges'**
+  String get badgesTitle;
+
+  /// No description provided for @noBadgesEarnedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No badges earned yet. Keep trading to unlock badges.'**
+  String get noBadgesEarnedYet;
+
+  /// No description provided for @badgeEarnedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Earned'**
+  String get badgeEarnedStatus;
+
+  /// No description provided for @badgeNotEarnedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Not earned yet'**
+  String get badgeNotEarnedStatus;
+
+  /// No description provided for @badgeIdentityVerifiedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity Verified'**
+  String get badgeIdentityVerifiedTitle;
+
+  /// No description provided for @badgeIdentityVerifiedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'User has completed identity verification.'**
+  String get badgeIdentityVerifiedDescription;
+
+  /// No description provided for @badgeVeteranTraderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Veteran Trader'**
+  String get badgeVeteranTraderTitle;
+
+  /// No description provided for @badgeVeteranTraderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'User has completed 100+ successful trades.'**
+  String get badgeVeteranTraderDescription;
+
+  /// No description provided for @badgeTopRatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Rated Seller'**
+  String get badgeTopRatedTitle;
+
+  /// No description provided for @badgeTopRatedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintains 4.8+ average rating with 50+ reviews.'**
+  String get badgeTopRatedDescription;
+
+  /// No description provided for @badgeQuickResponderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Responder'**
+  String get badgeQuickResponderTitle;
+
+  /// No description provided for @badgeQuickResponderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Usually responds within 24 hours.'**
+  String get badgeQuickResponderDescription;
+
+  /// No description provided for @badgeCommunityConnectorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Community Connector'**
+  String get badgeCommunityConnectorTitle;
+
+  /// No description provided for @badgeCommunityConnectorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Trades with diverse partners (high diversity score).'**
+  String get badgeCommunityConnectorDescription;
+
+  /// No description provided for @badgeVerifiedBusinessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified Business'**
+  String get badgeVerifiedBusinessTitle;
+
+  /// No description provided for @badgeVerifiedBusinessDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Business registration is verified.'**
+  String get badgeVerifiedBusinessDescription;
+
+  /// No description provided for @badgeDisputeFreeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispute-Free History'**
+  String get badgeDisputeFreeTitle;
+
+  /// No description provided for @badgeDisputeFreeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Has never had a disputed transaction.'**
+  String get badgeDisputeFreeDescription;
+
+  /// No description provided for @badgeFastTraderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast & Reliable'**
+  String get badgeFastTraderTitle;
+
+  /// No description provided for @badgeFastTraderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Completes trades faster than average.'**
+  String get badgeFastTraderDescription;
+
   /// No description provided for @showMore.
   ///
   /// In en, this message translates to:

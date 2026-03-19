@@ -129,24 +129,27 @@ class _MainContentWithLeftPanel extends StatelessWidget {
                 final bothPanelsOpen = profileState.isOpen && settingsState.isOpen;
                 
                 // Calculate total left panel width:
-                // - Profile/Settings only: leftPanelWidth
-                // - Profile/Settings + nested panel: leftPanelWidth + nestedPanelWidth
-                // - Profile + Settings side by side: leftPanelWidth * 2
-                // Max cap to prevent overflow on very large screens
+                // - Keep this in sync with `_ProfilePanelContent` width logic
+                //   to avoid reserving extra blank area on the right.
                 final baseWidth = context.leftPanelWidth;
-                final nestedWidth = baseWidth * 0.82;
-                final maxTotalWidth = 1000.0; // Cap to prevent overflow
-                
+                final settingsWidth = context.settingsPanelWidth * 0.6;
+                final nestedWidth = (baseWidth * 0.82).clamp(0.0, 400.0);
+                const maxProfileWithNestedWidth = 800.0;
+
                 double totalLeftWidth;
                 if (bothPanelsOpen) {
                   // Profile + Settings side by side
-                  totalLeftWidth = (baseWidth * 2).clamp(0.0, maxTotalWidth);
+                  totalLeftWidth = baseWidth + settingsWidth;
                 } else if (hasNestedPanel) {
-                  // Profile + nested panel
-                  totalLeftWidth = (baseWidth + nestedWidth).clamp(0.0, maxTotalWidth);
+                  // Profile + nested panel (match `_ProfilePanelContent` cap)
+                  totalLeftWidth =
+                      (baseWidth + nestedWidth).clamp(0.0, maxProfileWithNestedWidth);
+                } else if (settingsState.isOpen) {
+                  // Settings only
+                  totalLeftWidth = settingsWidth;
                 } else {
-                  // Single panel
-                  totalLeftWidth = baseWidth.clamp(0.0, maxTotalWidth);
+                  // Profile only
+                  totalLeftWidth = baseWidth;
                 }
 
                 return Row(
@@ -167,7 +170,7 @@ class _MainContentWithLeftPanel extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: baseWidth,
+                                  width: settingsWidth,
                                   child: _SettingsPanelContent(state: settingsState),
                                 ),
                               ],

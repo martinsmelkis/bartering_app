@@ -814,6 +814,32 @@ class AppLocalizationsMapper {
       'shareApp': localizations.shareApp,
       'copyLink': localizations.copyLink,
       'close': localizations.close,
+      'badgesTitle': localizations.badgesTitle,
+      'noBadgesEarnedYet': localizations.noBadgesEarnedYet,
+      'badgeEarnedStatus': localizations.badgeEarnedStatus,
+      'badgeNotEarnedStatus': localizations.badgeNotEarnedStatus,
+      'badgeIdentityVerifiedTitle': localizations.badgeIdentityVerifiedTitle,
+      'badgeIdentityVerifiedDescription':
+          localizations.badgeIdentityVerifiedDescription,
+      'badgeVeteranTraderTitle': localizations.badgeVeteranTraderTitle,
+      'badgeVeteranTraderDescription':
+          localizations.badgeVeteranTraderDescription,
+      'badgeTopRatedTitle': localizations.badgeTopRatedTitle,
+      'badgeTopRatedDescription': localizations.badgeTopRatedDescription,
+      'badgeQuickResponderTitle': localizations.badgeQuickResponderTitle,
+      'badgeQuickResponderDescription':
+          localizations.badgeQuickResponderDescription,
+      'badgeCommunityConnectorTitle':
+          localizations.badgeCommunityConnectorTitle,
+      'badgeCommunityConnectorDescription':
+          localizations.badgeCommunityConnectorDescription,
+      'badgeVerifiedBusinessTitle': localizations.badgeVerifiedBusinessTitle,
+      'badgeVerifiedBusinessDescription':
+          localizations.badgeVerifiedBusinessDescription,
+      'badgeDisputeFreeTitle': localizations.badgeDisputeFreeTitle,
+      'badgeDisputeFreeDescription': localizations.badgeDisputeFreeDescription,
+      'badgeFastTraderTitle': localizations.badgeFastTraderTitle,
+      'badgeFastTraderDescription': localizations.badgeFastTraderDescription,
       'showMore': localizations.showMore,
       'showLess': localizations.showLess,
       'linkCopiedToClipboard': localizations.linkCopiedToClipboard,
@@ -960,6 +986,17 @@ class AppLocalizationsMapper {
       'recoverySuccessMessage': localizations.recoverySuccessMessage,
       'noUsersFound': localizations.noUsersFound,
       'noPostingsFound': localizations.noPostingsFound,
+      'settingsGpsLocationTitle': localizations.settingsGpsLocationTitle,
+      'settingsGpsLocationEnabledDescription':
+          localizations.settingsGpsLocationEnabledDescription,
+      'settingsGpsLocationDisabledDescription':
+          localizations.settingsGpsLocationDisabledDescription,
+      'settingsGpsLocationDescription':
+          localizations.settingsGpsLocationDescription,
+      'locationPermissionRequiredDescription':
+          localizations.locationPermissionRequiredDescription,
+      'openSettings': localizations.openSettings,
+      'profilePanelTitle': localizations.profilePanelTitle,
       'errorWithMessage': (Object errorMessage) =>
           localizations.errorWithMessage(errorMessage),
       'questionsAnswered': (Object count) =>
@@ -1007,6 +1044,7 @@ class AppLocalizationsMapper {
       'expiresIn': (String time) => localizations.expiresIn(time),
       'codeSentTo': (Object email) => localizations.codeSentTo(email),
       'resendCodeIn': (Object seconds) => localizations.resendCodeIn(seconds),
+      'reviewsCount': (int count) => localizations.reviewsCount(count),
     };
   }
 }

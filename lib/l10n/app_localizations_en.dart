@@ -2310,6 +2310,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
+  String get badgesTitle => 'Badges';
+
+  @override
+  String get noBadgesEarnedYet =>
+      'No badges earned yet. Keep trading to unlock badges.';
+
+  @override
+  String get badgeEarnedStatus => 'Earned';
+
+  @override
+  String get badgeNotEarnedStatus => 'Not earned yet';
+
+  @override
+  String get badgeIdentityVerifiedTitle => 'Identity Verified';
+
+  @override
+  String get badgeIdentityVerifiedDescription =>
+      'User has completed identity verification.';
+
+  @override
+  String get badgeVeteranTraderTitle => 'Veteran Trader';
+
+  @override
+  String get badgeVeteranTraderDescription =>
+      'User has completed 100+ successful trades.';
+
+  @override
+  String get badgeTopRatedTitle => 'Top Rated Seller';
+
+  @override
+  String get badgeTopRatedDescription =>
+      'Maintains 4.8+ average rating with 50+ reviews.';
+
+  @override
+  String get badgeQuickResponderTitle => 'Quick Responder';
+
+  @override
+  String get badgeQuickResponderDescription =>
+      'Usually responds within 24 hours.';
+
+  @override
+  String get badgeCommunityConnectorTitle => 'Community Connector';
+
+  @override
+  String get badgeCommunityConnectorDescription =>
+      'Trades with diverse partners (high diversity score).';
+
+  @override
+  String get badgeVerifiedBusinessTitle => 'Verified Business';
+
+  @override
+  String get badgeVerifiedBusinessDescription =>
+      'Business registration is verified.';
+
+  @override
+  String get badgeDisputeFreeTitle => 'Dispute-Free History';
+
+  @override
+  String get badgeDisputeFreeDescription =>
+      'Has never had a disputed transaction.';
+
+  @override
+  String get badgeFastTraderTitle => 'Fast & Reliable';
+
+  @override
+  String get badgeFastTraderDescription =>
+      'Completes trades faster than average.';
+
+  @override
   String get showMore => 'Show more';
 
   @override

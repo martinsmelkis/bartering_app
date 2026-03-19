@@ -22,7 +22,9 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../models/map/point_of_interest.dart';
+import '../../../models/reviews/reputation_response.dart';
 import '../../../theme/app_colors.dart';
+import '../../../widgets/dialogs/badges_info_dialog.dart';
 import '../../../utils/avatar_color_utils.dart';
 
 class PoiDetailsBottomSheet extends StatefulWidget {
@@ -670,6 +672,29 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     );
   }
 
+  void _showPoiBadgesInfoDialog() {
+    final earnedBadgeTypes = (widget.poi.badges ?? const <ReputationBadge>[])
+        .map((b) => b.value.toLowerCase())
+        .toSet();
+
+    showDialog(
+      context: context,
+      useRootNavigator: kIsWeb,
+      builder: (dialogContext) {
+        return BadgesInfoDialog(
+          earnedBadgeTypes: earnedBadgeTypes,
+          onClose: () {
+            if (kIsWeb) {
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+            } else {
+              Navigator.of(dialogContext).pop();
+            }
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -797,43 +822,107 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            (widget.poi.profile.name.startsWith(
-                                                      'User_',
-                                                    )
-                                                    ? widget.poi.profile.name
-                                                          .replaceFirst(
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  (widget.poi.profile.name.startsWith(
                                                             'User_',
-                                                            l10n.userPrefix +
-                                                                ' ',
                                                           )
-                                                    : widget.poi.profile.name) +
-                                                (((widget.poi.matchRelevancyScore ??
-                                                                0) >
-                                                            0 &&
-                                                        (widget.poi.matchRelevancyScore ??
-                                                                1) <
-                                                            1)
-                                                    ? " (" +
-                                                          (((widget.poi.matchRelevancyScore ??
-                                                                      0) *
-                                                                  100))
-                                                              .toStringAsFixed(
-                                                                1,
-                                                              ) +
-                                                          "% ${l10n.match})"
-                                                    : ""),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.grey[900],
-                                              fontSize:
-                                                  ResponsiveBreakpoints.getBodyFontSize(
-                                                    context,
-                                                  ) *
-                                                  (widget.isLargeScreen
-                                                      ? 0.85
-                                                      : 1.0),
-                                            ),
+                                                          ? widget.poi.profile.name
+                                                                .replaceFirst(
+                                                                  'User_',
+                                                                  l10n.userPrefix +
+                                                                      ' ',
+                                                                )
+                                                          : widget.poi.profile.name) +
+                                                      (((widget.poi.matchRelevancyScore ??
+                                                                      0) >
+                                                                  0 &&
+                                                              (widget.poi.matchRelevancyScore ??
+                                                                      1) <
+                                                                  1)
+                                                          ? " (" +
+                                                                (((widget.poi.matchRelevancyScore ??
+                                                                            0) *
+                                                                        100))
+                                                                    .toStringAsFixed(
+                                                                      1,
+                                                                    ) +
+                                                                "% ${l10n.match})"
+                                                          : ""),
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey[900],
+                                                    fontSize:
+                                                        ResponsiveBreakpoints.getBodyFontSize(
+                                                          context,
+                                                        ) *
+                                                        (widget.isLargeScreen
+                                                            ? 0.85
+                                                            : 1.0),
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              PointerInterceptor(
+                                                child: InkWell(
+                                                  onTap: _showPoiBadgesInfoDialog,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.symmetric(
+                                                      horizontal: 4,
+                                                      vertical: 2,
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Container(
+                                                          width: 16,
+                                                          height: 16,
+                                                          decoration: BoxDecoration(
+                                                            color:
+                                                                (widget.poi.badges != null &&
+                                                                    widget.poi.badges!.isNotEmpty)
+                                                                ? Colors.amber
+                                                                : Colors.orange[300],
+                                                            shape: BoxShape.circle,
+                                                          ),
+                                                          alignment: Alignment.center,
+                                                          child: const Text(
+                                                            'B',
+                                                            style: TextStyle(
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight.w700,
+                                                              color: Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          '${widget.poi.badges?.length ?? 0}',
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color:
+                                                                (widget.poi.badges != null &&
+                                                                    widget.poi.badges!.isNotEmpty)
+                                                                ? Colors.grey[700]
+                                                                : Colors.grey[500],
+                                                            fontWeight:
+                                                                (widget.poi.badges != null &&
+                                                                    widget.poi.badges!.isNotEmpty)
+                                                                ? FontWeight.w600
+                                                                : FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),

@@ -45,6 +45,7 @@ import '../../repositories/chat_repository.dart';
 import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/settings_service.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/dialogs/badges_info_dialog.dart';
 import '../onboarding_screen/cubit/onboarding_cubit.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -1022,87 +1023,23 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   void _showBadgesInfoDialog() {
+    final earnedBadgeTypes = (_userBadges ?? const <BadgeDetail>[])
+        .map((b) => b.type.toLowerCase())
+        .toSet();
+
     showDialog(
       context: context,
       useRootNavigator: kIsWeb,
       builder: (dialogContext) {
-        final badges = _userBadges ?? const <BadgeDetail>[];
-
-        return PointerInterceptor(
-          child: AlertDialog(
-            title: const Text('Badges'),
-            content: SizedBox(
-              width: 360,
-              child: badges.isEmpty
-                  ? const Text('No badges earned yet. Keep trading to unlock badges.')
-                  : ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: badges.length,
-                      separatorBuilder: (_, __) => const Divider(height: 12),
-                      itemBuilder: (context, index) {
-                        final badge = badges[index];
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 16,
-                                  height: 16,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.amber,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: const Text(
-                                    'B',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    badge.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              badge.description,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-            ),
-            actions: [
-              PointerInterceptor(
-                child: TextButton(
-                  onPressed: () {
-                    if (kIsWeb) {
-                      Navigator.of(dialogContext, rootNavigator: true).pop();
-                    } else {
-                      Navigator.of(dialogContext).pop();
-                    }
-                  },
-                  child: const Text('Close'),
-                ),
-              ),
-            ],
-          ),
+        return BadgesInfoDialog(
+          earnedBadgeTypes: earnedBadgeTypes,
+          onClose: () {
+            if (kIsWeb) {
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+            } else {
+              Navigator.of(dialogContext).pop();
+            }
+          },
         );
       },
     );

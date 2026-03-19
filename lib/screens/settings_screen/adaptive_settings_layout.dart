@@ -55,7 +55,7 @@ class _SettingsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      width: context.settingsPanelWidth,
+      width: context.settingsPanelWidth * 0.8,
       color: AppColors.background,
       child: Column(
         children: [

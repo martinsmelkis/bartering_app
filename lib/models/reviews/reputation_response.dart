@@ -1,3 +1,38 @@
+/// Reputation badge values from backend
+/// Mirrors backend `ReputationBadge` enum values.
+enum ReputationBadge {
+  IDENTITY_VERIFIED('IDENTITY_VERIFIED', 'Identity Verified'),
+  VETERAN_TRADER('VETERAN_TRADER', 'Veteran Trader - 100+ trades'),
+  TOP_RATED('TOP_RATED', 'Top Rated Seller'),
+  QUICK_RESPONDER('QUICK_RESPONDER', 'Quick Responder'),
+  COMMUNITY_CONNECTOR('COMMUNITY_CONNECTOR', 'Community Connector'),
+  VERIFIED_BUSINESS('VERIFIED_BUSINESS', 'Verified Business'),
+  DISPUTE_FREE('DISPUTE_FREE', 'Dispute-Free History'),
+  FAST_TRADER('FAST_TRADER', 'Fast & Reliable');
+
+  const ReputationBadge(this.value, this.description);
+
+  final String value;
+  final String description;
+
+  static ReputationBadge? fromString(String value) {
+    final normalized = value
+        .trim()
+        .replaceAll('_BADGE_BOOST', '')
+        .replaceAll('-', '_');
+        //.toLowerCase();
+
+    for (final badge in ReputationBadge.values) {
+      final canonical = badge.value.toLowerCase();
+      //final camelLike = canonical.replaceAll('_', '');
+      if (normalized == badge.value) {
+        return badge;
+      }
+    }
+    return null;
+  }
+}
+
 /// Reputation response model
 class ReputationResponse {
   final String userId;
@@ -6,7 +41,7 @@ class ReputationResponse {
   final int verifiedReviews;
   final double tradeDiversityScore; // 0.0-1.0
   final String trustLevel; // "new", "emerging", "established", "trusted", "verified"
-  final List<String> badges;
+  final List<ReputationBadge>? badges;
   final int lastUpdated;
 
   ReputationResponse({
@@ -16,12 +51,12 @@ class ReputationResponse {
     required this.verifiedReviews,
     required this.tradeDiversityScore,
     required this.trustLevel,
-    required this.badges,
+    this.badges,
     required this.lastUpdated,
   });
 
   factory ReputationResponse.fromJson(Map<String, dynamic> json) {
-    final badgesList = json['badges'] as List<dynamic>? ?? [];
+    final badgesList = json['badges'] as List<dynamic>?;
     return ReputationResponse(
       userId: json['userId'] as String,
       averageRating: (json['averageRating'] as num).toDouble(),
@@ -29,7 +64,10 @@ class ReputationResponse {
       verifiedReviews: json['verifiedReviews'] as int,
       tradeDiversityScore: (json['tradeDiversityScore'] as num).toDouble(),
       trustLevel: json['trustLevel'] as String,
-      badges: badgesList.map((b) => b.toString()).toList(),
+      badges: badgesList
+          ?.map((b) => ReputationBadge.fromString(b.toString()))
+          .whereType<ReputationBadge>()
+          .toList(),
       lastUpdated: json['lastUpdated'] as int,
     );
   }
@@ -42,7 +80,7 @@ class ReputationResponse {
       'verifiedReviews': verifiedReviews,
       'tradeDiversityScore': tradeDiversityScore,
       'trustLevel': trustLevel,
-      'badges': badges,
+      'badges': badges?.map((b) => b.value).toList(),
       'lastUpdated': lastUpdated,
     };
   }
