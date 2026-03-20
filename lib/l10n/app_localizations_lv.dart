@@ -1683,6 +1683,62 @@ class AppLocalizationsLv extends AppLocalizations {
       'Mainiet prasmes, pakalpojumus, priekšmetus vai vienkārši savienojieties ar savu kopienu';
 
   @override
+  String get gdprConsentTitle => 'Privātuma un datu piekrišana';
+
+  @override
+  String get gdprConsentIntro =>
+      'Pirms turpināt, lūdzu, pārskatiet un izvēlieties, kā tiek apstrādāti jūsu dati.';
+
+  @override
+  String get gdprConsentRequiredLabel => 'Obligāti: pamatpakalpojuma apstrāde';
+
+  @override
+  String get gdprConsentRequiredDescription =>
+      'Nepieciešams konta izveidei, lietotāju atbilstībām un drošai saziņai. To nevar izslēgt, ja vēlaties lietot lietotni.';
+
+  @override
+  String get gdprConsentLocationLabel =>
+      'Neobligāti: atrašanās vietas apstrāde';
+
+  @override
+  String get gdprConsentLocationDescription =>
+      'Izmantojiet atrašanās vietu, lai atrastu lietotājus tuvumā un uzlabotu atbilstību.';
+
+  @override
+  String get gdprConsentAiLabel => 'Neobligāti: MI palīdzēta atbilstība';
+
+  @override
+  String get gdprConsentAiDescription =>
+      'Analizē profilu un mijiedarbības signālus, lai uzlabotu ieteikumus un atbilstību.';
+
+  @override
+  String get gdprCookiesSectionTitle => 'Sīkdatnes (Web)';
+
+  @override
+  String get gdprCookiesRequiredLabel => 'Obligātās sīkdatnes';
+
+  @override
+  String get gdprCookiesRequiredDescription =>
+      'Nepieciešamas pamatfunkcijām tīmeklī, piemēram, drošībai, sesiju uzturēšanai un būtisko iestatījumu saglabāšanai.';
+
+  @override
+  String get gdprCookiesAnalyticsLabel => 'Neobligātās analītikas sīkdatnes';
+
+  @override
+  String get gdprCookiesAnalyticsDescription =>
+      'Palīdz saprast lietojumu un uzlabot veiktspēju. Tās tiek izmantotas tikai ar jūsu piekrišanu.';
+
+  @override
+  String get gdprConsentManageLater =>
+      'Šīs izvēles varēsiet mainīt vēlāk iestatījumos.';
+
+  @override
+  String get gdprConsentDecline => 'Ne tagad';
+
+  @override
+  String get gdprConsentAccept => 'Turpināt';
+
+  @override
   String get wishlist => 'Vēlmju saraksts';
 
   @override

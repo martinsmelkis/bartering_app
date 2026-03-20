@@ -9,7 +9,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/settings_service.dart';
+import '../../widgets/dialogs/gdpr_consent_dialog.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -20,6 +23,8 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
+  static const String _gdprConsentVersion = 'v1';
+
   late AnimationController _animationController;
   List<_FloatingIcon> _floatingIcons = [];
 
@@ -150,6 +155,44 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.dispose();
   }
 
+  Future<void> _onGetStartedPressed() async {
+    final settingsService = getIt<SettingsService>();
+
+    final alreadyConsented =
+        await settingsService.hasAcceptedGdprConsentVersion(_gdprConsentVersion);
+
+    if (!mounted) return;
+
+    if (alreadyConsented) {
+      context.pushReplacement('/onboarding?isInitialOnboarding=true');
+      return;
+    }
+
+    final consent = await _showGdprConsentDialog(context);
+    if (!mounted || consent == null) return;
+
+    await settingsService.setGdprConsent(
+      version: _gdprConsentVersion,
+      locationConsent: consent.locationConsent,
+      aiProcessingConsent: consent.aiProcessingConsent,
+      analyticsCookiesConsent: consent.analyticsCookiesConsent,
+    );
+
+    // Optional: map consent to existing runtime setting for GPS usage
+    await settingsService.setEnableGpsLocation(consent.locationConsent);
+
+    if (!mounted) return;
+    context.pushReplacement('/onboarding?isInitialOnboarding=true');
+  }
+
+  Future<GdprConsentChoice?> _showGdprConsentDialog(BuildContext context) {
+    return showDialog<GdprConsentChoice>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const GdprConsentDialog(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -228,11 +271,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       SizedBox(height: 24),
                       // Get Started Button
                       ElevatedButton(
-                        onPressed: () {
-                          if (context.mounted) {
-                            context.pushReplacement('/onboarding?isInitialOnboarding=true');
-                          }
-                        },
+                        onPressed: _onGetStartedPressed,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.background,
                           foregroundColor: AppColors.primary,

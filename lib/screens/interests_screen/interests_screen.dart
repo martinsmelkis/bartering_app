@@ -119,14 +119,38 @@ class _InterestsViewState extends State<InterestsView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Info text
-                    Center(
-                      child: Text(
-                        l10n.selectTheInterestsThatMatchYourPreferences,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.black.withValues(alpha: 0.8),
-                          //fontWeight: FontWeight.bold,
-                          fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 12) * 1.2,
+                    Card(
+                      elevation: 1,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(top: 2.0),
+                              child: Icon(
+                                Icons.arrow_downward,
+                                size: 20,
+                                color: Colors.blue,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                l10n.selectTheInterestsThatMatchYourPreferences,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.black.withValues(alpha: 0.8),
+                                  fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 12) * 1.2,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

@@ -3260,6 +3260,102 @@ abstract class AppLocalizations {
   /// **'Trade skills, services, items, or simply connect with your community'**
   String get welcomeStep4Description;
 
+  /// No description provided for @gdprConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & Data Consent'**
+  String get gdprConsentTitle;
+
+  /// No description provided for @gdprConsentIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you continue, please review and choose how your data is processed.'**
+  String get gdprConsentIntro;
+
+  /// No description provided for @gdprConsentRequiredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Required: Core service processing'**
+  String get gdprConsentRequiredLabel;
+
+  /// No description provided for @gdprConsentRequiredDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed to create your account, match with users, and run secure messaging. This cannot be turned off if you want to use the app.'**
+  String get gdprConsentRequiredDescription;
+
+  /// No description provided for @gdprConsentLocationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional: Location processing'**
+  String get gdprConsentLocationLabel;
+
+  /// No description provided for @gdprConsentLocationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your location to discover users nearby and improve match relevance.'**
+  String get gdprConsentLocationDescription;
+
+  /// No description provided for @gdprConsentAiLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional: AI-assisted matching'**
+  String get gdprConsentAiLabel;
+
+  /// No description provided for @gdprConsentAiDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze profile and interaction signals to improve recommendations and relevance.'**
+  String get gdprConsentAiDescription;
+
+  /// No description provided for @gdprCookiesSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cookies (Web)'**
+  String get gdprCookiesSectionTitle;
+
+  /// No description provided for @gdprCookiesRequiredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Required cookies'**
+  String get gdprCookiesRequiredLabel;
+
+  /// No description provided for @gdprCookiesRequiredDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed for core web functionality such as security, session handling, and storing your essential settings.'**
+  String get gdprCookiesRequiredDescription;
+
+  /// No description provided for @gdprCookiesAnalyticsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional analytics cookies'**
+  String get gdprCookiesAnalyticsLabel;
+
+  /// No description provided for @gdprCookiesAnalyticsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Help us understand usage and improve performance. These are only used if you allow them.'**
+  String get gdprCookiesAnalyticsDescription;
+
+  /// No description provided for @gdprConsentManageLater.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change these choices later in Settings.'**
+  String get gdprConsentManageLater;
+
+  /// No description provided for @gdprConsentDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get gdprConsentDecline;
+
+  /// No description provided for @gdprConsentAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get gdprConsentAccept;
+
   /// No description provided for @wishlist.
   ///
   /// In en, this message translates to:
@@ -5099,7 +5195,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectTheInterestsThatMatchYourPreferences.
   ///
   /// In en, this message translates to:
-  /// **'What do you need? What would you like assistance with?\nYou can change this later.'**
+  /// **'What services or items do you need?\nYou can change this later.'**
   String get selectTheInterestsThatMatchYourPreferences;
 
   /// No description provided for @selectTheOffersThatYouCanProvide.

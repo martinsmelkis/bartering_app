@@ -17,6 +17,11 @@ class SettingsService {
   static const String _showSearchResultsAsListKey = 'show_search_results_as_list';
   static const String _preferredLanguageKey = 'preferred_language';
   static const String _enableGpsLocationKey = 'enable_gps_location';
+  static const String _gdprConsentVersionKey = 'gdpr_consent_version';
+  static const String _gdprConsentTimestampKey = 'gdpr_consent_timestamp';
+  static const String _gdprLocationConsentKey = 'gdpr_location_consent';
+  static const String _gdprAiProcessingConsentKey = 'gdpr_ai_processing_consent';
+  static const String _gdprAnalyticsCookiesConsentKey = 'gdpr_analytics_cookies_consent';
 
   // Default values
   static const double defaultNearbyUsersRadius = 50.0; // km
@@ -218,6 +223,32 @@ class SettingsService {
   /// Get GPS location enabled synchronously
   bool isGpsLocationEnabledSync() {
     return _prefs?.getBool(_enableGpsLocationKey) ?? false;
+  }
+
+  /// Save GDPR consent choices with versioning and timestamp
+  Future<void> setGdprConsent({
+    required String version,
+    required bool locationConsent,
+    required bool aiProcessingConsent,
+    bool? analyticsCookiesConsent,
+    DateTime? timestamp,
+  }) async {
+    final prefs = await _preferences;
+    final consentTimestamp = (timestamp ?? DateTime.now()).toUtc().toIso8601String();
+
+    await prefs.setString(_gdprConsentVersionKey, version);
+    await prefs.setString(_gdprConsentTimestampKey, consentTimestamp);
+    await prefs.setBool(_gdprLocationConsentKey, locationConsent);
+    await prefs.setBool(_gdprAiProcessingConsentKey, aiProcessingConsent);
+    if (analyticsCookiesConsent != null) {
+      await prefs.setBool(_gdprAnalyticsCookiesConsentKey, analyticsCookiesConsent);
+    }
+  }
+
+  /// Returns true when user has already completed GDPR consent flow for a given version
+  Future<bool> hasAcceptedGdprConsentVersion(String version) async {
+    final prefs = await _preferences;
+    return prefs.getString(_gdprConsentVersionKey) == version;
   }
 
   /// Clear all settings from SharedPreferences

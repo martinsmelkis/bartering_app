@@ -1658,6 +1658,61 @@ class AppLocalizationsEn extends AppLocalizations {
       'Trade skills, services, items, or simply connect with your community';
 
   @override
+  String get gdprConsentTitle => 'Privacy & Data Consent';
+
+  @override
+  String get gdprConsentIntro =>
+      'Before you continue, please review and choose how your data is processed.';
+
+  @override
+  String get gdprConsentRequiredLabel => 'Required: Core service processing';
+
+  @override
+  String get gdprConsentRequiredDescription =>
+      'Needed to create your account, match with users, and run secure messaging. This cannot be turned off if you want to use the app.';
+
+  @override
+  String get gdprConsentLocationLabel => 'Optional: Location processing';
+
+  @override
+  String get gdprConsentLocationDescription =>
+      'Use your location to discover users nearby and improve match relevance.';
+
+  @override
+  String get gdprConsentAiLabel => 'Optional: AI-assisted matching';
+
+  @override
+  String get gdprConsentAiDescription =>
+      'Analyze profile and interaction signals to improve recommendations and relevance.';
+
+  @override
+  String get gdprCookiesSectionTitle => 'Cookies (Web)';
+
+  @override
+  String get gdprCookiesRequiredLabel => 'Required cookies';
+
+  @override
+  String get gdprCookiesRequiredDescription =>
+      'Needed for core web functionality such as security, session handling, and storing your essential settings.';
+
+  @override
+  String get gdprCookiesAnalyticsLabel => 'Optional analytics cookies';
+
+  @override
+  String get gdprCookiesAnalyticsDescription =>
+      'Help us understand usage and improve performance. These are only used if you allow them.';
+
+  @override
+  String get gdprConsentManageLater =>
+      'You can change these choices later in Settings.';
+
+  @override
+  String get gdprConsentDecline => 'Not now';
+
+  @override
+  String get gdprConsentAccept => 'Continue';
+
+  @override
   String get wishlist => 'Wishlist';
 
   @override
@@ -2665,7 +2720,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectTheInterestsThatMatchYourPreferences =>
-      'What do you need? What would you like assistance with?\nYou can change this later.';
+      'What services or items do you need?\nYou can change this later.';
 
   @override
   String get selectTheOffersThatYouCanProvide =>
