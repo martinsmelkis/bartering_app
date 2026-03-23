@@ -11,7 +11,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/profile/user_consent_update_request.dart';
+import '../../repositories/user_repository.dart';
+import '../../services/api_client.dart';
 import '../../services/settings_service.dart';
+import '../../utils/debug_utils.dart';
 import '../../widgets/dialogs/gdpr_consent_dialog.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -180,6 +184,28 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     // Optional: map consent to existing runtime setting for GPS usage
     await settingsService.setEnableGpsLocation(consent.locationConsent);
+
+    try {
+      final userRepository = getIt<UserRepository>();
+      final apiClient = getIt<ApiClient>();
+      final userId = await userRepository.getUserId();
+
+      if (userId != null && userId.isNotEmpty) {
+        await apiClient.updateUserConsent(
+          UserConsentUpdateRequest(
+            userId: userId,
+            locationConsent: consent.locationConsent,
+            aiProcessingConsent: consent.aiProcessingConsent,
+            analyticsCookiesConsent: consent.analyticsCookiesConsent,
+            privacyPolicyVersion: _gdprConsentVersion,
+          ),
+        );
+      } else {
+        logDebug('⚠️ GDPR consent not submitted: userId missing');
+      }
+    } catch (e) {
+      logDebug('⚠️ Failed to submit GDPR consent to backend: $e');
+    }
 
     if (!mounted) return;
     context.pushReplacement('/onboarding?isInitialOnboarding=true');

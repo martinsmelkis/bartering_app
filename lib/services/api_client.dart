@@ -6,6 +6,7 @@ import 'package:barter_app/models/chat/file_metadata_dto.dart';
 import 'package:barter_app/models/chat/file_upload_response.dart';
 import 'package:barter_app/models/notifications/notification_models.dart';
 import 'package:barter_app/models/postings/posting_data_response.dart';
+import 'package:barter_app/models/profile/user_consent_update_request.dart';
 import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/models/relationships/user_relationships_response.dart';
 import 'package:barter_app/models/reviews/reputation_response.dart';
@@ -160,6 +161,10 @@ abstract class ApiClient {
 
   @POST('/api/v1/profile-update')
   Future<String> updateProfileInfo(@Body() UserProfileData user);
+
+  @POST('/api/v1/profile-consent-update')
+  Future<void> updateUserConsent(
+      @Body() UserConsentUpdateRequest request);
 
   @GET('/api/v1/similar-profiles')
   Future<List<PointOfInterest>> findSimilarProfiles(

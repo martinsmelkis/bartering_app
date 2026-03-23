@@ -615,6 +615,26 @@ class AppLocalizationsMapper {
       'welcomeStep3Description': localizations.welcomeStep3Description,
       'welcomeStep4Title': localizations.welcomeStep4Title,
       'welcomeStep4Description': localizations.welcomeStep4Description,
+      'gdprConsentTitle': localizations.gdprConsentTitle,
+      'gdprConsentIntro': localizations.gdprConsentIntro,
+      'gdprConsentRequiredLabel': localizations.gdprConsentRequiredLabel,
+      'gdprConsentRequiredDescription':
+          localizations.gdprConsentRequiredDescription,
+      'gdprConsentLocationLabel': localizations.gdprConsentLocationLabel,
+      'gdprConsentLocationDescription':
+          localizations.gdprConsentLocationDescription,
+      'gdprConsentAiLabel': localizations.gdprConsentAiLabel,
+      'gdprConsentAiDescription': localizations.gdprConsentAiDescription,
+      'gdprCookiesSectionTitle': localizations.gdprCookiesSectionTitle,
+      'gdprCookiesRequiredLabel': localizations.gdprCookiesRequiredLabel,
+      'gdprCookiesRequiredDescription':
+          localizations.gdprCookiesRequiredDescription,
+      'gdprCookiesAnalyticsLabel': localizations.gdprCookiesAnalyticsLabel,
+      'gdprCookiesAnalyticsDescription':
+          localizations.gdprCookiesAnalyticsDescription,
+      'gdprConsentManageLater': localizations.gdprConsentManageLater,
+      'gdprConsentDecline': localizations.gdprConsentDecline,
+      'gdprConsentAccept': localizations.gdprConsentAccept,
       'wishlist': localizations.wishlist,
       'myWishlist': localizations.myWishlist,
       'addWishlistItem': localizations.addWishlistItem,
