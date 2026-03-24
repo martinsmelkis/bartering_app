@@ -23,9 +23,9 @@ class GdprConsentDialog extends StatefulWidget {
 }
 
 class _GdprConsentDialogState extends State<GdprConsentDialog> {
-  bool _locationConsent = false;
+  bool _locationConsent = true;
   bool _aiConsent = true;
-  bool _analyticsCookiesConsent = false;
+  bool _analyticsCookiesConsent = true;
 
   @override
   Widget build(BuildContext context) {

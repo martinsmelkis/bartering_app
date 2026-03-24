@@ -4,6 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../application.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/profile/user_consent_update_request.dart';
 import '../../models/profile/user_profile_data.dart';
 import '../../repositories/user_repository.dart';
 import '../../services/api_client.dart';
@@ -12,6 +13,7 @@ import '../../services/secure_storage_service.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/debug_utils.dart';
 import '../../utils/responsive_breakpoints.dart';
+import '../../widgets/dialogs/gdpr_consent_dialog.dart';
 import '../pin_input_screen/setup_pin_from_settings_screen.dart';
 import '../security_question_screen/setup_security_question_screen.dart';
 
@@ -25,6 +27,8 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  static const String _gdprConsentVersion = 'v1';
+
   final SettingsService _settingsService = getIt<SettingsService>();
   final UserRepository _userRepository = getIt<UserRepository>();
   final ApiClient _apiClient = getIt<ApiClient>();
@@ -519,6 +523,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 24),
 
+            // Privacy Settings Section
+            _buildSectionHeader(l10n.gdprConsentTitle),
+            const SizedBox(height: 8),
+            Card(
+              elevation: 2,
+              child: ListTile(
+                leading: const Icon(Icons.privacy_tip_outlined),
+                title: Text(l10n.gdprConsentTitle),
+                subtitle: Text(l10n.gdprConsentManageLater),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: _openGdprConsentSettings,
+              ),
+            ),
+            const SizedBox(height: 24),
+
             // Security Settings Section
             _buildSectionHeader(l10n.settingsSecuritySection),
             const SizedBox(height: 8),
@@ -708,6 +727,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> _openGdprConsentSettings() async {
+    final consent = await _showGdprConsentDialog(context);
+    if (!mounted || consent == null) return;
+
+    await _settingsService.setGdprConsent(
+      version: _gdprConsentVersion,
+      locationConsent: consent.locationConsent,
+      aiProcessingConsent: consent.aiProcessingConsent,
+      analyticsCookiesConsent: consent.analyticsCookiesConsent,
+    );
+
+    if (mounted) {
+      setState(() {
+        _enableGpsLocation = consent.locationConsent;
+      });
+    }
+
+    try {
+      final userId = await _userRepository.getUserId();
+      if (userId != null && userId.isNotEmpty) {
+        await _apiClient.updateUserConsent(
+          UserConsentUpdateRequest(
+            userId: userId,
+            locationConsent: consent.locationConsent,
+            aiProcessingConsent: consent.aiProcessingConsent,
+            analyticsCookiesConsent: consent.analyticsCookiesConsent,
+            privacyPolicyVersion: _gdprConsentVersion,
+          ),
+        );
+      } else {
+        logDebug('⚠️ GDPR consent not submitted from settings: userId missing');
+      }
+    } catch (e) {
+      logDebug('⚠️ Failed to submit GDPR consent update from settings: $e');
+    }
+
+    _showSettingsSaved();
+  }
+
+  Future<GdprConsentChoice?> _showGdprConsentDialog(BuildContext context) {
+    return showDialog<GdprConsentChoice>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const GdprConsentDialog(),
+    );
+  }
+
   Future<void> _updateUserProfileLanguage(String languageCode) async {
     try {
       // Get current user data
@@ -718,7 +784,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         logDebug('Cannot update profile: userId or userName is null');
         return;
       }
-      
+
       // Create updated profile with new language
       final updatedProfile = UserProfileData(
         userId: userId,
@@ -730,7 +796,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         activePostingIds: [],
         preferredLanguage: languageCode,
       );
-      
+
       // Send to API
       await _apiClient.updateProfileInfo(updatedProfile);
       logDebug('Profile language updated successfully to: $languageCode');

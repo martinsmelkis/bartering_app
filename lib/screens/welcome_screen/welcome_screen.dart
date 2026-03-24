@@ -182,9 +182,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       analyticsCookiesConsent: consent.analyticsCookiesConsent,
     );
 
-    // Optional: map consent to existing runtime setting for GPS usage
-    await settingsService.setEnableGpsLocation(consent.locationConsent);
-
     try {
       final userRepository = getIt<UserRepository>();
       final apiClient = getIt<ApiClient>();

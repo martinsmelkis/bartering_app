@@ -195,6 +195,11 @@ abstract class ApiClient {
       @Query('excludeUserId') String? excludeUserId
   );
 
+  @GET('/api/v1/profiles/nearby')
+  Future<List<PointOfInterest>> getPointsOfInterestNoGeo(
+      @Query('excludeUserId') String? excludeUserId
+  );
+
   @GET('/api/v1/profiles/search')
   Future<List<PointOfInterest>> getProfilesByKeyword(
       @Query("userId") String userId,
@@ -202,6 +207,15 @@ abstract class ApiClient {
       @Query("lat") String lat,
       @Query("lon") String lon,
       @Query("radius") double? radius,
+      @Query("weight") int? weight,
+      @Query("seeking") String? seeking,
+      @Query("offering") String? offering,
+  );
+
+  @GET('/api/v1/profiles/search')
+  Future<List<PointOfInterest>> getProfilesByKeywordNoGeo(
+      @Query("userId") String userId,
+      @Query("q") String q,
       @Query("weight") int? weight,
       @Query("seeking") String? seeking,
       @Query("offering") String? offering,

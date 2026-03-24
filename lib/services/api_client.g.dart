@@ -355,6 +355,40 @@ class _ApiClient implements ApiClient {
   }
 
   @override
+  Future<List<PointOfInterest>> getPointsOfInterestNoGeo(
+    String? excludeUserId,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'excludeUserId': excludeUserId};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<PointOfInterest>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/v1/profiles/nearby',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<PointOfInterest> _value;
+    try {
+      _value = _result.data!
+          .map(
+            (dynamic i) => PointOfInterest.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<List<PointOfInterest>> getProfilesByKeyword(
     String userId,
     String q,
@@ -372,6 +406,50 @@ class _ApiClient implements ApiClient {
       r'lat': lat,
       r'lon': lon,
       r'radius': radius,
+      r'weight': weight,
+      r'seeking': seeking,
+      r'offering': offering,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<PointOfInterest>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/v1/profiles/search',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<PointOfInterest> _value;
+    try {
+      _value = _result.data!
+          .map(
+            (dynamic i) => PointOfInterest.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<List<PointOfInterest>> getProfilesByKeywordNoGeo(
+    String userId,
+    String q,
+    int? weight,
+    String? seeking,
+    String? offering,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'userId': userId,
+      r'q': q,
       r'weight': weight,
       r'seeking': seeking,
       r'offering': offering,

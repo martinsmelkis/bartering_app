@@ -9,6 +9,7 @@ import 'package:equatable/equatable.dart'; // For value equality in states
 import '../../../configure_dependencies.dart';
 import '../../../models/map/point_of_interest.dart';
 import '../../../services/secure_storage_service.dart';
+import '../../../services/settings_service.dart';
 
 part 'map_screen_api_state.dart';
 
@@ -50,31 +51,42 @@ class PoiCubit extends Cubit<PoiState> {
       final userRepository = getIt<SecureStorageService>();
       userId ??= await userRepository.getOwnUserId();
 
-      double latitude;
-      double longitude;
+      final settingsService = getIt<SettingsService>();
+      final hasLocationConsent = await settingsService.isGpsLocationEnabled();
 
-      // Check if explicit coordinates are provided (e.g., from map center)
-      if (lat != null && lon != null) {
-        latitude = lat;
-        longitude = lon;
-      } else {
-        // Use user's saved location
-        final location = await userRepository.getOwnLocation();
-        latitude = location?.isNotEmpty == true ?
-          double.tryParse(location?.split(',')[0] ?? "") ?? 0.0 : 0.0;
-        longitude = location?.isNotEmpty == true ?
-          double.tryParse(location?.split(',')[1] ?? "") ?? 0.0 : 0.0;
-        
-        // Check if location is not set (0.0, 0.0)
-        if (latitude == 0.0 && longitude == 0.0) {
-          log("⚠️ No valid location available - skipping POI fetch");
-          emit(const PoiError("Please set your location in settings to find nearby users"));
-          return;
+      List<PointOfInterest> pois;
+
+      if (hasLocationConsent) {
+        double latitude;
+        double longitude;
+
+        // Check if explicit coordinates are provided (e.g., from map center)
+        if (lat != null && lon != null) {
+          latitude = lat;
+          longitude = lon;
+        } else {
+          // Use user's saved location
+          final location = await userRepository.getOwnLocation();
+          latitude = location?.isNotEmpty == true ?
+            double.tryParse(location?.split(',')[0] ?? "") ?? 0.0 : 0.0;
+          longitude = location?.isNotEmpty == true ?
+            double.tryParse(location?.split(',')[1] ?? "") ?? 0.0 : 0.0;
+
+          // Check if location is not set (0.0, 0.0)
+          if (latitude == 0.0 && longitude == 0.0) {
+            log("⚠️ No valid location available - skipping POI fetch");
+            emit(const PoiError("Please set your location in settings to find nearby users"));
+            return;
+          }
         }
-      }
 
-      final pois = await _apiClient.getPointsOfInterest(
-          latitude, longitude, radius ?? 5000.0, userId);
+        pois = await _apiClient.getPointsOfInterest(
+            latitude, longitude, radius ?? 5000.0, userId);
+      } else {
+        // Backend requires consent for geo-filtered nearby search.
+        // Omit geo parameters when user has not consented.
+        pois = await _apiClient.getPointsOfInterestNoGeo(userId);
+      }
       final sortedPois = _sortPois(pois);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
@@ -105,39 +117,58 @@ class PoiCubit extends Cubit<PoiState> {
       
       userId ??= await userRepository.getOwnUserId();
       
-      double latitude;
-      double longitude;
-      
-      // Check if explicit coordinates are provided (e.g., from map center)
-      if (lat != null && lon != null) {
-        latitude = lat;
-        longitude = lon;
-      } else {
-        // Use user's saved location
-        final location = await userRepository.getOwnLocation();
-        latitude = location?.isNotEmpty == true ?
-            double.tryParse(location?.split(',')[0] ?? "") ?? 0.0 : 0.0;
-        longitude = location?.isNotEmpty == true ?
-            double.tryParse(location?.split(',')[1] ?? "") ?? 0.0 : 0.0;
-        
-        // Check if location is not set (0.0, 0.0)
-        if (latitude == 0.0 && longitude == 0.0) {
-          log("⚠️ No valid location available - skipping keyword search");
-          emit(const PoiError("Please set your location in settings to search for users"));
-          return;
+      final settingsService = getIt<SettingsService>();
+      final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+
+      List<PointOfInterest> poi;
+
+      if (hasLocationConsent) {
+        double parsedLatitude;
+        double parsedLongitude;
+
+        // Check if explicit coordinates are provided (e.g., from map center)
+        if (lat != null && lon != null) {
+          parsedLatitude = lat;
+          parsedLongitude = lon;
+        } else {
+          // Use user's saved location
+          final location = await userRepository.getOwnLocation();
+          parsedLatitude = location?.isNotEmpty == true
+              ? double.tryParse(location?.split(',')[0] ?? "") ?? 0.0
+              : 0.0;
+          parsedLongitude = location?.isNotEmpty == true
+              ? double.tryParse(location?.split(',')[1] ?? "") ?? 0.0
+              : 0.0;
+
+          // Check if location is not set (0.0, 0.0)
+          if (parsedLatitude == 0.0 && parsedLongitude == 0.0) {
+            log("⚠️ No valid location available - skipping keyword search");
+            emit(const PoiError("Please set your location in settings to search for users"));
+            return;
+          }
         }
+
+        poi = await _apiClient.getProfilesByKeyword(
+          userId ?? "",
+          keyword,
+          parsedLatitude.toString(),
+          parsedLongitude.toString(),
+          radiusMeters,
+          weight,
+          seeking,
+          offering,
+        );
+      } else {
+        // Backend requires consent for geo-filtered search.
+        // Omit geo parameters when user has not consented.
+        poi = await _apiClient.getProfilesByKeywordNoGeo(
+          userId ?? "",
+          keyword,
+          weight,
+          seeking,
+          offering,
+        );
       }
-      
-      final poi = await _apiClient.getProfilesByKeyword(
-        userId ?? "", 
-        keyword,
-        latitude.toString(), 
-        longitude.toString(),
-        radiusMeters,
-        weight,
-        seeking,
-        offering,
-      );
       poi.forEach((poi) {
         debugPrint('@@@@@@@@@@@ POI loaded: ${poi.profile.userId} ${poi.matchRelevancyScore}');
       });
@@ -168,35 +199,51 @@ class PoiCubit extends Cubit<PoiState> {
       
       userId ??= await userRepository.getOwnUserId();
       
-      double? latitude;
-      double? longitude;
-      
-      // Check if explicit coordinates are provided (e.g., from map center)
-      if (lat != null && lon != null) {
-        latitude = lat;
-        longitude = lon;
+      final settingsService = getIt<SettingsService>();
+      final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+
+      List<PointOfInterest> poi;
+
+      if (hasLocationConsent) {
+        double? latitude;
+        double? longitude;
+
+        // Check if explicit coordinates are provided (e.g., from map center)
+        if (lat != null && lon != null) {
+          latitude = lat;
+          longitude = lon;
+        } else {
+          // Use user's saved location
+          final location = await userRepository.getOwnLocation();
+          latitude = location?.isNotEmpty == true ?
+              double.tryParse(location?.split(',')[0] ?? "") : null;
+          longitude = location?.isNotEmpty == true ?
+              double.tryParse(location?.split(',')[1] ?? "") : null;
+        }
+
+        // Check if location is not set (0.0, 0.0) or null
+        if ((latitude == null || longitude == null) || (latitude == 0.0 && longitude == 0.0)) {
+          log("⚠️ No valid location available - skipping similar profiles fetch");
+          emit(const PoiError("Please set your location in settings to find similar users"));
+          return;
+        }
+
+        poi = await _apiClient.findSimilarProfiles(
+          userId ?? "",
+          latitude,
+          longitude,
+          radiusMeters,
+        );
       } else {
-        // Use user's saved location
-        final location = await userRepository.getOwnLocation();
-        latitude = location?.isNotEmpty == true ?
-            double.tryParse(location?.split(',')[0] ?? "") : null;
-        longitude = location?.isNotEmpty == true ?
-            double.tryParse(location?.split(',')[1] ?? "") : null;
+        // Backend requires consent for geo-filtered search.
+        // Omit geo parameters when user has not consented.
+        poi = await _apiClient.findSimilarProfiles(
+          userId ?? "",
+          null,
+          null,
+          null,
+        );
       }
-      
-      // Check if location is not set (0.0, 0.0) or null
-      if ((latitude == null || longitude == null) || (latitude == 0.0 && longitude == 0.0)) {
-        log("⚠️ No valid location available - skipping similar profiles fetch");
-        emit(const PoiError("Please set your location in settings to find similar users"));
-        return;
-      }
-      
-      final poi = await _apiClient.findSimilarProfiles(
-        userId ?? "",
-        latitude,
-        longitude,
-        radiusMeters,
-      );
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
@@ -225,40 +272,59 @@ class PoiCubit extends Cubit<PoiState> {
       
       userId ??= await userRepository.getOwnUserId();
       
+      final settingsService = getIt<SettingsService>();
+      final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+
       double? latitude;
       double? longitude;
-      
-      // Check if explicit coordinates are provided (e.g., from map center)
-      if (lat != null && lon != null) {
-        latitude = lat;
-        longitude = lon;
+      List<PointOfInterest> poi;
+
+      if (hasLocationConsent) {
+        // Check if explicit coordinates are provided (e.g., from map center)
+        if (lat != null && lon != null) {
+          latitude = lat;
+          longitude = lon;
+        } else {
+          // Use user's saved location
+          final location = await userRepository.getOwnLocation();
+          latitude = location?.isNotEmpty == true ?
+              double.tryParse(location?.split(',')[0] ?? "") : null;
+          longitude = location?.isNotEmpty == true ?
+              double.tryParse(location?.split(',')[1] ?? "") : null;
+        }
+
+        // Check if location is not set (0.0, 0.0) or null
+        if ((latitude == null || longitude == null) || (latitude == 0.0 && longitude == 0.0)) {
+          log("⚠️ No valid location available - skipping complementary profiles fetch");
+          emit(const PoiError("Please set your location in settings to find matching users"));
+          return;
+        }
+
+        poi = await _apiClient.findComplementaryProfiles(
+          userId ?? "",
+          latitude,
+          longitude,
+          radiusMeters,
+        );
       } else {
-        // Use user's saved location
-        final location = await userRepository.getOwnLocation();
-        latitude = location?.isNotEmpty == true ?
-            double.tryParse(location?.split(',')[0] ?? "") : null;
-        longitude = location?.isNotEmpty == true ?
-            double.tryParse(location?.split(',')[1] ?? "") : null;
+        // Backend requires consent for geo-filtered search.
+        // Omit geo parameters when user has not consented.
+        poi = await _apiClient.findComplementaryProfiles(
+          userId ?? "",
+          null,
+          null,
+          null,
+        );
       }
-      
-      // Check if location is not set (0.0, 0.0) or null
-      if ((latitude == null || longitude == null) || (latitude == 0.0 && longitude == 0.0)) {
-        log("⚠️ No valid location available - skipping complementary profiles fetch");
-        emit(const PoiError("Please set your location in settings to find matching users"));
-        return;
-      }
-      
-      final poi = await _apiClient.findComplementaryProfiles(
-        userId ?? "",
-        latitude,
-        longitude,
-        radiusMeters,
-      );
-      
+
       // If no results and fallback is enabled, try nearby search
       if (poi.isEmpty && fallbackToNearby) {
         log("No complementary profiles found, falling back to nearby search");
-        await fetchPois(lat: latitude, lon: longitude, radius: radiusMeters);
+        await fetchPois(
+          lat: hasLocationConsent ? latitude : null,
+          lon: hasLocationConsent ? longitude : null,
+          radius: hasLocationConsent ? radiusMeters : null,
+        );
         return;
       }
       
@@ -278,7 +344,13 @@ class PoiCubit extends Cubit<PoiState> {
       if (fallbackToNearby) {
         log("Error fetching complementary profiles, falling back to nearby search: $errorMessage");
         try {
-          await fetchPois(lat: lat, lon: lon, radius: radiusMeters);
+          final settingsService = getIt<SettingsService>();
+          final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+          await fetchPois(
+            lat: hasLocationConsent ? lat : null,
+            lon: hasLocationConsent ? lon : null,
+            radius: hasLocationConsent ? radiusMeters : null,
+          );
         } catch (fallbackError) {
           emit(PoiError(errorMessage)); // If fallback also fails, emit original error
         }
@@ -291,7 +363,13 @@ class PoiCubit extends Cubit<PoiState> {
       if (fallbackToNearby) {
         log("Error fetching complementary profiles, falling back to nearby search: ${e.toString()}");
         try {
-          await fetchPois(lat: lat, lon: lon, radius: radiusMeters);
+          final settingsService = getIt<SettingsService>();
+          final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+          await fetchPois(
+            lat: hasLocationConsent ? lat : null,
+            lon: hasLocationConsent ? lon : null,
+            radius: hasLocationConsent ? radiusMeters : null,
+          );
         } catch (fallbackError) {
           emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
         }
