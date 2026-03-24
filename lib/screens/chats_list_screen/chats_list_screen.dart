@@ -4,9 +4,7 @@ import 'package:barter_app/models/reviews/review_eligibility.dart';
 import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/router/app_router.dart';
-import 'package:barter_app/screens/map_screen/cubit/profile_panel_cubit.dart';
 import 'package:barter_app/screens/review_screen/review_screen.dart';
-import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/back_button_handler.dart';
@@ -15,7 +13,6 @@ import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -188,6 +185,13 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                   currentUserId: _currentUserId!,
                   svgAssetCount: _svgAssetCount,
                   onTap: () => _openChat(conversation),
+                  onDeletePressed: () async {
+                    final shouldDelete = await _confirmDelete(context, conversation);
+                    if (shouldDelete == true) {
+                      await _deleteConversation(conversation);
+                    }
+                  },
+                  onReviewPressed: () => _showReviewScreen(conversation),
                 ),
               );
             },
@@ -445,12 +449,16 @@ class _ConversationTile extends StatelessWidget {
   final String currentUserId;
   final int svgAssetCount;
   final VoidCallback onTap;
+  final VoidCallback onDeletePressed;
+  final VoidCallback onReviewPressed;
 
   const _ConversationTile({
     required this.conversation,
     required this.currentUserId,
     required this.svgAssetCount,
     required this.onTap,
+    required this.onDeletePressed,
+    required this.onReviewPressed,
   });
 
   // Generate SVG asset path by index (1-based)
@@ -599,6 +607,31 @@ class _ConversationTile extends StatelessWidget {
                     ),
                   ),
                 ],
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_vert,
+                    size: isWebSideBySide ? 18 : 20,
+                    color: Colors.grey.shade700,
+                  ),
+                  onSelected: (value) {
+                    if (value == 'review') {
+                      onReviewPressed();
+                    }
+                    if (value == 'delete') {
+                      onDeletePressed();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem<String>(
+                      value: 'review',
+                      child: Text(l10n.review),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'delete',
+                      child: Text(l10n.delete),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
