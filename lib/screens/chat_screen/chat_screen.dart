@@ -458,7 +458,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 value: 'view_profile',
                 child: Row(
                   children: [
-                    const Icon(Icons.person_outline),
+                    Icon(Icons.person_outline, color: Theme.of(context).colorScheme.onSurface),
                     SizedBox(width: 8.w),
                     Text(l10n.viewProfile),
                   ],
@@ -468,7 +468,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 value: 'finish_transaction',
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle_outline),
+                    Icon(Icons.check_circle_outline, color: Theme.of(context).colorScheme.onSurface),
                     SizedBox(width: 8.w),
                     Text(l10n.finishTransaction),
                   ],
@@ -478,7 +478,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 value: 'report_user',
                 child: Row(
                   children: [
-                    const Icon(Icons.report_outlined),
+                    Icon(Icons.report_outlined, color: Theme.of(context).colorScheme.onSurface),
                     SizedBox(width: 8.w),
                     Text(l10n.reportUser),
                   ],
@@ -489,7 +489,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   value: 'unblock_user',
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle),
+                      Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onSurface),
                       SizedBox(width: 8.w),
                       Text(l10n.unblockUser),
                     ],
@@ -500,7 +500,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   value: 'block_user',
                   child: Row(
                     children: [
-                      const Icon(Icons.block),
+                      Icon(Icons.block, color: Theme.of(context).colorScheme.onSurface),
                       SizedBox(width: 8.w),
                       Text(l10n.blockUser),
                     ],

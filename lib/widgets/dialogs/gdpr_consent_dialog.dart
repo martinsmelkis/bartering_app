@@ -120,7 +120,7 @@ class _GdprConsentDialogState extends State<GdprConsentDialog> {
             Navigator.of(context).pop(GdprConsentChoice(
               locationConsent: _locationConsent,
               aiProcessingConsent: _aiConsent,
-              analyticsCookiesConsent: kIsWeb ? _analyticsCookiesConsent : null,
+              analyticsCookiesConsent: kIsWeb ? _analyticsCookiesConsent : true,
             ));
           },
           child: Text(l10n.gdprConsentAccept),

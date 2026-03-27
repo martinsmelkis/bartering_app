@@ -310,7 +310,7 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
                   value: 'view_profile',
                   child: Row(
                     children: [
-                      const Icon(Icons.person_outline),
+                      Icon(Icons.person_outline, color: Theme.of(context).colorScheme.onSurface),
                       SizedBox(width: 8.w),
                       Text(l10n.viewProfile),
                     ],
@@ -320,7 +320,7 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
                   value: 'finish_transaction',
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle_outline),
+                      Icon(Icons.check_circle_outline, color: Theme.of(context).colorScheme.onSurface),
                       SizedBox(width: 8.w),
                       Text(l10n.finishTransaction),
                     ],
@@ -330,7 +330,7 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
                   value: 'report_user',
                   child: Row(
                     children: [
-                      const Icon(Icons.report_outlined),
+                      Icon(Icons.report_outlined, color: Theme.of(context).colorScheme.onSurface),
                       SizedBox(width: 8.w),
                       Text(l10n.reportUser),
                     ],
