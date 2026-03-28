@@ -378,13 +378,26 @@ class FirebaseService with WidgetsBindingObserver {
     final normalizedTitle = TextUtils.normalizeNotificationText(notification.title);
     final normalizedBody = TextUtils.normalizeNotificationText(notification.body);
     
-    await _localNotifications.plugin.show(
-      message.hashCode,
-      normalizedTitle,
-      normalizedBody,
-      details,
-      payload: payload,
-    );
+    final plugin = _localNotifications.plugin as dynamic;
+    try {
+      await Function.apply(
+        plugin.show,
+        [message.hashCode, normalizedTitle, normalizedBody, details],
+        {#payload: payload},
+      );
+    } catch (_) {
+      await Function.apply(
+        plugin.show,
+        [],
+        {
+          #id: message.hashCode,
+          #title: normalizedTitle,
+          #body: normalizedBody,
+          #notificationDetails: details,
+          #payload: payload,
+        },
+      );
+    }
     
     logDebug('📱 Local notification displayed: $notificationType');
   }

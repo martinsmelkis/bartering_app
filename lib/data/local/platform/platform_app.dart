@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:barter_app/services/crypto/crypto_service.dart';
-import 'package:barter_app/utils/debug_utils.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
@@ -47,12 +46,19 @@ class PlatformInterface {
     return NativeDatabase.createInBackground(
       dbFile,
       isolateSetup: () async {
-        open..overrideFor(
-            OperatingSystem.android, openCipherOnAndroid)..overrideFor(
+        open
+          ..overrideFor(
+            OperatingSystem.android,
+            () => DynamicLibrary.open('libsqlcipher.so'),
+          )
+          ..overrideFor(
             OperatingSystem.linux,
-                () => DynamicLibrary.open('libsqlcipher.so'))..overrideFor(
+            () => DynamicLibrary.open('libsqlcipher.so'),
+          )
+          ..overrideFor(
             OperatingSystem.windows,
-                () => DynamicLibrary.open('sqlcipher.dll'));
+            () => DynamicLibrary.open('sqlcipher.dll'),
+          );
       },
       setup: (db) {
         // Check that we're actually running with SQLCipher by quering the

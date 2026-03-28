@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/models/notifications/notification_models.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/debug_utils.dart';
@@ -169,41 +168,60 @@ class ChatNotificationService with WidgetsBindingObserver {
     required String body,
     required String userId,
   }) async {
-    await _notificationService.plugin.show(
-      userId.hashCode,
-      // Use userId hash as notification ID (replaces old notifications from same user)
-      title,
-      body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'chat_messages',
-          'Chat Messages',
-          channelDescription: 'Notifications for new chat messages',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: 'ic_notification',
-          enableVibration: true,
-          playSound: true,
-          // Make notification temporary when app is in foreground
-          autoCancel: true, // Automatically remove when tapped
-          ongoing: false, // Not an ongoing notification
-          onlyAlertOnce: true, // Don't alert for updates
-          //timeoutAfter: _isInForeground ? 5000 : null, // Auto-dismiss after 5s if in foreground
-        ),
-        iOS: const DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
+    final plugin = _notificationService.plugin as dynamic;
+    final notificationDetails = NotificationDetails(
+      android: AndroidNotificationDetails(
+        'chat_messages',
+        'Chat Messages',
+        channelDescription: 'Notifications for new chat messages',
+        importance: Importance.high,
+        priority: Priority.high,
+        icon: 'ic_notification',
+        enableVibration: true,
+        playSound: true,
+        // Make notification temporary when app is in foreground
+        autoCancel: true, // Automatically remove when tapped
+        ongoing: false, // Not an ongoing notification
+        onlyAlertOnce: true, // Don't alert for updates
+        //timeoutAfter: _isInForeground ? 5000 : null, // Auto-dismiss after 5s if in foreground
       ),
-      payload: jsonEncode({'userId': userId, 'action': 'open_chat'}),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
     );
+
+    try {
+      await Function.apply(
+        plugin.show,
+        [userId.hashCode, title, body, notificationDetails],
+        {#payload: jsonEncode({'userId': userId, 'action': 'open_chat'})},
+      );
+    } catch (_) {
+      await Function.apply(
+        plugin.show,
+        [],
+        {
+          #id: userId.hashCode,
+          #title: title,
+          #body: body,
+          #notificationDetails: notificationDetails,
+          #payload: jsonEncode({'userId': userId, 'action': 'open_chat'}),
+        },
+      );
+    }
   }
 
   /// Cancel notifications for a specific user (when messages are read)
   Future<void> cancelNotificationsForUser(String userId) async {
     try {
-      await _notificationService.plugin.cancel(userId.hashCode);
+      final plugin = _notificationService.plugin as dynamic;
+      try {
+        await Function.apply(plugin.cancel, [userId.hashCode]);
+      } catch (_) {
+        await Function.apply(plugin.cancel, [], {#id: userId.hashCode});
+      }
       debugPrint('🔕 Cancelled notifications for user: $userId');
     } catch (e) {
       debugPrint('❌ Error cancelling notifications: $e');

@@ -4,7 +4,6 @@ import 'dart:io' show Platform;
 import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// Singleton service to manage local notifications
@@ -51,14 +50,26 @@ class LocalNotificationService {
     );
 
       logDebug('🔔 Setting up notification tap handler...');
-    final bool? initialized = await _notifications.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        logDebug('🔔🔔🔔 NOTIFICATION TAP RECEIVED IN HANDLER! 🔔🔔🔔');
-        logDebug('Response: ${response.payload}');
-        _onNotificationTap(response);
-      },
-    );
+    final bool? initialized;
+    try {
+      initialized = await (_notifications as dynamic).initialize(
+        initSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse response) {
+          logDebug('🔔🔔🔔 NOTIFICATION TAP RECEIVED IN HANDLER! 🔔🔔🔔');
+          logDebug('Response: ${response.payload}');
+          _onNotificationTap(response);
+        },
+      ) as bool?;
+    } catch (_) {
+      initialized = await (_notifications as dynamic).initialize(
+        settings: initSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse response) {
+          logDebug('🔔🔔🔔 NOTIFICATION TAP RECEIVED IN HANDLER! 🔔🔔🔔');
+          logDebug('Response: ${response.payload}');
+          _onNotificationTap(response);
+        },
+      ) as bool?;
+    }
 
       logDebug('🔔 Notification initialization result: $initialized');
 
