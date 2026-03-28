@@ -50,7 +50,7 @@ class LocalNotificationService {
     );
 
       logDebug('🔔 Setting up notification tap handler...');
-    final bool? initialized;
+    bool? initialized;
     try {
       initialized = await (_notifications as dynamic).initialize(
         initSettings,
