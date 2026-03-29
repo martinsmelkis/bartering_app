@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:barter_app/models/reviews/reputation_response.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
+import 'package:barter_app/models/wallet/wallet_models.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/initialize_screen/initialize_screen.dart';
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart';
@@ -79,8 +80,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   // Reputation data with caching
   ReputationResponse? _reputationData;
   List<BadgeDetail>? _userBadges;
+  WalletResponse? _walletData;
   bool _isLoadingReputation = false;
   bool _isLoadingBadges = false;
+  bool _isLoadingWallet = false;
   
   // Cache instance
   final ReputationCache _reputationCache = ReputationCache();
@@ -95,6 +98,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       if (mounted) {
         _loadReputationWithCache();
         _loadBadgesWithCache();
+        _loadWalletData();
       }
     });
   }
@@ -161,6 +165,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       logDebug('Error loading user badges: $e');
       setState(() {
         _isLoadingBadges = false;
+      });
+    }
+  }
+
+  Future<void> _loadWalletData() async {
+    setState(() {
+      _isLoadingWallet = true;
+    });
+
+    try {
+      final apiClient = getIt<ApiClient>();
+      final wallet = await apiClient.getWallet();
+      if (!mounted) return;
+      setState(() {
+        _walletData = wallet;
+        _isLoadingWallet = false;
+      });
+      logDebug('✅ Fetched wallet data for ${widget.userId}');
+    } catch (e) {
+      logDebug('Error loading wallet data: $e');
+      if (!mounted) return;
+      setState(() {
+        _isLoadingWallet = false;
       });
     }
   }
@@ -855,6 +882,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final rating = _reputationData?.averageRating ?? 0.0;
     final reviewCount = _reputationData?.totalReviews ?? 0;
     final ratingColor = AvatarColorUtils.getRatingColor(rating);
+    final balanceText = _isLoadingWallet
+        ? '...'
+        : (_walletData?.availableBalance.toDouble() ?? 0.0).toStringAsFixed(2);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -1008,7 +1038,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
               const SizedBox(width: 4),
               Text(
-                '100.00',
+                balanceText,
                 style: TextStyle(
                   fontSize: 12,
                   color: AppColors.primary,

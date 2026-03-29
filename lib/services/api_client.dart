@@ -18,6 +18,7 @@ import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/user/user_attributes_data.dart';
 import 'package:barter_app/models/user/user_onboarding_data.dart';
 import 'package:barter_app/models/user/user_registration_data.dart';
+import 'package:barter_app/models/wallet/wallet_models.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -511,6 +512,25 @@ abstract class ApiClient {
   @POST('/api/v1/migration/recovery/verify')
   Future<VerifyRecoveryCodeResponse> verifyRecoveryCode(
     @Body() Map<String, dynamic> request,
+  );
+
+  ///////////// WALLET ///////////////
+
+  /// Get wallet summary for authenticated user
+  @GET('/api/v1/wallet')
+  Future<WalletResponse> getWallet();
+
+  /// Get wallet transactions for authenticated user
+  @GET('/api/v1/wallet/transactions')
+  Future<List<WalletTransactionResponse>> getWalletTransactions(
+    @Query('limit') int? limit,
+    @Query('offset') int? offset,
+  );
+
+  /// Transfer coins between users
+  @POST('/api/v1/wallet/transfer')
+  Future<WalletOperationResponse> transferCoins(
+    @Body() TransferCoinsRequest request,
   );
 
   ///////////// DEVICE MANAGEMENT ///////////////
