@@ -755,6 +755,18 @@
   "guidelineFalseReports": "Viltus ziņojumi var izraisīt konta apturēšanu",
   "submitReview": "Iesniegt atsauksmi",
   "skipForNow": "Pagaidām izlaist",
+  "bonusTipOptional": "Bonuss / dzeramnauda (neobligāti)",
+  "other": "Cits",
+  "enterBonusAmount": "Ievadiet bonusa summu",
+  "loadingWalletBalance": "Ielādē maka atlikumu...",
+  "currentWalletBalance": "Pašreizējais maka atlikums: {amount}",
+  "@currentWalletBalance": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "failedToSubmitReview": "Neizdevās iesniegt atsauksmi",
   "archiveConversationTitle": "Arhivēt sarunu?",
   "archiveConversationMessage": "Vai vēlaties tagad arhivēt šo sarunu?",

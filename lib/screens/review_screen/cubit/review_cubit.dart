@@ -10,6 +10,8 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../models/wallet/wallet_models.dart';
+
 part 'review_state.dart';
 
 class ReviewCubit extends Cubit<ReviewState> {
@@ -21,6 +23,7 @@ class ReviewCubit extends Cubit<ReviewState> {
   int rating = 0;
   TransactionStatus? selectedStatus;
   String? reviewText;
+  int? bonusAmount;
 
   ReviewCubit({
     required this.otherUserId,
@@ -43,6 +46,14 @@ class ReviewCubit extends Cubit<ReviewState> {
 
   void updateReviewText(String text) {
     reviewText = text.isEmpty ? null : text;
+  }
+
+  void updateBonusAmount(int? amount) {
+    if (amount != null && amount <= 0) {
+      bonusAmount = null;
+      return;
+    }
+    bonusAmount = amount;
   }
 
   Future<void> submitReview({
@@ -99,6 +110,21 @@ class ReviewCubit extends Cubit<ReviewState> {
       final response = await _apiClient.submitReview(submission);
 
       if (response.success) {
+        if ((bonusAmount ?? 0) > 0) {
+          final transferRequest = TransferCoinsRequest(
+            fromUserId: currentUserId,
+            toUserId: otherUserId,
+            amount: bonusAmount!,
+            transactionType: 'TIP',
+            externalRef: eligibility.transactionId,
+          );
+          final transferResponse = await _apiClient.transferCoins(transferRequest);
+          if (!transferResponse.success) {
+            emit(ReviewSubmitError(transferResponse.message));
+            return;
+          }
+        }
+
         // Check if response includes risk analysis
         if (response.riskAnalysisReport != null) {
           // Emit risk analysis state to show dialog
@@ -110,11 +136,23 @@ class ReviewCubit extends Cubit<ReviewState> {
         emit(ReviewSubmitError(defaultErrorMessage));
       }
     } on DioException catch (e) {
-      final errorMessage = DioErrorHandler.getErrorMessage(e, defaultErrorMessage);
+      final apiMessage = _extractApiMessage(e);
+      final errorMessage = apiMessage ?? DioErrorHandler.getErrorMessage(e, defaultErrorMessage);
       emit(ReviewSubmitError(errorMessage));
     } catch (e) {
       emit(ReviewSubmitError(e.toString()));
     }
+  }
+
+  String? _extractApiMessage(DioException e) {
+    final data = e.response?.data;
+    if (data is Map<String, dynamic>) {
+      final message = data['message'];
+      if (message is String && message.trim().isNotEmpty) {
+        return message.trim();
+      }
+    }
+    return null;
   }
 
 }

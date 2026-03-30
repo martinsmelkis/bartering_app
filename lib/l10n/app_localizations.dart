@@ -4376,6 +4376,36 @@ abstract class AppLocalizations {
   /// **'Skip for Now'**
   String get skipForNow;
 
+  /// No description provided for @bonusTipOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Bonus / Tip (optional)'**
+  String get bonusTipOptional;
+
+  /// No description provided for @other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get other;
+
+  /// No description provided for @enterBonusAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter bonus amount'**
+  String get enterBonusAmount;
+
+  /// No description provided for @loadingWalletBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading wallet balance...'**
+  String get loadingWalletBalance;
+
+  /// No description provided for @currentWalletBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Current wallet balance: {amount}'**
+  String currentWalletBalance(String amount);
+
   /// No description provided for @failedToSubmitReview.
   ///
   /// In en, this message translates to:

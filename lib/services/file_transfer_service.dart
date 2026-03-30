@@ -222,6 +222,7 @@ class FileTransferService {
     }
   }
 
+  // TODO make web worker for web platform async mode?
   /// Download and decrypt a file
   ///
   /// Process:

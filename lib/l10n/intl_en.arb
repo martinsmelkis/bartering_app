@@ -754,6 +754,18 @@
   "guidelineFalseReports": "False reports may result in account suspension",
   "submitReview": "Submit Review",
   "skipForNow": "Skip for Now",
+  "bonusTipOptional": "Bonus / Tip (optional)",
+  "other": "Other",
+  "enterBonusAmount": "Enter bonus amount",
+  "loadingWalletBalance": "Loading wallet balance...",
+  "currentWalletBalance": "Current wallet balance: {amount}",
+  "@currentWalletBalance": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "failedToSubmitReview": "Failed to submit review",
   "archiveConversationTitle": "Archive Conversation?",
   "archiveConversationMessage": "Would you like to archive this conversation now?",

@@ -2280,6 +2280,23 @@ class AppLocalizationsLv extends AppLocalizations {
   String get skipForNow => 'Pagaidām izlaist';
 
   @override
+  String get bonusTipOptional => 'Bonuss / dzeramnauda (neobligāti)';
+
+  @override
+  String get other => 'Cits';
+
+  @override
+  String get enterBonusAmount => 'Ievadiet bonusa summu';
+
+  @override
+  String get loadingWalletBalance => 'Ielādē maka atlikumu...';
+
+  @override
+  String currentWalletBalance(String amount) {
+    return 'Pašreizējais maka atlikums: $amount';
+  }
+
+  @override
   String get failedToSubmitReview => 'Neizdevās iesniegt atsauksmi';
 
   @override

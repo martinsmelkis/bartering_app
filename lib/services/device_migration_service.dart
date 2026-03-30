@@ -4,9 +4,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 
-import 'package:barter_app/models/auth/device_management_models.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
@@ -16,7 +14,6 @@ import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pointycastle/export.dart' as pc;
 
@@ -1115,13 +1112,6 @@ class DeviceMigrationService {
   // PRIVATE HELPERS - Key & Session Management
   // ==========================================================================
 
-  /// Generates a unique session ID (10 chars: uppercase letters + numbers)
-  String _generateSessionId() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    final random = Random.secure();
-    return List.generate(10, (_) => chars[random.nextInt(chars.length)]).join();
-  }
-
   /// Generates cryptographically secure random bytes
   Uint8List _generateSecureRandom(int length) {
     final random = Random.secure();
@@ -1166,8 +1156,8 @@ class DeviceMigrationService {
 
     final pair = keyGen.generateKeyPair();
     return pc.AsymmetricKeyPair<pc.ECPublicKey, pc.ECPrivateKey>(
-      pair.publicKey as pc.ECPublicKey,
-      pair.privateKey as pc.ECPrivateKey,
+      pair.publicKey,
+      pair.privateKey,
     );
   }
 
@@ -1185,29 +1175,6 @@ class DeviceMigrationService {
       'attemptCount': session.attemptCount,
     });
     await _secureStorage.write(key: key, value: json);
-  }
-
-  Future<MigrationSession?> _getSession(String sessionId) async {
-    final key = '$_migrationSessionsKey$sessionId';
-    final json = await _secureStorage.read(key: key);
-    if (json == null) return null;
-
-    try {
-      final map = jsonDecode(json) as Map<String, dynamic>;
-      return MigrationSession(
-        sessionId: map['sessionId'] as String,
-        sessionCode: map['sessionCode'] as String?,
-        sourceDeviceId: map['sourceDeviceId'] as String,
-        targetDeviceId: map['targetDeviceId'] as String,
-        createdAt: DateTime.parse(map['createdAt'] as String),
-        expiresAt: DateTime.parse(map['expiresAt'] as String),
-        status: MigrationStatus.values[map['status'] as int],
-        errorMessage: map['errorMessage'] as String?,
-        attemptCount: map['attemptCount'] as int? ?? 0,
-      );
-    } catch (e) {
-      return null;
-    }
   }
 
   Future<void> _storeEphemeralKeys(

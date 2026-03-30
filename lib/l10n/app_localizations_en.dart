@@ -2250,6 +2250,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skipForNow => 'Skip for Now';
 
   @override
+  String get bonusTipOptional => 'Bonus / Tip (optional)';
+
+  @override
+  String get other => 'Other';
+
+  @override
+  String get enterBonusAmount => 'Enter bonus amount';
+
+  @override
+  String get loadingWalletBalance => 'Loading wallet balance...';
+
+  @override
+  String currentWalletBalance(String amount) {
+    return 'Current wallet balance: $amount';
+  }
+
+  @override
   String get failedToSubmitReview => 'Failed to submit review';
 
   @override

@@ -1,11 +1,14 @@
 import 'package:barter_app/models/reviews/review_eligibility.dart';
 import 'package:barter_app/models/reviews/transaction_status.dart';
+import 'package:barter_app/models/wallet/wallet_models.dart';
+import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
+import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import 'cubit/review_cubit.dart';
 import 'models/risk_analysis_model.dart';
@@ -28,8 +31,15 @@ class ReviewScreen extends StatefulWidget {
 }
 
 class _ReviewScreenState extends State<ReviewScreen> {
+  static const List<int> _presetBonusOptions = [1, 10, 20, 50];
+
   final TextEditingController reviewTextController = TextEditingController();
+  final TextEditingController customBonusController = TextEditingController();
   bool _guidelinesExpanded = false;
+  int? _selectedBonusAmount;
+  bool _isCustomBonusSelected = false;
+  WalletResponse? _walletData;
+  bool _isLoadingWallet = false;
   late ReviewCubit _reviewCubit;
 
   @override
@@ -39,11 +49,34 @@ class _ReviewScreenState extends State<ReviewScreen> {
       otherUserId: widget.otherUserId,
       eligibility: widget.eligibility,
     );
+    _loadWalletData();
+  }
+
+  Future<void> _loadWalletData() async {
+    setState(() {
+      _isLoadingWallet = true;
+    });
+
+    try {
+      final apiClient = getIt<ApiClient>();
+      final wallet = await apiClient.getWallet();
+      if (!mounted) return;
+      setState(() {
+        _walletData = wallet;
+        _isLoadingWallet = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingWallet = false;
+      });
+    }
   }
 
   @override
   void dispose() {
     reviewTextController.dispose();
+    customBonusController.dispose();
     _reviewCubit.close();
     super.dispose();
   }
@@ -280,6 +313,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 SizedBox(height: 16),
                 _buildReviewTextSection(),
                 SizedBox(height: 16),
+                _buildBonusSection(),
+                SizedBox(height: 16),
                 _buildGuidelinesSection(),
                 SizedBox(height: 24),
                 _buildActionButtons(),
@@ -457,6 +492,86 @@ class _ReviewScreenState extends State<ReviewScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             helperText: l10n.beSpecificAndConstructive,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBonusSection() {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.bonusTipOptional,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        SizedBox(height: 8.h),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ..._presetBonusOptions.map((amount) {
+              final isSelected = !_isCustomBonusSelected && _selectedBonusAmount == amount;
+              return ChoiceChip(
+                selectedColor: AppColors.primary,
+                backgroundColor: Colors.white,
+                label: Text(amount.toString()),
+                selected: isSelected,
+                onSelected: (_) {
+                  setState(() {
+                    _isCustomBonusSelected = false;
+                    _selectedBonusAmount = amount;
+                    customBonusController.clear();
+                    _reviewCubit.updateBonusAmount(amount);
+                  });
+                },
+              );
+            }),
+            ChoiceChip(
+              label: Text(l10n.other),
+              selected: _isCustomBonusSelected,
+              onSelected: (_) {
+                setState(() {
+                  _isCustomBonusSelected = true;
+                  _selectedBonusAmount = null;
+                  _reviewCubit.updateBonusAmount(null);
+                });
+              },
+            ),
+          ],
+        ),
+        if (_isCustomBonusSelected) ...[
+          SizedBox(height: 10.h),
+          TextField(
+            controller: customBonusController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: l10n.enterBonusAmount,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onChanged: (value) {
+              final parsed = int.tryParse(value.trim());
+              _selectedBonusAmount = parsed;
+              _reviewCubit.updateBonusAmount(parsed);
+            },
+          ),
+        ],
+        SizedBox(height: 8.h),
+        Text(
+          _isLoadingWallet
+              ? l10n.loadingWalletBalance
+              : l10n.currentWalletBalance(
+                  (_walletData?.availableBalance.toDouble() ?? 0.0).toStringAsFixed(2),
+                ),
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
