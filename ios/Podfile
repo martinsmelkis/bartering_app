@@ -56,6 +56,11 @@ post_install do |installer|
       config.build_settings['CLANG_MODULE_CACHE_PATH'] = '${PROJECT_TEMP_DIR}/ModuleCache.noindex'
       config.build_settings['CLANG_MODULES_BUILD_SESSION_FILE'] = '${PROJECT_TEMP_DIR}/ModuleCache.noindex/Session.modulevalidation'
 
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+        '$(inherited)',
+        'PERMISSION_LOCATION=1',
+      ]
+
     end
   end
 end
