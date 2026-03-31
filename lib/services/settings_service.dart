@@ -225,6 +225,18 @@ class SettingsService {
     return _prefs?.getBool(_enableGpsLocationKey) ?? false;
   }
 
+  /// Get GDPR location consent value
+  /// Returns false by default when consent is not set.
+  Future<bool> hasLocationConsent() async {
+    final prefs = await _preferences;
+    return prefs.getBool(_gdprLocationConsentKey) ?? false;
+  }
+
+  /// Get GDPR location consent synchronously
+  bool hasLocationConsentSync() {
+    return _prefs?.getBool(_gdprLocationConsentKey) ?? false;
+  }
+
   /// Save GDPR consent choices with versioning and timestamp
   Future<void> setGdprConsent({
     required String version,

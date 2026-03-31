@@ -52,7 +52,7 @@ class PoiCubit extends Cubit<PoiState> {
       userId ??= await userRepository.getOwnUserId();
 
       final settingsService = getIt<SettingsService>();
-      final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+      final hasLocationConsent = await settingsService.hasLocationConsent();
 
       List<PointOfInterest> pois;
 
@@ -118,7 +118,7 @@ class PoiCubit extends Cubit<PoiState> {
       userId ??= await userRepository.getOwnUserId();
       
       final settingsService = getIt<SettingsService>();
-      final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+      final hasLocationConsent = await settingsService.hasLocationConsent();
 
       List<PointOfInterest> poi;
 
@@ -200,7 +200,7 @@ class PoiCubit extends Cubit<PoiState> {
       userId ??= await userRepository.getOwnUserId();
       
       final settingsService = getIt<SettingsService>();
-      final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+      final hasLocationConsent = await settingsService.hasLocationConsent();
 
       List<PointOfInterest> poi;
 
@@ -273,7 +273,7 @@ class PoiCubit extends Cubit<PoiState> {
       userId ??= await userRepository.getOwnUserId();
       
       final settingsService = getIt<SettingsService>();
-      final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+      final hasLocationConsent = await settingsService.hasLocationConsent();
 
       double? latitude;
       double? longitude;
@@ -345,7 +345,7 @@ class PoiCubit extends Cubit<PoiState> {
         log("Error fetching complementary profiles, falling back to nearby search: $errorMessage");
         try {
           final settingsService = getIt<SettingsService>();
-          final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+          final hasLocationConsent = await settingsService.hasLocationConsent();
           await fetchPois(
             lat: hasLocationConsent ? lat : null,
             lon: hasLocationConsent ? lon : null,
@@ -364,7 +364,7 @@ class PoiCubit extends Cubit<PoiState> {
         log("Error fetching complementary profiles, falling back to nearby search: ${e.toString()}");
         try {
           final settingsService = getIt<SettingsService>();
-          final hasLocationConsent = await settingsService.isGpsLocationEnabled();
+          final hasLocationConsent = await settingsService.hasLocationConsent();
           await fetchPois(
             lat: hasLocationConsent ? lat : null,
             lon: hasLocationConsent ? lon : null,

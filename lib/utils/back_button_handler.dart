@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 /// Utility for handling Android back button on mobile web
@@ -40,6 +42,12 @@ class BackButtonHandler extends StatelessWidget {
         // Allow normal back navigation
         if (context.canPop()) {
           context.pop();
+          return;
+        }
+
+        // On native mobile, exit app when we're at the root route.
+        if (!kIsWeb) {
+          await SystemNavigator.pop();
         }
       },
       child: child,
