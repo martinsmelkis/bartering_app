@@ -1048,6 +1048,28 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ],
           ),
         ),
+        const SizedBox(width: 6),
+        InkWell(
+          onTap: _showCoinsInfoDialog,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.35),
+              ),
+            ),
+            alignment: Alignment.center,
+            child: const Icon(
+              Icons.question_mark,
+              size: 14,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -1070,6 +1092,35 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Navigator.of(dialogContext).pop();
             }
           },
+        );
+      },
+    );
+  }
+
+  void _showCoinsInfoDialog() {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      useRootNavigator: kIsWeb,
+      builder: (dialogContext) {
+        return PointerInterceptor(
+          child: AlertDialog(
+            title: Text(l10n.barterCoinsTitle),
+            content: Text(l10n.barterCoinsInfoMessage),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  if (kIsWeb) {
+                    Navigator.of(dialogContext, rootNavigator: true).pop();
+                  } else {
+                    Navigator.of(dialogContext).pop();
+                  }
+                },
+                child: Text(l10n.ok),
+              ),
+            ],
+          ),
         );
       },
     );

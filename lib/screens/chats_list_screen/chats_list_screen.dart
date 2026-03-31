@@ -278,7 +278,8 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     // First, check if user can review the other party
-    final canShowReview = await _checkReviewEligibility(conversation);
+    final canShowReview =
+        await _checkReviewEligibility(conversation, showReasonOnFailure: false);
 
     return showDialog<bool>(
       context: context,
@@ -317,7 +318,10 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     );
   }
 
-  Future<bool> _checkReviewEligibility(Conversation conversation) async {
+  Future<bool> _checkReviewEligibility(
+    Conversation conversation, {
+    bool showReasonOnFailure = false,
+  }) async {
     try {
       // Get the other participant's ID
       final participants = await _chatRepository.getConversationParticipants(
@@ -326,6 +330,12 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
       );
 
       if (participants.isEmpty) {
+        if (showReasonOnFailure && mounted) {
+          final l10n = AppLocalizations.of(context)!;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.unableToReviewUser)),
+          );
+        }
         return false;
       }
 
@@ -333,15 +343,36 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
       final apiClient = getIt<ApiClient>();
 
       // Check eligibility via API
-      final eligibility = await apiClient.checkReviewEligibility(_currentUserId!, otherUserId);
+      final eligibility =
+          await apiClient.checkReviewEligibility(_currentUserId!, otherUserId);
 
       // Store eligibility for later use
       _lastCheckedEligibility = eligibility;
       _lastCheckedConversation = conversation;
 
+      if (!eligibility.eligible && showReasonOnFailure && mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        final reason = eligibility.reason?.trim();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              (reason != null && reason.isNotEmpty)
+                  ? l10n.unableToReviewUser + ": " + reason
+                  : l10n.unableToReviewUser,
+            ),
+          ),
+        );
+      }
+
       return eligibility.eligible;
     } catch (e) {
       logDebugError('Error checking review eligibility', e);
+      if (showReasonOnFailure && mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.unableToReviewUser)),
+        );
+      }
       return false;
     }
   }
@@ -350,18 +381,12 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
   Conversation? _lastCheckedConversation;
 
   Future<void> _showReviewScreen(Conversation conversation) async {
-    final l10n = AppLocalizations.of(context)!;
-    
     if (_lastCheckedEligibility == null ||
         _lastCheckedConversation?.conversationId != conversation.conversationId) {
       // Eligibility not cached, check again
-      final canReview = await _checkReviewEligibility(conversation);
+      final canReview =
+          await _checkReviewEligibility(conversation, showReasonOnFailure: true);
       if (!canReview || _lastCheckedEligibility == null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.unableToReviewUser)),
-          );
-        }
         return;
       }
     }

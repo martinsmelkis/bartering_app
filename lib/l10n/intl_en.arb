@@ -557,7 +557,7 @@
   "welcomeStep3Title": "Start Chatting",
   "welcomeStep3Description": "Connect with others through End-to-end encrypted chat",
   "welcomeStep4Title": "Make Exchanges",
-  "welcomeStep4Description": "Trade skills, services, items, or simply connect with your community",
+  "welcomeStep4Description": "Trade knowledge, services, items, or simply connect with your community",
   "gdprConsentTitle": "Privacy & Data Consent",
   "gdprConsentIntro": "Before you continue, please review and choose how your data is processed.",
   "gdprConsentRequiredLabel": "Required: Core service processing",
@@ -772,6 +772,8 @@
   "keep": "Keep",
   "archive": "Archive",
   "unableToReviewUser": "Unable to review this user at this time",
+  "barterCoinsTitle": "Barter Coins",
+  "barterCoinsInfoMessage": "Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on perks planned for future app versions: custom avatar icon, standing out on the map, and being able to add a picture and self-description.",
   "cannotSendFileNoRecipientKey": "Cannot send file: Recipient public key not available",
   "gallery": "Device",
   "camera": "Camera",
@@ -1074,7 +1076,7 @@
   "locationPermissionRequiredDescription": "Location permission is required to use GPS location tracking. Please enable location permission in your device settings.",
   "openSettings": "Open Settings",
   "profilePanelTitle": "Profile",
-  "reviewsCount": "{count} reviews",
+  "reviewsCount": "{count} {count, plural, =1{review} other{reviews}}",
   "@reviewsCount": {
     "description": "Number of reviews count display",
     "placeholders": {

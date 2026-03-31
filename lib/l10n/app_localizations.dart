@@ -3257,7 +3257,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeStep4Description.
   ///
   /// In en, this message translates to:
-  /// **'Trade skills, services, items, or simply connect with your community'**
+  /// **'Trade knowledge, services, items, or simply connect with your community'**
   String get welcomeStep4Description;
 
   /// No description provided for @gdprConsentTitle.
@@ -4442,6 +4442,18 @@ abstract class AppLocalizations {
   /// **'Unable to review this user at this time'**
   String get unableToReviewUser;
 
+  /// No description provided for @barterCoinsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Barter Coins'**
+  String get barterCoinsTitle;
+
+  /// No description provided for @barterCoinsInfoMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on perks planned for future app versions: custom avatar icon, standing out on the map, and being able to add a picture and self-description.'**
+  String get barterCoinsInfoMessage;
+
   /// No description provided for @cannotSendFileNoRecipientKey.
   ///
   /// In en, this message translates to:
@@ -5579,7 +5591,7 @@ abstract class AppLocalizations {
   /// Number of reviews count display
   ///
   /// In en, this message translates to:
-  /// **'{count} reviews'**
+  /// **'{count} {count, plural, =1{review} other{reviews}}'**
   String reviewsCount(int count);
 }
 

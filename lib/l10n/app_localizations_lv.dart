@@ -1680,7 +1680,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get welcomeStep4Description =>
-      'Mainiet prasmes, pakalpojumus, priekšmetus vai vienkārši savienojieties ar savu kopienu';
+      'Mainiet zināšanas, pakalpojumus, priekšmetus vai vienkārši savienojieties ar savu kopienu';
 
   @override
   String get gdprConsentTitle => 'Privātuma un datu piekrišana';
@@ -2315,6 +2315,13 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get unableToReviewUser =>
       'Šobrīd nav iespējams atsauksmēt šo lietotāju';
+
+  @override
+  String get barterCoinsTitle => 'Bartera monētas';
+
+  @override
+  String get barterCoinsInfoMessage =>
+      'Monētas var nopelnīt, sniedzot pakalpojumu vai aktīvi lietojot lietotni.\n\nMonētas varēs tērēt priekšrocībām, kas plānotas nākamajās lietotnes versijās: pielāgota avatara ikona, izcelšanās kartē, kā arī iespēja pievienot attēlu un pašaprakstu.';
 
   @override
   String get cannotSendFileNoRecipientKey =>
@@ -2971,6 +2978,12 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String reviewsCount(int count) {
-    return '$count atsauksmes';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'atsauksmes',
+      one: 'atsauksme',
+    );
+    return '$count $_temp0';
   }
 }

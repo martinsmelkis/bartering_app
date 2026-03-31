@@ -98,8 +98,21 @@ class ReviewCubit extends Cubit<ReviewState> {
         throw Exception('User not authenticated');
       }
 
+      final transactionId = eligibility.transactionId;
+      if (transactionId == null || transactionId.trim().isEmpty) {
+        final reason = eligibility.reason?.trim();
+        emit(
+          ReviewSubmitError(
+            (reason != null && reason.isNotEmpty)
+                ? reason
+                : defaultErrorMessage,
+          ),
+        );
+        return;
+      }
+
       final submission = SubmitReviewRequest(
-        transactionId: eligibility.transactionId!,
+        transactionId: transactionId,
         reviewerId: currentUserId,
         targetUserId: otherUserId,
         rating: rating,

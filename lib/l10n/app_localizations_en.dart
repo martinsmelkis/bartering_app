@@ -1655,7 +1655,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get welcomeStep4Description =>
-      'Trade skills, services, items, or simply connect with your community';
+      'Trade knowledge, services, items, or simply connect with your community';
 
   @override
   String get gdprConsentTitle => 'Privacy & Data Consent';
@@ -2284,6 +2284,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unableToReviewUser => 'Unable to review this user at this time';
+
+  @override
+  String get barterCoinsTitle => 'Barter Coins';
+
+  @override
+  String get barterCoinsInfoMessage =>
+      'Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on perks planned for future app versions: custom avatar icon, standing out on the map, and being able to add a picture and self-description.';
 
   @override
   String get cannotSendFileNoRecipientKey =>
@@ -2935,6 +2942,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String reviewsCount(int count) {
-    return '$count reviews';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'reviews',
+      one: 'review',
+    );
+    return '$count $_temp0';
   }
 }

@@ -562,16 +562,51 @@ class _ReviewScreenState extends State<ReviewScreen> {
           ),
         ],
         SizedBox(height: 8.h),
-        Text(
-          _isLoadingWallet
-              ? l10n.loadingWalletBalance
-              : l10n.currentWalletBalance(
-                  (_walletData?.availableBalance.toDouble() ?? 0.0).toStringAsFixed(2),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 21,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(4),
                 ),
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey[700],
-            fontWeight: FontWeight.w500,
+                alignment: Alignment.center,
+                child: const Text(
+                  '₿',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                _isLoadingWallet
+                    ? l10n.loadingWalletBalance
+                    : l10n.currentWalletBalance(
+                        (_walletData?.availableBalance.toDouble() ?? 0.0)
+                            .toStringAsFixed(2),
+                      ),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
       ],

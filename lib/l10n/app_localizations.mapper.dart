@@ -739,6 +739,8 @@ extension AppLocalizationsExtension on AppLocalizations {
       'keep' => keep,
       'archive' => archive,
       'unableToReviewUser' => unableToReviewUser,
+      'barterCoinsTitle' => barterCoinsTitle,
+      'barterCoinsInfoMessage' => barterCoinsInfoMessage,
       'cannotSendFileNoRecipientKey' => cannotSendFileNoRecipientKey,
       'gallery' => gallery,
       'camera' => camera,

@@ -3,16 +3,6 @@
 This guide explains how to deploy your Flutter web application to a VPS server running AlmaLinux
 using Docker.
 
-## 📋 Table of Contents
-
-1. [Prerequisites](#prerequisites)
-2. [Local Setup - Build Flutter Web](#local-setup)
-3. [Docker Setup](#docker-setup)
-4. [VPS Server Setup](#vps-server-setup)
-5. [Deployment Options](#deployment-options)
-6. [HTTPS/SSL Setup](#httpsssl-setup)
-7. [Monitoring & Maintenance](#monitoring--maintenance)
-
 ---
 
 ## Prerequisites
@@ -23,9 +13,7 @@ using Docker.
 - Docker installed (for testing)
 - SSH access to your VPS
 
-### On Your VPS (AlmaLinux):
-
-############ Set up VPS, if not done yet
+### 1. Server Setup on the VPS (e.g. AlmaLinux):
 
 ```bash
 1. Docker
@@ -102,7 +90,7 @@ nano .env if needed - check barter_app_backend docker-compose for environment va
 
 ```
 
-## 1. Local Setup - Build Flutter Web
+## 2. Local Setup - Build Flutter Web
 
 ### Step 1: Build the Flutter Web App
 
@@ -126,32 +114,7 @@ docker compose up --build
 
 ```
 
----
-
-## 5. HTTPS/SSL Setup
-
-### Option A: Using Let's Encrypt with Certbot + Nginx
-
-#### 1. Install Certbot on VPS:
-
-```bash
-sudo dnf install epel-release
-sudo dnf install certbot python3-certbot-nginx
-```
-
-#### 2. Stop Docker container temporarily:
-
-```bash
-docker stop barter-app
-```
-
-#### 3. Get SSL certificate:
-
-```bash
-sudo certbot certonly --standalone -d yourdomain.com -d www.yourdomain.com
-```
-
-#### 4. Update nginx.conf for HTTPS:
+#### 3. Update nginx.conf for HTTPS in the Backend:
 
 ```nginx
 # Nginx configuration for Barter App - bartering.app
@@ -699,7 +662,7 @@ server {
 
 ---
 
-## 6. Monitoring & Maintenance
+## 4. Monitoring & Maintenance
 
 ### Useful Docker Commands
 
@@ -745,7 +708,7 @@ Access at `http://your-vps-ip:9000`
 
 ---
 
-## 7. Troubleshooting
+## 5. Troubleshooting
 
 ### App not accessible
 
@@ -811,11 +774,8 @@ ssh $VPS_HOST << 'EOF'
   ./start-barter-app.sh
 EOF
 
-echo "🧹 Cleaning up..."
-rm barter-app-web.tar.gz
-
 echo "✅ Deployment complete!"
-echo "🌐 Your app is now live at http://your-domain.com"
+echo "🌐 Your app is now live at https://bartering.app"
 ```
 
 Make executable and run:

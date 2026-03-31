@@ -558,7 +558,7 @@
   "welcomeStep3Title": "Sāciet tērzēt",
   "welcomeStep3Description": "Savienojieties ar citiem, izmantojot pilnībā šifrētu tērzēšanu",
   "welcomeStep4Title": "Veiciet apmaiņas",
-  "welcomeStep4Description": "Mainiet prasmes, pakalpojumus, priekšmetus vai vienkārši savienojieties ar savu kopienu",
+  "welcomeStep4Description": "Mainiet zināšanas, pakalpojumus, priekšmetus vai vienkārši savienojieties ar savu kopienu",
   "gdprConsentTitle": "Privātuma un datu piekrišana",
   "gdprConsentIntro": "Pirms turpināt, lūdzu, pārskatiet un izvēlieties, kā tiek apstrādāti jūsu dati.",
   "gdprConsentRequiredLabel": "Obligāti: pamatpakalpojuma apstrāde",
@@ -773,6 +773,8 @@
   "keep": "Paturēt",
   "archive": "Arhivēt",
   "unableToReviewUser": "Šobrīd nav iespējams atsauksmēt šo lietotāju",
+  "barterCoinsTitle": "Bartera monētas",
+  "barterCoinsInfoMessage": "Monētas var nopelnīt, sniedzot pakalpojumu vai aktīvi lietojot lietotni.\n\nMonētas varēs tērēt priekšrocībām, kas plānotas nākamajās lietotnes versijās: pielāgota avatara ikona, izcelšanās kartē, kā arī iespēja pievienot attēlu un pašaprakstu.",
   "cannotSendFileNoRecipientKey": "Nevar nosūtīt failu: Saņēmēja publiskā atslēga nav pieejama",
   "gallery": "Iekārta",
   "camera": "Kamera",
@@ -1075,6 +1077,6 @@
   "locationPermissionRequiredDescription": "Atrašanās vietas atļauja ir nepieciešama, lai izmantotu GPS atrašanās vietas izsekošanu. Lūdzu, iespējojiet atrašanās vietas atļauju ierīces iestatījumos.",
   "openSettings": "Atvērt iestatījumus",
   "profilePanelTitle": "Profils",
-  "reviewsCount": "{count} atsauksmes"
+  "reviewsCount": "{count} {count, plural, =1{atsauksme} other{atsauksmes}}"
 
 }
