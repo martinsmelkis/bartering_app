@@ -632,36 +632,95 @@ class _ConversationTile extends StatelessWidget {
                     ),
                   ),
                 ],
-                PopupMenuButton<String>(
-                  icon: Icon(
-                    Icons.more_vert,
-                    size: isWebSideBySide ? 18 : 20,
-                    color: Colors.grey.shade700,
+                if ((conversation.transactionId ?? '').isNotEmpty)
+                  FutureBuilder<bool>(
+                    future: _isTransactionCompleted(currentUserId, otherUserId),
+                    builder: (context, completionSnapshot) {
+                      return _buildConversationMenuButton(
+                        context: context,
+                        l10n: l10n,
+                        isWebSideBySide: isWebSideBySide,
+                        showCompletedCheck: completionSnapshot.data ?? false,
+                      );
+                    },
+                  )
+                else
+                  _buildConversationMenuButton(
+                    context: context,
+                    l10n: l10n,
+                    isWebSideBySide: isWebSideBySide,
+                    showCompletedCheck: false,
                   ),
-                  onSelected: (value) {
-                    if (value == 'review') {
-                      onReviewPressed();
-                    }
-                    if (value == 'delete') {
-                      onDeletePressed();
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem<String>(
-                      value: 'review',
-                      child: Text(l10n.review),
-                    ),
-                    PopupMenuItem<String>(
-                      value: 'delete',
-                      child: Text(l10n.delete),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Future<bool> _isTransactionCompleted(String currentUserId, String otherUserId) async {
+    try {
+      final apiClient = getIt<ApiClient>();
+      final eligibility = await apiClient.checkReviewEligibility(currentUserId, otherUserId);
+      return eligibility.transactionCompletedAt != null;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Widget _buildConversationMenuButton({
+    required BuildContext context,
+    required AppLocalizations l10n,
+    required bool isWebSideBySide,
+    required bool showCompletedCheck,
+  }) {
+    return PopupMenuButton<String>(
+      icon: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Icon(
+            Icons.more_vert,
+            size: isWebSideBySide ? 18 : 20,
+            color: Colors.grey.shade700,
+          ),
+          if (showCompletedCheck)
+            Positioned(
+              right: -1,
+              bottom: -7,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(1),
+                child: Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: isWebSideBySide ? 10 : 12,
+                ),
+              ),
+            ),
+        ],
+      ),
+      onSelected: (value) {
+        if (value == 'review') {
+          onReviewPressed();
+        }
+        if (value == 'delete') {
+          onDeletePressed();
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem<String>(
+          value: 'review',
+          child: Text(l10n.review),
+        ),
+        PopupMenuItem<String>(
+          value: 'delete',
+          child: Text(l10n.delete),
+        ),
+      ],
     );
   }
 

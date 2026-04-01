@@ -2,7 +2,6 @@ import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart';
 import 'package:barter_app/services/api_client.dart';
-import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,13 +9,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/user/parsed_attribute_data.dart';
-import '../../utils/text_utils.dart';
 import '../../widgets/responsive_center_container.dart';
 import '../../widgets/selectable_attribute_bubble.dart';
 
 class InterestsScreen extends StatelessWidget {
-  bool? isInitialOnboarding = true;
-  InterestsScreen({super.key, this.isInitialOnboarding});
+  final bool? isInitialOnboarding;
+  InterestsScreen({super.key, this.isInitialOnboarding = true});
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +26,8 @@ class InterestsScreen extends StatelessWidget {
 }
 
 class InterestsView extends StatefulWidget {
-  bool? isInitialOnboarding = true;
-  InterestsView({super.key, this.isInitialOnboarding});
+  final bool? isInitialOnboarding;
+  InterestsView({super.key, this.isInitialOnboarding = true});
 
   @override
   State<InterestsView> createState() => _InterestsViewState();
@@ -67,10 +65,14 @@ class _InterestsViewState extends State<InterestsView> {
           );
         } else if (state.status == InterestsStatus.success) {
           if (this.widget.isInitialOnboarding == false) {
-            // Not in onboarding, navigate to map screen
-            logDebug('@@@@@@@@ Interests submitted successfully - navigating to map screen');
-            // Use go to replace the entire navigation stack with map screen
-            context.pushReplacement('/map');
+            // Not in onboarding, return to previous screen
+            logDebug('@@@@@@@@ Interests submitted successfully - returning to previous screen');
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop(true);
+            } else {
+              // Fallback in rare cases where there is no previous route
+              context.go('/map');
+            }
           } else {
             // Save the full ParsedAttributeData with all metadata
             List<ParsedAttributeData> finalList = List.empty(growable: true);
