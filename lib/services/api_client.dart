@@ -186,6 +186,9 @@ abstract class ApiClient {
   @POST('/api/v1/profile-info')
   Future<UserProfileData> getProfileInfo(@Body() String userId);
 
+  @POST('/api/v1/profile-info-extended')
+  Future<PointOfInterest> getProfileInfoExtended(@Body() String userId);
+
   //////////// POI ENDPOINTS ////////////
 
   @GET('/api/v1/profiles/nearby')
@@ -455,6 +458,10 @@ abstract class ApiClient {
 
   @DELETE('/api/v1/authentication/user/{userId}')
   Future<void> deleteUser(@Path('userId') String userId);
+
+  /// Request GDPR data export for authenticated user
+  @POST('/api/v1/profile/export-data')
+  Future<ExportResult> requestGdprDataExport();
 
   ///////////// DEVICE MIGRATION ///////////////
 

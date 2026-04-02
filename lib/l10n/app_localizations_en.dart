@@ -2941,6 +2941,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePanelTitle => 'Profile';
 
   @override
+  String get requestCollectedDataExport => 'Request collected data export';
+
+  @override
+  String get dataExportRequestAccepted =>
+      'Your data export request has been accepted.';
+
+  @override
+  String get dataExportRequestFailed => 'Failed to request data export.';
+
+  @override
+  String get dataExportEmailRequired =>
+      'Please add an email in Notification Preferences before requesting data export.';
+
+  @override
   String reviewsCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

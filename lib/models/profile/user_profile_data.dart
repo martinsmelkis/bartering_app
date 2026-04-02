@@ -26,6 +26,31 @@ class KeywordMapConverter {
 }
 
 @JsonSerializable()
+class ExportResult {
+  final bool success;
+  final String message;
+
+  const ExportResult({
+    required this.success,
+    required this.message,
+  });
+
+  factory ExportResult.fromJson(Map<String, dynamic> json) {
+    return ExportResult(
+      success: json['success'] as bool? ?? false,
+      message: json['message'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'message': message,
+    };
+  }
+}
+
+@JsonSerializable()
 class UserProfileData {
 
   final String userId;

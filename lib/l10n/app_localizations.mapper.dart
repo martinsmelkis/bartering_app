@@ -733,6 +733,10 @@ extension AppLocalizationsExtension on AppLocalizations {
       'guidelineFalseReports' => guidelineFalseReports,
       'submitReview' => submitReview,
       'skipForNow' => skipForNow,
+      'bonusTipOptional' => bonusTipOptional,
+      'other' => other,
+      'enterBonusAmount' => enterBonusAmount,
+      'loadingWalletBalance' => loadingWalletBalance,
       'failedToSubmitReview' => failedToSubmitReview,
       'archiveConversationTitle' => archiveConversationTitle,
       'archiveConversationMessage' => archiveConversationMessage,
@@ -920,6 +924,10 @@ extension AppLocalizationsExtension on AppLocalizations {
         locationPermissionRequiredDescription,
       'openSettings' => openSettings,
       'profilePanelTitle' => profilePanelTitle,
+      'requestCollectedDataExport' => requestCollectedDataExport,
+      'dataExportRequestAccepted' => dataExportRequestAccepted,
+      'dataExportRequestFailed' => dataExportRequestFailed,
+      'dataExportEmailRequired' => dataExportEmailRequired,
       'errorWithMessage' => switch (args) {
         [final Object errorMessage] => errorWithMessage(errorMessage),
         _ => throw ArgumentError('errorWithMessage requires 1 arguments'),
@@ -967,6 +975,10 @@ extension AppLocalizationsExtension on AppLocalizations {
       'reviewUser' => switch (args) {
         [final String userName] => reviewUser(userName),
         _ => throw ArgumentError('reviewUser requires 1 arguments'),
+      },
+      'currentWalletBalance' => switch (args) {
+        [final String amount] => currentWalletBalance(amount),
+        _ => throw ArgumentError('currentWalletBalance requires 1 arguments'),
       },
       'downloadingFile' => switch (args) {
         [final String filename] => downloadingFile(filename),

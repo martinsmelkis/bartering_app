@@ -21,7 +21,6 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/map/point_of_interest.dart';
-import '../../models/profile/user_profile_data.dart';
 
 class ChatsListScreen extends StatefulWidget {
   final bool showAppBar;
@@ -240,9 +239,9 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     final otherUserId = participants.first;
 
     // Try to fetch the other user's profile from API
-    UserProfileData? userProfile;
+    PointOfInterest? userProfile;
     try {
-      userProfile = await apiClient.getProfileInfo(otherUserId);
+      userProfile = await apiClient.getProfileInfoExtended(otherUserId);
     } catch (e) {
       // Failed to fetch user profile, will use userId as fallback
       logDebugError('Failed to fetch user profile for $otherUserId', e);
@@ -251,10 +250,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     // Create a PointOfInterest from the user profile if available
     PointOfInterest? poi;
     if (userProfile != null) {
-      poi = PointOfInterest(
-        profile: userProfile,
-        distanceKm: null,
-      );
+      poi = userProfile;
     }
 
     // If callback is provided (side-by-side mode), use it

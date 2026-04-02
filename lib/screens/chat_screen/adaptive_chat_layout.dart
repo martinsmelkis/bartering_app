@@ -193,11 +193,7 @@ class _PanelHeaderState extends State<_PanelHeader> {
       PointOfInterest? poi;
       try {
         final apiClient = getIt<ApiClient>();
-        final userProfile = await apiClient.getProfileInfo(widget.poiId!);
-        poi = PointOfInterest(
-          profile: userProfile,
-          distanceKm: null,
-        );
+        poi = await apiClient.getProfileInfoExtended(widget.poiId!);
         logDebug('@@@@@@@@@ AdaptiveChatLayout view_profile - fetched profile for userId: ${widget.poiId}');
       } catch (e) {
         logDebugError('Failed to fetch profile for view_profile', e);

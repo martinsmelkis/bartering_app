@@ -417,13 +417,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     // Fetch profile info from API
                     try {
                       final apiClient = getIt<ApiClient>();
-                      final userProfile = await apiClient.getProfileInfo(
-                        widget.poiId!,
-                      );
-                      poi = PointOfInterest(
-                        profile: userProfile,
-                        distanceKm: null,
-                      );
+                      poi = await apiClient.getProfileInfoExtended(widget.poiId!);
                       logDebug(
                         '@@@@@@@@@ ChatScreen view_profile - fetched profile for userId: ${widget.poiId}',
                       );

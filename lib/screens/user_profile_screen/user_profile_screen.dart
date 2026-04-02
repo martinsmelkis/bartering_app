@@ -30,6 +30,7 @@ import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/widgets/attribute_bubble.dart';
 import 'package:barter_app/widgets/count_badge.dart';
 import 'package:flutter/foundation.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -870,6 +871,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               ),
             ),
+            SizedBox(height: 16.h),
+            Center(
+              child: TextButton(
+                onPressed: _requestDataExport,
+                child: Text(l10n.requestCollectedDataExport),
+              ),
+            ),
           ],
         ),
       ),
@@ -1176,6 +1184,56 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         );
       },
     );
+  }
+
+  Future<void> _requestDataExport() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    try {
+      final response = await getIt<ApiClient>().requestGdprDataExport();
+      final success = response.success;
+      final message = response.message.trim();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            message.isNotEmpty
+                ? message
+                : success
+                    ? l10n.dataExportRequestAccepted
+                    : l10n.dataExportRequestFailed,
+          ),
+          backgroundColor: success ? Colors.green : Colors.red,
+        ),
+      );
+    } on DioException catch (e) {
+      logDebugError('Error requesting GDPR data export', e);
+      if (!mounted) return;
+
+      final statusCode = e.response?.statusCode;
+      final isEmailRequired = statusCode == 400;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isEmailRequired
+                ? l10n.dataExportEmailRequired
+                : l10n.dataExportRequestFailed,
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      logDebugError('Error requesting GDPR data export', e);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.dataExportRequestFailed),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> _deleteProfile(BuildContext context) async {

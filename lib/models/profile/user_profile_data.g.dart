@@ -6,6 +6,14 @@ part of 'user_profile_data.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+ExportResult _$ExportResultFromJson(Map<String, dynamic> json) => ExportResult(
+  success: json['success'] as bool,
+  message: json['message'] as String,
+);
+
+Map<String, dynamic> _$ExportResultToJson(ExportResult instance) =>
+    <String, dynamic>{'success': instance.success, 'message': instance.message};
+
 UserProfileData _$UserProfileDataFromJson(Map<String, dynamic> json) =>
     UserProfileData(
       userId: json['userId'] as String,

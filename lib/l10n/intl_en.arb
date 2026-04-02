@@ -1076,6 +1076,10 @@
   "locationPermissionRequiredDescription": "Location permission is required to use GPS location tracking. Please enable location permission in your device settings.",
   "openSettings": "Open Settings",
   "profilePanelTitle": "Profile",
+  "requestCollectedDataExport": "Request collected data export",
+  "dataExportRequestAccepted": "Your data export request has been accepted.",
+  "dataExportRequestFailed": "Failed to request data export.",
+  "dataExportEmailRequired": "Please add an email in Notification Preferences before requesting data export.",
   "reviewsCount": "{count} {count, plural, =1{review} other{reviews}}",
   "@reviewsCount": {
     "description": "Number of reviews count display",

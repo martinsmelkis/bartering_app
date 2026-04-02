@@ -5588,6 +5588,30 @@ abstract class AppLocalizations {
   /// **'Profile'**
   String get profilePanelTitle;
 
+  /// No description provided for @requestCollectedDataExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Request collected data export'**
+  String get requestCollectedDataExport;
+
+  /// No description provided for @dataExportRequestAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data export request has been accepted.'**
+  String get dataExportRequestAccepted;
+
+  /// No description provided for @dataExportRequestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to request data export.'**
+  String get dataExportRequestFailed;
+
+  /// No description provided for @dataExportEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add an email in Notification Preferences before requesting data export.'**
+  String get dataExportEmailRequired;
+
   /// Number of reviews count display
   ///
   /// In en, this message translates to:

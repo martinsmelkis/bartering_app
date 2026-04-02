@@ -1077,6 +1077,10 @@
   "locationPermissionRequiredDescription": "Atrašanās vietas atļauja ir nepieciešama, lai izmantotu GPS atrašanās vietas izsekošanu. Lūdzu, iespējojiet atrašanās vietas atļauju ierīces iestatījumos.",
   "openSettings": "Atvērt iestatījumus",
   "profilePanelTitle": "Profils",
+  "requestCollectedDataExport": "Pieprasīt savākto datu eksportu",
+  "dataExportRequestAccepted": "Jūsu datu eksporta pieprasījums ir pieņemts.",
+  "dataExportRequestFailed": "Neizdevās pieprasīt datu eksportu.",
+  "dataExportEmailRequired": "Lūdzu, pievienojiet e-pastu paziņojumu preferencēs pirms datu eksporta pieprasījuma.",
   "reviewsCount": "{count} {count, plural, =1{atsauksme} other{atsauksmes}}"
 
 }

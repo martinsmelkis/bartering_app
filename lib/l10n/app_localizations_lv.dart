@@ -2977,6 +2977,20 @@ class AppLocalizationsLv extends AppLocalizations {
   String get profilePanelTitle => 'Profils';
 
   @override
+  String get requestCollectedDataExport => 'Pieprasīt savākto datu eksportu';
+
+  @override
+  String get dataExportRequestAccepted =>
+      'Jūsu datu eksporta pieprasījums ir pieņemts.';
+
+  @override
+  String get dataExportRequestFailed => 'Neizdevās pieprasīt datu eksportu.';
+
+  @override
+  String get dataExportEmailRequired =>
+      'Lūdzu, pievienojiet e-pastu paziņojumu preferencēs pirms datu eksporta pieprasījuma.';
+
+  @override
   String reviewsCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

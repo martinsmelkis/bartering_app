@@ -282,11 +282,7 @@ class _ChatPanelHeaderState extends State<ChatPanelHeader> {
                     PointOfInterest? poi;
                     try {
                       final apiClient = getIt<ApiClient>();
-                      final userProfile = await apiClient.getProfileInfo(widget.chatPoiId);
-                      poi = PointOfInterest(
-                        profile: userProfile,
-                        distanceKm: null,
-                      );
+                      poi = await apiClient.getProfileInfoExtended(widget.chatPoiId);
                       logDebug('@@@@@@@@@ ChatScreen view_profile - fetched profile for userId: ${widget.chatPoiId}');
                     } catch (e) {
                       logDebugError('Failed to fetch profile for view_profile', e);
