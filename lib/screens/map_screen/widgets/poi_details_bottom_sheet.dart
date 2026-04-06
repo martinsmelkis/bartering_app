@@ -24,7 +24,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../models/map/point_of_interest.dart';
 import '../../../models/reviews/reputation_response.dart';
 import '../../../theme/app_colors.dart';
-import '../../../widgets/dialogs/badges_info_dialog.dart';
+import '../../user_profile_screen/widgets/badges_info_dialog.dart';
 import '../../../utils/avatar_color_utils.dart';
 
 class PoiDetailsBottomSheet extends StatefulWidget {
@@ -72,9 +72,12 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   List<String> _currentUserInterestIds = [];
   List<String> _currentUserOfferIds = [];
 
+  late ExpandableController _workReferenceController;
+
   @override
   void initState() {
     super.initState();
+    _workReferenceController = ExpandableController(initialExpanded: false);
     _initializeData();
   }
 
@@ -83,6 +86,8 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     super.didUpdateWidget(oldWidget);
     // Check if the POI has changed (different user)
     if (oldWidget.poi.profile.userId != widget.poi.profile.userId) {
+      _workReferenceController.dispose();
+      _workReferenceController = ExpandableController(initialExpanded: false);
       // Reset all state and reload data for the new POI
       _resetState();
       _initializeData();
@@ -100,6 +105,12 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
       _avatarIcon = null;
       _isLoadingAvatar = true;
     });
+  }
+
+  @override
+  void dispose() {
+    _workReferenceController.dispose();
+    super.dispose();
   }
 
   _initializeData() async {
@@ -486,6 +497,140 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
     );
   }
 
+  Widget _buildWorkReferenceImage(int index) {
+    final baseUrl = ApiClient.serviceBaseUrl;
+    final filename = widget.poi.profile.workReferenceImageUrls[index];
+
+    final thumbnailUrl = ImageUtils.buildThumbnailUrl(
+      baseUrl: baseUrl,
+      imagePath: filename,
+    );
+
+    return GestureDetector(
+      onTap: () async {
+        final allFullImageUrls = widget.poi.profile.workReferenceImageUrls
+            .map(
+              (file) => ImageUtils.buildFullImageUrl(
+                baseUrl: baseUrl,
+                imagePath: file,
+              ),
+            )
+            .toList();
+
+        if (kIsWeb) {
+          await ImageViewerDialog.show(
+            context: context,
+            imageUrls: allFullImageUrls,
+            initialIndex: index,
+            heroTag: null,
+          );
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => FullScreenImageViewer(
+                imageUrls: allFullImageUrls,
+                initialIndex: index,
+                heroTag: null,
+              ),
+            ),
+          );
+        }
+      },
+      child: Hero(
+        tag: 'work_ref_${widget.poi.profile.userId}_image_$index',
+        transitionOnUserGestures: false,
+        child: WebPImage(
+          imageUrl: thumbnailUrl,
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: 80,
+              height: 80,
+              color: Colors.grey[200],
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                      : null,
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 80,
+              height: 80,
+              color: Colors.grey[300],
+              child: const Icon(Icons.broken_image),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWorkReferencesPanel(AppLocalizations l10n) {
+    final workReferences = widget.poi.profile.workReferenceImageUrls;
+
+    if (workReferences.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: ExpandablePanel(
+        controller: _workReferenceController,
+        theme: const ExpandableThemeData(
+          headerAlignment: ExpandablePanelHeaderAlignment.center,
+          tapHeaderToExpand: true,
+          tapBodyToCollapse: true,
+          hasIcon: true,
+        ),
+        header: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.photo_library_outlined, size: 14, color: AppColors.primary),
+            const SizedBox(width: 4),
+            Text(
+              '${l10n.premiumProfileEditorWorkReferenceImages} (${workReferences.length})',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        collapsed: const SizedBox.shrink(),
+        expanded: Padding(
+          padding: const EdgeInsets.only(top: 6.0),
+          child: SizedBox(
+            height: 80,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: workReferences.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: _buildWorkReferenceImage(index),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildPostingCard(UserPostingData posting, AppLocalizations l10n) {
     final dateFormat = DateFormat('MMM dd, yyyy');
 
@@ -505,8 +650,8 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
           child: Row(
             children: [
               Icon(
-                posting.isOffer ? Icons.add_circle : Icons.add_circle_outline,
-                color: posting.isOffer ? Colors.blue : Colors.blue,
+                posting.isOffer ? Icons.arrow_upward : Icons.arrow_downward,
+                color: posting.isOffer ? AppColors.secondary : Colors.blue,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -924,17 +1069,28 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                               ),
                                             ],
                                           ),
+                                          if ((widget.poi.profile.selfDescription ?? '').trim().isNotEmpty) ...[
+                                            const SizedBox(height: 6),
+                                            Text(
+                                              widget.poi.profile.selfDescription!.trim(),
+                                              maxLines: 4,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey[700],
+                                                fontStyle: FontStyle.italic,
+                                              ),
+                                            ),
+                                          ],
+                                          _buildWorkReferencesPanel(l10n),
                                         ],
                                       ),
                                     ),
                                     // Rating widget - positioned just before the avatar
                                     Builder(
                                       builder: (context) {
-                                        final poiRating =
-                                            widget.poi.averageRating ??
-                                            widget.poi.profile.averageRating;
-                                        if (poiRating != null &&
-                                            poiRating > 0) {
+                                        final poiRating = widget.poi.averageRating;
+                                        if (poiRating != null && poiRating > 0) {
                                           return Container(
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 4,

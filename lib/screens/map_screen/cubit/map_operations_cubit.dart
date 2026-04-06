@@ -663,7 +663,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
   /// [svgString] - the SVG content loaded from assets
   /// [devicePixelRatio] - optional pixel ratio for sharp rendering on high-DPI screens
   MarkerIcon createNoUsersMarker(String svgString) {
-    final markerSize = AppDimensions.mapPoiMarkerSize * 0.5;
+    final markerSize = AppDimensions.mapPoiMarkerSize * (kIsWeb ? 0.5 : 1.0);
 
     return MarkerIcon(
       iconWidget: Stack(

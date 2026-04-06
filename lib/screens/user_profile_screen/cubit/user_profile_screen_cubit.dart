@@ -1,0 +1,132 @@
+import 'package:barter_app/models/profile/user_profile_data.dart';
+import 'package:barter_app/models/reviews/reputation_response.dart';
+import 'package:barter_app/models/wallet/wallet_models.dart';
+import 'package:barter_app/services/api_client.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class UserProfileScreenState {
+  final ReputationResponse? reputationData;
+  final List<BadgeDetail>? userBadges;
+  final WalletResponse? walletData;
+  final bool isLoadingReputation;
+  final bool isLoadingBadges;
+  final bool isLoadingWallet;
+  final ExportResult? exportResult;
+  final String? errorMessage;
+
+  const UserProfileScreenState({
+    this.reputationData,
+    this.userBadges,
+    this.walletData,
+    this.isLoadingReputation = false,
+    this.isLoadingBadges = false,
+    this.isLoadingWallet = false,
+    this.exportResult,
+    this.errorMessage,
+  });
+
+  UserProfileScreenState copyWith({
+    ReputationResponse? reputationData,
+    List<BadgeDetail>? userBadges,
+    WalletResponse? walletData,
+    bool? isLoadingReputation,
+    bool? isLoadingBadges,
+    bool? isLoadingWallet,
+    ExportResult? exportResult,
+    String? errorMessage,
+    bool clearError = false,
+  }) {
+    return UserProfileScreenState(
+      reputationData: reputationData ?? this.reputationData,
+      userBadges: userBadges ?? this.userBadges,
+      walletData: walletData ?? this.walletData,
+      isLoadingReputation: isLoadingReputation ?? this.isLoadingReputation,
+      isLoadingBadges: isLoadingBadges ?? this.isLoadingBadges,
+      isLoadingWallet: isLoadingWallet ?? this.isLoadingWallet,
+      exportResult: exportResult ?? this.exportResult,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+    );
+  }
+}
+
+class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
+  final ApiClient _apiClient;
+
+  UserProfileScreenCubit(this._apiClient) : super(const UserProfileScreenState());
+
+  Future<ReputationResponse> fetchReputation(String userId) async {
+    emit(state.copyWith(isLoadingReputation: true, clearError: true));
+    try {
+      final reputation = await _apiClient.getReputation(userId);
+      emit(state.copyWith(
+        reputationData: reputation,
+        isLoadingReputation: false,
+      ));
+      return reputation;
+    } catch (e) {
+      emit(state.copyWith(
+        isLoadingReputation: false,
+        errorMessage: e.toString(),
+      ));
+      rethrow;
+    }
+  }
+
+  Future<List<BadgeDetail>> fetchUserBadges(String userId) async {
+    emit(state.copyWith(isLoadingBadges: true, clearError: true));
+    try {
+      final badgesResponse = await _apiClient.getUserBadges(userId);
+      emit(state.copyWith(
+        userBadges: badgesResponse.badges,
+        isLoadingBadges: false,
+      ));
+      return badgesResponse.badges;
+    } catch (e) {
+      emit(state.copyWith(
+        isLoadingBadges: false,
+        errorMessage: e.toString(),
+      ));
+      rethrow;
+    }
+  }
+
+  Future<WalletResponse> fetchWallet() async {
+    emit(state.copyWith(isLoadingWallet: true, clearError: true));
+    try {
+      final wallet = await _apiClient.getWallet();
+      emit(state.copyWith(
+        walletData: wallet,
+        isLoadingWallet: false,
+      ));
+      return wallet;
+    } catch (e) {
+      emit(state.copyWith(
+        isLoadingWallet: false,
+        errorMessage: e.toString(),
+      ));
+      rethrow;
+    }
+  }
+
+  Future<ExportResult> requestGdprDataExport() async {
+    emit(state.copyWith(clearError: true));
+    try {
+      final response = await _apiClient.requestGdprDataExport();
+      emit(state.copyWith(exportResult: response));
+      return response;
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+      rethrow;
+    }
+  }
+
+  Future<void> deleteUser(String userId) async {
+    emit(state.copyWith(clearError: true));
+    try {
+      await _apiClient.deleteUser(userId);
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+      rethrow;
+    }
+  }
+}

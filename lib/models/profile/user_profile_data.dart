@@ -7,7 +7,7 @@ part 'user_profile_data.g.dart'; // Import the generated part
 class KeywordMapConverter {
   static Map<String, double>? _fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
-    
+
     final result = <String, double>{};
     json.forEach((key, value) {
       if (value is num) {
@@ -18,11 +18,28 @@ class KeywordMapConverter {
       }
       // Ignore values that are neither num nor String
     });
-    
+
     return result.isEmpty ? null : result;
   }
 
   static Map<String, dynamic>? _toJson(Map<String, double>? object) => object;
+}
+
+enum AccountType {
+  @JsonValue('individual')
+  INDIVIDUAL,
+  @JsonValue('individual_verified')
+  INDIVIDUAL_VERIFIED,
+  @JsonValue('business_unverified')
+  BUSINESS_UNVERIFIED,
+  @JsonValue('business_verified')
+  BUSINESS_VERIFIED,
+  @JsonValue('admin')
+  ADMIN,
+  @JsonValue('moderator')
+  MODERATOR,
+  @JsonValue('suspended')
+  SUSPENDED,
 }
 
 @JsonSerializable()
@@ -52,35 +69,35 @@ class ExportResult {
 
 @JsonSerializable()
 class UserProfileData {
-
   final String userId;
   final String name;
-  final double? longitude;
   final double? latitude;
-  final List<UserAttributeEntryData>? attributes;
+  final double? longitude;
+  final List<UserAttributeEntryData> attributes;
   final Map<String, double>? profileKeywordDataMap;
-  final List<String>? activePostingIds;
-  @JsonKey(includeIfNull: false)
-  final String? preferredLanguage;
+  final String? selfDescription;
+  final AccountType? accountType;
+  final String? profileAvatarIcon;
+  final List<String> workReferenceImageUrls;
+  final List<String> activePostingIds;
   @JsonKey(includeIfNull: false)
   final int? lastOnlineAt; // Timestamp in milliseconds when user was last online
-  @JsonKey(includeIfNull: false)
-  final double? averageRating; // Average rating score (0.0 to 5.0)
-  @JsonKey(includeIfNull: false)
-  final int? totalReviews; // Total number of reviews received
+  final String preferredLanguage;
 
   const UserProfileData({
     required this.userId,
     required this.name,
-    required this.longitude,
     required this.latitude,
-    required this.attributes,
-    required this.profileKeywordDataMap,
-    required this.activePostingIds,
-    this.preferredLanguage,
+    required this.longitude,
+    this.attributes = const [],
+    this.profileKeywordDataMap,
+    this.selfDescription,
+    this.accountType,
+    this.profileAvatarIcon,
+    this.workReferenceImageUrls = const [],
+    this.activePostingIds = const [],
     this.lastOnlineAt,
-    this.averageRating,
-    this.totalReviews,
+    this.preferredLanguage = 'en',
   });
 
   /// Check if user is currently online (within last 5 minutes)
@@ -110,11 +127,29 @@ class UserProfileData {
         json['profileKeywordDataMap'] as Map<String, dynamic>?,
       );
     }
-    
-    // Create a modified JSON with the parsed map
+
+    // Normalize accountType from backend values (case-insensitive)
+    // and gracefully fallback to INDIVIDUAL when missing or unknown.
+    final rawAccountType = json['accountType']?.toString();
+    final normalizedAccountType = rawAccountType == null
+        ? 'individual'
+        : rawAccountType.toLowerCase();
+
+    // Create a modified JSON with normalized fields
     final modifiedJson = Map<String, dynamic>.from(json);
     modifiedJson['profileKeywordDataMap'] = parsedKeywordMap;
-    
+    modifiedJson['accountType'] = {
+      'individual': 'individual',
+      'individual_verified': 'individual_verified',
+      'business_unverified': 'business_unverified',
+      'business_verified': 'business_verified',
+      'admin': 'admin',
+      'moderator': 'moderator',
+      'suspended': 'suspended',
+    }.containsKey(normalizedAccountType)
+        ? normalizedAccountType
+        : 'individual';
+
     return _$UserProfileDataFromJson(modifiedJson);
   }
 
@@ -129,11 +164,13 @@ class UserProfileData {
     double? longitude,
     List<UserAttributeEntryData>? attributes,
     Map<String, double>? profileKeywordDataMap,
+    String? selfDescription,
+    AccountType? accountType,
+    String? profileAvatarIcon,
+    List<String>? workReferenceImageUrls,
     List<String>? activePostingIds,
-    String? preferredLanguage,
     int? lastOnlineAt,
-    double? averageRating,
-    int? totalReviews,
+    String? preferredLanguage,
   }) {
     return UserProfileData(
       userId: userId ?? this.userId,
@@ -142,11 +179,13 @@ class UserProfileData {
       longitude: longitude ?? this.longitude,
       attributes: attributes ?? this.attributes,
       profileKeywordDataMap: profileKeywordDataMap ?? this.profileKeywordDataMap,
+      selfDescription: selfDescription ?? this.selfDescription,
+      accountType: accountType ?? this.accountType,
+      profileAvatarIcon: profileAvatarIcon ?? this.profileAvatarIcon,
+      workReferenceImageUrls: workReferenceImageUrls ?? this.workReferenceImageUrls,
       activePostingIds: activePostingIds ?? this.activePostingIds,
-      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       lastOnlineAt: lastOnlineAt ?? this.lastOnlineAt,
-      averageRating: averageRating ?? this.averageRating,
-      totalReviews: totalReviews ?? this.totalReviews,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
     );
   }
 }

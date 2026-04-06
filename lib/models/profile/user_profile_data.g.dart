@@ -18,37 +18,63 @@ UserProfileData _$UserProfileDataFromJson(Map<String, dynamic> json) =>
     UserProfileData(
       userId: json['userId'] as String,
       name: json['name'] as String,
-      longitude: (json['longitude'] as num?)?.toDouble(),
       latitude: (json['latitude'] as num?)?.toDouble(),
-      attributes: (json['attributes'] as List<dynamic>?)
-          ?.map(
-            (e) => UserAttributeEntryData.fromJson(e as Map<String, dynamic>),
-          )
-          .toList(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      attributes:
+          (json['attributes'] as List<dynamic>?)
+              ?.map(
+                (e) =>
+                    UserAttributeEntryData.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [],
       profileKeywordDataMap:
           (json['profileKeywordDataMap'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry(k, (e as num).toDouble()),
           ),
-      activePostingIds: (json['activePostingIds'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      preferredLanguage: json['preferredLanguage'] as String?,
+      selfDescription: json['selfDescription'] as String?,
+      accountType: $enumDecodeNullable(
+        _$AccountTypeEnumMap,
+        json['accountType'],
+      ),
+      profileAvatarIcon: json['profileAvatarIcon'] as String?,
+      workReferenceImageUrls:
+          (json['workReferenceImageUrls'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      activePostingIds:
+          (json['activePostingIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       lastOnlineAt: (json['lastOnlineAt'] as num?)?.toInt(),
-      averageRating: (json['averageRating'] as num?)?.toDouble(),
-      totalReviews: (json['totalReviews'] as num?)?.toInt(),
+      preferredLanguage: json['preferredLanguage'] as String? ?? 'en',
     );
 
 Map<String, dynamic> _$UserProfileDataToJson(UserProfileData instance) =>
     <String, dynamic>{
       'userId': instance.userId,
       'name': instance.name,
-      'longitude': instance.longitude,
       'latitude': instance.latitude,
+      'longitude': instance.longitude,
       'attributes': instance.attributes,
       'profileKeywordDataMap': instance.profileKeywordDataMap,
+      'selfDescription': instance.selfDescription,
+      'accountType': _$AccountTypeEnumMap[instance.accountType],
+      'profileAvatarIcon': instance.profileAvatarIcon,
+      'workReferenceImageUrls': instance.workReferenceImageUrls,
       'activePostingIds': instance.activePostingIds,
-      'preferredLanguage': ?instance.preferredLanguage,
       'lastOnlineAt': ?instance.lastOnlineAt,
-      'averageRating': ?instance.averageRating,
-      'totalReviews': ?instance.totalReviews,
+      'preferredLanguage': instance.preferredLanguage,
     };
+
+const _$AccountTypeEnumMap = {
+  AccountType.INDIVIDUAL: 'individual',
+  AccountType.INDIVIDUAL_VERIFIED: 'individual_verified',
+  AccountType.BUSINESS_UNVERIFIED: 'business_unverified',
+  AccountType.BUSINESS_VERIFIED: 'business_verified',
+  AccountType.ADMIN: 'admin',
+  AccountType.MODERATOR: 'moderator',
+  AccountType.SUSPENDED: 'suspended',
+};

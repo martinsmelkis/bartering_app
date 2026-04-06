@@ -719,6 +719,10 @@
   "thankYouForFeedback": "Thank you for your feedback!",
   "reviewVisibilityNotice": "Your review will be visible after the other User submits their review, or in 14 days.",
   "ok": "OK",
+  "premiumUserBenefitsTitle": "Premium User Benefits",
+  "premiumUserBenefitsMessage": "Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map",
+  "buyPremium": "Buy Premium",
+  "restorePurchases": "Restore Purchases",
   "skipReviewTitle": "Skip Review?",
   "skipReviewMessage": "You can review this user later from your transaction history. Reviews help build trust in the community.",
   "goBack": "Go Back",
@@ -773,7 +777,7 @@
   "archive": "Archive",
   "unableToReviewUser": "Unable to review this user at this time",
   "barterCoinsTitle": "Barter Coins",
-  "barterCoinsInfoMessage": "Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on perks planned for future app versions: custom avatar icon, standing out on the map, and being able to add a picture and self-description.",
+  "barterCoinsInfoMessage": "Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on: standing out on the map, boosting postings, custom Avatar icons, tipping other Users",
   "cannotSendFileNoRecipientKey": "Cannot send file: Recipient public key not available",
   "gallery": "Device",
   "camera": "Camera",
@@ -883,6 +887,10 @@
   "badgeDisputeFreeDescription": "Has never had a disputed transaction.",
   "badgeFastTraderTitle": "Fast & Reliable",
   "badgeFastTraderDescription": "Completes trades faster than average.",
+  "badgePremiumUserTitle": "Premium User",
+  "badgePremiumUserDescription": "User has an active Premium subscription.",
+  "badgeTop1000Title": "Early Adopter - First 1000 Users",
+  "badgeTop1000Description": "User was among the first 1000 registered users.",
   "showMore": "Show more",
   "showLess": "Show less",
   "linkCopiedToClipboard": "Link copied to clipboard!",
@@ -1088,6 +1096,29 @@
         "type": "int"
       }
     }
-  }
+  },
+  "premiumProfileEditorTitle": "Premium Profile Editor",
+  "premiumProfileEditorHeader": "Customize your premium profile",
+  "premiumProfileEditorDescription": "Here you can update your name, description, work references, and avatar SVG.",
+  "premiumProfileEditorSaving": "Saving...",
+  "premiumProfileEditorDisplayNameOptional": "Display name (optional)",
+  "premiumProfileEditorDescriptionOptional": "Description (optional)",
+  "premiumProfileEditorAvatarSvg": "Avatar (.svg)",
+  "premiumProfileEditorNoAvatarSvgSelected": "No avatar SVG selected.",
+  "premiumProfileEditorSelectedFile": "Selected: {fileName}",
+  "@premiumProfileEditorSelectedFile": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumProfileEditorUploadSvg": "Upload SVG",
+  "premiumProfileEditorRemoveSvg": "Remove SVG",
+  "premiumProfileEditorWorkReferenceImages": "Work reference images",
+  "premiumProfileEditorWorkReferenceDescription": "Add and manage your reference images.",
+  "premiumProfileEditorNoWorkReferenceImages": "No work reference images yet.",
+  "premiumProfileEditorReplace": "Replace",
+  "premiumProfileEditorAddImage": "Add image"
 
 }

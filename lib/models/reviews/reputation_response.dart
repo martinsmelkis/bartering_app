@@ -8,7 +8,9 @@ enum ReputationBadge {
   COMMUNITY_CONNECTOR('COMMUNITY_CONNECTOR', 'Community Connector'),
   VERIFIED_BUSINESS('VERIFIED_BUSINESS', 'Verified Business'),
   DISPUTE_FREE('DISPUTE_FREE', 'Dispute-Free History'),
-  FAST_TRADER('FAST_TRADER', 'Fast & Reliable');
+  FAST_TRADER('FAST_TRADER', 'Fast & Reliable'),
+  PREMIUM_USER('PREMIUM_USER', 'Premium User'),
+  TOP_1000('TOP_1000', 'Early Adopter - First 1000 Users');
 
   const ReputationBadge(this.value, this.description);
 

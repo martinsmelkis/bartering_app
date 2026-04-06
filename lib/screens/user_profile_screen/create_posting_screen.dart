@@ -92,7 +92,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
       final XFile? image = await _picker.pickImage(
         source: source,
         maxWidth: 1920,
-        maxHeight: 1080,
+        maxHeight: 1920,
         imageQuality: 100,
       );
 

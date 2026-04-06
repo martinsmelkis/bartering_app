@@ -39,4 +39,6 @@ const _$ReputationBadgeEnumMap = {
   ReputationBadge.VERIFIED_BUSINESS: 'VERIFIED_BUSINESS',
   ReputationBadge.DISPUTE_FREE: 'DISPUTE_FREE',
   ReputationBadge.FAST_TRADER: 'FAST_TRADER',
+  ReputationBadge.PREMIUM_USER: 'PREMIUM_USER',
+  ReputationBadge.TOP_1000: 'TOP_1000',
 };

@@ -720,6 +720,10 @@
   "thankYouForFeedback": "Paldies par atsauksmēm!",
   "reviewVisibilityNotice": "Jūsu atsauksme būs redzama pēc tam, kad otrs lietotājs iesniegs savu atsauksmi, vai pēc 14 dienām.",
   "ok": "Labi",
+  "premiumUserBenefitsTitle": "Premium lietotāja priekšrocības",
+  "premiumUserBenefitsMessage": "Atbloķējiet Premium, lai iegūtu šīs priekšrocības:\n• Rediģēt savu vārdu\n• Rediģēt profila aprakstu\n• Rediģēt savu profila ikonu\n• Pievienot darba atsauču attēlus\n• Izcelties kartē",
+  "buyPremium": "Pirkt Premium",
+  "restorePurchases": "Atjaunot pirkumus",
   "skipReviewTitle": "Izlaist atsauksmi?",
   "skipReviewMessage": "Jūs varat atsauksmēt šo lietotāju vēlāk no savas transakciju vēstures. Atsauksmes palīdz veidot uzticību kopienā.",
   "goBack": "Atpakaļ",
@@ -774,7 +778,7 @@
   "archive": "Arhivēt",
   "unableToReviewUser": "Šobrīd nav iespējams atsauksmēt šo lietotāju",
   "barterCoinsTitle": "Bartera monētas",
-  "barterCoinsInfoMessage": "Monētas var nopelnīt, sniedzot pakalpojumu vai aktīvi lietojot lietotni.\n\nMonētas varēs tērēt priekšrocībām, kas plānotas nākamajās lietotnes versijās: pielāgota avatara ikona, izcelšanās kartē, kā arī iespēja pievienot attēlu un pašaprakstu.",
+  "barterCoinsInfoMessage": "Monētas var nopelnīt, sniedzot pakalpojumu vai aktīvi lietojot lietotni.\n\nMonētas var tērēt: izcelšanās kartē, sludinājumu izcelšana, speciālas avatara ikonas",
   "cannotSendFileNoRecipientKey": "Nevar nosūtīt failu: Saņēmēja publiskā atslēga nav pieejama",
   "gallery": "Iekārta",
   "camera": "Kamera",
@@ -884,6 +888,10 @@
   "badgeDisputeFreeDescription": "Nav bijuši strīdīgi darījumi.",
   "badgeFastTraderTitle": "Ātrs un uzticams",
   "badgeFastTraderDescription": "Pabeidz maiņas ātrāk nekā vidēji.",
+  "badgePremiumUserTitle": "Premium lietotājs",
+  "badgePremiumUserDescription": "Lietotājam ir aktīvs Premium abonements.",
+  "badgeTop1000Title": "Agrīnais lietotājs - pirmie 1000",
+  "badgeTop1000Description": "Lietotājs bija starp pirmajiem 1000 reģistrētajiem lietotājiem.",
   "linkCopiedToClipboard": "Saite nokopēta starpliktuvē!",
   "unableToShareAtThisTime": "Šobrīd nevar dalīties",
   "inviteMessageShare": "Čau! Pievienojies man BarterApp - lielisks veids, kā mainīt priekšmetus un pakalpojumus ar cilvēkiem tuvumā! 🔄\n\n{appLink}",
@@ -1081,6 +1089,29 @@
   "dataExportRequestAccepted": "Jūsu datu eksporta pieprasījums ir pieņemts.",
   "dataExportRequestFailed": "Neizdevās pieprasīt datu eksportu.",
   "dataExportEmailRequired": "Lūdzu, pievienojiet e-pastu paziņojumu preferencēs pirms datu eksporta pieprasījuma.",
-  "reviewsCount": "{count} {count, plural, =1{atsauksme} other{atsauksmes}}"
+  "reviewsCount": "{count} {count, plural, =1{atsauksme} other{atsauksmes}}",
+  "premiumProfileEditorTitle": "Premium profila redaktors",
+  "premiumProfileEditorHeader": "Pielāgojiet savu Premium profilu",
+  "premiumProfileEditorDescription": "Šeit varat atjaunināt savu vārdu, aprakstu, darba atsauces un avatara SVG.",
+  "premiumProfileEditorSaving": "Saglabā...",
+  "premiumProfileEditorDisplayNameOptional": "Parādāmais vārds (neobligāti)",
+  "premiumProfileEditorDescriptionOptional": "Apraksts (neobligāti)",
+  "premiumProfileEditorAvatarSvg": "Avatars (.svg)",
+  "premiumProfileEditorNoAvatarSvgSelected": "Nav atlasīts avatara SVG.",
+  "premiumProfileEditorSelectedFile": "Atlasīts: {fileName}",
+  "@premiumProfileEditorSelectedFile": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumProfileEditorUploadSvg": "Augšupielādēt SVG",
+  "premiumProfileEditorRemoveSvg": "Noņemt SVG",
+  "premiumProfileEditorWorkReferenceImages": "Darbu atsauču attēli",
+  "premiumProfileEditorWorkReferenceDescription": "Pievienojiet un pārvaldiet savus atsauču attēlus.",
+  "premiumProfileEditorNoWorkReferenceImages": "Vēl nav darbu atsauču attēlu.",
+  "premiumProfileEditorReplace": "Aizvietot",
+  "premiumProfileEditorAddImage": "Pievienot attēlu"
 
 }

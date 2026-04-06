@@ -79,6 +79,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   // Controllers for expandable postings (auto-expanded by default)
   final Map<String, ExpandableController> _postingControllers = {};
 
+  // Controllers for expandable work references (collapsed by default)
+  final Map<String, ExpandableController> _workReferenceControllers = {};
+
   // Chat panel state
   bool _showChatPanel = false;
   PointOfInterest? _chatWithPoi;
@@ -220,10 +223,22 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     return _postingControllers[postingId]!;
   }
 
+  ExpandableController _getWorkReferenceController(String userId) {
+    if (!_workReferenceControllers.containsKey(userId)) {
+      _workReferenceControllers[userId] = ExpandableController(
+        initialExpanded: false,
+      );
+    }
+    return _workReferenceControllers[userId]!;
+  }
+
   @override
   void dispose() {
     // Dispose all controllers
     for (var controller in _postingControllers.values) {
+      controller.dispose();
+    }
+    for (var controller in _workReferenceControllers.values) {
       controller.dispose();
     }
     super.dispose();
@@ -513,10 +528,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               child: Row(
                 children: [
                   Icon(
-                    posting.isOffer
-                        ? Icons.add_circle
-                        : Icons.add_circle_outline,
-                    color: posting.isOffer ? Colors.green : Colors.blue,
+                    posting.isOffer ? Icons.arrow_upward : Icons.arrow_downward,
+                    color: posting.isOffer ? AppColors.secondary : Colors.blue,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -703,6 +716,146 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               child: const Icon(Icons.broken_image),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWorkReferenceImage(
+    List<String> workReferenceImageUrls,
+    int index,
+    String userId,
+  ) {
+    final baseUrl = ApiClient.serviceBaseUrl;
+    final filename = workReferenceImageUrls[index];
+
+    final thumbnailUrl = ImageUtils.buildThumbnailUrl(
+      baseUrl: baseUrl,
+      imagePath: filename,
+    );
+
+    return GestureDetector(
+      onTap: () {
+        final allFullImageUrls = workReferenceImageUrls
+            .map(
+              (file) => ImageUtils.buildFullImageUrl(
+                baseUrl: baseUrl,
+                imagePath: file,
+              ),
+            )
+            .toList();
+
+        if (kIsWeb) {
+          ImageViewerDialog.show(
+            context: context,
+            imageUrls: allFullImageUrls,
+            initialIndex: index,
+            heroTag: 'work_ref_${userId}_image',
+          );
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => FullScreenImageViewer(
+                imageUrls: allFullImageUrls,
+                initialIndex: index,
+                heroTag: 'work_ref_${userId}_image',
+              ),
+            ),
+          );
+        }
+      },
+      child: Hero(
+        tag: 'work_ref_${userId}_image_$index',
+        child: WebPImage(
+          imageUrl: thumbnailUrl,
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: 80,
+              height: 80,
+              color: Colors.grey[200],
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                      : null,
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 80,
+              height: 80,
+              color: Colors.grey[300],
+              child: const Icon(Icons.broken_image),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWorkReferencesPanel(PointOfInterest poi) {
+    final l10n = AppLocalizations.of(context)!;
+    final workReferences = poi.profile.workReferenceImageUrls;
+
+    if (workReferences.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 6.0),
+      child: ExpandablePanel(
+        controller: _getWorkReferenceController(poi.profile.userId),
+        theme: const ExpandableThemeData(
+          headerAlignment: ExpandablePanelHeaderAlignment.center,
+          tapHeaderToExpand: true,
+          tapBodyToCollapse: true,
+          hasIcon: true,
+        ),
+        header: Row(
+          children: [
+            Icon(Icons.photo_library_outlined, size: 14, color: AppColors.primary),
+            const SizedBox(width: 4),
+            Text(
+              '${l10n.premiumProfileEditorWorkReferenceImages} (${workReferences.length})',
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        collapsed: const SizedBox.shrink(),
+        expanded: Padding(
+          padding: const EdgeInsets.only(top: 6.0),
+          child: SizedBox(
+            height: 80,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: workReferences.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: _buildWorkReferenceImage(
+                      workReferences,
+                      index,
+                      poi.profile.userId,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -1083,9 +1236,23 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 ),
               ],
             ),
+            if ((poi.profile.selfDescription ?? '').trim().isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(
+                poi.profile.selfDescription!.trim(),
+                maxLines: isExpanded ? 6 : 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[700],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              const SizedBox(height: 6),
+            ],
+            _buildWorkReferencesPanel(poi),
             // Interests and Offerings separated
-            if (poi.profile.attributes != null &&
-                poi.profile.attributes!.isNotEmpty) ...[
+            if (poi.profile.attributes.isNotEmpty) ...[
               _buildAttributesSection(context, poi, isExpanded),
             ],
             // Distance, relevancy score, and chat button
@@ -1348,8 +1515,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   /// Build rating display widget
   Widget _buildRatingDisplay(PointOfInterest poi) {
     // Use rating data from POI fields, default to 0.0 and 0 if not available
-    final rating = poi.averageRating ?? poi.profile.averageRating ?? 0.0;
-    final reviewCount = poi.totalReviews ?? poi.profile.totalReviews ?? 0;
+    final rating = poi.averageRating ?? 0.0;
+    final reviewCount = poi.totalReviews ?? 0;
     final ratingColor = AvatarColorUtils.getRatingColor(rating);
 
     return Column(
@@ -1394,8 +1561,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   /// Build compact rating display widget for posting cards (horizontal layout)
   Widget _buildCompactRatingDisplay(PointOfInterest poi) {
     // Use rating data from POI fields, default to 0.0 and 0 if not available
-    final rating = poi.averageRating ?? poi.profile.averageRating ?? 0.0;
-    final reviewCount = poi.totalReviews ?? poi.profile.totalReviews ?? 0;
+    final rating = poi.averageRating ?? 0.0;
+    final reviewCount = poi.totalReviews ?? 0;
     final ratingColor = AvatarColorUtils.getRatingColor(rating);
 
     return Row(

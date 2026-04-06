@@ -2161,6 +2161,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ok => 'OK';
 
   @override
+  String get premiumUserBenefitsTitle => 'Premium User Benefits';
+
+  @override
+  String get premiumUserBenefitsMessage =>
+      'Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map';
+
+  @override
+  String get buyPremium => 'Buy Premium';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
+
+  @override
   String get skipReviewTitle => 'Skip Review?';
 
   @override
@@ -2290,7 +2303,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get barterCoinsInfoMessage =>
-      'Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on perks planned for future app versions: custom avatar icon, standing out on the map, and being able to add a picture and self-description.';
+      'Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on: standing out on the map, boosting postings, custom Avatar icons, tipping other Users';
 
   @override
   String get cannotSendFileNoRecipientKey =>
@@ -2456,6 +2469,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get badgeFastTraderDescription =>
       'Completes trades faster than average.';
+
+  @override
+  String get badgePremiumUserTitle => 'Premium User';
+
+  @override
+  String get badgePremiumUserDescription =>
+      'User has an active Premium subscription.';
+
+  @override
+  String get badgeTop1000Title => 'Early Adopter - First 1000 Users';
+
+  @override
+  String get badgeTop1000Description =>
+      'User was among the first 1000 registered users.';
 
   @override
   String get showMore => 'Show more';
@@ -2964,4 +2991,60 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$count $_temp0';
   }
+
+  @override
+  String get premiumProfileEditorTitle => 'Premium Profile Editor';
+
+  @override
+  String get premiumProfileEditorHeader => 'Customize your premium profile';
+
+  @override
+  String get premiumProfileEditorDescription =>
+      'Here you can update your name, description, work references, and avatar SVG.';
+
+  @override
+  String get premiumProfileEditorSaving => 'Saving...';
+
+  @override
+  String get premiumProfileEditorDisplayNameOptional =>
+      'Display name (optional)';
+
+  @override
+  String get premiumProfileEditorDescriptionOptional =>
+      'Description (optional)';
+
+  @override
+  String get premiumProfileEditorAvatarSvg => 'Avatar (.svg)';
+
+  @override
+  String get premiumProfileEditorNoAvatarSvgSelected =>
+      'No avatar SVG selected.';
+
+  @override
+  String premiumProfileEditorSelectedFile(String fileName) {
+    return 'Selected: $fileName';
+  }
+
+  @override
+  String get premiumProfileEditorUploadSvg => 'Upload SVG';
+
+  @override
+  String get premiumProfileEditorRemoveSvg => 'Remove SVG';
+
+  @override
+  String get premiumProfileEditorWorkReferenceImages => 'Work reference images';
+
+  @override
+  String get premiumProfileEditorWorkReferenceDescription =>
+      'Add and manage your reference images.';
+
+  @override
+  String get premiumProfileEditorNoWorkReferenceImages =>
+      'No work reference images yet.';
+
+  @override
+  String get premiumProfileEditorReplace => 'Replace';
+
+  @override
+  String get premiumProfileEditorAddImage => 'Add image';
 }

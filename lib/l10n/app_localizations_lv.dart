@@ -2190,6 +2190,19 @@ class AppLocalizationsLv extends AppLocalizations {
   String get ok => 'Labi';
 
   @override
+  String get premiumUserBenefitsTitle => 'Premium lietotāja priekšrocības';
+
+  @override
+  String get premiumUserBenefitsMessage =>
+      'Atbloķējiet Premium, lai iegūtu šīs priekšrocības:\n• Rediģēt savu vārdu\n• Rediģēt profila aprakstu\n• Rediģēt savu profila ikonu\n• Pievienot darba atsauču attēlus\n• Izcelties kartē';
+
+  @override
+  String get buyPremium => 'Pirkt Premium';
+
+  @override
+  String get restorePurchases => 'Atjaunot pirkumus';
+
+  @override
   String get skipReviewTitle => 'Izlaist atsauksmi?';
 
   @override
@@ -2321,7 +2334,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get barterCoinsInfoMessage =>
-      'Monētas var nopelnīt, sniedzot pakalpojumu vai aktīvi lietojot lietotni.\n\nMonētas varēs tērēt priekšrocībām, kas plānotas nākamajās lietotnes versijās: pielāgota avatara ikona, izcelšanās kartē, kā arī iespēja pievienot attēlu un pašaprakstu.';
+      'Monētas var nopelnīt, sniedzot pakalpojumu vai aktīvi lietojot lietotni.\n\nMonētas var tērēt: izcelšanās kartē, sludinājumu izcelšana, speciālas avatara ikonas';
 
   @override
   String get cannotSendFileNoRecipientKey =>
@@ -2486,6 +2499,20 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get badgeFastTraderDescription => 'Pabeidz maiņas ātrāk nekā vidēji.';
+
+  @override
+  String get badgePremiumUserTitle => 'Premium lietotājs';
+
+  @override
+  String get badgePremiumUserDescription =>
+      'Lietotājam ir aktīvs Premium abonements.';
+
+  @override
+  String get badgeTop1000Title => 'Agrīnais lietotājs - pirmie 1000';
+
+  @override
+  String get badgeTop1000Description =>
+      'Lietotājs bija starp pirmajiem 1000 reģistrētajiem lietotājiem.';
 
   @override
   String get showMore => 'Rādīt vairāk';
@@ -3000,4 +3027,59 @@ class AppLocalizationsLv extends AppLocalizations {
     );
     return '$count $_temp0';
   }
+
+  @override
+  String get premiumProfileEditorTitle => 'Premium profila redaktors';
+
+  @override
+  String get premiumProfileEditorHeader => 'Pielāgojiet savu Premium profilu';
+
+  @override
+  String get premiumProfileEditorDescription =>
+      'Šeit varat atjaunināt savu vārdu, aprakstu, darba atsauces un avatara SVG.';
+
+  @override
+  String get premiumProfileEditorSaving => 'Saglabā...';
+
+  @override
+  String get premiumProfileEditorDisplayNameOptional =>
+      'Parādāmais vārds (neobligāti)';
+
+  @override
+  String get premiumProfileEditorDescriptionOptional => 'Apraksts (neobligāti)';
+
+  @override
+  String get premiumProfileEditorAvatarSvg => 'Avatars (.svg)';
+
+  @override
+  String get premiumProfileEditorNoAvatarSvgSelected =>
+      'Nav atlasīts avatara SVG.';
+
+  @override
+  String premiumProfileEditorSelectedFile(String fileName) {
+    return 'Atlasīts: $fileName';
+  }
+
+  @override
+  String get premiumProfileEditorUploadSvg => 'Augšupielādēt SVG';
+
+  @override
+  String get premiumProfileEditorRemoveSvg => 'Noņemt SVG';
+
+  @override
+  String get premiumProfileEditorWorkReferenceImages => 'Darbu atsauču attēli';
+
+  @override
+  String get premiumProfileEditorWorkReferenceDescription =>
+      'Pievienojiet un pārvaldiet savus atsauču attēlus.';
+
+  @override
+  String get premiumProfileEditorNoWorkReferenceImages =>
+      'Vēl nav darbu atsauču attēlu.';
+
+  @override
+  String get premiumProfileEditorReplace => 'Aizvietot';
+
+  @override
+  String get premiumProfileEditorAddImage => 'Pievienot attēlu';
 }

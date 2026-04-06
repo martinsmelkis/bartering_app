@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
-import '../../l10n/app_localizations.dart';
-import '../../models/reviews/reputation_response.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../models/reviews/reputation_response.dart';
 
 class BadgesInfoDialog extends StatelessWidget {
   final Set<String> earnedBadgeTypes;
   final VoidCallback onClose;
 
   const BadgesInfoDialog({
+    super.key,
     required this.earnedBadgeTypes,
     required this.onClose,
   });
@@ -24,6 +25,10 @@ class BadgesInfoDialog extends StatelessWidget {
         return l10n.badgeVeteranTraderTitle;
       case ReputationBadge.TOP_RATED:
         return l10n.badgeTopRatedTitle;
+      case ReputationBadge.PREMIUM_USER:
+        return l10n.badgePremiumUserTitle;
+      case ReputationBadge.TOP_1000:
+        return l10n.badgeTop1000Title;
       case ReputationBadge.QUICK_RESPONDER:
         return l10n.badgeQuickResponderTitle;
       case ReputationBadge.COMMUNITY_CONNECTOR:
@@ -48,6 +53,10 @@ class BadgesInfoDialog extends StatelessWidget {
         return l10n.badgeVeteranTraderDescription;
       case ReputationBadge.TOP_RATED:
         return l10n.badgeTopRatedDescription;
+      case ReputationBadge.PREMIUM_USER:
+        return l10n.badgePremiumUserDescription;
+      case ReputationBadge.TOP_1000:
+        return l10n.badgeTop1000Description;
       case ReputationBadge.QUICK_RESPONDER:
         return l10n.badgeQuickResponderDescription;
       case ReputationBadge.COMMUNITY_CONNECTOR:
@@ -70,13 +79,14 @@ class BadgesInfoDialog extends StatelessWidget {
       child: AlertDialog(
         title: Text(l10n.badgesTitle),
         content: SizedBox(
-          width: 360,
+          width: 380,
           child: ListView.separated(
             shrinkWrap: true,
             itemCount: allBadges.length,
-            separatorBuilder: (_, __) => const Divider(height: 12),
+            separatorBuilder: (_, __) => const Divider(height: 8),
             itemBuilder: (context, index) {
               final badge = allBadges[index];
+              print('@@@@@@@@@ $badge ${badge.value} ${earnedBadgeTypes}');
               final isEarned = earnedBadgeTypes.contains(badge.value.toLowerCase());
               return Opacity(
                 opacity: isEarned ? 1 : 0.55,

@@ -4208,6 +4208,30 @@ abstract class AppLocalizations {
   /// **'OK'**
   String get ok;
 
+  /// No description provided for @premiumUserBenefitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium User Benefits'**
+  String get premiumUserBenefitsTitle;
+
+  /// No description provided for @premiumUserBenefitsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map'**
+  String get premiumUserBenefitsMessage;
+
+  /// No description provided for @buyPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Premium'**
+  String get buyPremium;
+
+  /// No description provided for @restorePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get restorePurchases;
+
   /// No description provided for @skipReviewTitle.
   ///
   /// In en, this message translates to:
@@ -4451,7 +4475,7 @@ abstract class AppLocalizations {
   /// No description provided for @barterCoinsInfoMessage.
   ///
   /// In en, this message translates to:
-  /// **'Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on perks planned for future app versions: custom avatar icon, standing out on the map, and being able to add a picture and self-description.'**
+  /// **'Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on: standing out on the map, boosting postings, custom Avatar icons, tipping other Users'**
   String get barterCoinsInfoMessage;
 
   /// No description provided for @cannotSendFileNoRecipientKey.
@@ -4723,6 +4747,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Completes trades faster than average.'**
   String get badgeFastTraderDescription;
+
+  /// No description provided for @badgePremiumUserTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium User'**
+  String get badgePremiumUserTitle;
+
+  /// No description provided for @badgePremiumUserDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'User has an active Premium subscription.'**
+  String get badgePremiumUserDescription;
+
+  /// No description provided for @badgeTop1000Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Early Adopter - First 1000 Users'**
+  String get badgeTop1000Title;
+
+  /// No description provided for @badgeTop1000Description.
+  ///
+  /// In en, this message translates to:
+  /// **'User was among the first 1000 registered users.'**
+  String get badgeTop1000Description;
 
   /// No description provided for @showMore.
   ///
@@ -5617,6 +5665,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} {count, plural, =1{review} other{reviews}}'**
   String reviewsCount(int count);
+
+  /// No description provided for @premiumProfileEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Profile Editor'**
+  String get premiumProfileEditorTitle;
+
+  /// No description provided for @premiumProfileEditorHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your premium profile'**
+  String get premiumProfileEditorHeader;
+
+  /// No description provided for @premiumProfileEditorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Here you can update your name, description, work references, and avatar SVG.'**
+  String get premiumProfileEditorDescription;
+
+  /// No description provided for @premiumProfileEditorSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get premiumProfileEditorSaving;
+
+  /// No description provided for @premiumProfileEditorDisplayNameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name (optional)'**
+  String get premiumProfileEditorDisplayNameOptional;
+
+  /// No description provided for @premiumProfileEditorDescriptionOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get premiumProfileEditorDescriptionOptional;
+
+  /// No description provided for @premiumProfileEditorAvatarSvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar (.svg)'**
+  String get premiumProfileEditorAvatarSvg;
+
+  /// No description provided for @premiumProfileEditorNoAvatarSvgSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No avatar SVG selected.'**
+  String get premiumProfileEditorNoAvatarSvgSelected;
+
+  /// No description provided for @premiumProfileEditorSelectedFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected: {fileName}'**
+  String premiumProfileEditorSelectedFile(String fileName);
+
+  /// No description provided for @premiumProfileEditorUploadSvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload SVG'**
+  String get premiumProfileEditorUploadSvg;
+
+  /// No description provided for @premiumProfileEditorRemoveSvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove SVG'**
+  String get premiumProfileEditorRemoveSvg;
+
+  /// No description provided for @premiumProfileEditorWorkReferenceImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Work reference images'**
+  String get premiumProfileEditorWorkReferenceImages;
+
+  /// No description provided for @premiumProfileEditorWorkReferenceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add and manage your reference images.'**
+  String get premiumProfileEditorWorkReferenceDescription;
+
+  /// No description provided for @premiumProfileEditorNoWorkReferenceImages.
+  ///
+  /// In en, this message translates to:
+  /// **'No work reference images yet.'**
+  String get premiumProfileEditorNoWorkReferenceImages;
+
+  /// No description provided for @premiumProfileEditorReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get premiumProfileEditorReplace;
+
+  /// No description provided for @premiumProfileEditorAddImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add image'**
+  String get premiumProfileEditorAddImage;
 }
 
 class _AppLocalizationsDelegate

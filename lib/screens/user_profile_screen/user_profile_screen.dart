@@ -16,6 +16,10 @@ import 'package:barter_app/screens/manage_postings_screen/manage_postings_screen
 import 'package:barter_app/screens/device_migration_screen/source_migration_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/cubit/nested_panel_cubit.dart';
+import 'package:barter_app/screens/user_profile_screen/cubit/in_app_purchases_cubit.dart';
+import 'package:barter_app/screens/user_profile_screen/cubit/premium_profile_editor_cubit.dart';
+import 'package:barter_app/screens/user_profile_screen/cubit/user_profile_screen_cubit.dart';
+import 'package:barter_app/screens/user_profile_screen/premium_profile_editor_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/adaptive_nested_panel_layout.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/reputation_cache.dart';
@@ -34,6 +38,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart' as p;
@@ -47,7 +52,11 @@ import '../../repositories/chat_repository.dart';
 import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/settings_service.dart';
 import '../../theme/app_colors.dart';
-import '../../widgets/dialogs/badges_info_dialog.dart';
+import 'widgets/badges_info_dialog.dart';
+import 'widgets/delete_profile_confirmation_dialog.dart';
+import 'widgets/premium_user_benefits_dialog.dart';
+import 'widgets/profile_action_button.dart';
+import 'widgets/profile_coins_info_dialog.dart';
 import '../onboarding_screen/cubit/onboarding_cubit.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -89,9 +98,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   // Cache instance
   final ReputationCache _reputationCache = ReputationCache();
 
+  late final InAppPurchasesCubit _inAppPurchasesCubit;
+  late final UserProfileScreenCubit _userProfileScreenCubit;
+
   @override
   void initState() {
     super.initState();
+
+    _inAppPurchasesCubit = InAppPurchasesCubit(
+      appUserId: widget.userId,
+      revenueCatApiKey: dotenv.env['REVENUECAT_API_KEY'] ?? '',
+      premiumEntitlementId: 'premium_user',
+    )..initialize();
+
+    _userProfileScreenCubit = UserProfileScreenCubit(getIt<ApiClient>());
+
     _loadUserLocation();
     _loadProfileKeywordData();
     // Delay reputation and badges loading by 5 seconds
@@ -102,6 +123,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _loadWalletData();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _inAppPurchasesCubit.close();
+    _userProfileScreenCubit.close();
+    super.dispose();
   }
 
   /// Load reputation data with 10-minute caching
@@ -120,8 +148,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       _isLoadingReputation = true;
     });
     try {
-      final apiClient = getIt<ApiClient>();
-      final reputation = await apiClient.getReputation(widget.userId);
+      final reputation = await _userProfileScreenCubit.fetchReputation(widget.userId);
       // Cache the result
       _reputationCache.setReputation(widget.userId, reputation);
       setState(() {
@@ -153,12 +180,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       _isLoadingBadges = true;
     });
     try {
-      final apiClient = getIt<ApiClient>();
-      final badgesResponse = await apiClient.getUserBadges(widget.userId);
+      final badges = await _userProfileScreenCubit.fetchUserBadges(widget.userId);
       // Cache the result
-      _reputationCache.setBadges(widget.userId, badgesResponse.badges);
+      _reputationCache.setBadges(widget.userId, badges);
       setState(() {
-        _userBadges = badgesResponse.badges;
+        _userBadges = badges;
         _isLoadingBadges = false;
       });
       logDebug('✅ Fetched and cached badges for ${widget.userId}');
@@ -176,8 +202,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
 
     try {
-      final apiClient = getIt<ApiClient>();
-      final wallet = await apiClient.getWallet();
+      final wallet = await _userProfileScreenCubit.fetchWallet();
       if (!mounted) return;
       setState(() {
         _walletData = wallet;
@@ -272,12 +297,45 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            widget.userName,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            children: [
+                              Flexible(
+                                fit: FlexFit.loose,
+                                child: Text(
+                                  widget.userName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              SizedBox(width: 8.w),
+                              PointerInterceptor(
+                                child: InkWell(
+                                  onTap: _handlePremiumLockTap,
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withValues(alpha: 0.12),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.primary.withValues(alpha: 0.35),
+                                      ),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Icon(
+                                      Icons.lock,
+                                      size: 14,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                            ],
                           ),
                           SizedBox(height: 8.h),
 
@@ -672,7 +730,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             Row(
               children: [
                 // Notification Preferences Button
-                InkWell(
+                ProfileActionButton(
+                  icon: Icons.notifications_active,
+                  label: l10n.notificationPreferences,
+                  color: AppColors.primary,
                   onTap: () async {
                     // Use adaptive behavior: panel within profile on web, full-screen on mobile
                     if (isWebPanel) {
@@ -687,33 +748,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       );
                     }
                   },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.notifications_active,
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          l10n.notificationPreferences,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
                 SizedBox(width: 12),
                 // Match History Button
@@ -727,7 +761,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     return Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        InkWell(
+                        ProfileActionButton(
+                          icon: Icons.history,
+                          label: l10n.matchHistory,
+                          color: AppColors.primary,
                           onTap: () async {
                             // Use adaptive behavior: panel within profile on web, full-screen on mobile
                             if (isWebPanel) {
@@ -742,33 +779,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               );
                             }
                           },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 4.h),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.history,
-                                  size: 18,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  l10n.matchHistory,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
                         if (unreadCount > 0)
                           PositionedCountBadge(
@@ -790,7 +800,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ],
             ),
             SizedBox(height: 12),
-            InkWell(
+            ProfileActionButton(
+              icon: Icons.manage_accounts,
+              label: l10n.managePostings,
+              color: AppColors.secondary,
               onTap: () async {
                 // Use adaptive behavior: panel within profile on web, full-screen on mobile
                 if (isWebPanel) {
@@ -805,36 +818,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   );
                 }
               },
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.manage_accounts,
-                      size: 18,
-                      color: Colors.white,
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      l10n.managePostings,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
             SizedBox(height: 12,),
-            InkWell(
+            ProfileActionButton(
+              icon: Icons.phonelink_setup,
+              label: l10n.migrateToNewDevice,
+              color: AppColors.secondary,
               onTap: () async {
                 // Navigate to source device migration screen
                 await Navigator.of(context).push(
@@ -843,33 +832,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                 );
               },
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.phonelink_setup,
-                      size: 18,
-                      color: Colors.white,
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      l10n.migrateToNewDevice,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
             SizedBox(height: 16.h),
             Center(
@@ -948,7 +910,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         // Reviews count - only show when not loading
         if (!_isLoadingReputation)
           Text(
-            l10n.reviewsCount(reviewCount),
+            '($reviewCount)',
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[600],
@@ -1106,28 +1068,81 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   void _showCoinsInfoDialog() {
-    final l10n = AppLocalizations.of(context)!;
-
     showDialog(
       context: context,
       useRootNavigator: kIsWeb,
       builder: (dialogContext) {
-        return PointerInterceptor(
-          child: AlertDialog(
-            title: Text(l10n.barterCoinsTitle),
-            content: Text(l10n.barterCoinsInfoMessage),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  if (kIsWeb) {
-                    Navigator.of(dialogContext, rootNavigator: true).pop();
-                  } else {
-                    Navigator.of(dialogContext).pop();
-                  }
+        return const ProfileCoinsInfoDialog();
+      },
+    );
+  }
+
+  Future<void> _handlePremiumLockTap() async {
+    final isPremium = _inAppPurchasesCubit.state.isPremium;
+
+    if (!isPremium) {
+      _showPremiumBenefitsDialog();
+      return;
+    }
+
+    await _openPremiumProfileEditor();
+  }
+
+  Future<void> _openPremiumProfileEditor() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (context) => PremiumProfileEditorCubit(
+            apiClient: getIt<ApiClient>(),
+            userRepository: getIt<UserRepository>(),
+          ),
+          child: PremiumProfileEditorScreen(
+            initialName: widget.userName,
+            initialDescription: null,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showPremiumBenefitsDialog() {
+    showDialog(
+      context: context,
+      useRootNavigator: kIsWeb,
+      builder: (dialogContext) {
+        return BlocProvider.value(
+          value: _inAppPurchasesCubit,
+          child: BlocConsumer<InAppPurchasesCubit, InAppPurchasesState>(
+            listener: (context, state) {
+              if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage!),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+
+              if (state.statusMessage != null && state.statusMessage!.isNotEmpty) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.statusMessage!),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            },
+            builder: (context, state) {
+              return PremiumUserBenefitsDialog(
+                isLoading: state.isPurchasing || state.isRestoring || state.isInitializing,
+                onPurchasePremium: () async {
+                  await context.read<InAppPurchasesCubit>().purchasePremium();
                 },
-                child: Text(l10n.ok),
-              ),
-            ],
+                onRestorePurchases: () async {
+                  await context.read<InAppPurchasesCubit>().restorePurchases();
+                },
+              );
+            },
           ),
         );
       },
@@ -1135,52 +1150,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   void _showDeleteProfileDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    
     showDialog(
       context: context,
       useRootNavigator: kIsWeb,
-      builder: (BuildContext dialogContext) {
-        return PointerInterceptor(
-          child: AlertDialog(
-            title: Text(l10n.deleteProfile),
-            content: Text(l10n.deleteProfileConfirmation),
-            actions: [
-              PointerInterceptor(
-                child: TextButton(
-                  onPressed: () {
-                    if (kIsWeb) {
-                      Navigator.of(dialogContext, rootNavigator: true).pop();
-                    } else {
-                      Navigator.of(dialogContext).pop();
-                    }
-                  },
-                  child: Text(
-                    l10n.cancel,
-                    style: const TextStyle(color: AppColors.primary),
-                  ),
-                ),
-              ),
-              PointerInterceptor(
-                child: TextButton(
-                  onPressed: () async {
-                    if (kIsWeb) {
-                      Navigator.of(dialogContext, rootNavigator: true).pop();
-                    } else {
-                      Navigator.of(dialogContext).pop();
-                    }
-
-                    // Delete profile
-                    await _deleteProfile(dialogContext);
-                  },
-                  child: Text(
-                    l10n.deleteProfile,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-              ),
-            ],
-          ),
+      builder: (dialogContext) {
+        return DeleteProfileConfirmationDialog(
+          onConfirmDelete: () async {
+            await _deleteProfile(dialogContext);
+          },
         );
       },
     );
@@ -1190,7 +1167,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final response = await getIt<ApiClient>().requestGdprDataExport();
+      final response = await _userProfileScreenCubit.requestGdprDataExport();
       final success = response.success;
       final message = response.message.trim();
 
@@ -1259,7 +1236,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       await authService.onSessionEnded(widget.userId);
 
       // Call the API to delete the user
-      await getIt<ApiClient>().deleteUser(widget.userId);
+      await _userProfileScreenCubit.deleteUser(widget.userId);
       
       // Delete the database file to prevent encryption key mismatch on next registration
       try {
