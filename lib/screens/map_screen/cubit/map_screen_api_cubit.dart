@@ -403,31 +403,6 @@ class PoiCubit extends Cubit<PoiState> {
     }
   }
 
-  /// Fetches a single user profile and displays it as a POI on the map
-  Future<void> loadSingleUserProfile(String targetUserId) async {
-    try {
-      emit(PoiLoading());
-      final profile = await _apiClient.getProfileInfo(targetUserId);
-      final poi = PointOfInterest(profile: profile, distanceKm: 0.0);
-      emit(PoiLoaded([poi]));
-    } on DioException catch (e) {
-      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch user profile");
-      log("Failed to fetch user profile: $errorMessage");
-      
-      // Check for authentication errors
-      if (_isAuthenticationError(e)) {
-        log("Authentication error detected - clearing keys and navigating to welcome screen");
-        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
-        return;
-      }
-      
-      emit(PoiError(errorMessage));
-    } catch (e) {
-      log("Failed to fetch user profile: ${e.toString()}");
-      emit(PoiError("Failed to fetch user profile: ${e.toString()}"));
-    }
-  }
-
   /// Checks if the DioException is an authentication error
   bool _isAuthenticationError(DioException e) {
     final errorString = e.error?.toString() ?? '';

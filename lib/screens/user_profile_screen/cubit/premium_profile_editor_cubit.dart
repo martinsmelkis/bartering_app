@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 
 import 'package:barter_app/models/profile/user_profile_data.dart';
@@ -14,6 +15,8 @@ class PremiumProfileEditorState {
   final String? name;
   final String? description;
   final XFile? avatarSvgFile;
+  final String? existingAvatarSvgContent;
+  final List<String> existingWorkReferenceImageUrls;
   final List<XFile> referenceImages;
   final String? statusMessage;
   final String? errorMessage;
@@ -25,6 +28,8 @@ class PremiumProfileEditorState {
     this.name,
     this.description,
     this.avatarSvgFile,
+    this.existingAvatarSvgContent,
+    this.existingWorkReferenceImageUrls = const [],
     this.referenceImages = const [],
     this.statusMessage,
     this.errorMessage,
@@ -37,6 +42,8 @@ class PremiumProfileEditorState {
     String? name,
     String? description,
     XFile? avatarSvgFile,
+    String? existingAvatarSvgContent,
+    List<String>? existingWorkReferenceImageUrls,
     List<XFile>? referenceImages,
     String? statusMessage,
     String? errorMessage,
@@ -51,6 +58,11 @@ class PremiumProfileEditorState {
       name: name ?? this.name,
       description: description ?? this.description,
       avatarSvgFile: clearAvatar ? null : (avatarSvgFile ?? this.avatarSvgFile),
+      existingAvatarSvgContent: clearAvatar
+          ? null
+          : (existingAvatarSvgContent ?? this.existingAvatarSvgContent),
+      existingWorkReferenceImageUrls:
+          existingWorkReferenceImageUrls ?? this.existingWorkReferenceImageUrls,
       referenceImages: referenceImages ?? this.referenceImages,
       statusMessage: clearStatus ? null : (statusMessage ?? this.statusMessage),
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
@@ -61,7 +73,30 @@ class PremiumProfileEditorState {
 class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
   final ApiClient _apiClient;
   final UserRepository _userRepository;
+  final String _appUserId;
   final ImagePicker _picker = ImagePicker();
+
+  bool _isHttpUrl(String value) {
+    final uri = Uri.tryParse(value.trim());
+    return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
+  List<String> _normalizeToHttpImageUrls(List<String> values) {
+    final baseUrl = ApiClient.serviceBaseUrl.endsWith('/')
+        ? ApiClient.serviceBaseUrl.substring(0, ApiClient.serviceBaseUrl.length - 1)
+        : ApiClient.serviceBaseUrl;
+
+    return values
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .map((value) {
+          if (_isHttpUrl(value)) return value;
+          if (value.startsWith('/')) return '$baseUrl$value';
+          return '';
+        })
+        .where((value) => _isHttpUrl(value))
+        .toList();
+  }
 
   // Keep web bytes in memory similar to create_posting_screen logic.
   final Map<String, Uint8List> _webImageBytes = {};
@@ -69,14 +104,16 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
   PremiumProfileEditorCubit({
     required ApiClient apiClient,
     required UserRepository userRepository,
+    required String appUserId,
   })  : _apiClient = apiClient,
         _userRepository = userRepository,
+        _appUserId = appUserId,
         super(const PremiumProfileEditorState());
 
-  void initialize({
+  Future<void> initialize({
     String? initialName,
     String? initialDescription,
-  }) {
+  }) async {
     emit(
       state.copyWith(
         name: initialName,
@@ -85,6 +122,34 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
         clearStatus: true,
       ),
     );
+
+    try {
+      final cached = _userRepository.getCachedProfileInfo();
+      if (cached != null) {
+        emit(state.copyWith(
+          name: cached.name,
+          description: cached.selfDescription,
+          existingAvatarSvgContent: cached.profileAvatarIcon,
+          existingWorkReferenceImageUrls: cached.workReferenceImageUrls,
+          clearError: true,
+          clearStatus: true,
+        ));
+        return;
+      }
+
+      final profile = await _apiClient.getProfileInfo(_appUserId);
+      _userRepository.setCachedProfileInfo(profile);
+      emit(state.copyWith(
+        name: profile.name,
+        description: profile.selfDescription,
+        existingAvatarSvgContent: profile.profileAvatarIcon,
+        existingWorkReferenceImageUrls: profile.workReferenceImageUrls,
+        clearError: true,
+        clearStatus: true,
+      ));
+    } catch (_) {
+      // Keep initial values if remote fetch fails.
+    }
   }
 
   void updateName(String value) {
@@ -144,6 +209,7 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
 
     emit(state.copyWith(
       clearAvatar: true,
+      existingAvatarSvgContent: null,
       statusMessage: 'Avatar image removed.',
       clearError: true,
     ));
@@ -187,12 +253,25 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
   }) async {
     emit(state.copyWith(isUploadingReference: true, clearError: true, clearStatus: true));
 
-    if (index < 0 || index >= state.referenceImages.length) {
-      emit(state.copyWith(
-        isUploadingReference: false,
-        errorMessage: 'Invalid work reference image index.',
-      ));
-      return;
+    final hasNewImages = state.referenceImages.isNotEmpty;
+    final existingCount = state.existingWorkReferenceImageUrls.length;
+
+    if (hasNewImages) {
+      if (index < 0 || index >= state.referenceImages.length) {
+        emit(state.copyWith(
+          isUploadingReference: false,
+          errorMessage: 'Invalid work reference image index.',
+        ));
+        return;
+      }
+    } else {
+      if (index < 0 || index >= existingCount) {
+        emit(state.copyWith(
+          isUploadingReference: false,
+          errorMessage: 'Invalid work reference image index.',
+        ));
+        return;
+      }
     }
 
     try {
@@ -202,15 +281,23 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
         return;
       }
 
-      final previousPath = state.referenceImages[index].path;
-      _webImageBytes.remove(previousPath);
+      if (hasNewImages) {
+        final previousPath = state.referenceImages[index].path;
+        _webImageBytes.remove(previousPath);
 
-      final updatedImages = List<XFile>.from(state.referenceImages)..[index] = image;
+        final updatedImages = List<XFile>.from(state.referenceImages)..[index] = image;
 
-      emit(state.copyWith(
-        isUploadingReference: false,
-        referenceImages: updatedImages,
-      ));
+        emit(state.copyWith(
+          isUploadingReference: false,
+          referenceImages: updatedImages,
+        ));
+      } else {
+        emit(state.copyWith(
+          isUploadingReference: false,
+          errorMessage:
+              'Replacing existing work reference images is not supported yet: backend accepts only hosted http/https URLs.',
+        ));
+      }
     } catch (e) {
       emit(state.copyWith(
         isUploadingReference: false,
@@ -220,17 +307,36 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
   }
 
   void removeReferenceImage(int index) {
-    if (index < 0 || index >= state.referenceImages.length) {
+    final hasNewImages = state.referenceImages.isNotEmpty;
+
+    if (hasNewImages) {
+      if (index < 0 || index >= state.referenceImages.length) {
+        emit(state.copyWith(errorMessage: 'Invalid work reference image index.'));
+        return;
+      }
+
+      final removedPath = state.referenceImages[index].path;
+      _webImageBytes.remove(removedPath);
+
+      final updatedImages = List<XFile>.from(state.referenceImages)..removeAt(index);
+      emit(state.copyWith(
+        referenceImages: updatedImages,
+        statusMessage: 'Work reference image removed.',
+        clearError: true,
+      ));
+      return;
+    }
+
+    if (index < 0 || index >= state.existingWorkReferenceImageUrls.length) {
       emit(state.copyWith(errorMessage: 'Invalid work reference image index.'));
       return;
     }
 
-    final removedPath = state.referenceImages[index].path;
-    _webImageBytes.remove(removedPath);
+    final updatedExisting = List<String>.from(state.existingWorkReferenceImageUrls)
+      ..removeAt(index);
 
-    final updatedImages = List<XFile>.from(state.referenceImages)..removeAt(index);
     emit(state.copyWith(
-      referenceImages: updatedImages,
+      existingWorkReferenceImageUrls: updatedExisting,
       statusMessage: 'Work reference image removed.',
       clearError: true,
     ));
@@ -283,10 +389,19 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
       }
 
       final keywordMap = await _userRepository.getProfileKeywordDataMap();
-      final profileAvatarIcon = await _toSvgContent(state.avatarSvgFile);
-      final workReferenceImageUrls = await Future.wait(
+      final profileAvatarIcon = state.avatarSvgFile != null
+          ? await _toSvgContent(state.avatarSvgFile)
+          : state.existingAvatarSvgContent;
+
+      final existingWorkReferenceImageUrls =
+          _normalizeToHttpImageUrls(state.existingWorkReferenceImageUrls);
+      final newWorkReferenceImageUrls = await Future.wait(
         state.referenceImages.map(_toDataBase64),
       );
+      final workReferenceImageUrls = [
+        ...existingWorkReferenceImageUrls,
+        ...newWorkReferenceImageUrls,
+      ];
 
       final updatedProfile = UserProfileData(
         userId: userId,
@@ -305,6 +420,8 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
       );
 
       final updatedUserName = await _apiClient.updateProfileInfo(updatedProfile);
+      _userRepository.invalidateCachedProfileInfo();
+      _userRepository.setCachedProfileInfo(updatedProfile);
       if (updatedUserName.trim().isNotEmpty) {
         await _userRepository.setUserName(updatedUserName.trim());
       }

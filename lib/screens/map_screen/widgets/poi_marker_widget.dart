@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:barter_app/models/map/point_of_interest.dart';
@@ -28,7 +29,9 @@ class PoiMarkerWidget {
     required List<ParsedAttributeData>? userInterests,
     required List<ParsedAttributeData>? userOfferings,
   }) async {
-    // Use the POI's userId to get a consistent random icon
+    final profileAvatarIcon = poi.profile.profileAvatarIcon?.trim();
+
+    // Use the POI's userId to get a consistent random icon fallback
     final userIdHashCode = poi.profile.userId.hashCode;
     logDebug('@@@@@@@@@@ Creating POI marker for ${poi.profile.userId}, hashCode: $userIdHashCode');
     final index = userIdHashCode.abs() % _svgAssetCount;
@@ -122,8 +125,25 @@ class PoiMarkerWidget {
     if (kIsWeb) {
       logDebug('@@@@@@@@@@ Using direct SVG for web platform');
 
-      // Load the SVG string
-      final svgString = await rootBundle.loadString(selectedIconPath);
+      // Prefer backend-provided SVG avatar content, fallback to generated asset.
+      String svgString;
+      var isCustomProfileAvatar = false;
+      if (profileAvatarIcon != null && profileAvatarIcon.isNotEmpty) {
+        if (profileAvatarIcon.contains('<svg')) {
+          svgString = profileAvatarIcon;
+          isCustomProfileAvatar = true;
+        } else if (profileAvatarIcon.startsWith('data:image/svg+xml;base64,')) {
+          svgString = utf8.decode(
+            base64Decode(profileAvatarIcon.split(',').last),
+            allowMalformed: true,
+          );
+          isCustomProfileAvatar = true;
+        } else {
+          svgString = await rootBundle.loadString(selectedIconPath);
+        }
+      } else {
+        svgString = await rootBundle.loadString(selectedIconPath);
+      }
 
       // Calculate color segments for the border
       final colorWeights = CategoryStatsUtils.calculateColorWeights(
@@ -147,6 +167,7 @@ class PoiMarkerWidget {
         glowAlpha: glowAlpha,
         isOnline: poi.isOnline,
         isAway: poi.isAway,
+        useOriginalViewBox: isCustomProfileAvatar,
       );
 
       logDebug('@@@@@@@@@@ Returning MarkerIcon with SVG string (${compositeSvg.length} chars)');
@@ -158,8 +179,28 @@ class PoiMarkerWidget {
     }
 
     // For NATIVE platforms: Use widget-based rendering with flutter_svg
-    final svgString = await rootBundle.loadString(selectedIconPath);
-    final localSvgCopy = String.fromCharCodes(svgString.runes);
+    String svgString;
+    var isCustomProfileAvatar = false;
+    if (profileAvatarIcon != null && profileAvatarIcon.isNotEmpty) {
+      if (profileAvatarIcon.contains('<svg')) {
+        svgString = profileAvatarIcon;
+        isCustomProfileAvatar = true;
+      } else if (profileAvatarIcon.startsWith('data:image/svg+xml;base64,')) {
+        svgString = utf8.decode(
+          base64Decode(profileAvatarIcon.split(',').last),
+          allowMalformed: true,
+        );
+        isCustomProfileAvatar = true;
+      } else {
+        svgString = await rootBundle.loadString(selectedIconPath);
+      }
+    } else {
+      svgString = await rootBundle.loadString(selectedIconPath);
+    }
+
+    final localSvgCopy = isCustomProfileAvatar
+        ? _normalizeSvgForNativeAvatar(svgString)
+        : String.fromCharCodes(svgString.runes);
 
     // Mobile native: Use widget-based SVG rendering at high resolution
     Widget markerWidget = SizedBox(
@@ -268,6 +309,7 @@ class PoiMarkerWidget {
     required double glowAlpha,
     required bool isOnline,
     required bool isAway,
+    required bool useOriginalViewBox,
   }) {
     final center = size / 2;
     final radius = (size - strokeWidth) / 2;
@@ -346,14 +388,15 @@ class PoiMarkerWidget {
 ''';
     }
 
-    // Extract the avatar content (path elements) from the original SVG
-    // Match width/height only when preceded by space (not part of stroke-width etc)
+    // Extract avatar inner content and preserve original viewBox so custom SVGs
+    // (e.g. Material icons with viewBox 0 -960 960 960) render correctly.
+    final avatarViewBox = _extractSvgViewBox(avatarSvgContent);
     final avatarContent = avatarSvgContent
         .replaceAll(RegExp(r'<\?xml.*\?>'), '')
         .replaceAll(RegExp(r'<svg[^>]*>'), '')
         .replaceAll(RegExp(r'</svg>'), '')
-        .replaceAll(RegExp(r'\swidth="[^"]*"'), ' ')  // Preceded by space
-        .replaceAll(RegExp(r'\sheight="[^"]*"'), ' '); // Preceded by space
+        .replaceAll(RegExp(r'\swidth="[^"]*"'), ' ')
+        .replaceAll(RegExp(r'\sheight="[^"]*"'), ' ');
 
     // Build final composite SVG
     return '''<?xml version="1.0" encoding="UTF-8"?>
@@ -374,15 +417,68 @@ class PoiMarkerWidget {
   <!-- Avatar content -->
   <g clip-path="url(#avatarClip)">
     <rect x="0" y="0" width="$size" height="$size" fill="$backgroundColor" />
-    <!-- Avatar SVG uses 512x512 coordinates, scale to fit inside marker (with padding for border) -->
-    <g transform="translate(${size * -0.2}, ${size * -0.2}) scale(${size * 1.4 / 512})">
-      $avatarContent
-    </g>
+    ${useOriginalViewBox
+        ? '<svg x="0" y="0" width="$size" height="$size" viewBox="$avatarViewBox" preserveAspectRatio="xMidYMid meet">$avatarContent</svg>'
+        : '<g transform="translate(${size * -0.2}, ${size * -0.2}) scale(${size * 1.4 / 512})">$avatarContent</g>'}
   </g>
   
   $onlineBadge
   $matchIndicator
 </svg>''';  }
+
+  static String _normalizeSvgForNativeAvatar(String svg) {
+    final cleaned = svg
+        .replaceAll(RegExp(r'<\?xml.*\?>'), '')
+        .replaceAll(RegExp(r'<svg[^>]*>'), '')
+        .replaceAll(RegExp(r'</svg>'), '')
+        .replaceAll(RegExp(r'\swidth="[^"]*"'), ' ')
+        .replaceAll(RegExp(r'\sheight="[^"]*"'), ' ')
+        .trim();
+
+    final viewBox = _extractSvgViewBox(svg).trim().split(RegExp(r'\s+'));
+    double minX = 0;
+    double minY = 0;
+    double vbWidth = 512;
+    double vbHeight = 512;
+
+    if (viewBox.length >= 4) {
+      minX = double.tryParse(viewBox[0]) ?? 0;
+      minY = double.tryParse(viewBox[1]) ?? 0;
+      vbWidth = double.tryParse(viewBox[2]) ?? 512;
+      vbHeight = double.tryParse(viewBox[3]) ?? 512;
+    }
+
+    final largestSide = vbWidth > vbHeight ? vbWidth : vbHeight;
+    final scale = (largestSide == 0 ? 1.0 : 512 / largestSide) * 0.65;
+    final scaledWidth = vbWidth * scale;
+    final scaledHeight = vbHeight * scale;
+
+    // Rebase original minX/minY (including negatives) into 0..512 canvas and center.
+    final tx = ((512 - scaledWidth) / 2) - (minX * scale);
+    final ty = ((512 - scaledHeight) / 2) - (minY * scale);
+
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" '
+        'preserveAspectRatio="xMidYMid meet">'
+        '<g transform="translate($tx $ty) scale($scale)">$cleaned</g>'
+        '</svg>';
+  }
+
+  static String _extractSvgViewBox(String svg) {
+    final match = RegExp(r'viewBox="([^"]+)"', caseSensitive: false).firstMatch(svg);
+    if (match != null) {
+      return match.group(1)!;
+    }
+
+    final widthMatch = RegExp(r'width="([0-9]+(?:\.[0-9]+)?)', caseSensitive: false).firstMatch(svg);
+    final heightMatch = RegExp(r'height="([0-9]+(?:\.[0-9]+)?)', caseSensitive: false).firstMatch(svg);
+    final width = double.tryParse(widthMatch?.group(1) ?? '');
+    final height = double.tryParse(heightMatch?.group(1) ?? '');
+    if (width != null && height != null) {
+      return '0 0 $width $height';
+    }
+
+    return '0 0 512 512';
+  }
 
   /// Converts a Color to hex string
   static String _colorToHex(Color color) {

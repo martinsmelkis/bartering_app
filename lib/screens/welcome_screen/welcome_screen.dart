@@ -208,11 +208,22 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     context.pushReplacement('/onboarding?isInitialOnboarding=true');
   }
 
-  Future<GdprConsentChoice?> _showGdprConsentDialog(BuildContext context) {
+  Future<GdprConsentChoice?> _showGdprConsentDialog(BuildContext context) async {
+    final settingsService = getIt<SettingsService>();
+    final initialLocationConsent = await settingsService.getStoredLocationConsent();
+    final initialAiConsent = await settingsService.getStoredAiProcessingConsent();
+    final initialAnalyticsConsent = await settingsService.getStoredAnalyticsCookiesConsent();
+
+    if (!context.mounted) return null;
+
     return showDialog<GdprConsentChoice>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const GdprConsentDialog(),
+      builder: (_) => GdprConsentDialog(
+        initialLocationConsent: initialLocationConsent,
+        initialAiProcessingConsent: initialAiConsent,
+        initialAnalyticsCookiesConsent: initialAnalyticsConsent,
+      ),
     );
   }
 

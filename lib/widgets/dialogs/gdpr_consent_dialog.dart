@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/settings_service.dart';
 
 class GdprConsentChoice {
   final bool locationConsent;
@@ -16,20 +18,68 @@ class GdprConsentChoice {
 }
 
 class GdprConsentDialog extends StatefulWidget {
-  const GdprConsentDialog({super.key});
+  const GdprConsentDialog({
+    super.key,
+    this.initialLocationConsent,
+    this.initialAiProcessingConsent,
+    this.initialAnalyticsCookiesConsent,
+  });
+
+  final bool? initialLocationConsent;
+  final bool? initialAiProcessingConsent;
+  final bool? initialAnalyticsCookiesConsent;
 
   @override
   State<GdprConsentDialog> createState() => _GdprConsentDialogState();
 }
 
 class _GdprConsentDialogState extends State<GdprConsentDialog> {
+  final SettingsService _settingsService = getIt<SettingsService>();
+
   bool _locationConsent = true;
   bool _aiConsent = true;
   bool _analyticsCookiesConsent = true;
+  bool _isLoadingPersistedConsents = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialConsentValues();
+  }
+
+  Future<void> _loadInitialConsentValues() async {
+    final locationConsent =
+        widget.initialLocationConsent ?? await _settingsService.getStoredLocationConsent();
+    final aiConsent = widget.initialAiProcessingConsent
+        ?? await _settingsService.getStoredAiProcessingConsent();
+    final analyticsConsent = widget.initialAnalyticsCookiesConsent
+        ?? await _settingsService.getStoredAnalyticsCookiesConsent();
+
+    if (!mounted) return;
+
+    setState(() {
+      _locationConsent = locationConsent ?? true;
+      _aiConsent = aiConsent ?? true;
+      _analyticsCookiesConsent = analyticsConsent ?? true;
+      _isLoadingPersistedConsents = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    if (_isLoadingPersistedConsents) {
+      return const AlertDialog(
+        content: SizedBox(
+          width: 120,
+          height: 80,
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
 
     return AlertDialog(
       title: Text(l10n.gdprConsentTitle),
@@ -107,11 +157,7 @@ class _GdprConsentDialogState extends State<GdprConsentDialog> {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop(const GdprConsentChoice(
-              locationConsent: false,
-              aiProcessingConsent: false,
-              analyticsCookiesConsent: false,
-            ));
+            Navigator.of(context).pop();
           },
           child: Text(l10n.gdprConsentDecline),
         ),

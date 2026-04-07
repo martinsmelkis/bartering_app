@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/models/postings/posting_data_response.dart';
 import 'package:barter_app/repositories/user_repository.dart';
@@ -267,14 +269,31 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
 
   _loadAvatarIcon() async {
     try {
-      // Use the same logic as map_screen to select the icon
-      const int svgAssetCount = 29;
-      final userIdHashCode = widget.poi.profile.userId.hashCode;
-      final index = userIdHashCode.abs() % svgAssetCount;
-      final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
+      final profileAvatarIcon = widget.poi.profile.profileAvatarIcon?.trim();
+      String svgString;
 
-      // Load SVG without color modification
-      final svgString = await _loadSvg(selectedIconPath);
+      if (profileAvatarIcon != null && profileAvatarIcon.isNotEmpty) {
+        if (profileAvatarIcon.contains('<svg')) {
+          svgString = profileAvatarIcon;
+        } else if (profileAvatarIcon.startsWith('data:image/svg+xml;base64,')) {
+          final encoded = profileAvatarIcon.split(',').last;
+          svgString = utf8.decode(base64Decode(encoded), allowMalformed: true);
+        } else {
+          // Fallback to generated avatar if payload is not recognized.
+          const int svgAssetCount = 29;
+          final userIdHashCode = widget.poi.profile.userId.hashCode;
+          final index = userIdHashCode.abs() % svgAssetCount;
+          final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
+          svgString = await rootBundle.loadString(selectedIconPath);
+        }
+      } else {
+        // Fallback to generated avatar when profile icon is missing.
+        const int svgAssetCount = 29;
+        final userIdHashCode = widget.poi.profile.userId.hashCode;
+        final index = userIdHashCode.abs() % svgAssetCount;
+        final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
+        svgString = await rootBundle.loadString(selectedIconPath);
+      }
 
       if (mounted) {
         setState(() {
@@ -297,11 +316,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
         });
       }
     }
-  }
-
-  Future<String> _loadSvg(String assetPath) async {
-    // Load SVG without color modification
-    return await rootBundle.loadString(assetPath);
   }
 
   _loadPostings() async {

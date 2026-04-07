@@ -1,3 +1,4 @@
+import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
@@ -17,6 +18,8 @@ class UserRepository {
   Map<String, double>? profileKeywordDataMap;
   List<ParsedAttributeData>? userInterests;
   List<ParsedAttributeData>? userOfferings;
+  UserProfileData? _cachedProfileInfo;
+  DateTime? _cachedProfileInfoAt;
 
   UserRepository(this._secureStorageService);
 
@@ -185,7 +188,35 @@ class UserRepository {
     profileKeywordDataMap = null;
     userInterests = null;
     userOfferings = null;
+    _cachedProfileInfo = null;
+    _cachedProfileInfoAt = null;
     logDebug('✅ UserRepository cache cleared');
+  }
+
+  static const Duration _profileInfoCacheTtl = Duration(minutes: 10);
+
+  UserProfileData? getCachedProfileInfo({bool ignoreTtl = false}) {
+    final profile = _cachedProfileInfo;
+    final cachedAt = _cachedProfileInfoAt;
+    if (profile == null || cachedAt == null) return null;
+
+    if (ignoreTtl || DateTime.now().difference(cachedAt) <= _profileInfoCacheTtl) {
+      return profile;
+    }
+
+    _cachedProfileInfo = null;
+    _cachedProfileInfoAt = null;
+    return null;
+  }
+
+  void setCachedProfileInfo(UserProfileData profile) {
+    _cachedProfileInfo = profile;
+    _cachedProfileInfoAt = DateTime.now();
+  }
+
+  void invalidateCachedProfileInfo() {
+    _cachedProfileInfo = null;
+    _cachedProfileInfoAt = null;
   }
 
   Future<void> clearStorage() async {

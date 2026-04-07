@@ -1095,6 +1095,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           create: (context) => PremiumProfileEditorCubit(
             apiClient: getIt<ApiClient>(),
             userRepository: getIt<UserRepository>(),
+            appUserId: widget.userId,
           ),
           child: PremiumProfileEditorScreen(
             initialName: widget.userName,

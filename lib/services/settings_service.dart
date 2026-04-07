@@ -237,6 +237,27 @@ class SettingsService {
     return _prefs?.getBool(_gdprLocationConsentKey) ?? false;
   }
 
+  /// Returns stored GDPR location consent, or null when not yet set.
+  Future<bool?> getStoredLocationConsent() async {
+    final prefs = await _preferences;
+    if (!prefs.containsKey(_gdprLocationConsentKey)) return null;
+    return prefs.getBool(_gdprLocationConsentKey);
+  }
+
+  /// Returns stored GDPR AI processing consent, or null when not yet set.
+  Future<bool?> getStoredAiProcessingConsent() async {
+    final prefs = await _preferences;
+    if (!prefs.containsKey(_gdprAiProcessingConsentKey)) return null;
+    return prefs.getBool(_gdprAiProcessingConsentKey);
+  }
+
+  /// Returns stored GDPR analytics cookies consent, or null when not yet set.
+  Future<bool?> getStoredAnalyticsCookiesConsent() async {
+    final prefs = await _preferences;
+    if (!prefs.containsKey(_gdprAnalyticsCookiesConsentKey)) return null;
+    return prefs.getBool(_gdprAnalyticsCookiesConsentKey);
+  }
+
   /// Save GDPR consent choices with versioning and timestamp
   Future<void> setGdprConsent({
     required String version,

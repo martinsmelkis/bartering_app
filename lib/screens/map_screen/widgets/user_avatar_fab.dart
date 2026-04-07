@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/models/map/point_of_interest.dart';
 import 'package:barter_app/models/profile/user_profile_data.dart';
@@ -5,11 +7,11 @@ import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/user/user_attribute_entry_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/map_screen/cubit/profile_panel_cubit.dart';
+import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
 import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
-import 'package:barter_app/utils/avatar_color_utils.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/widgets/count_badge.dart';
@@ -40,6 +42,29 @@ class UserAvatarFab extends StatelessWidget {
 
   // Generate SVG asset path by index (1-based)
   static String _getSvgAsset(int index) => 'assets/icons/avatars/path$index.svg';
+
+  Future<String?> _getOwnProfileAvatarIcon() async {
+    try {
+      final userRepository = getIt<UserRepository>();
+      final uid = await userRepository.getUserId();
+      if (uid == null || uid.isEmpty) return null;
+
+      final apiClient = getIt<ApiClient>();
+      final profile = await apiClient.getProfileInfo(uid);
+      final avatar = profile.profileAvatarIcon?.trim();
+      if (avatar == null || avatar.isEmpty) return null;
+
+      if (avatar.contains('<svg')) {
+        return avatar;
+      }
+      if (avatar.startsWith('data:image/svg+xml;base64,')) {
+        return utf8.decode(base64Decode(avatar.split(',').last), allowMalformed: true);
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<Widget> _createUserAvatar(BuildContext context) async {
     final userRepository = getIt<UserRepository>();
@@ -85,14 +110,21 @@ class UserAvatarFab extends StatelessWidget {
       distanceKm: 0,
     );
 
-    // Use the userId to get a consistent random icon
-    final userIdHashCode = userPoi.profile.userId.hashCode;
-    final index = userIdHashCode.abs() % _svgAssetCount;
-    final selectedIconPath = _getSvgAsset(index + 1); // 1-based index
+    final ownProfileAvatarSvg = await _getOwnProfileAvatarIcon();
 
-    // Load SVG without color modification
-    final svgString = await rootBundle.loadString(selectedIconPath);
-    final localSvgCopy = String.fromCharCodes(svgString.runes);
+    String localSvgCopy;
+    if (ownProfileAvatarSvg != null && ownProfileAvatarSvg.isNotEmpty) {
+      localSvgCopy = ownProfileAvatarSvg;
+    } else {
+      // Use the userId to get a consistent random icon
+      final userIdHashCode = userPoi.profile.userId.hashCode;
+      final index = userIdHashCode.abs() % _svgAssetCount;
+      final selectedIconPath = _getSvgAsset(index + 1); // 1-based index
+
+      // Load SVG without color modification
+      final svgString = await rootBundle.loadString(selectedIconPath);
+      localSvgCopy = String.fromCharCodes(svgString.runes);
+    }
 
     return RepaintBoundary(
       child: CategoryStatsUtils.buildCategoryStatsCircle(

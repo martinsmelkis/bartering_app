@@ -685,7 +685,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           value: 'lv',
                           child: Text(l10n.languageLatvian),
                         ),
-                        DropdownMenuItem(
+                        /*DropdownMenuItem(
                           value: 'fr',
                           child: Text(l10n.languageFrench),
                         ),
@@ -696,7 +696,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         DropdownMenuItem(
                           value: 'es',
                           child: Text(l10n.languageSpanish),
-                        ),
+                        ),*/
                       ],
                       onChanged: (value) async {
                         if (value != null) {
@@ -766,11 +766,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _showSettingsSaved();
   }
 
-  Future<GdprConsentChoice?> _showGdprConsentDialog(BuildContext context) {
+  Future<GdprConsentChoice?> _showGdprConsentDialog(BuildContext context) async {
+    final initialLocationConsent = await _settingsService.getStoredLocationConsent();
+    final initialAiConsent = await _settingsService.getStoredAiProcessingConsent();
+    final initialAnalyticsConsent = await _settingsService.getStoredAnalyticsCookiesConsent();
+
+    if (!context.mounted) return null;
+
     return showDialog<GdprConsentChoice>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const GdprConsentDialog(),
+      builder: (_) => GdprConsentDialog(
+        initialLocationConsent: initialLocationConsent,
+        initialAiProcessingConsent: initialAiConsent,
+        initialAnalyticsCookiesConsent: initialAnalyticsConsent,
+      ),
     );
   }
 

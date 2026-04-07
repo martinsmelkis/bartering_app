@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
 import 'package:barter_app/widgets/image_viewer_dialog.dart';
 import 'package:barter_app/widgets/webp_network_image.dart';
@@ -1631,6 +1633,17 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   }
 
   Future<String> _loadSvg(PointOfInterest poi) async {
+    final profileAvatarIcon = poi.profile.profileAvatarIcon?.trim();
+    if (profileAvatarIcon != null && profileAvatarIcon.isNotEmpty) {
+      if (profileAvatarIcon.contains('<svg')) {
+        return profileAvatarIcon;
+      }
+      if (profileAvatarIcon.startsWith('data:image/svg+xml;base64,')) {
+        final encoded = profileAvatarIcon.split(',').last;
+        return utf8.decode(base64Decode(encoded), allowMalformed: true);
+      }
+    }
+
     final userIdHashCode = poi.profile.userId.hashCode;
     final index = userIdHashCode.abs() % 29; // Assuming 29 avatars
     final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
