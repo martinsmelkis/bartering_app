@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 class ProfileCoinsInfoDialog extends StatelessWidget {
-  const ProfileCoinsInfoDialog({super.key});
+  const ProfileCoinsInfoDialog({
+    super.key,
+    this.onPurchaseCoins,
+  });
+
+  final VoidCallback? onPurchaseCoins;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +28,59 @@ class ProfileCoinsInfoDialog extends StatelessWidget {
                 Navigator.of(context).pop();
               }
             },
-            child: Text(l10n.ok),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: onPurchaseCoins ?? () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.purchaseCoinsFlowComingSoon)),
+              );
+              if (kIsWeb) {
+                Navigator.of(context, rootNavigator: true).pop();
+              } else {
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text(l10n.purchaseCoins),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PurchaseCoinsOptionsDialog extends StatelessWidget {
+  const PurchaseCoinsOptionsDialog({
+    super.key,
+    this.options = const [20, 50, 200],
+  });
+
+  final List<int> options;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return PointerInterceptor(
+      child: AlertDialog(
+        title: Text(l10n.purchaseCoins),
+        content: Text(l10n.selectCoinPackage),
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (kIsWeb) {
+                Navigator.of(context, rootNavigator: true).pop();
+              } else {
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text(l10n.cancel),
+          ),
+          ...options.map(
+            (amount) => ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(amount),
+              child: Text('$amount'),
+            ),
           ),
         ],
       ),

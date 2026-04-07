@@ -749,6 +749,16 @@ extension AppLocalizationsExtension on AppLocalizations {
       'unableToReviewUser' => unableToReviewUser,
       'barterCoinsTitle' => barterCoinsTitle,
       'barterCoinsInfoMessage' => barterCoinsInfoMessage,
+      'purchaseCoins' => purchaseCoins,
+      'selectCoinPackage' => selectCoinPackage,
+      'purchaseCoinsFlowComingSoon' => purchaseCoinsFlowComingSoon,
+      'createPostingBoostTitle' => createPostingBoostTitle,
+      'createPostingBoostDescription' => createPostingBoostDescription,
+      'createPostingBoostNone' => createPostingBoostNone,
+      'createPostingBoost3Days' => createPostingBoost3Days,
+      'createPostingBoost7Days' => createPostingBoost7Days,
+      'createPostingBoostInsufficientCoins' =>
+        createPostingBoostInsufficientCoins,
       'cannotSendFileNoRecipientKey' => cannotSendFileNoRecipientKey,
       'gallery' => gallery,
       'camera' => camera,
@@ -788,6 +798,8 @@ extension AppLocalizationsExtension on AppLocalizations {
       'badgeFastTraderDescription' => badgeFastTraderDescription,
       'badgePremiumUserTitle' => badgePremiumUserTitle,
       'badgePremiumUserDescription' => badgePremiumUserDescription,
+      'badgeTop1000Title' => badgeTop1000Title,
+      'badgeTop1000Description' => badgeTop1000Description,
       'showMore' => showMore,
       'showLess' => showLess,
       'linkCopiedToClipboard' => linkCopiedToClipboard,
@@ -934,6 +946,27 @@ extension AppLocalizationsExtension on AppLocalizations {
       'dataExportRequestAccepted' => dataExportRequestAccepted,
       'dataExportRequestFailed' => dataExportRequestFailed,
       'dataExportEmailRequired' => dataExportEmailRequired,
+      'premiumProfileEditorTitle' => premiumProfileEditorTitle,
+      'premiumProfileEditorHeader' => premiumProfileEditorHeader,
+      'premiumProfileEditorDescription' => premiumProfileEditorDescription,
+      'premiumProfileEditorSaving' => premiumProfileEditorSaving,
+      'premiumProfileEditorDisplayNameOptional' =>
+        premiumProfileEditorDisplayNameOptional,
+      'premiumProfileEditorDescriptionOptional' =>
+        premiumProfileEditorDescriptionOptional,
+      'premiumProfileEditorAvatarSvg' => premiumProfileEditorAvatarSvg,
+      'premiumProfileEditorNoAvatarSvgSelected' =>
+        premiumProfileEditorNoAvatarSvgSelected,
+      'premiumProfileEditorUploadSvg' => premiumProfileEditorUploadSvg,
+      'premiumProfileEditorRemoveSvg' => premiumProfileEditorRemoveSvg,
+      'premiumProfileEditorWorkReferenceImages' =>
+        premiumProfileEditorWorkReferenceImages,
+      'premiumProfileEditorWorkReferenceDescription' =>
+        premiumProfileEditorWorkReferenceDescription,
+      'premiumProfileEditorNoWorkReferenceImages' =>
+        premiumProfileEditorNoWorkReferenceImages,
+      'premiumProfileEditorReplace' => premiumProfileEditorReplace,
+      'premiumProfileEditorAddImage' => premiumProfileEditorAddImage,
       'errorWithMessage' => switch (args) {
         [final Object errorMessage] => errorWithMessage(errorMessage),
         _ => throw ArgumentError('errorWithMessage requires 1 arguments'),
@@ -985,6 +1018,10 @@ extension AppLocalizationsExtension on AppLocalizations {
       'currentWalletBalance' => switch (args) {
         [final String amount] => currentWalletBalance(amount),
         _ => throw ArgumentError('currentWalletBalance requires 1 arguments'),
+      },
+      'selectedCoinPackage' => switch (args) {
+        [final String amount] => selectedCoinPackage(amount),
+        _ => throw ArgumentError('selectedCoinPackage requires 1 arguments'),
       },
       'downloadingFile' => switch (args) {
         [final String filename] => downloadingFile(filename),
@@ -1065,6 +1102,12 @@ extension AppLocalizationsExtension on AppLocalizations {
       'reviewsCount' => switch (args) {
         [final int count] => reviewsCount(count),
         _ => throw ArgumentError('reviewsCount requires 1 arguments'),
+      },
+      'premiumProfileEditorSelectedFile' => switch (args) {
+        [final String fileName] => premiumProfileEditorSelectedFile(fileName),
+        _ => throw ArgumentError(
+          'premiumProfileEditorSelectedFile requires 1 arguments',
+        ),
       },
       _ => null,
     };

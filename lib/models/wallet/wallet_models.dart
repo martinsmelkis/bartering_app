@@ -142,3 +142,221 @@ class WalletOperationResponse {
     };
   }
 }
+
+/// Request model for purchasing premium lifetime
+class PurchasePremiumLifetimeRequest {
+  final String userId;
+  final String currency;
+  final int amountMinor;
+  final String? externalRef;
+  final String? metadataJson;
+
+  PurchasePremiumLifetimeRequest({
+    required this.userId,
+    required this.currency,
+    required this.amountMinor,
+    this.externalRef,
+    this.metadataJson,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'currency': currency,
+      'amountMinor': amountMinor,
+      if (externalRef != null) 'externalRef': externalRef,
+      if (metadataJson != null) 'metadataJson': metadataJson,
+    };
+  }
+}
+
+/// Request model for purchasing a coin pack
+class PurchaseCoinPackRequest {
+  final String userId;
+  final int coinAmount;
+  final String currency;
+  final int amountMinor;
+  final String? externalRef;
+  final String? metadataJson;
+
+  PurchaseCoinPackRequest({
+    required this.userId,
+    required this.coinAmount,
+    required this.currency,
+    required this.amountMinor,
+    this.externalRef,
+    this.metadataJson,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'coinAmount': coinAmount,
+      'currency': currency,
+      'amountMinor': amountMinor,
+      if (externalRef != null) 'externalRef': externalRef,
+      if (metadataJson != null) 'metadataJson': metadataJson,
+    };
+  }
+}
+
+/// Request model for purchasing visibility boost
+class PurchaseVisibilityBoostRequest {
+  final String userId;
+  final String boostType;
+  final int costCoins;
+  final String? metadataJson;
+
+  PurchaseVisibilityBoostRequest({
+    required this.userId,
+    required this.boostType,
+    required this.costCoins,
+    this.metadataJson,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'boostType': boostType,
+      'costCoins': costCoins,
+      if (metadataJson != null) 'metadataJson': metadataJson,
+    };
+  }
+}
+
+/// Purchase record response model
+class PurchaseResponse {
+  final String id;
+  final String userId;
+  final String purchaseType;
+  final String status;
+  final String currency;
+  final int fiatAmountMinor;
+  final int? coinAmount;
+  final String? externalRef;
+  final String? metadataJson;
+  final String? fulfillmentRef;
+  final int createdAt;
+  final int updatedAt;
+
+  PurchaseResponse({
+    required this.id,
+    required this.userId,
+    required this.purchaseType,
+    required this.status,
+    required this.currency,
+    required this.fiatAmountMinor,
+    this.coinAmount,
+    this.externalRef,
+    this.metadataJson,
+    this.fulfillmentRef,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory PurchaseResponse.fromJson(Map<String, dynamic> json) {
+    return PurchaseResponse(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      purchaseType: json['purchaseType'] as String,
+      status: json['status'] as String,
+      currency: json['currency'] as String,
+      fiatAmountMinor: json['fiatAmountMinor'] as int? ?? 0,
+      coinAmount: json['coinAmount'] as int?,
+      externalRef: json['externalRef'] as String?,
+      metadataJson: json['metadataJson'] as String?,
+      fulfillmentRef: json['fulfillmentRef'] as String?,
+      createdAt: json['createdAt'] as int? ?? 0,
+      updatedAt: json['updatedAt'] as int? ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'purchaseType': purchaseType,
+      'status': status,
+      'currency': currency,
+      'fiatAmountMinor': fiatAmountMinor,
+      'coinAmount': coinAmount,
+      'externalRef': externalRef,
+      'metadataJson': metadataJson,
+      'fulfillmentRef': fulfillmentRef,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
+}
+
+/// Premium status response model
+class PremiumStatusResponse {
+  final String userId;
+  final bool isPremium;
+  final bool isLifetime;
+  final int? grantedAt;
+  final int? expiresAt;
+  final int updatedAt;
+
+  PremiumStatusResponse({
+    required this.userId,
+    required this.isPremium,
+    required this.isLifetime,
+    this.grantedAt,
+    this.expiresAt,
+    required this.updatedAt,
+  });
+
+  factory PremiumStatusResponse.fromJson(Map<String, dynamic> json) {
+    return PremiumStatusResponse(
+      userId: json['userId'] as String,
+      isPremium: json['isPremium'] as bool? ?? false,
+      isLifetime: json['isLifetime'] as bool? ?? false,
+      grantedAt: json['grantedAt'] as int?,
+      expiresAt: json['expiresAt'] as int?,
+      updatedAt: json['updatedAt'] as int? ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'isPremium': isPremium,
+      'isLifetime': isLifetime,
+      'grantedAt': grantedAt,
+      'expiresAt': expiresAt,
+      'updatedAt': updatedAt,
+    };
+  }
+}
+
+/// Purchase operation response model
+class PurchaseOperationResponse {
+  final bool success;
+  final String message;
+  final PurchaseResponse? purchase;
+
+  PurchaseOperationResponse({
+    required this.success,
+    required this.message,
+    this.purchase,
+  });
+
+  factory PurchaseOperationResponse.fromJson(Map<String, dynamic> json) {
+    return PurchaseOperationResponse(
+      success: json['success'] as bool? ?? false,
+      message: json['message'] as String? ?? '',
+      purchase: json['purchase'] != null
+          ? PurchaseResponse.fromJson(json['purchase'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'message': message,
+      if (purchase != null) 'purchase': purchase!.toJson(),
+    };
+  }
+}

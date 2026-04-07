@@ -2306,6 +2306,40 @@ class AppLocalizationsEn extends AppLocalizations {
       'Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on: standing out on the map, boosting postings, custom Avatar icons, tipping other Users';
 
   @override
+  String get purchaseCoins => 'Purchase coins';
+
+  @override
+  String get selectCoinPackage => 'Select coin package:';
+
+  @override
+  String selectedCoinPackage(String amount) {
+    return 'Selected coin package: $amount';
+  }
+
+  @override
+  String get purchaseCoinsFlowComingSoon => 'Purchase coins flow coming soon';
+
+  @override
+  String get createPostingBoostTitle => 'Boost visibility';
+
+  @override
+  String get createPostingBoostDescription =>
+      'Spend coins to boost this posting in search results.';
+
+  @override
+  String get createPostingBoostNone => 'No boost';
+
+  @override
+  String get createPostingBoost3Days => '3 days (20 coins)';
+
+  @override
+  String get createPostingBoost7Days => '7 days (50 coins)';
+
+  @override
+  String get createPostingBoostInsufficientCoins =>
+      'Not enough coins for selected boost.';
+
+  @override
   String get cannotSendFileNoRecipientKey =>
       'Cannot send file: Recipient public key not available';
 

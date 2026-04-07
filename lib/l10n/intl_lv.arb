@@ -721,7 +721,7 @@
   "reviewVisibilityNotice": "Jūsu atsauksme būs redzama pēc tam, kad otrs lietotājs iesniegs savu atsauksmi, vai pēc 14 dienām.",
   "ok": "Labi",
   "premiumUserBenefitsTitle": "Premium lietotāja priekšrocības",
-  "premiumUserBenefitsMessage": "Atbloķējiet Premium, lai iegūtu šīs priekšrocības:\n• Rediģēt savu vārdu\n• Rediģēt profila aprakstu\n• Rediģēt savu profila ikonu\n• Pievienot darba atsauču attēlus\n• Izcelties kartē",
+  "premiumUserBenefitsMessage": "Atbloķējiet Premium, lai iegūtu šīs priekšrocības:\n• Rediģēt savu vārdu\n• Rediģēt profila aprakstu\n• Rediģēt savu profila ikonu\n• Pievienot darba atsauču attēlus\n• Izcelties kartē\n• Atļauti vairāk nekā 3 aktīvi sludinājumi",
   "buyPremium": "Pirkt Premium",
   "restorePurchases": "Atjaunot pirkumus",
   "skipReviewTitle": "Izlaist atsauksmi?",
@@ -779,6 +779,23 @@
   "unableToReviewUser": "Šobrīd nav iespējams atsauksmēt šo lietotāju",
   "barterCoinsTitle": "Bartera monētas",
   "barterCoinsInfoMessage": "Monētas var nopelnīt, sniedzot pakalpojumu vai aktīvi lietojot lietotni.\n\nMonētas var tērēt: izcelšanās kartē, sludinājumu izcelšana, speciālas avatara ikonas",
+  "purchaseCoins": "Pirkt monētas",
+  "selectCoinPackage": "Izvēlieties monētu pakotni:",
+  "selectedCoinPackage": "Izvēlētā monētu pakotne: {amount}",
+  "@selectedCoinPackage": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "purchaseCoinsFlowComingSoon": "Monētu pirkšanas plūsma drīzumā",
+  "createPostingBoostTitle": "Redzamības boost",
+  "createPostingBoostDescription": "Tērē monētas, lai izceltu šo sludinājumu meklēšanas rezultātos.",
+  "createPostingBoostNone": "Bez boost",
+  "createPostingBoost3Days": "3 dienas (20 monētas)",
+  "createPostingBoost7Days": "7 dienas (50 monētas)",
+  "createPostingBoostInsufficientCoins": "Nepietiek monētu izvēlētajam boost.",
   "cannotSendFileNoRecipientKey": "Nevar nosūtīt failu: Saņēmēja publiskā atslēga nav pieejama",
   "gallery": "Iekārta",
   "camera": "Kamera",

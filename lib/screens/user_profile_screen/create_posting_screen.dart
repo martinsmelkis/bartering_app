@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:barter_app/models/postings/posting_data_response.dart';
+import 'package:barter_app/models/wallet/wallet_models.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/back_button_handler.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
@@ -42,7 +44,32 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
   final Map<String, Uint8List> _webImageBytes = {};
   final ImagePicker _picker = ImagePicker();
   bool _isSubmitting = false;
+  WalletResponse? _walletData;
+  bool _isLoadingWallet = true;
+  int _selectedBoostDays = 0;
   bool get _isEditing => widget.existingPosting != null;
+
+  int get _selectedBoostCost {
+    switch (_selectedBoostDays) {
+      case 3:
+        return 20;
+      case 7:
+        return 50;
+      default:
+        return 0;
+    }
+  }
+
+  String? get _selectedBoostType {
+    switch (_selectedBoostDays) {
+      case 3:
+        return 'POSTING_VISIBILITY_3_DAYS';
+      case 7:
+        return 'POSTING_VISIBILITY_7_DAYS';
+      default:
+        return null;
+    }
+  }
 
   @override
   void initState() {
@@ -64,6 +91,25 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
         _valueController.text = widget.existingPosting!.value.toString();
       }
       _selectedExpirationDate = widget.existingPosting!.expiresAt;
+    }
+
+    _loadWalletData();
+  }
+
+  Future<void> _loadWalletData() async {
+    try {
+      final apiClient = getIt<ApiClient>();
+      final wallet = await apiClient.getWallet();
+      if (!mounted) return;
+      setState(() {
+        _walletData = wallet;
+        _isLoadingWallet = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingWallet = false;
+      });
     }
   }
 
@@ -211,6 +257,19 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
       return;
     }
 
+    if (_selectedBoostCost > 0) {
+      final availableCoins = _walletData?.availableBalance ?? 0;
+      if (availableCoins < _selectedBoostCost) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.createPostingBoostInsufficientCoins),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+
     setState(() {
       _isSubmitting = true;
     });
@@ -260,6 +319,32 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
 
           imageFiles.add(multipartFile);
         }
+      }
+
+      // Purchase selected visibility boost before posting operation
+      final selectedBoostType = _selectedBoostType;
+      if (selectedBoostType != null && _selectedBoostCost > 0) {
+        final purchaseResponse = await apiClient.purchaseVisibilityBoost(
+          PurchaseVisibilityBoostRequest(
+            userId: userRepository.userId!,
+            boostType: selectedBoostType,
+            costCoins: _selectedBoostCost,
+            metadataJson: jsonEncode({
+              'source': 'create_posting_screen',
+              'mode': _isEditing ? 'update' : 'create',
+              'selectedBoostDays': _selectedBoostDays,
+            }),
+          ),
+        );
+
+        if (!purchaseResponse.success) {
+          throw Exception(purchaseResponse.message.isNotEmpty
+              ? purchaseResponse.message
+              : AppLocalizations.of(context)!.createPostingBoostInsufficientCoins);
+        }
+
+        // Refresh wallet balance after successful purchase
+        await _loadWalletData();
       }
 
       // Call the appropriate API (create or update)
@@ -640,6 +725,84 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                       padding: EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
+                SizedBox(height: 16),
+
+                Card(
+                  elevation: 1,
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.createPostingBoostTitle,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          l10n.createPostingBoostDescription,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        if (_isLoadingWallet)
+                          Text(l10n.loadingWalletBalance)
+                        else
+                          Text(
+                            l10n.currentWalletBalance(
+                              (_walletData?.availableBalance ?? 0).toString(),
+                            ),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            ChoiceChip(
+                              label: Text(l10n.createPostingBoostNone),
+                              selectedColor: AppColors.primary,
+                              selected: _selectedBoostDays == 0,
+                              onSelected: (_) {
+                                setState(() {
+                                  _selectedBoostDays = 0;
+                                });
+                              },
+                            ),
+                            ChoiceChip(
+                              label: Text(l10n.createPostingBoost3Days),
+                              selectedColor: AppColors.primary,
+                              selected: _selectedBoostDays == 3,
+                              onSelected: (_) {
+                                setState(() {
+                                  _selectedBoostDays = 3;
+                                });
+                              },
+                            ),
+                            ChoiceChip(
+                              label: Text(l10n.createPostingBoost7Days),
+                              selected: _selectedBoostDays == 7,
+                              selectedColor: AppColors.primary,
+                              onSelected: (_) {
+                                setState(() {
+                                  _selectedBoostDays = 7;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 SizedBox(height: 24),
 
                 // Submit Button

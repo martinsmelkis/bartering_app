@@ -540,6 +540,37 @@ abstract class ApiClient {
     @Body() TransferCoinsRequest request,
   );
 
+  ///////////// PURCHASES ///////////////
+
+  /// Get premium status for authenticated user
+  @GET('/api/v1/purchases/premium/status')
+  Future<PremiumStatusResponse> getPremiumStatus();
+
+  /// Get purchase history for authenticated user
+  @GET('/api/v1/purchases/history')
+  Future<List<PurchaseResponse>> getPurchaseHistory(
+    @Query('limit') int? limit,
+    @Query('offset') int? offset,
+  );
+
+  /// Purchase premium lifetime plan
+  @POST('/api/v1/purchases/premium/lifetime')
+  Future<PurchaseOperationResponse> purchasePremiumLifetime(
+    @Body() PurchasePremiumLifetimeRequest request,
+  );
+
+  /// Purchase a coin pack
+  @POST('/api/v1/purchases/coins')
+  Future<PurchaseOperationResponse> purchaseCoinPack(
+    @Body() PurchaseCoinPackRequest request,
+  );
+
+  /// Purchase a visibility boost
+  @POST('/api/v1/purchases/boosts/visibility')
+  Future<PurchaseOperationResponse> purchaseVisibilityBoost(
+    @Body() PurchaseVisibilityBoostRequest request,
+  );
+
   ///////////// DEVICE MANAGEMENT ///////////////
 
   /// Registers a new device for the authenticated user

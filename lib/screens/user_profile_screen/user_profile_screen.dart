@@ -1072,9 +1072,37 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       context: context,
       useRootNavigator: kIsWeb,
       builder: (dialogContext) {
-        return const ProfileCoinsInfoDialog();
+        return ProfileCoinsInfoDialog(
+          onPurchaseCoins: () {
+            if (kIsWeb) {
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+            } else {
+              Navigator.of(dialogContext).pop();
+            }
+            _showPurchaseCoinsOptionsDialog();
+          },
+        );
       },
     );
+  }
+
+  void _showPurchaseCoinsOptionsDialog() {
+    showDialog<int>(
+      context: context,
+      useRootNavigator: kIsWeb,
+      builder: (dialogContext) {
+        return const PurchaseCoinsOptionsDialog();
+      },
+    ).then((selectedAmount) {
+      if (!mounted || selectedAmount == null) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.selectedCoinPackage(selectedAmount.toString()),
+          ),
+        ),
+      );
+    });
   }
 
   Future<void> _handlePremiumLockTap() async {

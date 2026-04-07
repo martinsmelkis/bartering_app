@@ -2337,6 +2337,40 @@ class AppLocalizationsLv extends AppLocalizations {
       'Monētas var nopelnīt, sniedzot pakalpojumu vai aktīvi lietojot lietotni.\n\nMonētas var tērēt: izcelšanās kartē, sludinājumu izcelšana, speciālas avatara ikonas';
 
   @override
+  String get purchaseCoins => 'Pirkt monētas';
+
+  @override
+  String get selectCoinPackage => 'Izvēlieties monētu pakotni:';
+
+  @override
+  String selectedCoinPackage(String amount) {
+    return 'Izvēlētā monētu pakotne: $amount';
+  }
+
+  @override
+  String get purchaseCoinsFlowComingSoon => 'Monētu pirkšanas plūsma drīzumā';
+
+  @override
+  String get createPostingBoostTitle => 'Redzamības boost';
+
+  @override
+  String get createPostingBoostDescription =>
+      'Tērē monētas, lai izceltu šo sludinājumu meklēšanas rezultātos.';
+
+  @override
+  String get createPostingBoostNone => 'Bez boost';
+
+  @override
+  String get createPostingBoost3Days => '3 dienas (20 monētas)';
+
+  @override
+  String get createPostingBoost7Days => '7 dienas (50 monētas)';
+
+  @override
+  String get createPostingBoostInsufficientCoins =>
+      'Nepietiek monētu izvēlētajam boost.';
+
+  @override
   String get cannotSendFileNoRecipientKey =>
       'Nevar nosūtīt failu: Saņēmēja publiskā atslēga nav pieejama';
 

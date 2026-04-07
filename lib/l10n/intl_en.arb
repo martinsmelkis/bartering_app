@@ -720,7 +720,7 @@
   "reviewVisibilityNotice": "Your review will be visible after the other User submits their review, or in 14 days.",
   "ok": "OK",
   "premiumUserBenefitsTitle": "Premium User Benefits",
-  "premiumUserBenefitsMessage": "Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map",
+  "premiumUserBenefitsMessage": "Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map\n• Have a limit of more than 3 active postings",
   "buyPremium": "Buy Premium",
   "restorePurchases": "Restore Purchases",
   "skipReviewTitle": "Skip Review?",
@@ -778,6 +778,23 @@
   "unableToReviewUser": "Unable to review this user at this time",
   "barterCoinsTitle": "Barter Coins",
   "barterCoinsInfoMessage": "Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on: standing out on the map, boosting postings, custom Avatar icons, tipping other Users",
+  "purchaseCoins": "Purchase coins",
+  "selectCoinPackage": "Select coin package:",
+  "selectedCoinPackage": "Selected coin package: {amount}",
+  "@selectedCoinPackage": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "purchaseCoinsFlowComingSoon": "Purchase coins flow coming soon",
+  "createPostingBoostTitle": "Boost visibility",
+  "createPostingBoostDescription": "Spend coins to boost this posting in search results.",
+  "createPostingBoostNone": "No boost",
+  "createPostingBoost3Days": "3 days (20 coins)",
+  "createPostingBoost7Days": "7 days (50 coins)",
+  "createPostingBoostInsufficientCoins": "Not enough coins for selected boost.",
   "cannotSendFileNoRecipientKey": "Cannot send file: Recipient public key not available",
   "gallery": "Device",
   "camera": "Camera",

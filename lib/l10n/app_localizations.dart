@@ -4478,6 +4478,66 @@ abstract class AppLocalizations {
   /// **'Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on: standing out on the map, boosting postings, custom Avatar icons, tipping other Users'**
   String get barterCoinsInfoMessage;
 
+  /// No description provided for @purchaseCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase coins'**
+  String get purchaseCoins;
+
+  /// No description provided for @selectCoinPackage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select coin package:'**
+  String get selectCoinPackage;
+
+  /// No description provided for @selectedCoinPackage.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected coin package: {amount}'**
+  String selectedCoinPackage(String amount);
+
+  /// No description provided for @purchaseCoinsFlowComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase coins flow coming soon'**
+  String get purchaseCoinsFlowComingSoon;
+
+  /// No description provided for @createPostingBoostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Boost visibility'**
+  String get createPostingBoostTitle;
+
+  /// No description provided for @createPostingBoostDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Spend coins to boost this posting in search results.'**
+  String get createPostingBoostDescription;
+
+  /// No description provided for @createPostingBoostNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No boost'**
+  String get createPostingBoostNone;
+
+  /// No description provided for @createPostingBoost3Days.
+  ///
+  /// In en, this message translates to:
+  /// **'3 days (20 coins)'**
+  String get createPostingBoost3Days;
+
+  /// No description provided for @createPostingBoost7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days (50 coins)'**
+  String get createPostingBoost7Days;
+
+  /// No description provided for @createPostingBoostInsufficientCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough coins for selected boost.'**
+  String get createPostingBoostInsufficientCoins;
+
   /// No description provided for @cannotSendFileNoRecipientKey.
   ///
   /// In en, this message translates to:
