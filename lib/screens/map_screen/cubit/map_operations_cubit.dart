@@ -29,7 +29,7 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
 
   static const double MAIN_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD = 14.0;
   static const double SUB_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD = 16.0;
-  static const double MAIN_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD = 13.5;
+  static const double MAIN_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD = 13.0;
   static const double SUB_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD = 15.5;
 
   List<PoiClusterOsm> mainPoiClusters = [];
@@ -43,9 +43,16 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
   List<String> _lastClusteredPoiIds = [];
   double _lastClusteringZoom = -1.0;
 
+  // Track zoom from previous performMainClustering invocation
+  double? _previousPerformMainClusteringZoom;
+
   MapOperationsCubit() : super(MapOperationsInitial());
 
   void performMainClustering(List<PointOfInterest> _allPois, {bool emitUpdate = true}) {
+    // Cache zoom state at method entry for transition-aware emit logic
+    final double previousZoomAtMethodEntry = _previousPerformMainClusteringZoom ?? currentZoom;
+    final double currentZoomAtMethodEntry = currentZoom;
+
     // Save current cluster counts for comparison
     final int previousMainClusterCount = mainPoiClusters.length;
     final int previousLooseSubClusterCount = looseSubClusters.length;
@@ -129,7 +136,14 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
             looseSubClusters.length != previousLooseSubClusterCount ||
             individualPois.length != previousIndividualPoiCount;
 
-    if (clustersChanged && emitUpdate) {
+    // Force UI update when zoom crosses from expand threshold down to collapse threshold
+    final bool crossedMainExpandToCollapseThreshold =
+        previousZoomAtMethodEntry >= MAIN_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD &&
+            currentZoomAtMethodEntry <= MAIN_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD;
+
+    _previousPerformMainClusteringZoom = currentZoomAtMethodEntry;
+
+    if (clustersChanged && emitUpdate || crossedMainExpandToCollapseThreshold) {
       emit(MapOperationsClusterUpdateSuccess(currentZoom));
     }
   }

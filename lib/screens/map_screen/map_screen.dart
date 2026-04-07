@@ -1204,6 +1204,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             logDebug('@@@@@@@@@ Zoom changed to $newZoom - performing main clustering');
             if (!kIsWeb) {
               await Future.delayed(Duration(milliseconds: 1200), () async => {
+                mapOperationsCubit.currentZoom = newZoom,
                 mapOperationsCubit.performMainClustering(_allPois)
               });
             } else {
@@ -1215,6 +1216,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           logDebug('@@@@@@@@@ Zoomed past clustering threshold - resetting tracking');
           if (!kIsWeb) {
             await Future.delayed(Duration(milliseconds: 1200), () async => {
+              mapOperationsCubit.currentZoom = newZoom,
               await mapOperationsCubit.handleZoomBasedClusterChanges(_mapController, emitUpdate: false),
               mapOperationsCubit.performMainClustering(_allPois),
             });
