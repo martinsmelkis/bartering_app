@@ -4217,7 +4217,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumUserBenefitsMessage.
   ///
   /// In en, this message translates to:
-  /// **'Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map'**
+  /// **'Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map\n• Have a limit of more than 3 active postings'**
   String get premiumUserBenefitsMessage;
 
   /// No description provided for @buyPremium.
@@ -4667,7 +4667,7 @@ abstract class AppLocalizations {
   /// No description provided for @noUsersNearbyMessage.
   ///
   /// In en, this message translates to:
-  /// **'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!'**
+  /// **'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering — first referral awards 50 coins!'**
   String get noUsersNearbyMessage;
 
   /// No description provided for @shareApp.

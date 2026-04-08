@@ -86,7 +86,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return [
       OnboardingCategory(titleKey: 'category_green', color: Colors.green.shade400, icons: [Icons.eco, Icons.park, Icons.pets, Icons.forest]),
       OnboardingCategory(titleKey: 'category_red', color: Colors.red.shade400, icons: [Icons.sports_soccer, Icons.directions_run, Icons.party_mode, Icons.build]),
-      OnboardingCategory(titleKey: 'category_blue', color: Colors.blue.shade400, icons: [Icons.business, Icons.attach_money, Icons.work, Icons.handshake]),
+      OnboardingCategory(titleKey: 'category_blue', color: Colors.blue.shade400, icons: [Icons.business, Icons.euro, Icons.work, Icons.handshake]),
       OnboardingCategory(titleKey: 'category_purple', color: Colors.purple.shade400, icons: [Icons.palette, Icons.self_improvement, Icons.music_note, Icons.book]),
       OnboardingCategory(titleKey: 'category_yellow', color: Colors.yellow.shade700, icons: [Icons.chat, Icons.forum, Icons.alternate_email, Icons.event]),
       OnboardingCategory(titleKey: 'category_orange', color: Colors.orange.shade600, icons: [Icons.volunteer_activism, Icons.healing, Icons.support_agent, Icons.construction]),

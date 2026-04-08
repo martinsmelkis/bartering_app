@@ -295,7 +295,7 @@ class _ManagePostingsScreenState extends State<ManagePostingsScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
+                      Icon(Icons.euro, size: 16, color: Colors.grey[600]),
                       Text(
                         '${posting.value}',
                         style: TextStyle(

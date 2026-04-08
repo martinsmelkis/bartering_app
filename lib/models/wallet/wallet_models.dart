@@ -118,6 +118,71 @@ class TransferCoinsRequest {
   }
 }
 
+/// Request model for claiming wallet award
+class ClaimAwardRequest {
+  final String userId;
+  final String awardType;
+  final String? externalRef;
+  final String? metadataJson;
+
+  ClaimAwardRequest({
+    required this.userId,
+    required this.awardType,
+    this.externalRef,
+    this.metadataJson,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'awardType': awardType,
+      if (externalRef != null) 'externalRef': externalRef,
+      if (metadataJson != null) 'metadataJson': metadataJson,
+    };
+  }
+}
+
+/// Response model for claiming wallet award
+class ClaimAwardResponse {
+  final bool success;
+  final bool awarded;
+  final String awardType;
+  final int amount;
+  final String externalRef;
+  final String message;
+
+  ClaimAwardResponse({
+    required this.success,
+    required this.awarded,
+    required this.awardType,
+    required this.amount,
+    required this.externalRef,
+    required this.message,
+  });
+
+  factory ClaimAwardResponse.fromJson(Map<String, dynamic> json) {
+    return ClaimAwardResponse(
+      success: json['success'] as bool? ?? false,
+      awarded: json['awarded'] as bool? ?? false,
+      awardType: json['awardType'] as String? ?? '',
+      amount: json['amount'] as int? ?? 0,
+      externalRef: json['externalRef'] as String? ?? '',
+      message: json['message'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'awarded': awarded,
+      'awardType': awardType,
+      'amount': amount,
+      'externalRef': externalRef,
+      'message': message,
+    };
+  }
+}
+
 /// Wallet operation response model
 class WalletOperationResponse {
   final bool success;
@@ -260,7 +325,7 @@ class PurchaseResponse {
       userId: json['userId'] as String,
       purchaseType: json['purchaseType'] as String,
       status: json['status'] as String,
-      currency: json['currency'] as String,
+      currency: json['currency'] as String? ?? '',
       fiatAmountMinor: json['fiatAmountMinor'] as int? ?? 0,
       coinAmount: json['coinAmount'] as int?,
       externalRef: json['externalRef'] as String?,

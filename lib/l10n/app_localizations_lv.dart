@@ -2194,7 +2194,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get premiumUserBenefitsMessage =>
-      'Atbloķējiet Premium, lai iegūtu šīs priekšrocības:\n• Rediģēt savu vārdu\n• Rediģēt profila aprakstu\n• Rediģēt savu profila ikonu\n• Pievienot darba atsauču attēlus\n• Izcelties kartē';
+      'Atbloķējiet Premium, lai iegūtu šīs priekšrocības:\n• Rediģēt savu vārdu\n• Rediģēt profila aprakstu\n• Rediģēt savu profila ikonu\n• Pievienot darba atsauču attēlus\n• Izcelties kartē\n• Atļauti vairāk nekā 3 aktīvi sludinājumi';
 
   @override
   String get buyPremium => 'Pirkt Premium';
@@ -2456,7 +2456,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get noUsersNearbyMessage =>
-      'Šķiet, ka jūsu apkārtnē vēl nav lietotāju. Esiet pirmais, kas uzaicina draugus un sāk barterēšanos!';
+      'Šķiet, ka jūsu apkārtnē vēl nav lietotāju. Esi pirmais, kas uzaicina draugus un sāk barterēšanos — nopelni 50 monētas par pirmo ieteikumu!';
 
   @override
   String get shareApp => 'Dalīties ar lietotni';

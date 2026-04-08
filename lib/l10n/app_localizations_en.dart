@@ -2165,7 +2165,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumUserBenefitsMessage =>
-      'Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map';
+      'Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map\n• Have a limit of more than 3 active postings';
 
   @override
   String get buyPremium => 'Buy Premium';
@@ -2424,7 +2424,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noUsersNearbyMessage =>
-      'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!';
+      'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering — first referral awards 50 coins!';
 
   @override
   String get shareApp => 'Share App';

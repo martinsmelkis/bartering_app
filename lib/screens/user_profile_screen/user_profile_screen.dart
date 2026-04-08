@@ -54,9 +54,11 @@ import '../../services/settings_service.dart';
 import '../../theme/app_colors.dart';
 import 'widgets/badges_info_dialog.dart';
 import 'widgets/delete_profile_confirmation_dialog.dart';
+import 'widgets/premium_lock_icon.dart';
 import 'widgets/premium_user_benefits_dialog.dart';
 import 'widgets/profile_action_button.dart';
 import 'widgets/profile_coins_info_dialog.dart';
+import 'widgets/purchase_coins_options_dialog.dart';
 import '../onboarding_screen/cubit/onboarding_cubit.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -91,6 +93,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   ReputationResponse? _reputationData;
   List<BadgeDetail>? _userBadges;
   WalletResponse? _walletData;
+  bool _isPremiumActive = false;
   bool _isLoadingReputation = false;
   bool _isLoadingBadges = false;
   bool _isLoadingWallet = false;
@@ -115,6 +118,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     _loadUserLocation();
     _loadProfileKeywordData();
+    _loadPremiumStatus();
     // Delay reputation and badges loading by 5 seconds
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
@@ -218,10 +222,42 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
+  Future<void> _loadPremiumStatus() async {
+    try {
+      final premiumStatus = await getIt<ApiClient>().getPremiumStatus();
+      if (!mounted) return;
+      setState(() {
+        _isPremiumActive = premiumStatus.isPremium;
+      });
+    } catch (e) {
+      logDebug('Error loading premium status: $e');
+      if (!mounted) return;
+      setState(() {
+        _isPremiumActive = false;
+      });
+    }
+  }
+
   Future<void> _loadUserLocation() async {
     final location = await SecureStorageService().getOwnLocation();
     setState(() {
-      _userLocation = location;
+      _userLocation = _formatLocationForDisplay(location);
+    });
+  }
+
+  String? _formatLocationForDisplay(String? rawLocation) {
+    if (rawLocation == null || rawLocation.isEmpty) {
+      return rawLocation;
+    }
+
+    final decimalNumberPattern = RegExp(r'-?\d+\.\d+');
+
+    return rawLocation.replaceAllMapped(decimalNumberPattern, (match) {
+      final value = double.tryParse(match.group(0)!);
+      if (value == null) {
+        return match.group(0)!;
+      }
+      return value.toStringAsFixed(4);
     });
   }
 
@@ -293,7 +329,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Stack(
                   children: [
                     Padding(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -311,28 +347,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 ),
                               ),
                               SizedBox(width: 8.w),
-                              PointerInterceptor(
-                                child: InkWell(
-                                  onTap: _handlePremiumLockTap,
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    width: 24,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary.withValues(alpha: 0.12),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: AppColors.primary.withValues(alpha: 0.35),
-                                      ),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.lock,
-                                      size: 14,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
+                              PremiumLockIcon(
+                                isPremiumActive: _isPremiumActive,
+                                onTap: _handlePremiumLockTap,
                               ),
                               const Spacer(),
                             ],
@@ -340,12 +357,61 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           SizedBox(height: 8.h),
 
                           _buildRatingDisplay(l10n),
+                          SizedBox(height: 8),
+                          Divider(height: 1, color: Colors.grey.withValues(alpha: 0.25)),
+                          SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _userLocation ?? l10n.notSet,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontFamily: 'Courier',
+                                    color: _userLocation != null
+                                        ? Colors.black87
+                                        : Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              PointerInterceptor(
+                                child: IconButton(
+                                  onPressed: () async {
+                                    // Navigate to location picker
+                                    // If in full-screen mode, the location picker will handle navigation back
+                                    // If in panel mode, just reload data when done
+                                    if (widget.showAppBar) {
+                                      // Full-screen mode: use go navigation
+                                      context.push('/location-picker');
+                                    } else {
+                                      // Panel mode: use push and reload on return
+                                      context.pushReplacement('/location-picker');
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.edit,
+                                    size: AppDimensions.editIconSize,
+                                    color: AppColors.primary,
+                                  ),
+                                  padding: EdgeInsets.fromLTRB(4, 4, 0, 4),
+                                  constraints: const BoxConstraints(),
+                                  tooltip: l10n.editLocation,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
                     Positioned(
                       top: 8,
-                      right: 8,
+                      right: 16,
                       child: PointerInterceptor(
                         child: IconButton(
                           onPressed: () => _showDeleteProfileDialog(context),
@@ -362,73 +428,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   ],
                 ),
-              ),
-            ),
-            SizedBox(height: 16.h),
-
-            // Location Section
-            Card(
-              elevation: 1,
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          color: AppColors.primary,
-                          size: 20,
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            _userLocation ?? l10n.notSet,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontFamily: 'Courier',
-                              color: _userLocation != null
-                                  ? Colors.black87
-                                  : Colors.grey,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 40), // Space for the edit icon
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    top: kIsWeb ? 6 : -2,
-                    right: kIsWeb ? 6 : -2,
-                    child: PointerInterceptor(
-                      child: IconButton(
-                        onPressed: () async {
-                          // Navigate to location picker
-                          // If in full-screen mode, the location picker will handle navigation back
-                          // If in panel mode, just reload data when done
-                          if (widget.showAppBar) {
-                            // Full-screen mode: use go navigation
-                            context.push('/location-picker');
-                          } else {
-                            // Panel mode: use push and reload on return
-                            context.pushReplacement('/location-picker');
-                            //if (mounted) {
-                            //  await _loadProfileKeywordData();
-                            //}
-                          }
-                        },
-                        icon: Icon(
-                          Icons.edit,
-                          size: AppDimensions.editIconSize,
-                          color: AppColors.primary,
-                        ),
-                        padding: EdgeInsets.all(4),
-                        constraints: const BoxConstraints(),
-                        tooltip: l10n.editLocation,
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
             SizedBox(height: 20.h),
@@ -1106,7 +1105,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<void> _handlePremiumLockTap() async {
-    final isPremium = _inAppPurchasesCubit.state.isPremium;
+    bool isPremium = false;
+
+    try {
+      final premiumStatus = await getIt<ApiClient>().getPremiumStatus();
+      isPremium = premiumStatus.isPremium;
+      if (mounted) {
+        setState(() {
+          _isPremiumActive = isPremium;
+        });
+      }
+    } catch (e) {
+      logDebug('Error refreshing premium status: $e');
+      isPremium = _isPremiumActive;
+    }
 
     if (!isPremium) {
       _showPremiumBenefitsDialog();
@@ -1159,6 +1171,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     backgroundColor: Colors.green,
                   ),
                 );
+              }
+
+              if (state.isPremium && mounted) {
+                setState(() {
+                  _isPremiumActive = true;
+                });
               }
             },
             builder: (context, state) {

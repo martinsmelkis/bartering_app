@@ -552,7 +552,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.r),
                     ),
-                    prefixIcon: const Icon(Icons.attach_money),
+                    prefixIcon: const Icon(Icons.euro),
                     suffixText: l10n.optionalField,
                   ),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),

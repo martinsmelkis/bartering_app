@@ -1,10 +1,15 @@
+import 'dart:convert';
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/l10n/app_localizations.dart';
+import 'package:barter_app/models/wallet/wallet_models.dart';
+import 'package:barter_app/repositories/user_repository.dart';
+import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:share_plus/share_plus.dart';
@@ -18,15 +23,38 @@ class InviteFriendsDialog extends StatelessWidget {
   static String get appShareLink => 
       dotenv.env['SERVICE_BASE_URL_WEB'] ?? 'https://barters.lv';
 
-  void _shareApp(BuildContext context) async {
+  Future<void> _shareApp(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final shareMessage = l10n.inviteMessageShare(appShareLink);
     final subject = l10n.inviteMessageSubject;
-    
+
     try {
       await SharePlus.instance.share(
-        ShareParams(text: shareMessage, subject: subject)
+        ShareParams(text: shareMessage, subject: subject),
       );
+
+      final inviterUserId = await getIt<UserRepository>().getUserId();
+      if (inviterUserId == null || inviterUserId.isEmpty) {
+        return;
+      }
+
+      const campaign = 'INIT_PROMO';
+      final inviterShortId = inviterUserId.length >= 6
+          ? inviterUserId.substring(0, 6)
+          : inviterUserId;
+
+      final request = ClaimAwardRequest(
+        userId: inviterUserId,
+        awardType: 'referral_signup',
+        externalRef: 'inviteCode:$campaign:inviter:$inviterShortId',
+        metadataJson: jsonEncode({
+          'campaign': campaign,
+          'inviterUserId': inviterUserId,
+          'source': 'mobile_referral',
+        }),
+      );
+
+      await getIt<ApiClient>().claimWalletAward(request);
     } catch (e) {
       debugPrint(e.toString());
       if (context.mounted) {

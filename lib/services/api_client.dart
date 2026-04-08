@@ -540,6 +540,12 @@ abstract class ApiClient {
     @Body() TransferCoinsRequest request,
   );
 
+  /// Claim wallet award for a user
+  @POST('/api/v1/wallet/awards/claim')
+  Future<ClaimAwardResponse> claimWalletAward(
+    @Body() ClaimAwardRequest request,
+  );
+
   ///////////// PURCHASES ///////////////
 
   /// Get premium status for authenticated user

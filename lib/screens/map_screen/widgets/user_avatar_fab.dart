@@ -248,7 +248,7 @@ class UserAvatarFab extends StatelessWidget {
                           child: Icon(
                             Icons.edit,
                             size: AppDimensions.avatarEditIconInnerSize,
-                            color: AppColors.primary,
+                            color: AppColors.darkGrey,
                           ),
                         ),
                         if (unreadCount > 0)

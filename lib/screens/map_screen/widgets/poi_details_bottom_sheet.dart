@@ -703,7 +703,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                 Row(
                   children: [
                     const Icon(
-                      Icons.monetization_on,
+                      Icons.euro_outlined,
                       size: 16,
                       color: Colors.green,
                     ),

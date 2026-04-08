@@ -49,7 +49,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     Icons.party_mode,
     Icons.build,
     Icons.business,
-    Icons.attach_money,
+    Icons.euro,
     Icons.work,
     Icons.handshake,
     Icons.palette,
