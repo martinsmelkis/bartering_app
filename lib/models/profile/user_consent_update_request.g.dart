@@ -15,6 +15,7 @@ UserConsentUpdateRequest _$UserConsentUpdateRequestFromJson(
   analyticsCookiesConsent: json['analyticsCookiesConsent'] as bool?,
   federationConsent: json['federationConsent'] as bool?,
   privacyPolicyVersion: json['privacyPolicyVersion'] as String?,
+  termsConditionsVersion: json['termsConditionsVersion'] as String?,
 );
 
 Map<String, dynamic> _$UserConsentUpdateRequestToJson(
@@ -26,4 +27,5 @@ Map<String, dynamic> _$UserConsentUpdateRequestToJson(
   'analyticsCookiesConsent': ?instance.analyticsCookiesConsent,
   'federationConsent': ?instance.federationConsent,
   'privacyPolicyVersion': ?instance.privacyPolicyVersion,
+  'termsConditionsVersion': ?instance.termsConditionsVersion,
 };

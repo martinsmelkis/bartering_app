@@ -179,6 +179,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacyPolicy => 'Privacy Policy';
 
   @override
+  String get termsConditionsTitle => 'Terms & Conditions';
+
+  @override
+  String get termsConditionsSectionScopeTitle => '1. Scope';
+
+  @override
+  String get termsConditionsSectionScopeContent =>
+      'These terms govern your use of Barter App and define user rights and responsibilities.';
+
+  @override
+  String get termsConditionsSectionMinimumAgeTitle => '2. Minimum Age';
+
+  @override
+  String get termsConditionsSectionMinimumAgeContent =>
+      'The app is intended for users aged 16 or older. By registering, you confirm you are at least 16 years old.';
+
+  @override
+  String get termsConditionsSectionAccountUseTitle => '3. Account Use';
+
+  @override
+  String get termsConditionsSectionAccountUseContent =>
+      'You are responsible for maintaining your account security and activities performed through your account.';
+
+  @override
+  String get termsConditionsSectionProhibitedConductTitle =>
+      '4. Prohibited Conduct';
+
+  @override
+  String get termsConditionsSectionProhibitedConductContent =>
+      'Fraud, harassment, unlawful content, misuse of other users’ data, and other illegal actions are prohibited.';
+
+  @override
+  String get termsConditionsSectionAccountRestrictionTitle =>
+      '5. Account Restriction or Termination';
+
+  @override
+  String get termsConditionsSectionAccountRestrictionContent =>
+      'We may restrict or terminate accounts for violations of these terms or security risks.';
+
+  @override
+  String get termsConditionsSectionLiabilityDisputesTitle =>
+      '6. Liability and Disputes';
+
+  @override
+  String get termsConditionsSectionLiabilityDisputesContent =>
+      'Users are responsible for their own exchanges and interactions. The platform provides an intermediary environment to the extent permitted by law.';
+
+  @override
+  String get termsConditionsSectionChangesTitle => '7. Changes to Terms';
+
+  @override
+  String get termsConditionsSectionChangesContent =>
+      'We may update these terms from time to time. Continued use of the app after changes means acceptance of the updated terms.';
+
+  @override
   String get settingsSaved => 'Settings saved successfully';
 
   @override
@@ -1973,6 +2028,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get match => 'Match';
+
+  @override
+  String get matchLabel => 'Match:';
 
   @override
   String get dismissMatch => 'Dismiss Match';

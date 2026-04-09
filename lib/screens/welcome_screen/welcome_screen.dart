@@ -195,6 +195,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             aiProcessingConsent: consent.aiProcessingConsent,
             analyticsCookiesConsent: consent.analyticsCookiesConsent,
             privacyPolicyVersion: _gdprConsentVersion,
+            termsConditionsVersion: _gdprConsentVersion,
           ),
         );
       } else {

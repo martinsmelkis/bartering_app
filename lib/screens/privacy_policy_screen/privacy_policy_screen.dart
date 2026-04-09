@@ -4,6 +4,22 @@ import '../../l10n/app_localizations.dart';
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
+  String _minimumAgeTitle(BuildContext context) {
+    final localeCode = Localizations.localeOf(context).languageCode;
+    if (localeCode == 'lv') {
+      return 'Minimālais vecums';
+    }
+    return 'Minimum Age Requirement';
+  }
+
+  String _minimumAgeContent(BuildContext context) {
+    final localeCode = Localizations.localeOf(context).languageCode;
+    if (localeCode == 'lv') {
+      return 'Šis pakalpojums paredzēts lietotājiem no 16 gadu vecuma. Reģistrējoties un lietojot lietotni, jūs apliecināt, ka jums ir vismaz 16 gadi. Ja konstatējam, ka konts izveidots personai, kas jaunāka par 16 gadiem, mēs varam ierobežot, apturēt vai dzēst kontu un saistītos datus, lai ievērotu piemērojamos datu aizsardzības un drošības pienākumus.';
+    }
+    return 'This service is intended for users aged 16 or older. By registering and using the app, you confirm that you are at least 16 years old. If we determine that an account was created by a person under 16, we may restrict, suspend, or delete the account and related data to comply with applicable data protection and safety obligations.';
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -61,6 +77,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
             _buildSection(
               title: l10n.privacyPolicyContactTitle,
               content: l10n.privacyPolicyContactContent,
+            ),
+            const SizedBox(height: 24),
+            _buildSection(
+              title: _minimumAgeTitle(context),
+              content: _minimumAgeContent(context),
             ),
             const SizedBox(height: 32),
             Center(

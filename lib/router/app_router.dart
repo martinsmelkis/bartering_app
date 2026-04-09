@@ -12,7 +12,9 @@ import 'package:barter_app/screens/notifications_screen/notifications_screen.dar
 import 'package:barter_app/screens/offers_screen/offers_screen.dart';
 import 'package:barter_app/screens/onboarding_screen/onboarding_screen.dart';
 import 'package:barter_app/screens/pin_input_screen/pin_verification_screen.dart';
+import 'package:barter_app/screens/privacy_policy_screen/privacy_policy_screen.dart';
 import 'package:barter_app/screens/settings_screen/settings_screen.dart';
+import 'package:barter_app/screens/terms_screen/terms_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dart';
 import 'package:barter_app/screens/welcome_screen/welcome_screen.dart';
 import 'package:barter_app/services/settings_service.dart';
@@ -260,6 +262,20 @@ class AppRouter {
         path: '/settings',
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+
+      // Public Privacy Policy Screen (for web URL sharing)
+      GoRoute(
+        path: '/privacy-policy',
+        name: 'privacy-policy',
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+
+      // Public Terms & Conditions Screen
+      GoRoute(
+        path: '/terms',
+        name: 'terms',
+        builder: (context, state) => const TermsScreen(),
       ),
     ],
 

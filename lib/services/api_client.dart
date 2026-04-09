@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/models/chat/file_metadata_dto.dart';
@@ -20,7 +21,7 @@ import 'package:barter_app/models/user/user_onboarding_data.dart';
 import 'package:barter_app/models/user/user_registration_data.dart';
 import 'package:barter_app/models/wallet/wallet_models.dart';
 import 'package:dio/io.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, kReleaseMode;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pointycastle/asn1/primitives/asn1_integer.dart' as pc;
@@ -58,15 +59,20 @@ abstract class ApiClient {
     if (!kIsWeb) {
       (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
         final client = HttpClient();
-        // This line is for DEVELOPMENT on mobile only.
-        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+        // Allow invalid certificates only in debug/profile builds for local dev.
+        if (!kReleaseMode) {
+          client.badCertificateCallback =
+              (X509Certificate cert, String host, int port) => true;
+        }
         return client;
       };
     }
 
     dio.options.connectTimeout = Duration(seconds: 10);
     // Add interceptors for logging, auth, etc. if needed
-    dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+    if (!kReleaseMode) {
+      dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+    }
     dio.interceptors.add(ReviewRiskTrackingInterceptor());
     dio.interceptors.add(InterceptorsWrapper(
 

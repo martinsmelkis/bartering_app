@@ -35,7 +35,7 @@ class PremiumLockIcon extends StatelessWidget {
                 Center(
                   child: Icon(
                     isPremiumActive ? Icons.stars_sharp : Icons.lock,
-                    size: isPremiumActive ? 16.8 : 14,
+                    size: isPremiumActive ? 16.8 : 17,
                     color: isPremiumActive ? Colors.green : AppColors.primary,
                   ),
                 ),

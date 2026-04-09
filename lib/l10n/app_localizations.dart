@@ -404,6 +404,96 @@ abstract class AppLocalizations {
   /// **'Privacy Policy'**
   String get privacyPolicy;
 
+  /// No description provided for @termsConditionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions'**
+  String get termsConditionsTitle;
+
+  /// No description provided for @termsConditionsSectionScopeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Scope'**
+  String get termsConditionsSectionScopeTitle;
+
+  /// No description provided for @termsConditionsSectionScopeContent.
+  ///
+  /// In en, this message translates to:
+  /// **'These terms govern your use of Barter App and define user rights and responsibilities.'**
+  String get termsConditionsSectionScopeContent;
+
+  /// No description provided for @termsConditionsSectionMinimumAgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Minimum Age'**
+  String get termsConditionsSectionMinimumAgeTitle;
+
+  /// No description provided for @termsConditionsSectionMinimumAgeContent.
+  ///
+  /// In en, this message translates to:
+  /// **'The app is intended for users aged 16 or older. By registering, you confirm you are at least 16 years old.'**
+  String get termsConditionsSectionMinimumAgeContent;
+
+  /// No description provided for @termsConditionsSectionAccountUseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'3. Account Use'**
+  String get termsConditionsSectionAccountUseTitle;
+
+  /// No description provided for @termsConditionsSectionAccountUseContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You are responsible for maintaining your account security and activities performed through your account.'**
+  String get termsConditionsSectionAccountUseContent;
+
+  /// No description provided for @termsConditionsSectionProhibitedConductTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'4. Prohibited Conduct'**
+  String get termsConditionsSectionProhibitedConductTitle;
+
+  /// No description provided for @termsConditionsSectionProhibitedConductContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Fraud, harassment, unlawful content, misuse of other users’ data, and other illegal actions are prohibited.'**
+  String get termsConditionsSectionProhibitedConductContent;
+
+  /// No description provided for @termsConditionsSectionAccountRestrictionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'5. Account Restriction or Termination'**
+  String get termsConditionsSectionAccountRestrictionTitle;
+
+  /// No description provided for @termsConditionsSectionAccountRestrictionContent.
+  ///
+  /// In en, this message translates to:
+  /// **'We may restrict or terminate accounts for violations of these terms or security risks.'**
+  String get termsConditionsSectionAccountRestrictionContent;
+
+  /// No description provided for @termsConditionsSectionLiabilityDisputesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'6. Liability and Disputes'**
+  String get termsConditionsSectionLiabilityDisputesTitle;
+
+  /// No description provided for @termsConditionsSectionLiabilityDisputesContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Users are responsible for their own exchanges and interactions. The platform provides an intermediary environment to the extent permitted by law.'**
+  String get termsConditionsSectionLiabilityDisputesContent;
+
+  /// No description provided for @termsConditionsSectionChangesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'7. Changes to Terms'**
+  String get termsConditionsSectionChangesTitle;
+
+  /// No description provided for @termsConditionsSectionChangesContent.
+  ///
+  /// In en, this message translates to:
+  /// **'We may update these terms from time to time. Continued use of the app after changes means acceptance of the updated terms.'**
+  String get termsConditionsSectionChangesContent;
+
   /// No description provided for @settingsSaved.
   ///
   /// In en, this message translates to:
@@ -3865,6 +3955,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Match'**
   String get match;
+
+  /// No description provided for @matchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Match:'**
+  String get matchLabel;
 
   /// No description provided for @dismissMatch.
   ///

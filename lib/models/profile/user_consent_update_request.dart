@@ -15,6 +15,8 @@ class UserConsentUpdateRequest {
   final bool? federationConsent;
   @JsonKey(includeIfNull: false)
   final String? privacyPolicyVersion;
+  @JsonKey(includeIfNull: false)
+  final String? termsConditionsVersion;
 
   const UserConsentUpdateRequest({
     required this.userId,
@@ -23,6 +25,7 @@ class UserConsentUpdateRequest {
     this.analyticsCookiesConsent,
     this.federationConsent,
     this.privacyPolicyVersion,
+    this.termsConditionsVersion,
   });
 
   factory UserConsentUpdateRequest.fromJson(Map<String, dynamic> json) =>

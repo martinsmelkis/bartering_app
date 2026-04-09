@@ -22,6 +22,8 @@ class SettingsService {
   static const String _gdprLocationConsentKey = 'gdpr_location_consent';
   static const String _gdprAiProcessingConsentKey = 'gdpr_ai_processing_consent';
   static const String _gdprAnalyticsCookiesConsentKey = 'gdpr_analytics_cookies_consent';
+  static const String _termsVersionKey = 'terms_version';
+  static const String _termsAcceptedAtKey = 'terms_accepted_at';
 
   // Default values
   static const double defaultNearbyUsersRadius = 50.0; // km
@@ -276,12 +278,28 @@ class SettingsService {
     if (analyticsCookiesConsent != null) {
       await prefs.setBool(_gdprAnalyticsCookiesConsentKey, analyticsCookiesConsent);
     }
+
+    // Persist Terms acceptance metadata alongside consent flow
+    await prefs.setString(_termsVersionKey, version);
+    await prefs.setString(_termsAcceptedAtKey, consentTimestamp);
   }
 
   /// Returns true when user has already completed GDPR consent flow for a given version
   Future<bool> hasAcceptedGdprConsentVersion(String version) async {
     final prefs = await _preferences;
     return prefs.getString(_gdprConsentVersionKey) == version;
+  }
+
+  /// Returns stored terms version, or null when not yet accepted.
+  Future<String?> getTermsVersion() async {
+    final prefs = await _preferences;
+    return prefs.getString(_termsVersionKey);
+  }
+
+  /// Returns stored terms acceptance timestamp (UTC ISO8601), or null when not yet accepted.
+  Future<String?> getTermsAcceptedAt() async {
+    final prefs = await _preferences;
+    return prefs.getString(_termsAcceptedAtKey);
   }
 
   /// Clear all settings from SharedPreferences

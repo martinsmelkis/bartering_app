@@ -1289,7 +1289,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           Icon(Icons.star, size: 16, color: Colors.amber[700]),
           const SizedBox(width: 4),
           Text(
-            'Match: ${(poi.matchRelevancyScore! * 100).toStringAsFixed(2)}%',
+            '${l10n.matchLabel} ${(poi.matchRelevancyScore! * 100).toStringAsFixed(2)}%',
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[700],

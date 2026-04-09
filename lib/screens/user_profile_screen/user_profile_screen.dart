@@ -399,7 +399,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     size: AppDimensions.editIconSize,
                                     color: AppColors.primary,
                                   ),
-                                  padding: EdgeInsets.fromLTRB(4, 4, 0, 4),
+                                  padding: EdgeInsets.fromLTRB(4, 4, (kIsWeb ? 8 : 0), 4),
                                   constraints: const BoxConstraints(),
                                   tooltip: l10n.editLocation,
                                 ),

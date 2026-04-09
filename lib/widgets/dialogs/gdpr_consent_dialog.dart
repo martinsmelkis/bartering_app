@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
@@ -143,12 +144,32 @@ class _GdprConsentDialogState extends State<GdprConsentDialog> {
                 ),
               ],
               const SizedBox(height: 8),
-              Text(
-                l10n.gdprConsentManageLater,
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 12,
-                ),
+              Wrap(
+                spacing: 4,
+                runSpacing: 2,
+                children: [
+                  Text(
+                    l10n.gdprConsentManageLater,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(0, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    onPressed: () {
+                      context.push('/terms');
+                    },
+                    child: Text(
+                      'Terms & Conditions',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -169,7 +190,7 @@ class _GdprConsentDialogState extends State<GdprConsentDialog> {
               analyticsCookiesConsent: kIsWeb ? _analyticsCookiesConsent : true,
             ));
           },
-          child: Text(l10n.gdprConsentAccept),
+          child: const Text('Continue (accept Terms & Conditions)'),
         ),
       ],
     );

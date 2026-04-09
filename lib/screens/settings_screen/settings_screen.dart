@@ -754,6 +754,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             aiProcessingConsent: consent.aiProcessingConsent,
             analyticsCookiesConsent: consent.analyticsCookiesConsent,
             privacyPolicyVersion: _gdprConsentVersion,
+            termsConditionsVersion: _gdprConsentVersion,
           ),
         );
       } else {

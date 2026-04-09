@@ -182,6 +182,61 @@ class AppLocalizationsLv extends AppLocalizations {
   String get privacyPolicy => 'Privātuma politika';
 
   @override
+  String get termsConditionsTitle => 'Lietošanas noteikumi';
+
+  @override
+  String get termsConditionsSectionScopeTitle => '1. Piemērošana';
+
+  @override
+  String get termsConditionsSectionScopeContent =>
+      'Šie noteikumi attiecas uz Barter App lietošanu un nosaka lietotāja tiesības un pienākumus.';
+
+  @override
+  String get termsConditionsSectionMinimumAgeTitle => '2. Minimālais vecums';
+
+  @override
+  String get termsConditionsSectionMinimumAgeContent =>
+      'Lietotne paredzēta personām no 16 gadu vecuma. Reģistrējoties, jūs apliecināt, ka jums ir vismaz 16 gadi.';
+
+  @override
+  String get termsConditionsSectionAccountUseTitle => '3. Konta lietošana';
+
+  @override
+  String get termsConditionsSectionAccountUseContent =>
+      'Jūs esat atbildīgs par sava konta drošību un par aktivitātēm, kas notiek, izmantojot jūsu kontu.';
+
+  @override
+  String get termsConditionsSectionProhibitedConductTitle =>
+      '4. Aizliegtā rīcība';
+
+  @override
+  String get termsConditionsSectionProhibitedConductContent =>
+      'Aizliegta krāpniecība, uzmākšanās, nelikumīgs saturs, citu lietotāju datu ļaunprātīga izmantošana un jebkāda pretlikumīga darbība.';
+
+  @override
+  String get termsConditionsSectionAccountRestrictionTitle =>
+      '5. Konta ierobežošana vai dzēšana';
+
+  @override
+  String get termsConditionsSectionAccountRestrictionContent =>
+      'Mēs varam ierobežot vai dzēst kontus par noteikumu pārkāpumiem vai drošības riskiem.';
+
+  @override
+  String get termsConditionsSectionLiabilityDisputesTitle =>
+      '6. Atbildība un strīdi';
+
+  @override
+  String get termsConditionsSectionLiabilityDisputesContent =>
+      'Lietotāji ir atbildīgi par savām vienošanām un mijiedarbību. Platforma sniedz starpniecības vidi, cik to atļauj tiesību akti.';
+
+  @override
+  String get termsConditionsSectionChangesTitle => '7. Izmaiņas noteikumos';
+
+  @override
+  String get termsConditionsSectionChangesContent =>
+      'Mēs varam periodiski atjaunināt šos noteikumus. Turpinot lietot lietotni pēc izmaiņām, jūs piekrītat atjauninātajiem noteikumiem.';
+
+  @override
   String get settingsSaved => 'Iestatījumi veiksmīgi saglabāti';
 
   @override
@@ -2002,6 +2057,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get match => 'Atbilstība';
+
+  @override
+  String get matchLabel => 'Atbilstība:';
 
   @override
   String get dismissMatch => 'Noraidīt atbilstību';
