@@ -655,10 +655,10 @@ class _AttributeSetupViewState extends State<_AttributeSetupView> {
                             ),
                           ],
                         ),
-                        subtitle: Text(
+                        /*subtitle: Text(
                           '${l10n.category}: ${attr.uiStyleHint} • ${l10n.relevancy}: ${(attr.relevancyScore * 100).toStringAsFixed(0)}%',
                           style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                        ),
+                        ),*/
                         value: isSelected,
                         onChanged: (value) {
                           setState(() {

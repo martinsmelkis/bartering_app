@@ -68,6 +68,34 @@ extension AppLocalizationsExtension on AppLocalizations {
       'drawer_menu_favorite_users' => drawer_menu_favorite_users,
       'settingsTitle' => settingsTitle,
       'privacyPolicy' => privacyPolicy,
+      'termsConditionsTitle' => termsConditionsTitle,
+      'termsConditionsSectionScopeTitle' => termsConditionsSectionScopeTitle,
+      'termsConditionsSectionScopeContent' =>
+        termsConditionsSectionScopeContent,
+      'termsConditionsSectionMinimumAgeTitle' =>
+        termsConditionsSectionMinimumAgeTitle,
+      'termsConditionsSectionMinimumAgeContent' =>
+        termsConditionsSectionMinimumAgeContent,
+      'termsConditionsSectionAccountUseTitle' =>
+        termsConditionsSectionAccountUseTitle,
+      'termsConditionsSectionAccountUseContent' =>
+        termsConditionsSectionAccountUseContent,
+      'termsConditionsSectionProhibitedConductTitle' =>
+        termsConditionsSectionProhibitedConductTitle,
+      'termsConditionsSectionProhibitedConductContent' =>
+        termsConditionsSectionProhibitedConductContent,
+      'termsConditionsSectionAccountRestrictionTitle' =>
+        termsConditionsSectionAccountRestrictionTitle,
+      'termsConditionsSectionAccountRestrictionContent' =>
+        termsConditionsSectionAccountRestrictionContent,
+      'termsConditionsSectionLiabilityDisputesTitle' =>
+        termsConditionsSectionLiabilityDisputesTitle,
+      'termsConditionsSectionLiabilityDisputesContent' =>
+        termsConditionsSectionLiabilityDisputesContent,
+      'termsConditionsSectionChangesTitle' =>
+        termsConditionsSectionChangesTitle,
+      'termsConditionsSectionChangesContent' =>
+        termsConditionsSectionChangesContent,
       'settingsSaved' => settingsSaved,
       'settingsSearchSection' => settingsSearchSection,
       'settingsSearchCenterPointTitle' => settingsSearchCenterPointTitle,
@@ -649,6 +677,7 @@ extension AppLocalizationsExtension on AppLocalizations {
       'userMatch' => userMatch,
       'attributeMatch' => attributeMatch,
       'match' => match,
+      'matchLabel' => matchLabel,
       'dismissMatch' => dismissMatch,
       'dismissMatchConfirmation' => dismissMatchConfirmation,
       'matchDismissed' => matchDismissed,

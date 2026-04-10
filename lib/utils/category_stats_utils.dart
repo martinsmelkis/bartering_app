@@ -95,7 +95,7 @@ class CategoryStatsUtils {
   static Widget buildCategoryStatsBar({
     required Map<String, double>? keywordMap,
     List<dynamic>? attributes,
-    double height = 4.0,
+    double height = 6.0,
     double borderRadius = 2.0,
     Widget? fallbackWidget,
   }) {

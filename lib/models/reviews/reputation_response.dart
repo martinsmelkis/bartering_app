@@ -1,16 +1,16 @@
 /// Reputation badge values from backend
 /// Mirrors backend `ReputationBadge` enum values.
 enum ReputationBadge {
-  IDENTITY_VERIFIED('IDENTITY_VERIFIED', 'Identity Verified'),
   VETERAN_TRADER('VETERAN_TRADER', 'Veteran Trader - 100+ trades'),
   TOP_RATED('TOP_RATED', 'Top Rated Seller'),
   QUICK_RESPONDER('QUICK_RESPONDER', 'Quick Responder'),
   COMMUNITY_CONNECTOR('COMMUNITY_CONNECTOR', 'Community Connector'),
-  VERIFIED_BUSINESS('VERIFIED_BUSINESS', 'Verified Business'),
+  PREMIUM_USER('PREMIUM_USER', 'Premium User'),
+  TOP_1000('TOP_1000', 'Early Adopter - First 1000 Users'),
   DISPUTE_FREE('DISPUTE_FREE', 'Dispute-Free History'),
   FAST_TRADER('FAST_TRADER', 'Fast & Reliable'),
-  PREMIUM_USER('PREMIUM_USER', 'Premium User'),
-  TOP_1000('TOP_1000', 'Early Adopter - First 1000 Users');
+  IDENTITY_VERIFIED('IDENTITY_VERIFIED', 'Identity Verified'),
+  VERIFIED_BUSINESS('VERIFIED_BUSINESS', 'Verified Business');
 
   const ReputationBadge(this.value, this.description);
 

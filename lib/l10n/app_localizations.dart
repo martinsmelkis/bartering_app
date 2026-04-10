@@ -212,6 +212,90 @@ abstract class AppLocalizations {
   /// **'Error during initialization.'**
   String get errorDuringInitialization;
 
+  /// No description provided for @apiErrorAuthSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has expired. Please sign in again.'**
+  String get apiErrorAuthSessionExpired;
+
+  /// No description provided for @apiErrorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The request timed out. Please try again.'**
+  String get apiErrorTimeout;
+
+  /// No description provided for @apiErrorNoInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Please check your network and try again.'**
+  String get apiErrorNoInternet;
+
+  /// No description provided for @apiErrorBadRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'There was an issue with the request. Please check your input and try again.'**
+  String get apiErrorBadRequest;
+
+  /// No description provided for @apiErrorForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to perform this action.'**
+  String get apiErrorForbidden;
+
+  /// No description provided for @apiErrorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The requested resource was not found.'**
+  String get apiErrorNotFound;
+
+  /// No description provided for @apiErrorConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict with existing data. Please refresh and try again.'**
+  String get apiErrorConflict;
+
+  /// No description provided for @apiErrorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Some of the provided data is invalid.'**
+  String get apiErrorValidation;
+
+  /// No description provided for @apiErrorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error. Please try again later.'**
+  String get apiErrorServer;
+
+  /// No description provided for @apiErrorNearbyUsersFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load nearby users right now.'**
+  String get apiErrorNearbyUsersFallback;
+
+  /// No description provided for @apiErrorSearchUsersFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to search users right now.'**
+  String get apiErrorSearchUsersFallback;
+
+  /// No description provided for @apiErrorSimilarUsersFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load similar users right now.'**
+  String get apiErrorSimilarUsersFallback;
+
+  /// No description provided for @apiErrorMatchingUsersFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load matching users right now.'**
+  String get apiErrorMatchingUsersFallback;
+
+  /// No description provided for @apiErrorFavoriteUsersFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load favorite users right now.'**
+  String get apiErrorFavoriteUsersFallback;
+
   /// No description provided for @selectYourInterests.
   ///
   /// In en, this message translates to:

@@ -1,5 +1,4 @@
 import 'package:barter_app/repositories/user_repository.dart';
-import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -19,8 +18,7 @@ class InitializeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          InitializeCubit(getIt<UserRepository>(),
-              ApiClient.create())..startInitialization(),
+          InitializeCubit(getIt<UserRepository>())..startInitialization(),
       child: const SplashView(),
     );
   }

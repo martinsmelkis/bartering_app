@@ -36,9 +36,6 @@ class _NotificationsScreenView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    // Check if we're in web panel mode
-    final bool isWebPanel = kIsWeb && !showAppBar && context.canShowSideBySide;
-
     return DefaultTabController(
       length: 2,
       child: Scaffold(

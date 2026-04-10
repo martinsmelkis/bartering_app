@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'application.dart';
@@ -55,18 +57,21 @@ void main() async {
     } catch (e) {
       logDebug('⚠️ Firebase already initialized (probably by background handler): $e');
     }
-    
-    // Initialize Firebase and FCM
-    logDebug('⏳ Initializing FirebaseService...');
-    await FirebaseService().initialize();
-    logDebug('✅ FirebaseService initialized');
   } else {
-    logDebug('🔔 Skipping Firebase/FCM initialization on web (using WebSocket messaging)');
+    logDebug('🔔 Skipping Firebase initialization on web (using WebSocket messaging)');
   }
 
   logDebug('⏳ Running Application widget...');
   runApp(const Application());
   logDebug('✅ Application widget started');
+
+  // Defer non-critical FCM/service setup until after first frame.
+  if (!kIsWeb) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      logDebug('⏳ Initializing FirebaseService after first frame...');
+      unawaited(FirebaseService().initialize());
+    });
+  }
 }
 
 /// The root widget of the application.

@@ -75,6 +75,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorDuringInitialization => 'Error during initialization.';
 
   @override
+  String get apiErrorAuthSessionExpired =>
+      'Your session has expired. Please sign in again.';
+
+  @override
+  String get apiErrorTimeout => 'The request timed out. Please try again.';
+
+  @override
+  String get apiErrorNoInternet =>
+      'No internet connection. Please check your network and try again.';
+
+  @override
+  String get apiErrorBadRequest =>
+      'There was an issue with the request. Please check your input and try again.';
+
+  @override
+  String get apiErrorForbidden =>
+      'You do not have permission to perform this action.';
+
+  @override
+  String get apiErrorNotFound => 'The requested resource was not found.';
+
+  @override
+  String get apiErrorConflict =>
+      'Conflict with existing data. Please refresh and try again.';
+
+  @override
+  String get apiErrorValidation => 'Some of the provided data is invalid.';
+
+  @override
+  String get apiErrorServer => 'Server error. Please try again later.';
+
+  @override
+  String get apiErrorNearbyUsersFallback =>
+      'Unable to load nearby users right now.';
+
+  @override
+  String get apiErrorSearchUsersFallback => 'Unable to search users right now.';
+
+  @override
+  String get apiErrorSimilarUsersFallback =>
+      'Unable to load similar users right now.';
+
+  @override
+  String get apiErrorMatchingUsersFallback =>
+      'Unable to load matching users right now.';
+
+  @override
+  String get apiErrorFavoriteUsersFallback =>
+      'Unable to load favorite users right now.';
+
+  @override
   String get selectYourInterests => 'What is of interest to you?';
 
   @override

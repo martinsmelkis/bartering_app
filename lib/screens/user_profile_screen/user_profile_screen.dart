@@ -13,7 +13,6 @@ import 'package:barter_app/screens/notifications_screen/notifications_screen.dar
 import 'package:barter_app/screens/offers_screen/offers_screen.dart';
 import 'package:barter_app/screens/onboarding_screen/onboarding_screen.dart';
 import 'package:barter_app/screens/manage_postings_screen/manage_postings_screen.dart';
-import 'package:barter_app/screens/device_migration_screen/source_migration_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/cubit/nested_panel_cubit.dart';
 import 'package:barter_app/screens/user_profile_screen/cubit/in_app_purchases_cubit.dart';
@@ -119,6 +118,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _loadUserLocation();
     _loadProfileKeywordData();
     _loadPremiumStatus();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final notificationsCubit = context.read<NotificationsCubit>();
+      if (notificationsCubit.state.matchHistory == null) {
+        notificationsCubit.loadMatchHistory();
+      }
+    });
+
     // Delay reputation and badges loading by 5 seconds
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
@@ -724,12 +732,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ],
               ),
             SizedBox(height: 20.h),
-
-            // Notification Preferences and Match History Buttons
-            Row(
-              children: [
-                // Notification Preferences Button
-                ProfileActionButton(
+            // Notification Preferences Button
+            Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                width: 250,
+                child: ProfileActionButton(
                   icon: Icons.notifications_active,
                   label: l10n.notificationPreferences,
                   color: AppColors.primary,
@@ -748,19 +756,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     }
                   },
                 ),
-                SizedBox(width: 12),
-                // Match History Button
-                // Use existing NotificationsCubit - don't reload match history here
-                // Match history will be loaded when user actually opens the match history screen
-                BlocBuilder<NotificationsCubit, NotificationsState>(
-                  bloc: getIt<NotificationsCubit>(),
-                  builder: (context, notificationState) {
-                    final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
+              ),
+            ),
+            SizedBox(height: 8),
+            // Match History Button
+            // Use existing NotificationsCubit - don't reload match history here
+            // Match history will be loaded when user actually opens the match history screen
+            BlocBuilder<NotificationsCubit, NotificationsState>(
+              builder: (context, notificationState) {
+                final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
 
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        ProfileActionButton(
+                return Align(
+                  alignment: Alignment.centerRight,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      SizedBox(
+                        width: 250,
+                        child: ProfileActionButton(
                           icon: Icons.history,
                           label: l10n.matchHistory,
                           color: AppColors.primary,
@@ -779,59 +792,53 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             }
                           },
                         ),
-                        if (unreadCount > 0)
-                          PositionedCountBadge(
-                            count: unreadCount,
-                            top: -6,
-                            right: -6,
-                            padding: const EdgeInsets.all(4),
-                            borderColor: Colors.white,
-                            borderWidth: 1.5,
-                            constraints: const BoxConstraints(
-                              minWidth: 28,
-                              minHeight: 28,
-                            ),
+                      ),
+                      if (unreadCount > 0)
+                        PositionedCountBadge(
+                          count: unreadCount,
+                          top: -6,
+                          right: -6,
+                          padding: const EdgeInsets.all(4),
+                          borderColor: Colors.white,
+                          borderWidth: 1.5,
+                          constraints: const BoxConstraints(
+                            minWidth: 28,
+                            minHeight: 28,
                           ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            ProfileActionButton(
-              icon: Icons.manage_accounts,
-              label: l10n.managePostings,
-              color: AppColors.secondary,
-              onTap: () async {
-                // Use adaptive behavior: panel within profile on web, full-screen on mobile
-                if (isWebPanel) {
-                  // Open as nested panel within profile on web
-                  context.read<NestedPanelCubit>().openManagePostings(widget.userId);
-                } else {
-                  // Navigate to full-screen on mobile
-                  await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => ManagePostingsScreen(userId: widget.userId),
-                    ),
-                  );
-                }
-              },
-            ),
-            SizedBox(height: 12,),
-            ProfileActionButton(
-              icon: Icons.phonelink_setup,
-              label: l10n.migrateToNewDevice,
-              color: AppColors.secondary,
-              onTap: () async {
-                // Navigate to source device migration screen
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const SourceMigrationScreen(),
+                        ),
+                    ],
                   ),
                 );
               },
             ),
+
+            SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                width: 250,
+                child: ProfileActionButton(
+                  icon: Icons.manage_accounts,
+                  label: l10n.managePostings,
+                  color: AppColors.secondary,
+                  onTap: () async {
+                    // Use adaptive behavior: panel within profile on web, full-screen on mobile
+                    if (isWebPanel) {
+                      // Open as nested panel within profile on web
+                      context.read<NestedPanelCubit>().openManagePostings(widget.userId);
+                    } else {
+                      // Navigate to full-screen on mobile
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ManagePostingsScreen(userId: widget.userId),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+
             SizedBox(height: 16.h),
             Center(
               child: TextButton(

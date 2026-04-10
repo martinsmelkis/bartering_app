@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:barter_app/models/user/user_registration_data.dart';
+import 'package:barter_app/services/crypto/crypto_service.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:flutter/foundation.dart';
@@ -185,8 +187,72 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     try {
       final userRepository = getIt<UserRepository>();
       final apiClient = getIt<ApiClient>();
-      final userId = await userRepository.getUserId();
 
+      // Deferred first-launch account bootstrap:
+      // only do expensive crypto/profile creation after explicit consent.
+      await userRepository.init();
+      final hasOnboardingData = await userRepository.getProfileKeywordDataMap();
+      if (hasOnboardingData == null) {
+        String? userId = await userRepository.getUserId();
+
+        if (userId != null && userId.isNotEmpty) {
+          try {
+            CryptoService.disposeSingletonStatic();
+            final cryptoService = await CryptoService.create();
+            final publicKey = cryptoService.ecPublicKeyToString(
+              cryptoService.getPublicKey(),
+            );
+
+            await apiClient.createProfile(
+              UserRegistrationData(
+                id: userId,
+                name: 'User_${userId.substring(0, 8)}',
+                publicKey: publicKey,
+                email: '',
+                password: 'User_${Random.secure().nextInt(100000)}',
+              ),
+            );
+          } on PlatformException catch (cryptoError) {
+            final cryptoErrorString = cryptoError.toString().toLowerCase();
+            if (cryptoErrorString.contains('key_not_found') ||
+                cryptoErrorString.contains('badpaddingexception') ||
+                cryptoErrorString.contains('bad_decrypt') ||
+                cryptoErrorString.contains('cipher functions') ||
+                (cryptoError.code.toLowerCase().contains('read') && cryptoError.message == null) ||
+                (cryptoError.message?.toLowerCase().contains('read') == true) ||
+                cryptoErrorString.contains('keystore') ||
+                cryptoErrorString.contains('fluttersecurestorage')) {
+              logDebug('🔄 Keystore error during deferred crypto init. Resetting secure storage and retrying bootstrap.');
+
+              await userRepository.clearStorage();
+              await userRepository.resetUserId();
+              userId = await userRepository.getUserId();
+
+              if (userId != null && userId.isNotEmpty) {
+                CryptoService.disposeSingletonStatic();
+                final recoveredCryptoService = await CryptoService.create();
+                final recoveredPublicKey = recoveredCryptoService.ecPublicKeyToString(
+                  recoveredCryptoService.getPublicKey(),
+                );
+
+                await apiClient.createProfile(
+                  UserRegistrationData(
+                    id: userId,
+                    name: 'User_${userId.substring(0, 8)}',
+                    publicKey: recoveredPublicKey,
+                    email: '',
+                    password: 'User_${Random.secure().nextInt(100000)}',
+                  ),
+                );
+              }
+            } else {
+              rethrow;
+            }
+          }
+        }
+      }
+
+      final userId = await userRepository.getUserId();
       if (userId != null && userId.isNotEmpty) {
         await apiClient.updateUserConsent(
           UserConsentUpdateRequest(
@@ -202,7 +268,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         logDebug('⚠️ GDPR consent not submitted: userId missing');
       }
     } catch (e) {
-      logDebug('⚠️ Failed to submit GDPR consent to backend: $e');
+      logDebug('⚠️ Failed to complete deferred registration/consent sync: $e');
     }
 
     if (!mounted) return;
@@ -396,23 +462,21 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
                       ),
                       SizedBox(height: 24),
-                      // Import Existing Account link
+
                       GestureDetector(
-                        onTap: () {
-                          if (context.mounted) {
-                            context.go('/device-migration');
-                          }
-                        },
+                        onTap: () => context.push('/device-migration'),
                         child: Text(
                           l10n.importExistingAccount,
                           style: TextStyle(
                             fontSize: context.bodyFontSize / fontScale,
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
                             decoration: TextDecoration.underline,
-                            decorationColor: Colors.white.withValues(alpha: 0.9),
+                            decorationColor: Colors.white,
                           ),
                         ),
                       ),
+
                     ],
                   ),
                 ),

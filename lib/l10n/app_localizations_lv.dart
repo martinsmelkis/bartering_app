@@ -76,6 +76,58 @@ class AppLocalizationsLv extends AppLocalizations {
   String get errorDuringInitialization => 'Kļūda inicializācijas laikā.';
 
   @override
+  String get apiErrorAuthSessionExpired =>
+      'Sesija beidzās. Lūdzu, autorizējieties vēlreiz.';
+
+  @override
+  String get apiErrorTimeout =>
+      'Pieprasījums aizņēma pārāk ilgu laiku. Lūdzu, mēģiniet vēlreiz.';
+
+  @override
+  String get apiErrorNoInternet =>
+      'Nav savienojuma ar internetu. Pārbaudiet tīklu un mēģiniet vēlreiz.';
+
+  @override
+  String get apiErrorBadRequest =>
+      'Pieprasījumā ir kļūda. Lūdzu, pārbaudiet datus un mēģiniet vēlreiz.';
+
+  @override
+  String get apiErrorForbidden => 'Jums nav piekļuves šai darbībai.';
+
+  @override
+  String get apiErrorNotFound => 'Pieprasītais resurss nav atrasts.';
+
+  @override
+  String get apiErrorConflict =>
+      'Konflikts ar esošiem datiem. Lūdzu, atjaunojiet un mēģiniet vēlreiz.';
+
+  @override
+  String get apiErrorValidation => 'Daži ievadītie dati nav derīgi.';
+
+  @override
+  String get apiErrorServer => 'Servera kļūda. Lūdzu, mēģiniet vēlreiz vēlāk.';
+
+  @override
+  String get apiErrorNearbyUsersFallback =>
+      'Pašlaik neizdodas ielādēt tuvumā esošos lietotājus.';
+
+  @override
+  String get apiErrorSearchUsersFallback =>
+      'Pašlaik neizdodas meklēt lietotājus.';
+
+  @override
+  String get apiErrorSimilarUsersFallback =>
+      'Pašlaik neizdodas ielādēt līdzīgus lietotājus.';
+
+  @override
+  String get apiErrorMatchingUsersFallback =>
+      'Pašlaik neizdodas ielādēt atbilstošus lietotājus.';
+
+  @override
+  String get apiErrorFavoriteUsersFallback =>
+      'Pašlaik neizdodas ielādēt iecienītos lietotājus.';
+
+  @override
   String get selectYourInterests => 'Ko Jūs meklējat?';
 
   @override
@@ -2800,7 +2852,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get privacyPolicyLastUpdated =>
-      'Pēdējoreiz atjaunots: 2025. gada janvāris';
+      'Pēdējoreiz atjaunots: 2026. gada janvāris';
 
   @override
   String get chats => 'Čati';
@@ -2857,7 +2909,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get users => 'Lietotāji';
 
   @override
-  String get tradeMatch => 'Tirdzniecības atbilstība';
+  String get tradeMatch => 'Atbilstība';
 
   @override
   String get similar => 'Līdzīgs';

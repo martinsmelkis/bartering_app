@@ -489,7 +489,7 @@ class _MatchHistoryCard extends StatelessWidget {
           });
         } else {
           // For mobile, push a new route with the MapScreenV2
-          Navigator.of(context).pushReplacement(
+          Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => MapScreenV2(initialPois: poisList),
             ),

@@ -70,16 +70,13 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i33.UserRepository>(
       () => _i33.UserRepository(gh<_i607.SecureStorageService>()),
     );
+    gh.factory<_i646.InitializeCubit>(
+      () => _i646.InitializeCubit(gh<_i33.UserRepository>()),
+    );
     gh.factory<_i838.InterestsCubit>(
       () => _i838.InterestsCubit(
         gh<_i205.ApiClient>(),
         gh<_i33.UserRepository>(),
-      ),
-    );
-    gh.factory<_i646.InitializeCubit>(
-      () => _i646.InitializeCubit(
-        gh<_i33.UserRepository>(),
-        gh<_i205.ApiClient>(),
       ),
     );
     gh.factory<_i12.OnboardingCubit>(

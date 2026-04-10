@@ -10,6 +10,7 @@ import '../../../utils/responsive_breakpoints.dart';
 import '../cubit/map_screen_api_cubit.dart';
 import '../../settings_screen/settings_screen.dart';
 import '../../privacy_policy_screen/privacy_policy_screen.dart';
+import '../../device_migration_screen/source_migration_screen.dart';
 
 class DrawerMain extends StatelessWidget {
 
@@ -129,6 +130,20 @@ class DrawerMain extends StatelessWidget {
                       }
                     },
                     title: Text(l10n?.settingsTitle ?? "Settings"),
+                  ),
+                ),
+                PointerInterceptor(
+                  child: ListTile(
+                    leading: const Icon(Icons.phonelink_setup),
+                    onTap: () {
+                      Scaffold.of(context).closeDrawer();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SourceMigrationScreen(),
+                        ),
+                      );
+                    },
+                    title: Text(l10n?.migrateToNewDevice ?? "Migrate to New Device"),
                   ),
                 ),
                 PointerInterceptor(

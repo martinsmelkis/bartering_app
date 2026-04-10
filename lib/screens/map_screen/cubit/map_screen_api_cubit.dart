@@ -1,15 +1,18 @@
 import 'dart:developer' show log;
 
+import 'package:barter_app/l10n/app_localizations.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/dio_error_handler.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart'; // For value equality in states
 import '../../../configure_dependencies.dart';
 import '../../../models/map/point_of_interest.dart';
 import '../../../services/secure_storage_service.dart';
 import '../../../services/settings_service.dart';
+import '../../../application.dart';
 
 part 'map_screen_api_state.dart';
 
@@ -19,6 +22,11 @@ class PoiCubit extends Cubit<PoiState> {
   String? userId;
 
   PoiCubit(this._apiClient) : super(PoiInitial());
+
+  AppLocalizations get _l10n {
+    final locale = localeNotifier.value ?? const Locale('en');
+    return lookupAppLocalizations(locale);
+  }
 
   /// Sorts POIs by distance (ascending) and then by relevancy score (descending)
   List<PointOfInterest> _sortPois(List<PointOfInterest> pois) {
@@ -90,20 +98,24 @@ class PoiCubit extends Cubit<PoiState> {
       final sortedPois = _sortPois(pois);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
-      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch POIs");
+      final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
+        e,
+        _l10n,
+        fallbackMessage: _l10n.apiErrorNearbyUsersFallback,
+      );
       log("Failed to fetch POIs: $errorMessage");
-      
+
       // Check for authentication errors
       if (_isAuthenticationError(e)) {
         log("Authentication error detected - clearing keys and navigating to welcome screen");
-        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        emit(PoiAuthenticationError(_l10n.apiErrorAuthSessionExpired));
         return;
       }
-      
+
       emit(PoiError(errorMessage));
     } catch (e) {
       log("Failed to fetch POIs: ${e.toString()}");
-      emit(PoiError("Failed to fetch POIs: ${e.toString()}"));
+      emit(PoiError(_l10n.apiErrorNearbyUsersFallback));
     }
   }
 
@@ -175,18 +187,22 @@ class PoiCubit extends Cubit<PoiState> {
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
-      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch POI with keyword $keyword");
-      
+      final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
+        e,
+        _l10n,
+        fallbackMessage: _l10n.apiErrorSearchUsersFallback,
+      );
+
       // Check for authentication errors
       if (_isAuthenticationError(e)) {
         log("Authentication error detected - clearing keys and navigating to welcome screen");
-        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        emit(PoiAuthenticationError(_l10n.apiErrorAuthSessionExpired));
         return;
       }
-      
+
       emit(PoiError(errorMessage));
     } catch (e) {
-      emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
+      emit(PoiError(_l10n.apiErrorSearchUsersFallback));
     }
   }
 
@@ -247,18 +263,22 @@ class PoiCubit extends Cubit<PoiState> {
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
-      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch similar profiles");
-      
+      final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
+        e,
+        _l10n,
+        fallbackMessage: _l10n.apiErrorSimilarUsersFallback,
+      );
+
       // Check for authentication errors
       if (_isAuthenticationError(e)) {
         log("Authentication error detected - clearing keys and navigating to welcome screen");
-        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        emit(PoiAuthenticationError(_l10n.apiErrorAuthSessionExpired));
         return;
       }
-      
+
       emit(PoiError(errorMessage));
     } catch (e) {
-      emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
+      emit(PoiError(_l10n.apiErrorSimilarUsersFallback));
     }
   }
 
@@ -331,15 +351,19 @@ class PoiCubit extends Cubit<PoiState> {
       final sortedPois = _sortPois(poi);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
-      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch complementary profiles");
-      
+      final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
+        e,
+        _l10n,
+        fallbackMessage: _l10n.apiErrorMatchingUsersFallback,
+      );
+
       // Check for authentication errors
       if (_isAuthenticationError(e)) {
         log("Authentication error detected - clearing keys and navigating to welcome screen");
-        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        emit(PoiAuthenticationError(_l10n.apiErrorAuthSessionExpired));
         return;
       }
-      
+
       // If fallback is enabled, try nearby search
       if (fallbackToNearby) {
         log("Error fetching complementary profiles, falling back to nearby search: $errorMessage");
@@ -356,9 +380,11 @@ class PoiCubit extends Cubit<PoiState> {
         }
         return;
       }
-      
+
       emit(PoiError(errorMessage));
     } catch (e) {
+      final genericMessage = _l10n.apiErrorMatchingUsersFallback;
+
       // If fallback is enabled, try nearby search
       if (fallbackToNearby) {
         log("Error fetching complementary profiles, falling back to nearby search: ${e.toString()}");
@@ -371,12 +397,12 @@ class PoiCubit extends Cubit<PoiState> {
             radius: hasLocationConsent ? radiusMeters : null,
           );
         } catch (fallbackError) {
-          emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
+          emit(PoiError(genericMessage));
         }
         return;
       }
-      
-      emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
+
+      emit(PoiError(genericMessage));
     }
   }
 
@@ -388,23 +414,32 @@ class PoiCubit extends Cubit<PoiState> {
       final sortedPois = _sortPois(mappedToPOI);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
-      final errorMessage = DioErrorHandler.getErrorMessage(e, "Failed to fetch favorite profiles");
-      
+      final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
+        e,
+        _l10n,
+        fallbackMessage: _l10n.apiErrorFavoriteUsersFallback,
+      );
+
       // Check for authentication errors
       if (_isAuthenticationError(e)) {
         log("Authentication error detected - clearing keys and navigating to welcome screen");
-        emit(const PoiAuthenticationError("Authentication error: Please log in again"));
+        emit(PoiAuthenticationError(_l10n.apiErrorAuthSessionExpired));
         return;
       }
-      
+
       emit(PoiError(errorMessage));
     } catch (e) {
-      emit(PoiError("Failed to fetch POI with keyword $keyword: ${e.toString()}"));
+      emit(PoiError(_l10n.apiErrorFavoriteUsersFallback));
     }
   }
 
   /// Checks if the DioException is an authentication error
   bool _isAuthenticationError(DioException e) {
+    final statusCode = e.response?.statusCode;
+    if (statusCode == 401) {
+      return true;
+    }
+
     final errorString = e.error?.toString() ?? '';
     return errorString.contains('Authentication error') ||
         errorString.contains('Private key') ||
