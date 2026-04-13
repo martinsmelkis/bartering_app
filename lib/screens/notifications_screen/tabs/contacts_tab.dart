@@ -33,11 +33,14 @@ class _ContactsTabState extends State<ContactsTab> {
 
     return BlocBuilder<NotificationsCubit, NotificationsState>(
       builder: (context, state) {
-        final contacts = state.contacts!;
+        final contacts = state.contacts;
 
-        // Show email input form if no contacts found (404 or empty response)
+        // Handle initial load and null-safe rendering for direct /notifications/contacts route
         if (contacts == null) {
-          //return _buildEmailInputForm(context, l10n);
+          if (state.status == NotificationsStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return _buildEmailInputForm(context, l10n);
         }
 
         return RefreshIndicator(
@@ -80,7 +83,7 @@ class _ContactsTabState extends State<ContactsTab> {
                           style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                         value: contacts.notificationsEnabled,
-                        activeColor: AppColors.primary,
+                        activeThumbColor: AppColors.primary,
                         onChanged: (value) {
                           context
                               .read<NotificationsCubit>()
@@ -306,7 +309,7 @@ class _ContactsTabState extends State<ContactsTab> {
                           Icon(Icons.campaign, color: AppColors.primary),
                           SizedBox(width: 8),
                           Text(
-                            'Marketing Preferences',
+                            l10n.emailNotificationPreferences,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -326,7 +329,7 @@ class _ContactsTabState extends State<ContactsTab> {
                           style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                         value: contacts.marketingConsent,
-                        activeColor: AppColors.primary,
+                        activeThumbColor: AppColors.primary,
                         onChanged: (value) {
                           context
                               .read<NotificationsCubit>()
@@ -408,9 +411,12 @@ class _ContactsTabState extends State<ContactsTab> {
 
   String _formatHour(int hour) {
     if (hour < 0 || hour > 23) return '00:00';
-    final period = hour >= 12 ? 'PM' : 'AM';
-    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-    return '$displayHour:00 $period';
+    final localizations = MaterialLocalizations.of(context);
+    final formatted = localizations.formatTimeOfDay(
+      TimeOfDay(hour: hour, minute: 0),
+      alwaysUse24HourFormat: false,
+    );
+    return formatted;
   }
 
   void _showQuietHoursStartPicker(

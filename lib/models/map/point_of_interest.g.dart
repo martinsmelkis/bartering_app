@@ -31,14 +31,14 @@ Map<String, dynamic> _$PointOfInterestToJson(
 };
 
 const _$ReputationBadgeEnumMap = {
-  ReputationBadge.IDENTITY_VERIFIED: 'IDENTITY_VERIFIED',
   ReputationBadge.VETERAN_TRADER: 'VETERAN_TRADER',
   ReputationBadge.TOP_RATED: 'TOP_RATED',
   ReputationBadge.QUICK_RESPONDER: 'QUICK_RESPONDER',
   ReputationBadge.COMMUNITY_CONNECTOR: 'COMMUNITY_CONNECTOR',
-  ReputationBadge.VERIFIED_BUSINESS: 'VERIFIED_BUSINESS',
-  ReputationBadge.DISPUTE_FREE: 'DISPUTE_FREE',
-  ReputationBadge.FAST_TRADER: 'FAST_TRADER',
   ReputationBadge.PREMIUM_USER: 'PREMIUM_USER',
   ReputationBadge.TOP_1000: 'TOP_1000',
+  ReputationBadge.DISPUTE_FREE: 'DISPUTE_FREE',
+  ReputationBadge.FAST_TRADER: 'FAST_TRADER',
+  ReputationBadge.IDENTITY_VERIFIED: 'IDENTITY_VERIFIED',
+  ReputationBadge.VERIFIED_BUSINESS: 'VERIFIED_BUSINESS',
 };

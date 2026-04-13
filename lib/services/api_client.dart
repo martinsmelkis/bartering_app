@@ -339,6 +339,11 @@ abstract class ApiClient {
   Future<NotificationPreferencesResponse> addPushToken(
       @Body() AddPushTokenRequest request);
 
+  /// Public unsubscribe endpoint used by email deep links
+  @GET('/api/v1/notifications/unsubscribe')
+  Future<NotificationPreferencesResponse> unsubscribeFromEmails(
+      @Query('token') String token);
+
   /// Remove push token
   @DELETE('/api/v1/notifications/contacts/push-tokens/{token}')
   Future<NotificationPreferencesResponse> removePushToken(

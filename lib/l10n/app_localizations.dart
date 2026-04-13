@@ -2414,6 +2414,12 @@ abstract class AppLocalizations {
   /// **'Fresh eggs'**
   String get attr_fresh_eggs;
 
+  /// No description provided for @attr_chicken_eggs.
+  ///
+  /// In en, this message translates to:
+  /// **'Chicken eggs'**
+  String get attr_chicken_eggs;
+
   /// No description provided for @attr_furniture_repair.
   ///
   /// In en, this message translates to:
@@ -2443,6 +2449,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Handmade'**
   String get attr_handmade;
+
+  /// No description provided for @attr_home_decor.
+  ///
+  /// In en, this message translates to:
+  /// **'Home decor'**
+  String get attr_home_decor;
 
   /// No description provided for @attr_handyman_services.
   ///
@@ -4250,6 +4262,24 @@ abstract class AppLocalizations {
   /// **'Email address is required'**
   String get emailRequired;
 
+  /// No description provided for @emailNotificationPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Notification Preferences'**
+  String get emailNotificationPreferences;
+
+  /// No description provided for @emailUnsubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsubscribe'**
+  String get emailUnsubscribe;
+
+  /// No description provided for @emailUnsubscribed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsubscribed successfully'**
+  String get emailUnsubscribed;
+
   /// No description provided for @emailInvalid.
   ///
   /// In en, this message translates to:
@@ -4271,7 +4301,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketingConsentLabel.
   ///
   /// In en, this message translates to:
-  /// **'I agree to receive marketing emails about new features, offers, and updates'**
+  /// **'I agree to receive emails about new matches, offers, and updates'**
   String get marketingConsentLabel;
 
   /// No description provided for @marketingConsentDescription.
@@ -4279,12 +4309,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We may send you occasional emails about our services. You can unsubscribe at any time.'**
   String get marketingConsentDescription;
-
-  /// No description provided for @marketingConsentRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Please consent to receive marketing emails to continue'**
-  String get marketingConsentRequired;
 
   /// No description provided for @deleteProfile.
   ///
@@ -4315,6 +4339,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Review'**
   String get review;
+
+  /// No description provided for @ratingAndReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating and Reviews'**
+  String get ratingAndReviews;
 
   /// No description provided for @reportScam.
   ///
@@ -5243,85 +5273,85 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicyIntroTitle.
   ///
   /// In en, this message translates to:
-  /// **'Introduction'**
+  /// **'Controller, Scope and Contact'**
   String get privacyPolicyIntroTitle;
 
   /// No description provided for @privacyPolicyIntroContent.
   ///
   /// In en, this message translates to:
-  /// **'This Privacy Policy describes how we collect, use, and protect your personal information when you use our bartering application. We are committed to ensuring your privacy and protecting your data.'**
+  /// **'This policy explains how Barter backend services and connected mobile/web clients process personal data. It covers backend APIs, client apps, admin/compliance tooling, and optional federation features when enabled.'**
   String get privacyPolicyIntroContent;
 
   /// No description provided for @privacyPolicyDataCollectionTitle.
   ///
   /// In en, this message translates to:
-  /// **'Information We Collect'**
+  /// **'Data We Process'**
   String get privacyPolicyDataCollectionTitle;
 
   /// No description provided for @privacyPolicyDataCollectionContent.
   ///
   /// In en, this message translates to:
-  /// **'We collect information you provide directly, including your profile information, interests, offerings, location data, and chat messages. We also collect usage data such as app interactions and device information to improve our service.'**
+  /// **'We may process account/authentication data (including signature metadata), profile data, postings and chat-related data, notification data (email, push tokens, consent flags), security/compliance records, and technical request metadata.'**
   String get privacyPolicyDataCollectionContent;
 
   /// No description provided for @privacyPolicyDataUsageTitle.
   ///
   /// In en, this message translates to:
-  /// **'How We Use Your Information'**
+  /// **'Purposes and GDPR Legal Bases'**
   String get privacyPolicyDataUsageTitle;
 
   /// No description provided for @privacyPolicyDataUsageContent.
   ///
   /// In en, this message translates to:
-  /// **'We use your information to: facilitate bartering connections between users, display your profile to other users in your area, enable chat functionality, improve our services, and send notifications about matches and messages.'**
+  /// **'Processing supports service delivery (Art. 6(1)(b)), security and abuse prevention (Art. 6(1)(f)), and legal/compliance obligations (Art. 6(1)(c), 6(1)(f)). Where applicable, optional features and consents are processed under Art. 6(1)(a).'**
   String get privacyPolicyDataUsageContent;
 
   /// No description provided for @privacyPolicyDataSharingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Information Sharing'**
+  /// **'Processors, Infrastructure and Transfers'**
   String get privacyPolicyDataSharingTitle;
 
   /// No description provided for @privacyPolicyDataSharingContent.
   ///
   /// In en, this message translates to:
-  /// **'Your profile information, interests, and offerings are visible to other users of the app to facilitate bartering. We do not sell your personal information to third parties. We may share data with service providers who assist in operating our app, and we may disclose information if required by law.'**
+  /// **'Current integrations may include PostgreSQL, Mailjet, Firebase/FCM, Ollama, and Nginx + Docker infrastructure. Optional federation peers are used only when enabled and trusted. If data is processed outside your country/EEA, legally required safeguards (such as SCCs) are applied.'**
   String get privacyPolicyDataSharingContent;
 
   /// No description provided for @privacyPolicyDataSecurityTitle.
   ///
   /// In en, this message translates to:
-  /// **'Data Security'**
+  /// **'Security, Retention and Deletion'**
   String get privacyPolicyDataSecurityTitle;
 
   /// No description provided for @privacyPolicyDataSecurityContent.
   ///
   /// In en, this message translates to:
-  /// **'We implement appropriate technical and organizational measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.'**
+  /// **'We apply measures such as authenticated request-signature checks, access controls, transport security, and audit logging. Retention controls and scheduled cleanup are used for operational/compliance records, with legal-hold-aware handling where required.'**
   String get privacyPolicyDataSecurityContent;
 
   /// No description provided for @privacyPolicyUserRightsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your Rights'**
+  /// **'Your Rights, Erasure and Portability'**
   String get privacyPolicyUserRightsTitle;
 
   /// No description provided for @privacyPolicyUserRightsContent.
   ///
   /// In en, this message translates to:
-  /// **'You have the right to access, update, or delete your personal information at any time through the app settings. You can also request a copy of your data or object to certain types of processing.'**
+  /// **'Subject to applicable law, you may request access, rectification, erasure, restriction, portability, objection, and consent withdrawal. Authenticated deletion/export workflows include legal-hold checks, DSAR tracking, and compliance event logging.'**
   String get privacyPolicyUserRightsContent;
 
   /// No description provided for @privacyPolicyThirdPartyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Third-Party Services'**
+  /// **'Backend and Client Privacy Notice'**
   String get privacyPolicyThirdPartyTitle;
 
   /// No description provided for @privacyPolicyThirdPartyContent.
   ///
   /// In en, this message translates to:
-  /// **'Our app may use third-party services for analytics, maps, and notifications. These services have their own privacy policies, and we encourage you to review them.'**
+  /// **'This in-app text summarizes backend-centric processing and should be read together with client-facing app notices (permissions, identifiers, push UX, and local storage/cookies where applicable).'**
   String get privacyPolicyThirdPartyContent;
 
   /// No description provided for @privacyPolicyChangesTitle.
@@ -5333,25 +5363,25 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicyChangesContent.
   ///
   /// In en, this message translates to:
-  /// **'We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the app. Continued use of the app after changes constitutes acceptance of the updated policy.'**
+  /// **'We may update this policy from time to time. Material changes should be communicated in-app or via another appropriate channel, with updated effective dates.'**
   String get privacyPolicyChangesContent;
 
   /// No description provided for @privacyPolicyContactTitle.
   ///
   /// In en, this message translates to:
-  /// **'Contact Us'**
+  /// **'Contact'**
   String get privacyPolicyContactTitle;
 
   /// No description provided for @privacyPolicyContactContent.
   ///
   /// In en, this message translates to:
-  /// **'If you have any questions about this Privacy Policy or our data practices, please contact us at info@bartering.app'**
+  /// **'For privacy and GDPR requests, contact: info@bartering.app'**
   String get privacyPolicyContactContent;
 
   /// No description provided for @privacyPolicyLastUpdated.
   ///
   /// In en, this message translates to:
-  /// **'Last updated: January 2026'**
+  /// **'Last updated: 2026-04-13'**
   String get privacyPolicyLastUpdated;
 
   /// No description provided for @chats.

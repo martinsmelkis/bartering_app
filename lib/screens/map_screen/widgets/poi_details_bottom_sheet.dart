@@ -319,8 +319,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
   }
 
   _loadPostings() async {
-    if (widget.poi.profile.activePostingIds == null ||
-        widget.poi.profile.activePostingIds!.isEmpty) {
+    if (widget.poi.profile.activePostingIds.isEmpty) {
       if (mounted) {
         setState(() {
           _isLoadingPostings = false;
@@ -331,7 +330,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
 
     try {
       final apiClient = getIt<ApiClient>();
-      final postingIds = widget.poi.profile.activePostingIds!;
+      final postingIds = widget.poi.profile.activePostingIds;
 
       // Separate cached and non-cached postings
       final cachedPostings = <UserPostingData>[];
@@ -1083,6 +1082,27 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                               ),
                                             ],
                                           ),
+                                          if (!widget.isLargeScreen && widget.poi.distanceKm != null) ...[
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.location_on,
+                                                  size: 14,
+                                                  color: Colors.blue[700],
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  '${widget.poi.distanceKm!.toStringAsFixed(1)} km',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey[700],
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                           if ((widget.poi.profile.selfDescription ?? '').trim().isNotEmpty) ...[
                                             const SizedBox(height: 6),
                                             Text(

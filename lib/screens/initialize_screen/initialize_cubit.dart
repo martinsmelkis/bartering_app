@@ -1,5 +1,4 @@
 import 'package:barter_app/repositories/user_repository.dart';
-import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';

@@ -171,7 +171,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         final firstPoi = widget.initialPois!.first;
         logDebug('@@@@@@@@@ didUpdateWidget - Centering map on POI: ${firstPoi.profile.userId}');
 
-        _mapController.moveTo(
+        _safeMoveTo(
           GeoPoint(
             latitude: firstPoi.profile.latitude ?? 0.0,
             longitude: firstPoi.profile.longitude ?? 0.0,
@@ -287,8 +287,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         final lat = double.tryParse(parts[0]);
         final lon = double.tryParse(parts[1]);
         if (lat != null && lon != null) {
-          await _mapController.moveTo(GeoPoint(latitude: lat, longitude: lon));
-          if (ResponsiveBreakpoints.isPhone(context)) _mapController.setZoom(zoomLevel: 12.0);
+          await _safeMoveTo(GeoPoint(latitude: lat, longitude: lon));
+          if (ResponsiveBreakpoints.isPhone(context)) {
+            await _safeSetZoom(12.0);
+          }
         }
       }
     }
@@ -309,10 +311,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       // Center map on the first POI
       final firstPoi = widget.initialPois!.first;
       logDebug('@@@@@@@@@ Centering map on POI: ${firstPoi.profile.userId} at ${firstPoi.profile.latitude}, ${firstPoi.profile.longitude}');
-      _mapController.setZoom(zoomLevel: 16.0);
-      _mapController.moveTo(
-        GeoPoint(latitude: firstPoi.profile.latitude ?? 0.0,
-            longitude: firstPoi.profile.longitude ?? 0.0),
+      await _safeSetZoom(16.0);
+      await _safeMoveTo(
+        GeoPoint(
+          latitude: firstPoi.profile.latitude ?? 0.0,
+          longitude: firstPoi.profile.longitude ?? 0.0,
+        ),
       );
       _processPois(widget.initialPois!);
     } else {
@@ -684,6 +688,28 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             ),
         );
       });
+    }
+  }
+
+  Future<void> _safeMoveTo(GeoPoint point) async {
+    try {
+      await _mapController.moveTo(point);
+    } catch (e) {
+      if (!kIsWeb) rethrow;
+      logDebug('⚠️ moveTo failed on web, retrying once: $e');
+      await Future.delayed(const Duration(milliseconds: 200));
+      await _mapController.moveTo(point);
+    }
+  }
+
+  Future<void> _safeSetZoom(double zoomLevel) async {
+    try {
+      await _mapController.setZoom(zoomLevel: zoomLevel);
+    } catch (e) {
+      if (!kIsWeb) rethrow;
+      logDebug('⚠️ setZoom failed on web, retrying once: $e');
+      await Future.delayed(const Duration(milliseconds: 250));
+      await _mapController.setZoom(zoomLevel: zoomLevel);
     }
   }
 

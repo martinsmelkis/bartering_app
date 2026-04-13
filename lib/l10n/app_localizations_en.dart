@@ -1231,6 +1231,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_fresh_eggs => 'Fresh eggs';
 
   @override
+  String get attr_chicken_eggs => 'Chicken eggs';
+
+  @override
   String get attr_furniture_repair => 'Furniture repair';
 
   @override
@@ -1244,6 +1247,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attr_handmade => 'Handmade';
+
+  @override
+  String get attr_home_decor => 'Home decor';
 
   @override
   String get attr_handyman_services => 'Handyman services';
@@ -2193,6 +2199,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailRequired => 'Email address is required';
 
   @override
+  String get emailNotificationPreferences => 'Email Notification Preferences';
+
+  @override
+  String get emailUnsubscribe => 'Unsubscribe';
+
+  @override
+  String get emailUnsubscribed => 'Unsubscribed successfully';
+
+  @override
   String get emailInvalid => 'Please enter a valid email address';
 
   @override
@@ -2203,15 +2218,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketingConsentLabel =>
-      'I agree to receive marketing emails about new features, offers, and updates';
+      'I agree to receive emails about new matches, offers, and updates';
 
   @override
   String get marketingConsentDescription =>
       'We may send you occasional emails about our services. You can unsubscribe at any time.';
-
-  @override
-  String get marketingConsentRequired =>
-      'Please consent to receive marketing emails to continue';
 
   @override
   String get deleteProfile => 'Delete Profile';
@@ -2228,6 +2239,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get review => 'Review';
+
+  @override
+  String get ratingAndReviews => 'Rating and Reviews';
 
   @override
   String get reportScam => 'Report Scam';
@@ -2755,70 +2769,74 @@ class AppLocalizationsEn extends AppLocalizations {
   String get submitReport => 'Submit Report';
 
   @override
-  String get privacyPolicyIntroTitle => 'Introduction';
+  String get privacyPolicyIntroTitle => 'Controller, Scope and Contact';
 
   @override
   String get privacyPolicyIntroContent =>
-      'This Privacy Policy describes how we collect, use, and protect your personal information when you use our bartering application. We are committed to ensuring your privacy and protecting your data.';
+      'This policy explains how Barter backend services and connected mobile/web clients process personal data. It covers backend APIs, client apps, admin/compliance tooling, and optional federation features when enabled.';
 
   @override
-  String get privacyPolicyDataCollectionTitle => 'Information We Collect';
+  String get privacyPolicyDataCollectionTitle => 'Data We Process';
 
   @override
   String get privacyPolicyDataCollectionContent =>
-      'We collect information you provide directly, including your profile information, interests, offerings, location data, and chat messages. We also collect usage data such as app interactions and device information to improve our service.';
+      'We may process account/authentication data (including signature metadata), profile data, postings and chat-related data, notification data (email, push tokens, consent flags), security/compliance records, and technical request metadata.';
 
   @override
-  String get privacyPolicyDataUsageTitle => 'How We Use Your Information';
+  String get privacyPolicyDataUsageTitle => 'Purposes and GDPR Legal Bases';
 
   @override
   String get privacyPolicyDataUsageContent =>
-      'We use your information to: facilitate bartering connections between users, display your profile to other users in your area, enable chat functionality, improve our services, and send notifications about matches and messages.';
+      'Processing supports service delivery (Art. 6(1)(b)), security and abuse prevention (Art. 6(1)(f)), and legal/compliance obligations (Art. 6(1)(c), 6(1)(f)). Where applicable, optional features and consents are processed under Art. 6(1)(a).';
 
   @override
-  String get privacyPolicyDataSharingTitle => 'Information Sharing';
+  String get privacyPolicyDataSharingTitle =>
+      'Processors, Infrastructure and Transfers';
 
   @override
   String get privacyPolicyDataSharingContent =>
-      'Your profile information, interests, and offerings are visible to other users of the app to facilitate bartering. We do not sell your personal information to third parties. We may share data with service providers who assist in operating our app, and we may disclose information if required by law.';
+      'Current integrations may include PostgreSQL, Mailjet, Firebase/FCM, Ollama, and Nginx + Docker infrastructure. Optional federation peers are used only when enabled and trusted. If data is processed outside your country/EEA, legally required safeguards (such as SCCs) are applied.';
 
   @override
-  String get privacyPolicyDataSecurityTitle => 'Data Security';
+  String get privacyPolicyDataSecurityTitle =>
+      'Security, Retention and Deletion';
 
   @override
   String get privacyPolicyDataSecurityContent =>
-      'We implement appropriate technical and organizational measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.';
+      'We apply measures such as authenticated request-signature checks, access controls, transport security, and audit logging. Retention controls and scheduled cleanup are used for operational/compliance records, with legal-hold-aware handling where required.';
 
   @override
-  String get privacyPolicyUserRightsTitle => 'Your Rights';
+  String get privacyPolicyUserRightsTitle =>
+      'Your Rights, Erasure and Portability';
 
   @override
   String get privacyPolicyUserRightsContent =>
-      'You have the right to access, update, or delete your personal information at any time through the app settings. You can also request a copy of your data or object to certain types of processing.';
+      'Subject to applicable law, you may request access, rectification, erasure, restriction, portability, objection, and consent withdrawal. Authenticated deletion/export workflows include legal-hold checks, DSAR tracking, and compliance event logging.';
 
   @override
-  String get privacyPolicyThirdPartyTitle => 'Third-Party Services';
+  String get privacyPolicyThirdPartyTitle =>
+      'Backend and Client Privacy Notice';
 
   @override
   String get privacyPolicyThirdPartyContent =>
-      'Our app may use third-party services for analytics, maps, and notifications. These services have their own privacy policies, and we encourage you to review them.';
+      'This in-app text summarizes backend-centric processing and should be read together with client-facing app notices (permissions, identifiers, push UX, and local storage/cookies where applicable).';
 
   @override
   String get privacyPolicyChangesTitle => 'Changes to This Policy';
 
   @override
   String get privacyPolicyChangesContent =>
-      'We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the app. Continued use of the app after changes constitutes acceptance of the updated policy.';
+      'We may update this policy from time to time. Material changes should be communicated in-app or via another appropriate channel, with updated effective dates.';
 
   @override
-  String get privacyPolicyContactTitle => 'Contact Us';
+  String get privacyPolicyContactTitle => 'Contact';
 
   @override
   String get privacyPolicyContactContent =>
-      'If you have any questions about this Privacy Policy or our data practices, please contact us at info@bartering.app';
+      'For privacy and GDPR requests, contact: info@bartering.app';
 
   @override
-  String get privacyPolicyLastUpdated => 'Last updated: January 2026';
+  String get privacyPolicyLastUpdated => 'Last updated: 2026-04-13';
 
   @override
   String get chats => 'Chats';

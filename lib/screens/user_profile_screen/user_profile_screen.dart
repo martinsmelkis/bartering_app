@@ -58,6 +58,7 @@ import 'widgets/premium_user_benefits_dialog.dart';
 import 'widgets/profile_action_button.dart';
 import 'widgets/profile_coins_info_dialog.dart';
 import 'widgets/purchase_coins_options_dialog.dart';
+import 'widgets/rating_details_dialog.dart';
 import '../onboarding_screen/cubit/onboarding_cubit.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -92,6 +93,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   ReputationResponse? _reputationData;
   List<BadgeDetail>? _userBadges;
   WalletResponse? _walletData;
+  List<PublicReviewItem> _publicReviews = const [];
   bool _isPremiumActive = false;
   bool _isLoadingReputation = false;
   bool _isLoadingBadges = false;
@@ -161,10 +163,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
     try {
       final reputation = await _userProfileScreenCubit.fetchReputation(widget.userId);
+      final reviewsResponse = await _userProfileScreenCubit.fetchUserReviews(widget.userId);
       // Cache the result
       _reputationCache.setReputation(widget.userId, reputation);
       setState(() {
         _reputationData = reputation;
+        _publicReviews = reviewsResponse.reviews
+            .where((review) {
+              final hasText = review.reviewText?.trim().isNotEmpty ?? false;
+              final hasRating = review.rating > 0;
+              return review.isVisible && (hasText || hasRating);
+            })
+            .map(
+              (review) => PublicReviewItem(
+                text: review.reviewText?.trim(),
+                rating: review.rating > 0 ? review.rating.toDouble() : null,
+                submittedAt: DateTime.fromMillisecondsSinceEpoch(review.submittedAt),
+              ),
+            )
+            .toList();
         _isLoadingReputation = false;
       });
       logDebug('✅ Fetched and cached reputation for ${widget.userId}');
@@ -539,7 +556,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         spacing: 7.2,
                         runSpacing: 7.2,
                         children: widget.interests!
-                            .where((interest) => interest != null)
                             .map((interest) {
                           try {
                             return AttributeBubble(
@@ -659,7 +675,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         spacing: 7.2,
                         runSpacing: 7.2,
                         children: widget.offerings!
-                            .where((offering) => offering != null)
                             .map((offering) {
                           try {
                             return AttributeBubble(
@@ -727,8 +742,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               CategoryStatsUtils.buildCategoryStatsBar(
                 keywordMap: _profileKeywordDataMap,
                 attributes: [
-                  ...?(widget.interests?.where((i) => i != null)),
-                  ...?(widget.offerings?.where((o) => o != null)),
+                  ...?widget.interests,
+                  ...?widget.offerings,
                 ],
               ),
             SizedBox(height: 20.h),
@@ -856,7 +871,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget _buildRatingDisplay(AppLocalizations l10n) {
     // Use reputation data if available, otherwise default to 0.0 and 0
     final rating = _reputationData?.averageRating ?? 0.0;
-    final reviewCount = _reputationData?.totalReviews ?? 0;
     final ratingColor = AvatarColorUtils.getRatingColor(rating);
     final balanceText = _isLoadingWallet
         ? '...'
@@ -882,45 +896,40 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ),
           )
         else
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: ratingColor,
+          PointerInterceptor(
+            child: InkWell(
+              onTap: _showRatingDetailsDialog,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: ratingColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.star, size: 16, color: Colors.white),
-                const SizedBox(width: 4),
-                Text(
-                  rating.toStringAsFixed(1),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star, size: 16, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      rating.toStringAsFixed(1),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        const SizedBox(width: 8),
-        // Reviews count - only show when not loading
-        if (!_isLoadingReputation)
-          Text(
-            '($reviewCount)',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         const SizedBox(width: 12),
@@ -1047,6 +1056,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showRatingDetailsDialog() {
+    final reviewCount = _reputationData?.totalReviews ?? 0;
+    showDialog(
+      context: context,
+      useRootNavigator: kIsWeb,
+      builder: (dialogContext) {
+        return RatingDetailsDialog(
+          reviewCount: reviewCount,
+          publicReviews: _publicReviews,
+          onClose: () {
+            if (kIsWeb) {
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+            } else {
+              Navigator.of(dialogContext).pop();
+            }
+          },
+        );
+      },
     );
   }
 

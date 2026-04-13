@@ -31,6 +31,37 @@ final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// App router configuration using go_router
 class AppRouter {
+  static String? _extractUnsubscribeToken(GoRouterState state) {
+    final fromState = state.uri.queryParameters['token']?.trim();
+    if (fromState != null && fromState.isNotEmpty) return fromState;
+
+    final fromBaseQuery = Uri.base.queryParameters['token']?.trim();
+    if (fromBaseQuery != null && fromBaseQuery.isNotEmpty) return fromBaseQuery;
+
+    final fragment = Uri.base.fragment;
+    if (fragment.isNotEmpty) {
+      final decodedFragment = Uri.decodeFull(fragment);
+      final normalized = decodedFragment.startsWith('/')
+          ? decodedFragment
+          : '/$decodedFragment';
+      try {
+        final fragmentUri = Uri.parse(normalized);
+        final fromFragment = fragmentUri.queryParameters['token']?.trim();
+        if (fromFragment != null && fromFragment.isNotEmpty) return fromFragment;
+      } catch (_) {
+        // Ignore malformed fragment URI and continue to regex fallback
+      }
+
+      final regexMatch = RegExp(r'[?&]token=([^&#]+)').firstMatch(decodedFragment);
+      if (regexMatch != null) {
+        final token = Uri.decodeComponent(regexMatch.group(1)!).trim();
+        if (token.isNotEmpty) return token;
+      }
+    }
+
+    return null;
+  }
+
   static final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: true,
@@ -257,6 +288,34 @@ class AppRouter {
         builder: (context, state) => const NotificationsScreen(),
       ),
 
+      // Contacts / Unsubscribe Screen (supports deep-link token)
+      GoRoute(
+        path: '/notifications/contacts',
+        name: 'notification-contacts',
+        builder: (context, state) {
+          final token = _extractUnsubscribeToken(state);
+          logDebug('🧭 notifications/contacts route token: $token, stateUri: ${state.uri}, base: ${Uri.base}');
+          return NotificationsScreen(
+            contactsOnly: token == null || token.isEmpty,
+            unsubscribeToken: token,
+          );
+        },
+      ),
+
+      // Backward-compatible alias for older/shared links using singular `notification`
+      GoRoute(
+        path: '/notification/contacts',
+        name: 'notification-contacts-legacy',
+        builder: (context, state) {
+          final token = _extractUnsubscribeToken(state);
+          logDebug('🧭 notification/contacts (legacy) route token: $token, stateUri: ${state.uri}, base: ${Uri.base}');
+          return NotificationsScreen(
+            contactsOnly: token == null || token.isEmpty,
+            unsubscribeToken: token,
+          );
+        },
+      ),
+
       // Settings Screen
       GoRoute(
         path: '/settings',
@@ -354,6 +413,11 @@ class AppRouter {
   /// Navigate to settings
   static void navigateToSettings() {
     router.go('/settings');
+  }
+
+  /// Navigate directly to notification contacts (unsubscribe/email flow)
+  static void navigateToNotificationContacts() {
+    router.go('/notifications/contacts');
   }
 
   /// Navigate to map with initial POIs (e.g., from match history)

@@ -1,5 +1,6 @@
 import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/models/reviews/reputation_response.dart';
+import 'package:barter_app/models/reviews/review_response.dart';
 import 'package:barter_app/models/wallet/wallet_models.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -106,6 +107,10 @@ class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
       ));
       rethrow;
     }
+  }
+
+  Future<UserReviewsResponse> fetchUserReviews(String userId) {
+    return _apiClient.getUserReviews(userId);
   }
 
   Future<ExportResult> requestGdprDataExport() async {
