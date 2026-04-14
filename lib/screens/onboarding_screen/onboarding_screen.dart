@@ -2,6 +2,7 @@ import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../configure_dependencies.dart';
@@ -115,11 +116,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     // Initialize cubit only once to avoid multiple state emissions during rebuilds
     if (!_cubitInitialized) {
       debugPrint('@@@@@@@@@@@ Initializing cubit for the first time');
-      
+
       // Reset cubit to initial state to ensure clean slate
       debugPrint('@@@@@@@@@@@ Resetting cubit to initial state');
       _cubit.reset();
-      
+
       final List<OnboardingQuestion> initialQuestions = [
         OnboardingQuestion(
           id: 2,
@@ -158,15 +159,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
       ];
       _cubit.initQuestions(initialQuestions);
-      
+
       debugPrint('@@@@@@@@@@@ Current cubit state after init: ${_cubit.state.status}');
-      
+
       _cubitInitialized = true;
     }
-    
+
     return BlocProvider.value(
-      value: _cubit,
-      child: BlocConsumer<OnboardingCubit, OnboardingState>(
+        value: _cubit,
+        child: BlocConsumer<OnboardingCubit, OnboardingState>(
           bloc: _cubit,
           listenWhen: (previous, current) {
             final shouldListen = previous.status != current.status;
@@ -184,7 +185,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               debugPrint('@@@@@@@@@@@ Handling error status');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.errorMessage ?? 
+                  content: Text(state.errorMessage ??
                       AppLocalizations.of(context)!.anUnknownErrorOccurred),
                   backgroundColor: Colors.red,
                   duration: const Duration(seconds: 5),
@@ -195,18 +196,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               // Save the full ParsedAttributeData with all metadata
               List<ParsedAttributeData> finalList = List.empty(growable: true);
               state.interestsKeyList?.forEach((e) {
-                  // Use e.attributeKey if available (from API), otherwise derive from e.attribute
-                  final key = e.effectiveAttributeKey;
-                  // Use the API-provided display name (e.attribute) as-is for display
-                  // AttributeBubble will use effectiveAttributeKey for translation lookup
-                  finalList.add(
-                      ParsedAttributeData(
-                          attributeKey: key,
-                          uiStyleHint: e.uiStyleHint,
-                          relevancyScore: e.relevancyScore,
-                          attribute: e.attribute, // Use API's localized display name directly
-                      )
-                  );
+                // Use e.attributeKey if available (from API), otherwise derive from e.attribute
+                final key = e.effectiveAttributeKey;
+                // Use the API-provided display name (e.attribute) as-is for display
+                // AttributeBubble will use effectiveAttributeKey for translation lookup
+                finalList.add(
+                    ParsedAttributeData(
+                      attributeKey: key,
+                      uiStyleHint: e.uiStyleHint,
+                      relevancyScore: e.relevancyScore,
+                      attribute: e.attribute, // Use API's localized display name directly
+                    )
+                );
               });
               context.read<OnboardingCubit>().updateInterestsList(finalList);
 
@@ -231,21 +232,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               });
             }
           },
-            builder: (context, state) {
-              debugPrint('@@@@@@@@@@@ BlocConsumer builder called - Status: ${state.status}');
-              return Stack(
-                children: [
-                  Scaffold(
-                    body: SafeArea(
-                      child: ResponsiveCenterContainer(
-                        maxWidth: 700.0,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Title section
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 16.0),
-                              child: Text(
+          builder: (context, state) {
+            debugPrint('@@@@@@@@@@@ BlocConsumer builder called - Status: ${state.status}');
+            return Stack(
+              children: [
+                Scaffold(
+                  body: SafeArea(
+                    child: ResponsiveCenterContainer(
+                      maxWidth: 700.0,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Title section
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 16.0),
+                            child: Text(
                               l10n!.shareYourInterestsToFindBestMatches,
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -264,7 +265,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                           // Category cards
                           Padding(
-                            padding: const EdgeInsets.all(12.0),
+                            padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 50.0),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: _categories.asMap().entries.map((entry) {
@@ -289,59 +290,62 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               }).toList(),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  logDebug("Onboarding V2 Complete: $_answers");
-                                  final locale = Localizations.localeOf(context);
-                                  context.read<OnboardingCubit>().completeOnboarding(
-                                      locale.languageCode);
-                                },
-                                icon: const Icon(Icons.check),
-                                label: Text(AppLocalizations.of(context)!.finishOnboarding),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                                ),
-                              ),
-                            ),
-                          ),
                         ],
-                      ),
                       ),
                     ),
                   ),
-                  // Loading overlay when submitting
-                  if (state.status == OnboardingStatus.submitting)
-                    Container(
-                      color: Colors.black54,
-                      child: Center(
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const CircularProgressIndicator(),
-                                const SizedBox(height: 16),
-                                Text(
-                                  AppLocalizations.of(context)!.submitting,
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                              ],
-                            ),
+                ),
+                // Loading overlay when submitting
+                if (state.status == OnboardingStatus.submitting)
+                  Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const CircularProgressIndicator(),
+                              const SizedBox(height: 16),
+                              Text(
+                                AppLocalizations.of(context)!.submitting,
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                ],
-              );
-            },
-      )
+                  ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SizedBox(
+                      width: 200.w,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          logDebug("Onboarding V2 Complete: $_answers");
+                          final locale = Localizations.localeOf(context);
+                          context.read<OnboardingCubit>().completeOnboarding(
+                              locale.languageCode);
+                        },
+                        icon: const Icon(Icons.check),
+                        label: Text(AppLocalizations.of(context)!.finishOnboarding),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        )
     );
   }
 

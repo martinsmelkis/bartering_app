@@ -1849,7 +1849,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get gdprConsentDecline => 'Ne tagad';
 
   @override
-  String get gdprConsentAccept => 'Turpināt';
+  String get gdprConsentAccept => 'Turpināt (Piekrītot lietošanas noteikumiem)';
 
   @override
   String get wishlist => 'Vēlmju saraksts';

@@ -9,7 +9,6 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/map_screen/cubit/profile_panel_cubit.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/screens/notifications_screen/cubit/notifications_cubit.dart';
-import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
@@ -20,6 +19,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 /// A floating action button that displays the current user's avatar
 /// with an edit badge and optional notification count
@@ -186,16 +186,15 @@ class UserAvatarFab extends StatelessWidget {
                 offerings: offerings,
               );
             } else {
-              // Navigate to full-screen on mobile
-              await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => UserProfileScreen(
-                    userId: userId!,
-                    userName: userName ?? "Not registered",
-                    interests: interests,
-                    offerings: offerings,
-                  ),
-                ),
+              // Navigate to dedicated full-screen profile route on mobile/small screens
+              await context.push(
+                '/profile',
+                extra: {
+                  'userId': userId!,
+                  'userName': userName ?? "Not registered",
+                  'interests': interests,
+                  'offerings': offerings,
+                },
               );
               // Reload match history when user returns
               if (context.mounted) {

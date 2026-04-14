@@ -405,7 +405,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
                         padding: EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: Colors.white.withValues(alpha: 0.4),
                           borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.3),
@@ -508,7 +508,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           child: Icon(
             icon,
             color: AppColors.primary,
-            size: 16.sp / iconScale,
+            size: 18.sp / iconScale,
           ),
         ),
         SizedBox(width: 12.w / iconScale),

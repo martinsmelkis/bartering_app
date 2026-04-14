@@ -48,6 +48,7 @@ import '../../configure_dependencies.dart';
 import '../../data/local/platform/platform.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repositories/chat_repository.dart';
+import '../../router/app_router.dart';
 import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/settings_service.dart';
 import '../../theme/app_colors.dart';
@@ -302,9 +303,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final bool isWebPanel = kIsWeb && !widget.showAppBar && context.canShowSideBySide;
 
     return BackButtonHandler(
-      onBackPressed: () {
-        Navigator.pop(context);
-        return Future.value(false);
+      onBackPressed: () async {
+        if (!kIsWeb) {
+          Navigator.pop(context);
+        } else {
+          AppRouter.navigateToHome();
+        }
+        return false;
       },
       child: BlocListener<NestedPanelCubit, NestedPanelState>(
           listener: (context, nestedPanelState) {

@@ -165,7 +165,7 @@ class _GdprConsentDialogState extends State<GdprConsentDialog> {
                       context.push('/terms');
                     },
                     child: Text(
-                      'Terms & Conditions',
+                      l10n.termsConditionsTitle,
                       style: const TextStyle(fontSize: 12),
                     ),
                   ),
@@ -190,7 +190,7 @@ class _GdprConsentDialogState extends State<GdprConsentDialog> {
               analyticsCookiesConsent: kIsWeb ? _analyticsCookiesConsent : true,
             ));
           },
-          child: const Text('Continue (accept Terms & Conditions)'),
+          child: Text('${l10n.gdprConsentAccept}'),
         ),
       ],
     );

@@ -604,7 +604,7 @@
   "gdprCookiesAnalyticsDescription": "Help us understand usage and improve performance. These are only used if you allow them.",
   "gdprConsentManageLater": "You can change these choices later in Settings.",
   "gdprConsentDecline": "Not now",
-  "gdprConsentAccept": "Continue",
+  "gdprConsentAccept": "Continue (Accept Terms & Conditions)",
 
   "wishlist": "Wishlist",
   "myWishlist": "My Wishlist",

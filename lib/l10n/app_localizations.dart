@@ -3539,7 +3539,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprConsentAccept.
   ///
   /// In en, this message translates to:
-  /// **'Continue'**
+  /// **'Continue (Accept Terms & Conditions)'**
   String get gdprConsentAccept;
 
   /// No description provided for @wishlist.

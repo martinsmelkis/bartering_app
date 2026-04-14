@@ -1822,7 +1822,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gdprConsentDecline => 'Not now';
 
   @override
-  String get gdprConsentAccept => 'Continue';
+  String get gdprConsentAccept => 'Continue (Accept Terms & Conditions)';
 
   @override
   String get wishlist => 'Wishlist';

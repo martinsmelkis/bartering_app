@@ -16,7 +16,9 @@ import 'package:barter_app/screens/privacy_policy_screen/privacy_policy_screen.d
 import 'package:barter_app/screens/settings_screen/settings_screen.dart';
 import 'package:barter_app/screens/terms_screen/terms_screen.dart';
 import 'package:barter_app/screens/user_profile_screen/create_posting_screen.dart';
+import 'package:barter_app/screens/user_profile_screen/user_profile_screen.dart';
 import 'package:barter_app/screens/welcome_screen/welcome_screen.dart';
+import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -236,6 +238,49 @@ class AppRouter {
         builder: (context, state) => ChatsListScreen(
           showAppBar: true,
         ),
+      ),
+
+      // User Profile Screen (full-screen route for mobile navigation)
+      GoRoute(
+        path: '/profile',
+        name: 'profile',
+        builder: (context, state) {
+          List<ParsedAttributeData>? parseAttributes(dynamic rawList) {
+            if (rawList is! List) return null;
+
+            return rawList.map<ParsedAttributeData?>((item) {
+              if (item is ParsedAttributeData) {
+                return item;
+              }
+              if (item is Map) {
+                final map = Map<String, dynamic>.from(item);
+                try {
+                  return ParsedAttributeData.fromJson(map);
+                } catch (_) {
+                  return null;
+                }
+              }
+              return null;
+            }).whereType<ParsedAttributeData>().toList();
+          }
+
+          final extra = state.extra as Map<String, dynamic>?;
+          final userId = extra?['userId'] as String?;
+          final userName = extra?['userName'] as String?;
+          final interests = parseAttributes(extra?['interests']);
+          final offerings = parseAttributes(extra?['offerings']);
+
+          if (userId == null || userId.isEmpty || userName == null || userName.isEmpty) {
+            return const MapScreenV2();
+          }
+
+          return UserProfileScreen(
+            userId: userId,
+            userName: userName,
+            interests: interests,
+            offerings: offerings,
+          );
+        },
       ),
 
       // Create Posting Screen
