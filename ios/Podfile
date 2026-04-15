@@ -1,3 +1,5 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
 platform :ios, '15.0'
 
 # Disable CocoaPods analytics to speed up Flutter builds.

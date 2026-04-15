@@ -14,6 +14,7 @@ class SecureStorageService {
   SecureStorageService._internal();
 
   final _secureStorage = const FlutterSecureStorage();
+  final Map<String, String> _memoryFallback = {};
 
   static const _ownPrivateKeyKey = '4554JUiugjdf';
   static const _ownPublicKeyKey = '4554HHiugjdf';
@@ -25,28 +26,32 @@ class SecureStorageService {
   static const _interestsKey = '1243344gfyfdrjH';
   static const _offeringsKey = '124667gfyfdrjH';
   static const _profileKeywordDataMapKey = '124668gfyfdrjH';
-  static const _suggestedInterestsKey = '124669gfyfdrjI'; // Server-suggested interests
-  static const _suggestedOfferingsKey = '124670gfyfdrjJ'; // Server-suggested offerings
+  static const _suggestedInterestsKey = '124669gfyfdrjI';
+  static const _suggestedOfferingsKey = '124670gfyfdrjJ';
   static const _contactPublicKeyPrefix = 'contact_pubkey_';
   static const _federatedIdMappingPrefix = 'federated_mapping_';
   static const _securityQuestionKey = 'security_question';
   static const _securityAnswerKey = 'security_answer_hash';
 
+  Future<void> _safeWrite({required String key, required String value}) async {
+    try {
+      await _secureStorage.write(key: key, value: value);
+    } catch (e) {
+      logDebug('SecureStorage write failed, using memory fallback for $key');
+      _memoryFallback[key] = value;
+    }
+  }
+
   /// Safely reads from secure storage, handling keystore errors
   /// Returns null if key not found or keystore error occurs
   Future<String?> _safeRead(String key) async {
     try {
-      return await _secureStorage.read(key: key);
-    } on PlatformException catch (e) {
-      final errorStr = e.toString().toLowerCase();
-      if (errorStr.contains('key_not_found') ||
-          errorStr.contains('badpaddingexception') ||
-          errorStr.contains('bad_decrypt') ||
-          (e.code?.toLowerCase() == 'read' && e.message == null)) {
-        logDebug('Keystore error reading key $key - key may be invalidated. Returning null.');
-        return null;
-      }
-      rethrow;
+      final value = await _secureStorage.read(key: key);
+      if (value != null) return value;
+      return _memoryFallback[key];
+    } catch (e) {
+      logDebug('Keystore error reading $key, using memory fallback');
+      return _memoryFallback[key];
     }
   }
 
@@ -56,13 +61,13 @@ class SecureStorageService {
       final random = Random.secure();
       final passwordBytes = List<int>.generate(32, (_) => random.nextInt(256));
       password = base64Url.encode(passwordBytes);
-      await _secureStorage.write(key: _dbPasswordKey, value: password);
+      await _safeWrite(key: _dbPasswordKey, value: password);
     }
     return password;
   }
 
   Future<void> saveOwnPublicKey(String publicKey) async {
-    await _secureStorage.write(key: _ownPublicKeyKey, value: publicKey);
+    await _safeWrite(key: _ownPublicKeyKey, value: publicKey);
   }
 
   Future<String?> getOwnPublicKey() async {
@@ -70,7 +75,7 @@ class SecureStorageService {
   }
 
   Future<void> saveOwnPrivateKey(String publicKey) async {
-    await _secureStorage.write(key: _ownPrivateKeyKey, value: publicKey);
+    await _safeWrite(key: _ownPrivateKeyKey, value: publicKey);
   }
 
   Future<String?> getOwnPrivateKey() async {
@@ -78,7 +83,7 @@ class SecureStorageService {
   }
 
   Future<void> saveOwnUserId(String userId) async {
-    await _secureStorage.write(key: _ownUserIdKey, value: userId);
+    await _safeWrite(key: _ownUserIdKey, value: userId);
   }
 
   Future<String?> getOwnUserId() async {
@@ -87,7 +92,7 @@ class SecureStorageService {
   }
 
   Future<void> setOwnUserName(String userName) async {
-    await _secureStorage.write(key: _ownUserNameKey, value: userName);
+    await _safeWrite(key: _ownUserNameKey, value: userName);
   }
 
   Future<String?> getOwnUserName() async {
@@ -96,7 +101,7 @@ class SecureStorageService {
   }
 
   Future<void> saveOwnLocation(String publicKey) async {
-    await _secureStorage.write(key: _ownLocationKey, value: publicKey);
+    await _safeWrite(key: _ownLocationKey, value: publicKey);
   }
 
   Future<String?> getOwnLocation() async {
@@ -104,7 +109,7 @@ class SecureStorageService {
   }
 
   Future<void> savePIN(String hashedPin) async {
-    await _secureStorage.write(key: _pinKey, value: hashedPin);
+    await _safeWrite(key: _pinKey, value: hashedPin);
   }
 
   Future<String?> getPIN(String hashedPin) async {
@@ -115,7 +120,7 @@ class SecureStorageService {
   Future<void> saveOwnInterestsAttributes(
       List<ParsedAttributeData> interests) async {
     final jsonList = interests.map((e) => e.toJson()).toList();
-    await _secureStorage.write(key: _interestsKey, value: jsonEncode(jsonList));
+    await _safeWrite(key: _interestsKey, value: jsonEncode(jsonList));
   }
 
   /// Retrieves interests with full metadata
@@ -137,7 +142,7 @@ class SecureStorageService {
   Future<void> saveOwnOfferingsAttributes(
       List<ParsedAttributeData> offerings) async {
     final jsonList = offerings.map((e) => e.toJson()).toList();
-    await _secureStorage.write(key: _offeringsKey, value: jsonEncode(jsonList));
+    await _safeWrite(key: _offeringsKey, value: jsonEncode(jsonList));
   }
 
   /// Retrieves offerings with full metadata
@@ -158,7 +163,7 @@ class SecureStorageService {
   /// Saves profile keyword data map (keyword -> relevancy score)
   Future<void> saveProfileKeywordDataMap(
       Map<String, double> keywordDataMap) async {
-    await _secureStorage.write(
+    await _safeWrite(
       key: _profileKeywordDataMapKey,
       value: jsonEncode(keywordDataMap),
     );
@@ -188,7 +193,7 @@ class SecureStorageService {
       'relevancyScore': attr.relevancyScore,
       'uiStyleHint': attr.uiStyleHint,
     }).toList();
-    await _secureStorage.write(
+    await _safeWrite(
       key: _suggestedInterestsKey,
       value: jsonEncode(jsonList),
     );
@@ -221,7 +226,7 @@ class SecureStorageService {
       'relevancyScore': attr.relevancyScore,
       'uiStyleHint': attr.uiStyleHint,
     }).toList();
-    await _secureStorage.write(
+    await _safeWrite(
       key: _suggestedOfferingsKey,
       value: jsonEncode(jsonList),
     );
@@ -254,7 +259,7 @@ class SecureStorageService {
 
   /// Writes a value directly to secure storage
   Future<void> write({required String key, required String value}) async {
-    await _secureStorage.write(key: key, value: value);
+    await _safeWrite(key: key, value: value);
   }
 
   /// Reads a value directly from secure storage
@@ -276,14 +281,14 @@ class SecureStorageService {
     // For federated users, store mapping from normalized -> original
     final normalizedId = _normalizeUserId(userId);
     if (normalizedId != userId) {
-      await _secureStorage.write(
+      await _safeWrite(
         key: '$_federatedIdMappingPrefix$normalizedId',
         value: userId, // Store original federated ID
       );
     }
     
     // Save key with original ID
-    await _secureStorage.write(
+    await _safeWrite(
       key: '$_contactPublicKeyPrefix$userId',
       value: publicKey,
     );
@@ -356,7 +361,7 @@ class SecureStorageService {
   Future<void> saveFederatedIdMapping(String federatedUserId) async {
     final normalizedId = _normalizeUserId(federatedUserId);
     if (normalizedId != federatedUserId) {
-      await _secureStorage.write(
+      await _safeWrite(
         key: '$_federatedIdMappingPrefix$normalizedId',
         value: federatedUserId,
       );
@@ -383,7 +388,7 @@ class SecureStorageService {
 
   /// Save security question
   Future<void> saveSecurityQuestion(String question) async {
-    await _secureStorage.write(key: _securityQuestionKey, value: question);
+    await _safeWrite(key: _securityQuestionKey, value: question);
   }
 
   /// Get security question
@@ -393,7 +398,7 @@ class SecureStorageService {
 
   /// Save security answer (hashed)
   Future<void> saveSecurityAnswer(String hashedAnswer) async {
-    await _secureStorage.write(key: _securityAnswerKey, value: hashedAnswer);
+    await _safeWrite(key: _securityAnswerKey, value: hashedAnswer);
   }
 
   /// Get security answer (hashed)
