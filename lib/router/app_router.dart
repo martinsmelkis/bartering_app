@@ -12,6 +12,7 @@ import 'package:barter_app/screens/notifications_screen/notifications_screen.dar
 import 'package:barter_app/screens/offers_screen/offers_screen.dart';
 import 'package:barter_app/screens/onboarding_screen/onboarding_screen.dart';
 import 'package:barter_app/screens/pin_input_screen/pin_verification_screen.dart';
+import 'package:barter_app/screens/purchase_success_screen/purchase_success_screen.dart';
 import 'package:barter_app/screens/privacy_policy_screen/privacy_policy_screen.dart';
 import 'package:barter_app/screens/settings_screen/settings_screen.dart';
 import 'package:barter_app/screens/terms_screen/terms_screen.dart';
@@ -206,6 +207,20 @@ class AppRouter {
         path: '/',
         name: 'home',
         redirect: (context, state) => '/map',
+      ),
+
+      // Purchase success redirect screen (web + deep-link callback target)
+      GoRoute(
+        path: '/purchase-success',
+        name: 'purchase-success',
+        builder: (context, state) => const PurchaseSuccessScreen(),
+      ),
+
+      // Alias for providers that return to /success
+      GoRoute(
+        path: '/success',
+        name: 'success',
+        builder: (context, state) => const PurchaseSuccessScreen(),
       ),
 
       // Chat Screen with specific user

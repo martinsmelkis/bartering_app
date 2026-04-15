@@ -2327,6 +2327,44 @@ class AppLocalizationsLv extends AppLocalizations {
   String get restorePurchases => 'Atjaunot pirkumus';
 
   @override
+  String get inAppRevenueCatApiKeyMissing => 'Trūkst RevenueCat API atslēgas.';
+
+  @override
+  String get inAppFailedToInitializePurchases =>
+      'Neizdevās inicializēt pirkumus';
+
+  @override
+  String get inAppFailedToLoadOfferings => 'Neizdevās ielādēt piedāvājumus';
+
+  @override
+  String get inAppNoPremiumPackagesAvailable =>
+      'Pašlaik nav pieejamu Premium paku.';
+
+  @override
+  String get inAppPremiumActivatedSuccessfully =>
+      'Premium veiksmīgi aktivizēts.';
+
+  @override
+  String get inAppPurchaseCompletedEntitlementNotActiveYet =>
+      'Pirkums pabeigts, bet piekļuve vēl nav aktivizēta.';
+
+  @override
+  String get inAppPurchaseCancelled => 'Pirkums atcelts.';
+
+  @override
+  String get inAppPurchaseFailed => 'Pirkums neizdevās';
+
+  @override
+  String get inAppPremiumRestoredSuccessfully => 'Premium veiksmīgi atjaunots.';
+
+  @override
+  String get inAppNoActivePremiumPurchasesToRestore =>
+      'Nav atrasti aktīvi Premium pirkumi atjaunošanai.';
+
+  @override
+  String get inAppRestoreFailed => 'Atjaunošana neizdevās';
+
+  @override
   String get skipReviewTitle => 'Izlaist atsauksmi?';
 
   @override

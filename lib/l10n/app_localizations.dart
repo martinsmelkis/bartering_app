@@ -4442,6 +4442,72 @@ abstract class AppLocalizations {
   /// **'Restore Purchases'**
   String get restorePurchases;
 
+  /// No description provided for @inAppRevenueCatApiKeyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'RevenueCat API key is missing.'**
+  String get inAppRevenueCatApiKeyMissing;
+
+  /// No description provided for @inAppFailedToInitializePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to initialize purchases'**
+  String get inAppFailedToInitializePurchases;
+
+  /// No description provided for @inAppFailedToLoadOfferings.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load offerings'**
+  String get inAppFailedToLoadOfferings;
+
+  /// No description provided for @inAppNoPremiumPackagesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No premium packages available right now.'**
+  String get inAppNoPremiumPackagesAvailable;
+
+  /// No description provided for @inAppPremiumActivatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium activated successfully.'**
+  String get inAppPremiumActivatedSuccessfully;
+
+  /// No description provided for @inAppPurchaseCompletedEntitlementNotActiveYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase completed, but entitlement not active yet.'**
+  String get inAppPurchaseCompletedEntitlementNotActiveYet;
+
+  /// No description provided for @inAppPurchaseCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase cancelled.'**
+  String get inAppPurchaseCancelled;
+
+  /// No description provided for @inAppPurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed'**
+  String get inAppPurchaseFailed;
+
+  /// No description provided for @inAppPremiumRestoredSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium restored successfully.'**
+  String get inAppPremiumRestoredSuccessfully;
+
+  /// No description provided for @inAppNoActivePremiumPurchasesToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'No active Premium purchases found to restore.'**
+  String get inAppNoActivePremiumPurchasesToRestore;
+
+  /// No description provided for @inAppRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed'**
+  String get inAppRestoreFailed;
+
   /// No description provided for @skipReviewTitle.
   ///
   /// In en, this message translates to:

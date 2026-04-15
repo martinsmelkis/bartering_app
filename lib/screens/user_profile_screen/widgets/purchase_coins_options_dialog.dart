@@ -16,6 +16,12 @@ class PurchaseCoinsOptionsDialog extends StatefulWidget {
 }
 
 class _PurchaseCoinsOptionsDialogState extends State<PurchaseCoinsOptionsDialog> {
+  static const Map<int, double> _optionPricesInEuro = {
+    20: 1.11,
+    50: 2.22,
+    200: 5.55,
+  };
+
   int? _selectedAmount;
 
   @override
@@ -45,7 +51,11 @@ class _PurchaseCoinsOptionsDialogState extends State<PurchaseCoinsOptionsDialog>
                 groupValue: _selectedAmount,
                 dense: true,
                 contentPadding: EdgeInsets.zero,
-                title: Text('$amount'),
+                title: Text(
+                  _optionPricesInEuro.containsKey(amount)
+                      ? '$amount (€${_optionPricesInEuro[amount]!.toStringAsFixed(2)})'
+                      : '$amount',
+                ),
                 onChanged: (value) {
                   if (value == null) return;
                   setState(() {

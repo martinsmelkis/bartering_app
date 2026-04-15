@@ -113,8 +113,34 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _inAppPurchasesCubit = InAppPurchasesCubit(
       appUserId: widget.userId,
       revenueCatApiKey: dotenv.env['REVENUECAT_API_KEY'] ?? '',
-      premiumEntitlementId: 'premium_user',
-    )..initialize();
+      apiClient: getIt<ApiClient>(),
+      webPurchaseLinkBaseUrl:
+          dotenv.env['REVENUECAT_WEB_PREMIUM_LINK_BASE_URL'] ?? '',
+      texts: () {
+        final l10n = AppLocalizations.of(context)!;
+        return InAppPurchasesTexts(
+          revenueCatApiKeyMissing: l10n.inAppRevenueCatApiKeyMissing,
+          failedToInitializePurchases: l10n.inAppFailedToInitializePurchases,
+          failedToLoadOfferings: l10n.inAppFailedToLoadOfferings,
+          noPremiumPackagesAvailable: l10n.inAppNoPremiumPackagesAvailable,
+          premiumActivatedSuccessfully: l10n.inAppPremiumActivatedSuccessfully,
+          purchaseCompletedEntitlementNotActiveYet:
+              l10n.inAppPurchaseCompletedEntitlementNotActiveYet,
+          purchaseCancelled: l10n.inAppPurchaseCancelled,
+          purchaseFailed: l10n.inAppPurchaseFailed,
+          premiumRestoredSuccessfully: l10n.inAppPremiumRestoredSuccessfully,
+          noActivePremiumPurchasesToRestore:
+              l10n.inAppNoActivePremiumPurchasesToRestore,
+          restoreFailed: l10n.inAppRestoreFailed,
+        );
+      },
+      premiumEntitlementId: 'Bartering App Premium',
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _inAppPurchasesCubit.initialize();
+    });
 
     _userProfileScreenCubit = UserProfileScreenCubit(getIt<ApiClient>());
 

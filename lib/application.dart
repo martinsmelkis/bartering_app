@@ -1,5 +1,8 @@
+import 'dart:async' show StreamSubscription;
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+import 'package:app_links/app_links.dart';
 import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/screens/chat_screen/cubit/chat_cubit.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
@@ -38,6 +41,8 @@ class Application extends StatefulWidget {
 class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   ChatNotificationService? _chatNotificationService;
   late ChatsBadgeCubit _chatsBadgeCubit;
+  AppLinks? _appLinks;
+  StreamSubscription<Uri>? _deepLinkSub;
 
   // It is assumed that all messages contain a data field with the key 'type'
   setupInteractedMessage() async {
@@ -76,7 +81,8 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _initializeServices();
     _loadSavedLocale();
-    
+    _initializePurchaseSuccessDeepLinks();
+
     // Listen to locale changes
     localeNotifier.addListener(_onLocaleChanged);
   }
@@ -92,11 +98,41 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   Future<void> _loadSavedLocale() async {
     final settingsService = getIt<SettingsService>();
     final languageCode = await settingsService.getPreferredLanguage();
-    
+
     if (languageCode != null && languageCode.isNotEmpty) {
       localeNotifier.value = Locale(languageCode);
       logDebug('Loaded saved locale: $languageCode');
     }
+  }
+
+  void _initializePurchaseSuccessDeepLinks() {
+    if (kIsWeb) return;
+
+    _appLinks = AppLinks();
+
+    _appLinks!.getInitialLink().then((uri) {
+      if (uri != null) {
+        _handleIncomingDeepLink(uri);
+      }
+    }).catchError((e) {
+      logDebug('Failed to read initial deep link: $e');
+    });
+
+    _deepLinkSub = _appLinks!.uriLinkStream.listen(
+      _handleIncomingDeepLink,
+      onError: (Object e) {
+        logDebug('Deep link stream error: $e');
+      },
+    );
+  }
+
+  void _handleIncomingDeepLink(Uri uri) {
+    final isPurchaseSuccess =
+        uri.scheme == 'barterapp' && uri.host == 'purchase-success';
+    if (!isPurchaseSuccess) return;
+
+    logDebug('Received purchase success deep link: $uri');
+    AppRouter.router.go('/purchase-success');
   }
 
   /// Navigate to chat screen with specific user using go_router
@@ -133,6 +169,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   void dispose() {
     localeNotifier.removeListener(_onLocaleChanged);
     WidgetsBinding.instance.removeObserver(this);
+    _deepLinkSub?.cancel();
     _chatNotificationService?.dispose();
     super.dispose();
   }

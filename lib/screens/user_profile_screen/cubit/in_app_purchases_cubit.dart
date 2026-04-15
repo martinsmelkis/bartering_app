@@ -1,7 +1,38 @@
+import 'package:barter_app/services/api_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class InAppPurchasesTexts {
+  final String revenueCatApiKeyMissing;
+  final String failedToInitializePurchases;
+  final String failedToLoadOfferings;
+  final String noPremiumPackagesAvailable;
+  final String premiumActivatedSuccessfully;
+  final String purchaseCompletedEntitlementNotActiveYet;
+  final String purchaseCancelled;
+  final String purchaseFailed;
+  final String premiumRestoredSuccessfully;
+  final String noActivePremiumPurchasesToRestore;
+  final String restoreFailed;
+
+  const InAppPurchasesTexts({
+    required this.revenueCatApiKeyMissing,
+    required this.failedToInitializePurchases,
+    required this.failedToLoadOfferings,
+    required this.noPremiumPackagesAvailable,
+    required this.premiumActivatedSuccessfully,
+    required this.purchaseCompletedEntitlementNotActiveYet,
+    required this.purchaseCancelled,
+    required this.purchaseFailed,
+    required this.premiumRestoredSuccessfully,
+    required this.noActivePremiumPurchasesToRestore,
+    required this.restoreFailed,
+  });
+}
 
 class InAppPurchasesState {
   final bool isInitializing;
@@ -53,13 +84,19 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
   final String appUserId;
   final String revenueCatApiKey;
   final String premiumEntitlementId;
+  final InAppPurchasesTexts Function() texts;
+  final ApiClient apiClient;
+  final String webPurchaseLinkBaseUrl;
 
   static bool _isConfigured = false;
 
   InAppPurchasesCubit({
     required this.appUserId,
     required this.revenueCatApiKey,
-    this.premiumEntitlementId = 'premium_user',
+    required this.texts,
+    required this.apiClient,
+    required this.webPurchaseLinkBaseUrl,
+    this.premiumEntitlementId = 'Bartering App Premium',
   }) : super(const InAppPurchasesState());
 
   Future<void> initialize() async {
@@ -69,15 +106,22 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       clearStatus: true,
     ));
 
-    if (revenueCatApiKey.isEmpty) {
-      emit(state.copyWith(
-        isInitializing: false,
-        errorMessage: 'RevenueCat API key is missing.',
-      ));
-      return;
-    }
+    final localized = texts();
 
     try {
+      if (kIsWeb) {
+        await refreshPremiumStatus();
+        return;
+      }
+
+      if (revenueCatApiKey.isEmpty) {
+        emit(state.copyWith(
+          isInitializing: false,
+          errorMessage: localized.revenueCatApiKeyMissing,
+        ));
+        return;
+      }
+
       if (!_isConfigured) {
         await Purchases.setLogLevel(LogLevel.warn);
         final configuration = PurchasesConfiguration(revenueCatApiKey)
@@ -92,7 +136,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       await refreshPremiumStatus();
     } catch (e) {
       emit(state.copyWith(
-        errorMessage: 'Failed to initialize purchases: $e',
+        errorMessage: '${localized.failedToInitializePurchases}: $e',
       ));
     } finally {
       emit(state.copyWith(isInitializing: false));
@@ -100,7 +144,14 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
   }
 
   Future<void> loadOfferings() async {
+    if (kIsWeb) {
+      emit(state.copyWith(isLoadingOfferings: false, availablePackages: const []));
+      return;
+    }
+
     emit(state.copyWith(isLoadingOfferings: true, clearError: true));
+
+    final localized = texts();
 
     try {
       final offerings = await Purchases.getOfferings();
@@ -112,7 +163,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     } catch (e) {
       emit(state.copyWith(
         isLoadingOfferings: false,
-        errorMessage: 'Failed to load offerings: $e',
+        errorMessage: '${localized.failedToLoadOfferings}: $e',
       ));
     }
   }
@@ -120,7 +171,35 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
   Future<void> purchasePremium() async {
     emit(state.copyWith(isPurchasing: true, clearError: true, clearStatus: true));
 
+    final localized = texts();
+
     try {
+      if (kIsWeb) {
+        if (webPurchaseLinkBaseUrl.trim().isEmpty) {
+          emit(state.copyWith(
+            isPurchasing: false,
+            errorMessage: localized.purchaseFailed,
+          ));
+          return;
+        }
+
+        final webPurchaseLink = _buildWebPurchaseLink();
+        final launched = await launchUrl(
+          webPurchaseLink,
+          mode: LaunchMode.platformDefault,
+          webOnlyWindowName: '_self',
+        );
+
+        emit(state.copyWith(
+          isPurchasing: false,
+          statusMessage: launched
+              ? localized.purchaseCompletedEntitlementNotActiveYet
+              : null,
+          errorMessage: launched ? null : localized.purchaseFailed,
+        ));
+        return;
+      }
+
       var packages = state.availablePackages;
       if (packages.isEmpty) {
         await loadOfferings();
@@ -130,48 +209,60 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       if (packages.isEmpty) {
         emit(state.copyWith(
           isPurchasing: false,
-          errorMessage: 'No premium packages available right now.',
+          errorMessage: localized.noPremiumPackagesAvailable,
         ));
         return;
       }
 
-      final targetPackage = _selectPreferredPackage(packages);
-      final purchaseParams = PurchaseParams.package(targetPackage);
-      final purchaseResult = await Purchases.purchase(purchaseParams);
+      final paywallResult = await RevenueCatUI.presentPaywallIfNeeded(
+        premiumEntitlementId,
+      );
 
-      final premiumActive = _isPremiumActiveFromResult(purchaseResult);
+      final customerInfo = await Purchases.getCustomerInfo();
+      final premiumActive = _isPremiumActive(customerInfo);
+
+      if (paywallResult == PaywallResult.cancelled) {
+        emit(state.copyWith(
+          isPurchasing: false,
+          statusMessage: localized.purchaseCancelled,
+          isPremium: premiumActive,
+        ));
+        return;
+      }
 
       emit(state.copyWith(
         isPurchasing: false,
         isPremium: premiumActive,
         statusMessage: premiumActive
-            ? 'Premium activated successfully.'
-            : 'Purchase completed, but entitlement not active yet.',
+            ? localized.premiumActivatedSuccessfully
+            : localized.purchaseCompletedEntitlementNotActiveYet,
       ));
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
       if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
         emit(state.copyWith(
           isPurchasing: false,
-          statusMessage: 'Purchase cancelled.',
+          statusMessage: localized.purchaseCancelled,
         ));
         return;
       }
 
       emit(state.copyWith(
         isPurchasing: false,
-        errorMessage: 'Purchase failed: ${e.message ?? e.code}',
+        errorMessage: '${localized.purchaseFailed}: ${e.message ?? e.code}',
       ));
     } catch (e) {
       emit(state.copyWith(
         isPurchasing: false,
-        errorMessage: 'Purchase failed: $e',
+        errorMessage: '${localized.purchaseFailed}: $e',
       ));
     }
   }
 
   Future<void> restorePurchases() async {
     emit(state.copyWith(isRestoring: true, clearError: true, clearStatus: true));
+
+    final localized = texts();
 
     try {
       final customerInfo = await Purchases.restorePurchases();
@@ -181,19 +272,25 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         isRestoring: false,
         isPremium: premiumActive,
         statusMessage: premiumActive
-            ? 'Premium restored successfully.'
-            : 'No active Premium purchases found to restore.',
+            ? localized.premiumRestoredSuccessfully
+            : localized.noActivePremiumPurchasesToRestore,
       ));
     } catch (e) {
       emit(state.copyWith(
         isRestoring: false,
-        errorMessage: 'Restore failed: $e',
+        errorMessage: '${localized.restoreFailed}: $e',
       ));
     }
   }
 
   Future<void> refreshPremiumStatus() async {
     try {
+      if (kIsWeb) {
+        final premiumStatus = await apiClient.getPremiumStatus();
+        emit(state.copyWith(isPremium: premiumStatus.isPremium));
+        return;
+      }
+
       final customerInfo = await Purchases.getCustomerInfo();
       emit(state.copyWith(isPremium: _isPremiumActive(customerInfo)));
     } catch (e) {
@@ -201,25 +298,18 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     }
   }
 
-  Package _selectPreferredPackage(List<Package> packages) {
-    for (final type in [
-      PackageType.annual,
-      PackageType.monthly,
-      PackageType.lifetime,
-      PackageType.weekly,
-    ]) {
-      final match = packages.where((p) => p.packageType == type);
-      if (match.isNotEmpty) return match.first;
-    }
+  Uri _buildWebPurchaseLink() {
+    final normalizedBase = webPurchaseLinkBaseUrl.trim();
+    final baseUri = Uri.parse(normalizedBase);
+    final cleanPath = baseUri.path.endsWith('/')
+        ? baseUri.path.substring(0, baseUri.path.length - 1)
+        : baseUri.path;
 
-    return packages.first;
+    return baseUri.replace(path: '$cleanPath/$appUserId');
   }
 
   bool _isPremiumActive(CustomerInfo customerInfo) {
     return customerInfo.entitlements.active.containsKey(premiumEntitlementId);
   }
 
-  bool _isPremiumActiveFromResult(PurchaseResult purchaseResult) {
-    return _isPremiumActive(purchaseResult.customerInfo);
-  }
 }

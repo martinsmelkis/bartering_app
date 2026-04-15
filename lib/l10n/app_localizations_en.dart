@@ -2297,6 +2297,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restorePurchases => 'Restore Purchases';
 
   @override
+  String get inAppRevenueCatApiKeyMissing => 'RevenueCat API key is missing.';
+
+  @override
+  String get inAppFailedToInitializePurchases =>
+      'Failed to initialize purchases';
+
+  @override
+  String get inAppFailedToLoadOfferings => 'Failed to load offerings';
+
+  @override
+  String get inAppNoPremiumPackagesAvailable =>
+      'No premium packages available right now.';
+
+  @override
+  String get inAppPremiumActivatedSuccessfully =>
+      'Premium activated successfully.';
+
+  @override
+  String get inAppPurchaseCompletedEntitlementNotActiveYet =>
+      'Purchase completed, but entitlement not active yet.';
+
+  @override
+  String get inAppPurchaseCancelled => 'Purchase cancelled.';
+
+  @override
+  String get inAppPurchaseFailed => 'Purchase failed';
+
+  @override
+  String get inAppPremiumRestoredSuccessfully =>
+      'Premium restored successfully.';
+
+  @override
+  String get inAppNoActivePremiumPurchasesToRestore =>
+      'No active Premium purchases found to restore.';
+
+  @override
+  String get inAppRestoreFailed => 'Restore failed';
+
+  @override
   String get skipReviewTitle => 'Skip Review?';
 
   @override
