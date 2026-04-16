@@ -102,11 +102,14 @@ class _PremiumProfileEditorScreenState extends State<PremiumProfileEditorScreen>
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 700),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 Text(
                   l10n.premiumProfileEditorHeader,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -150,7 +153,9 @@ class _PremiumProfileEditorScreenState extends State<PremiumProfileEditorScreen>
                     ),
                   ),
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         );

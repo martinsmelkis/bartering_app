@@ -1807,7 +1807,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get gdprConsentRequiredDescription =>
-      'Nepieciešams konta izveidei, lietotāju atbilstībām un drošai saziņai. To nevar izslēgt, ja vēlaties lietot lietotni.';
+      'Nepieciešams konta izveidei, lietotāju atbilstībām un drošai saziņai.';
 
   @override
   String get gdprConsentLocationLabel =>
@@ -1815,14 +1815,14 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get gdprConsentLocationDescription =>
-      'Izmantojiet atrašanās vietu, lai atrastu lietotājus tuvumā un uzlabotu atbilstību.';
+      'Izmantojiet atrašanās vietu, lai atrastu atbilstošākos lietotājus tuvumā';
 
   @override
   String get gdprConsentAiLabel => 'Neobligāti: MI palīdzēta atbilstība';
 
   @override
   String get gdprConsentAiDescription =>
-      'Analizē profilu un mijiedarbības signālus, lai uzlabotu ieteikumus un atbilstību.';
+      'Analizē profilu un iestatījumus, lai uzlabotu ieteikumus un atbilstību.';
 
   @override
   String get gdprCookiesSectionTitle => 'Sīkdatnes (Web)';
@@ -1832,7 +1832,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get gdprCookiesRequiredDescription =>
-      'Nepieciešamas pamatfunkcijām tīmeklī, piemēram, drošībai, sesiju uzturēšanai un būtisko iestatījumu saglabāšanai.';
+      'Nepieciešamas pamatfunkcijām: drošībai, sesiju uzturēšanai un būtisko iestatījumu saglabāšanai.';
 
   @override
   String get gdprCookiesAnalyticsLabel => 'Neobligātās analītikas sīkdatnes';

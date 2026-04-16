@@ -40,6 +40,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   // Generate SVG asset path by index (1-based)
   static String _getSvgAsset(int index) => 'assets/icons/avatars/path$index.svg';
 
+  // Same palette as onboarding category card colors
+  static final List<Color> _onboardingCategoryColors = [
+    Colors.green.shade400,
+    Colors.red.shade400,
+    Colors.blue.shade400,
+    Colors.purple.shade400,
+    Colors.yellow.shade700,
+    Colors.orange.shade600,
+    Colors.teal.shade400,
+  ];
+
   // Onboarding category icons
   static const List<IconData> _onboardingIcons = [
     Icons.eco,
@@ -120,13 +131,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     }
 
     // Onboarding icons are 1/3 less
-    onboardingIconCount = (avatarIconCount * 0.73).round();
+    onboardingIconCount = (avatarIconCount * 0.75).round();
 
     final List<_FloatingIcon> icons = [];
 
     // Generate avatar icons
     for (int i = 0; i < avatarIconCount; i++) {
-      final size = random.nextDouble() * 40 + 30; // 30-70
+      final size = random.nextDouble() * 40 + 28; // 30-70
       icons.add(_FloatingIcon(
         svgAsset: _getSvgAsset(random.nextInt(_svgAssetCount) + 1),
         // 1-based index
@@ -144,6 +155,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       final size = random.nextDouble() * 30 + 25; // 25-55 (slightly smaller)
       icons.add(_FloatingIcon(
         iconData: _onboardingIcons[random.nextInt(_onboardingIcons.length)],
+        iconColor:
+            _onboardingCategoryColors[random.nextInt(_onboardingCategoryColors.length)]
+                .withValues(alpha: 0.60),
         left: random.nextDouble() * (screenSize.width - size),
         top: random.nextDouble() * screenSize.height,
         size: size,
@@ -328,7 +342,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 child: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(
                     horizontal: ResponsiveBreakpoints.getPadding(context),
-                    vertical: 40,
+                    vertical: 30,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -351,7 +365,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 16),
                       // Tagline
                       Text(
                         l10n.welcomeTagline,
@@ -384,7 +398,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             borderRadius: BorderRadius.circular(16.r),
                           ),
                           elevation: 8,
-                          shadowColor: Colors.black.withValues(alpha: 0.3),
+                          shadowColor: Colors.black.withValues(alpha: 0.5),
                         ),
                         child: Text(
                           l10n.getStarted,
@@ -544,6 +558,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 class _FloatingIcon {
   final String? svgAsset;
   final IconData? iconData;
+  final Color? iconColor;
   final double left;
   final double top;
   final double size;
@@ -553,6 +568,7 @@ class _FloatingIcon {
   _FloatingIcon({
     this.svgAsset,
     this.iconData,
+    this.iconColor,
     required this.left,
     required this.top,
     required this.size,
@@ -620,26 +636,26 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
       },
       child: widget.floatingIcon.svgAsset != null
           ? FutureBuilder<String>(
-        future: _loadAndModifySvg(widget.floatingIcon.svgAsset!),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return SizedBox(
-              width: widget.floatingIcon.size,
-              height: widget.floatingIcon.size,
-            );
-          }
-          return SvgPicture.string(
-            snapshot.data!,
-            width: widget.floatingIcon.size,
-            height: widget.floatingIcon.size,
-          );
-        },
-      )
+              future: _loadAndModifySvg(widget.floatingIcon.svgAsset!),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return SizedBox(
+                    width: widget.floatingIcon.size,
+                    height: widget.floatingIcon.size,
+                  );
+                }
+                return SvgPicture.string(
+                  snapshot.data!,
+                  width: widget.floatingIcon.size,
+                  height: widget.floatingIcon.size,
+                );
+              },
+            )
           : Icon(
-        widget.floatingIcon.iconData!,
-        size: widget.floatingIcon.size,
-        color: Colors.white.withValues(alpha: 0.5),
-      ),
+              widget.floatingIcon.iconData!,
+              size: widget.floatingIcon.size,
+              color: widget.floatingIcon.iconColor ?? Colors.white.withValues(alpha: 0.5),
+            ),
     );
   }
 

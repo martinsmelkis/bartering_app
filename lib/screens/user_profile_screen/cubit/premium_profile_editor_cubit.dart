@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/dio_error_handler.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -160,13 +162,18 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
     emit(state.copyWith(description: value, clearError: true, clearStatus: true));
   }
 
-  Future<XFile?> _pickImage(ImageSource source) async {
-    final XFile? image = await _picker.pickImage(
-      source: source,
-      maxWidth: 1920,
-      maxHeight: 1920,
-      imageQuality: 100,
-    );
+  Future<XFile?> _pickImage(
+    ImageSource source, {
+    bool applyResizeAndCompression = true,
+  }) async {
+    final XFile? image = applyResizeAndCompression
+        ? await _picker.pickImage(
+            source: source,
+            maxWidth: 1920,
+            maxHeight: 1920,
+            imageQuality: 100,
+          )
+        : await _picker.pickImage(source: source);
 
     if (image != null && kIsWeb) {
       try {
@@ -188,7 +195,30 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
     ));
 
     try {
-      final image = await _pickImage(source);
+      final image = await _pickImage(
+        source,
+        applyResizeAndCompression: false,
+      );
+      if (image == null) {
+        emit(state.copyWith(isUploadingAvatar: false));
+        return;
+      }
+
+      final svgContent = await _toSvgContent(image);
+      if (svgContent == null) {
+        final avatarPath = image.path;
+        if (avatarPath.isNotEmpty) {
+          _webImageBytes.remove(avatarPath);
+        }
+
+        emit(state.copyWith(
+          isUploadingAvatar: false,
+          errorMessage:
+              'Please select a valid SVG file. The selected file appears to be a raster image (PNG/JPG).',
+        ));
+        return;
+      }
+
       emit(state.copyWith(
         isUploadingAvatar: false,
         avatarSvgFile: image,
@@ -371,8 +401,20 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
     if (avatarSvgFile == null) return null;
 
     final bytes = await _readImageBytes(avatarSvgFile);
-    final svgContent = utf8.decode(bytes, allowMalformed: true).trim();
-    return svgContent.isEmpty ? null : svgContent;
+    final decoded = utf8.decode(bytes, allowMalformed: true).trim();
+    if (decoded.isEmpty) return null;
+
+    final lower = decoded.toLowerCase();
+    final looksLikeSvg = lower.contains('<svg') ||
+        lower.startsWith('<?xml') ||
+        lower.contains('xmlns="http://www.w3.org/2000/svg"') ||
+        lower.contains("xmlns='http://www.w3.org/2000/svg'");
+
+    if (!looksLikeSvg) {
+      return null;
+    }
+
+    return decoded;
   }
 
   Future<void> saveProfile() async {
@@ -430,10 +472,18 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
         isSaving: false,
         statusMessage: 'Profile updated successfully.',
       ));
+    } on DioException catch (e) {
+      final backendMessage = DioErrorHandler.extractBackendErrorMessage(e);
+      emit(state.copyWith(
+        isSaving: false,
+        errorMessage: backendMessage?.trim().isNotEmpty == true
+            ? backendMessage!.trim()
+            : 'Failed to save profile. Please try again.',
+      ));
     } catch (e) {
       emit(state.copyWith(
         isSaving: false,
-        errorMessage: 'Failed to save profile: $e',
+        errorMessage: 'Failed to save profile. Please try again.',
       ));
     }
   }

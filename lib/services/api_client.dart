@@ -559,6 +559,10 @@ abstract class ApiClient {
 
   ///////////// PURCHASES ///////////////
 
+  /// Force immediate premium sync from RevenueCat for authenticated user
+  @POST('/api/v1/purchases/premium/sync-now')
+  Future<void> syncPremiumNow();
+
   /// Get premium status for authenticated user
   @GET('/api/v1/purchases/premium/status')
   Future<PremiumStatusResponse> getPremiumStatus();

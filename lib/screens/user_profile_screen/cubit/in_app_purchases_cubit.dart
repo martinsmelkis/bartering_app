@@ -176,9 +176,11 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     try {
       if (kIsWeb) {
         if (webPurchaseLinkBaseUrl.trim().isEmpty) {
+          _logPurchaseError('web_config_missing', 'webPurchaseLinkBaseUrl is empty');
           emit(state.copyWith(
             isPurchasing: false,
-            errorMessage: localized.purchaseFailed,
+            errorMessage:
+                '${localized.purchaseFailed}: missing web purchase URL configuration',
           ));
           return;
         }
@@ -190,12 +192,18 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
           webOnlyWindowName: '_self',
         );
 
+        if (!launched) {
+          _logPurchaseError('web_launch_failed', 'Could not launch $webPurchaseLink');
+        }
+
         emit(state.copyWith(
           isPurchasing: false,
           statusMessage: launched
               ? localized.purchaseCompletedEntitlementNotActiveYet
               : null,
-          errorMessage: launched ? null : localized.purchaseFailed,
+          errorMessage: launched
+              ? null
+              : '${localized.purchaseFailed}: unable to open purchase page',
         ));
         return;
       }
@@ -207,6 +215,10 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       }
 
       if (packages.isEmpty) {
+        _logPurchaseError(
+          'no_packages_available',
+          'No packages found after loading offerings',
+        );
         emit(state.copyWith(
           isPurchasing: false,
           errorMessage: localized.noPremiumPackagesAvailable,
@@ -237,7 +249,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
             ? localized.premiumActivatedSuccessfully
             : localized.purchaseCompletedEntitlementNotActiveYet,
       ));
-    } on PlatformException catch (e) {
+    } on PlatformException catch (e, st) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
       if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
         emit(state.copyWith(
@@ -247,11 +259,18 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         return;
       }
 
+      _logPurchaseError(
+        'platform_exception',
+        'code=${e.code}, message=${e.message ?? 'n/a'}, details=${e.details ?? 'n/a'}',
+        st,
+      );
       emit(state.copyWith(
         isPurchasing: false,
-        errorMessage: '${localized.purchaseFailed}: ${e.message ?? e.code}',
+        errorMessage:
+            '${localized.purchaseFailed}: code=${e.code}, message=${e.message ?? 'n/a'}',
       ));
-    } catch (e) {
+    } catch (e, st) {
+      _logPurchaseError('unexpected_exception', e, st);
       emit(state.copyWith(
         isPurchasing: false,
         errorMessage: '${localized.purchaseFailed}: $e',
@@ -310,6 +329,13 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
 
   bool _isPremiumActive(CustomerInfo customerInfo) {
     return customerInfo.entitlements.active.containsKey(premiumEntitlementId);
+  }
+
+  void _logPurchaseError(String context, Object error, [StackTrace? st]) {
+    debugPrint('[IAP][purchasePremium][$context] $error');
+    if (st != null) {
+      debugPrint('[IAP][purchasePremium][$context][stack] $st');
+    }
   }
 
 }

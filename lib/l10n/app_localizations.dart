@@ -3467,7 +3467,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprConsentRequiredDescription.
   ///
   /// In en, this message translates to:
-  /// **'Needed to create your account, match with users, and run secure messaging. This cannot be turned off if you want to use the app.'**
+  /// **'Needed to create your account, match with users, and run secure messaging. This cannot be turned off.'**
   String get gdprConsentRequiredDescription;
 
   /// No description provided for @gdprConsentLocationLabel.
@@ -3479,7 +3479,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprConsentLocationDescription.
   ///
   /// In en, this message translates to:
-  /// **'Use your location to discover users nearby and improve match relevance.'**
+  /// **'Use your location to discover matching users nearby.'**
   String get gdprConsentLocationDescription;
 
   /// No description provided for @gdprConsentAiLabel.
@@ -3491,7 +3491,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprConsentAiDescription.
   ///
   /// In en, this message translates to:
-  /// **'Analyze profile and interaction signals to improve recommendations and relevance.'**
+  /// **'Analyze profile configuration to improve recommendations and relevance.'**
   String get gdprConsentAiDescription;
 
   /// No description provided for @gdprCookiesSectionTitle.
@@ -3509,7 +3509,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprCookiesRequiredDescription.
   ///
   /// In en, this message translates to:
-  /// **'Needed for core web functionality such as security, session handling, and storing your essential settings.'**
+  /// **'Needed for core web functionality: security, session handling, and storing preferences.'**
   String get gdprCookiesRequiredDescription;
 
   /// No description provided for @gdprCookiesAnalyticsLabel.
@@ -3521,13 +3521,13 @@ abstract class AppLocalizations {
   /// No description provided for @gdprCookiesAnalyticsDescription.
   ///
   /// In en, this message translates to:
-  /// **'Help us understand usage and improve performance. These are only used if you allow them.'**
+  /// **'Helps us understand usage and improve performance. These are only used if you allow them.'**
   String get gdprCookiesAnalyticsDescription;
 
   /// No description provided for @gdprConsentManageLater.
   ///
   /// In en, this message translates to:
-  /// **'You can change these choices later in Settings.'**
+  /// **'You can change this later in Settings.'**
   String get gdprConsentManageLater;
 
   /// No description provided for @gdprConsentDecline.

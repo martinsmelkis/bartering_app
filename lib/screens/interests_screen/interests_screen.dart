@@ -3,6 +3,7 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/interests_screen/cubit/interests_cubit.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -112,7 +113,7 @@ class _InterestsViewState extends State<InterestsView> {
               final screenWidth = MediaQuery.of(context).size.width;
               final isLargeScreen = screenWidth >= 600;
               final spacing = isLargeScreen ? 12.0 : 4.0;
-              final runSpacing = isLargeScreen ? 12.0 : 0.0;
+              final runSpacing = isLargeScreen ? 12.0 : (kIsWeb ? 4.0 : 0.0);
               
               return Padding(
                 padding: const EdgeInsets.all(16.0),

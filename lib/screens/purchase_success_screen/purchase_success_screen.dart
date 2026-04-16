@@ -1,6 +1,8 @@
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/l10n/app_localizations.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/utils/dio_error_handler.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -29,19 +31,34 @@ class _PurchaseSuccessScreenState extends State<PurchaseSuccessScreen> {
     });
 
     try {
-      final premiumStatus = await getIt<ApiClient>().getPremiumStatus();
+      final apiClient = getIt<ApiClient>();
+      await apiClient.syncPremiumNow();
+      final premiumStatus = await apiClient.getPremiumStatus();
       if (!mounted) return;
 
       setState(() {
         _isPremium = premiumStatus.isPremium;
         _isRefreshing = false;
       });
+    } on DioException catch (e) {
+      if (!mounted) return;
+
+      final l10n = AppLocalizations.of(context)!;
+      setState(() {
+        _isRefreshing = false;
+        _errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
+          e,
+          l10n,
+          fallbackMessage: l10n.apiErrorServer,
+        );
+      });
     } catch (e) {
       if (!mounted) return;
 
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
         _isRefreshing = false;
-        _errorMessage = e.toString();
+        _errorMessage = l10n.apiErrorServer;
       });
     }
   }
@@ -54,7 +71,7 @@ class _PurchaseSuccessScreenState extends State<PurchaseSuccessScreen> {
       appBar: AppBar(title: Text(l10n.buyPremium)),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 460),
+          constraints: const BoxConstraints(maxWidth: 700),
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
