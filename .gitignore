@@ -63,3 +63,9 @@ pubspec.yaml.backup
 
 # Jan's Custom Docs
 _jan-docs/
+# Local build outputs
+ios/build/
+macos/build/
+build/
+.antigravity/
+
