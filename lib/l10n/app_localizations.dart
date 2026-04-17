@@ -3467,7 +3467,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprConsentRequiredDescription.
   ///
   /// In en, this message translates to:
-  /// **'Needed to create your account, match with users, and run secure messaging. This cannot be turned off if you want to use the app.'**
+  /// **'Needed to create your account, match with users, and run secure messaging. This cannot be turned off.'**
   String get gdprConsentRequiredDescription;
 
   /// No description provided for @gdprConsentLocationLabel.
@@ -3479,7 +3479,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprConsentLocationDescription.
   ///
   /// In en, this message translates to:
-  /// **'Use your location to discover users nearby and improve match relevance.'**
+  /// **'Use your location to discover matching users nearby.'**
   String get gdprConsentLocationDescription;
 
   /// No description provided for @gdprConsentAiLabel.
@@ -3491,7 +3491,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprConsentAiDescription.
   ///
   /// In en, this message translates to:
-  /// **'Analyze profile and interaction signals to improve recommendations and relevance.'**
+  /// **'Analyze profile configuration to improve recommendations and relevance.'**
   String get gdprConsentAiDescription;
 
   /// No description provided for @gdprCookiesSectionTitle.
@@ -3509,7 +3509,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprCookiesRequiredDescription.
   ///
   /// In en, this message translates to:
-  /// **'Needed for core web functionality such as security, session handling, and storing your essential settings.'**
+  /// **'Needed for core web functionality: security, session handling, and storing preferences.'**
   String get gdprCookiesRequiredDescription;
 
   /// No description provided for @gdprCookiesAnalyticsLabel.
@@ -3521,13 +3521,13 @@ abstract class AppLocalizations {
   /// No description provided for @gdprCookiesAnalyticsDescription.
   ///
   /// In en, this message translates to:
-  /// **'Help us understand usage and improve performance. These are only used if you allow them.'**
+  /// **'Helps us understand usage and improve performance. These are only used if you allow them.'**
   String get gdprCookiesAnalyticsDescription;
 
   /// No description provided for @gdprConsentManageLater.
   ///
   /// In en, this message translates to:
-  /// **'You can change these choices later in Settings.'**
+  /// **'You can change this later in Settings.'**
   String get gdprConsentManageLater;
 
   /// No description provided for @gdprConsentDecline.
@@ -4441,6 +4441,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restore Purchases'**
   String get restorePurchases;
+
+  /// No description provided for @inAppRevenueCatApiKeyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'RevenueCat API key is missing.'**
+  String get inAppRevenueCatApiKeyMissing;
+
+  /// No description provided for @inAppFailedToInitializePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to initialize purchases'**
+  String get inAppFailedToInitializePurchases;
+
+  /// No description provided for @inAppFailedToLoadOfferings.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load offerings'**
+  String get inAppFailedToLoadOfferings;
+
+  /// No description provided for @inAppNoPremiumPackagesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No premium packages available right now.'**
+  String get inAppNoPremiumPackagesAvailable;
+
+  /// No description provided for @inAppPremiumActivatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium activated successfully.'**
+  String get inAppPremiumActivatedSuccessfully;
+
+  /// No description provided for @inAppPurchaseCompletedEntitlementNotActiveYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase completed, but entitlement not active yet.'**
+  String get inAppPurchaseCompletedEntitlementNotActiveYet;
+
+  /// No description provided for @inAppPurchaseCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase cancelled.'**
+  String get inAppPurchaseCancelled;
+
+  /// No description provided for @inAppPurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed'**
+  String get inAppPurchaseFailed;
+
+  /// No description provided for @inAppPremiumRestoredSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium restored successfully.'**
+  String get inAppPremiumRestoredSuccessfully;
+
+  /// No description provided for @inAppNoActivePremiumPurchasesToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'No active Premium purchases found to restore.'**
+  String get inAppNoActivePremiumPurchasesToRestore;
+
+  /// No description provided for @inAppRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed'**
+  String get inAppRestoreFailed;
 
   /// No description provided for @skipReviewTitle.
   ///

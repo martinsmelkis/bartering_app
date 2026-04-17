@@ -8,6 +8,9 @@
     <!-- Network state permission for connectivity monitoring -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- To allow Google Play Store In-app Purchases -->
+    <uses-permission android:name="com.android.vending.BILLING" />
+
     <application
         android:label="Bartering App"
         android:name="${applicationName}"
@@ -39,6 +42,14 @@
             <intent-filter>
                 <action android:name="FLUTTER_NOTIFICATION_CLICK" />
                 <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Deep link redirect target for purchase success -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="barterapp" android:host="purchase-success" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

@@ -325,10 +325,10 @@ class ResponsiveBreakpoints {
   static double getButtonFontSize(BuildContext context) {
     return getValue(
       context: context,
-      compact: 16.0,
-      medium: 17.0,
-      expanded: 18.0,
-      large: 19.0,
+      compact: 17.0,
+      medium: 18.0,
+      expanded: 19.0,
+      large: 20.0,
       extraLarge: 21.0,
     );
   }

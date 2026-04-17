@@ -1781,21 +1781,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gdprConsentRequiredDescription =>
-      'Needed to create your account, match with users, and run secure messaging. This cannot be turned off if you want to use the app.';
+      'Needed to create your account, match with users, and run secure messaging. This cannot be turned off.';
 
   @override
   String get gdprConsentLocationLabel => 'Optional: Location processing';
 
   @override
   String get gdprConsentLocationDescription =>
-      'Use your location to discover users nearby and improve match relevance.';
+      'Use your location to discover matching users nearby.';
 
   @override
   String get gdprConsentAiLabel => 'Optional: AI-assisted matching';
 
   @override
   String get gdprConsentAiDescription =>
-      'Analyze profile and interaction signals to improve recommendations and relevance.';
+      'Analyze profile configuration to improve recommendations and relevance.';
 
   @override
   String get gdprCookiesSectionTitle => 'Cookies (Web)';
@@ -1805,18 +1805,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gdprCookiesRequiredDescription =>
-      'Needed for core web functionality such as security, session handling, and storing your essential settings.';
+      'Needed for core web functionality: security, session handling, and storing preferences.';
 
   @override
   String get gdprCookiesAnalyticsLabel => 'Optional analytics cookies';
 
   @override
   String get gdprCookiesAnalyticsDescription =>
-      'Help us understand usage and improve performance. These are only used if you allow them.';
+      'Helps us understand usage and improve performance. These are only used if you allow them.';
 
   @override
-  String get gdprConsentManageLater =>
-      'You can change these choices later in Settings.';
+  String get gdprConsentManageLater => 'You can change this later in Settings.';
 
   @override
   String get gdprConsentDecline => 'Not now';
@@ -2295,6 +2294,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restorePurchases => 'Restore Purchases';
+
+  @override
+  String get inAppRevenueCatApiKeyMissing => 'RevenueCat API key is missing.';
+
+  @override
+  String get inAppFailedToInitializePurchases =>
+      'Failed to initialize purchases';
+
+  @override
+  String get inAppFailedToLoadOfferings => 'Failed to load offerings';
+
+  @override
+  String get inAppNoPremiumPackagesAvailable =>
+      'No premium packages available right now.';
+
+  @override
+  String get inAppPremiumActivatedSuccessfully =>
+      'Premium activated successfully.';
+
+  @override
+  String get inAppPurchaseCompletedEntitlementNotActiveYet =>
+      'Purchase completed, but entitlement not active yet.';
+
+  @override
+  String get inAppPurchaseCancelled => 'Purchase cancelled.';
+
+  @override
+  String get inAppPurchaseFailed => 'Purchase failed';
+
+  @override
+  String get inAppPremiumRestoredSuccessfully =>
+      'Premium restored successfully.';
+
+  @override
+  String get inAppNoActivePremiumPurchasesToRestore =>
+      'No active Premium purchases found to restore.';
+
+  @override
+  String get inAppRestoreFailed => 'Restore failed';
 
   @override
   String get skipReviewTitle => 'Skip Review?';

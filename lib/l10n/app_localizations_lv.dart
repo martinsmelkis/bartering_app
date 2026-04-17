@@ -1807,7 +1807,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get gdprConsentRequiredDescription =>
-      'Nepieciešams konta izveidei, lietotāju atbilstībām un drošai saziņai. To nevar izslēgt, ja vēlaties lietot lietotni.';
+      'Nepieciešams konta izveidei, lietotāju atbilstībām un drošai saziņai.';
 
   @override
   String get gdprConsentLocationLabel =>
@@ -1815,14 +1815,14 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get gdprConsentLocationDescription =>
-      'Izmantojiet atrašanās vietu, lai atrastu lietotājus tuvumā un uzlabotu atbilstību.';
+      'Izmantojiet atrašanās vietu, lai atrastu atbilstošākos lietotājus tuvumā';
 
   @override
   String get gdprConsentAiLabel => 'Neobligāti: MI palīdzēta atbilstība';
 
   @override
   String get gdprConsentAiDescription =>
-      'Analizē profilu un mijiedarbības signālus, lai uzlabotu ieteikumus un atbilstību.';
+      'Analizē profilu un iestatījumus, lai uzlabotu ieteikumus un atbilstību.';
 
   @override
   String get gdprCookiesSectionTitle => 'Sīkdatnes (Web)';
@@ -1832,7 +1832,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get gdprCookiesRequiredDescription =>
-      'Nepieciešamas pamatfunkcijām tīmeklī, piemēram, drošībai, sesiju uzturēšanai un būtisko iestatījumu saglabāšanai.';
+      'Nepieciešamas pamatfunkcijām: drošībai, sesiju uzturēšanai un būtisko iestatījumu saglabāšanai.';
 
   @override
   String get gdprCookiesAnalyticsLabel => 'Neobligātās analītikas sīkdatnes';
@@ -2325,6 +2325,44 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get restorePurchases => 'Atjaunot pirkumus';
+
+  @override
+  String get inAppRevenueCatApiKeyMissing => 'Trūkst RevenueCat API atslēgas.';
+
+  @override
+  String get inAppFailedToInitializePurchases =>
+      'Neizdevās inicializēt pirkumus';
+
+  @override
+  String get inAppFailedToLoadOfferings => 'Neizdevās ielādēt piedāvājumus';
+
+  @override
+  String get inAppNoPremiumPackagesAvailable =>
+      'Pašlaik nav pieejamu Premium paku.';
+
+  @override
+  String get inAppPremiumActivatedSuccessfully =>
+      'Premium veiksmīgi aktivizēts.';
+
+  @override
+  String get inAppPurchaseCompletedEntitlementNotActiveYet =>
+      'Pirkums pabeigts, bet piekļuve vēl nav aktivizēta.';
+
+  @override
+  String get inAppPurchaseCancelled => 'Pirkums atcelts.';
+
+  @override
+  String get inAppPurchaseFailed => 'Pirkums neizdevās';
+
+  @override
+  String get inAppPremiumRestoredSuccessfully => 'Premium veiksmīgi atjaunots.';
+
+  @override
+  String get inAppNoActivePremiumPurchasesToRestore =>
+      'Nav atrasti aktīvi Premium pirkumi atjaunošanai.';
+
+  @override
+  String get inAppRestoreFailed => 'Atjaunošana neizdevās';
 
   @override
   String get skipReviewTitle => 'Izlaist atsauksmi?';

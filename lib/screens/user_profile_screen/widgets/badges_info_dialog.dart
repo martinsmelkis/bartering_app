@@ -132,16 +132,6 @@ class BadgesInfoDialog extends StatelessWidget {
                         color: Colors.grey[700],
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      isEarned
-                          ? l10n.badgeEarnedStatus
-                          : l10n.badgeNotEarnedStatus,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[700],
-                      ),
-                    ),
                   ],
                 ),
               );

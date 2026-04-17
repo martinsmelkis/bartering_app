@@ -1,4 +1,5 @@
 import 'package:barter_app/theme/app_colors.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -95,7 +96,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
               final screenWidth = MediaQuery.of(context).size.width;
               final isLargeScreen = screenWidth >= 600;
               final spacing = isLargeScreen ? 12.0 : 4.0;
-              final runSpacing = isLargeScreen ? 12.0 : 2.0;
+              final runSpacing = isLargeScreen ? 12.0 : (kIsWeb ? 4.0 : 0.0);
               
               return Padding(
                 padding: const EdgeInsets.all(16.0),

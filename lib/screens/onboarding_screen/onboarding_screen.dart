@@ -320,23 +320,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SizedBox(
-                      width: 200.w,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          logDebug("Onboarding V2 Complete: $_answers");
-                          final locale = Localizations.localeOf(context);
-                          context.read<OnboardingCubit>().completeOnboarding(
-                              locale.languageCode);
-                        },
-                        icon: const Icon(Icons.check),
-                        label: Text(AppLocalizations.of(context)!.finishOnboarding),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: SafeArea(
+                    top: false,
+                    minimum: const EdgeInsets.only(bottom: 8),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SizedBox(
+                        width: 200.w,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            logDebug("Onboarding V2 Complete: $_answers");
+                            final locale = Localizations.localeOf(context);
+                            context.read<OnboardingCubit>().completeOnboarding(
+                                locale.languageCode);
+                          },
+                          icon: const Icon(Icons.check),
+                          label: Text(AppLocalizations.of(context)!.finishOnboarding),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          ),
                         ),
                       ),
                     ),
