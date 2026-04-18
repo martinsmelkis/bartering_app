@@ -95,8 +95,8 @@ class _OffersScreenState extends State<OffersScreenWidget> {
               // Determine spacing based on screen width
               final screenWidth = MediaQuery.of(context).size.width;
               final isLargeScreen = screenWidth >= 600;
-              final spacing = isLargeScreen ? 12.0 : 4.0;
-              final runSpacing = isLargeScreen ? 12.0 : (kIsWeb ? 4.0 : 0.0);
+              final spacing = isLargeScreen ? 8.0 : 4.0;
+              final runSpacing = isLargeScreen ? 8.0 : (kIsWeb ? 4.0 : 0.0);
               
               return Padding(
                 padding: const EdgeInsets.all(16.0),

@@ -13,7 +13,11 @@ class AppDimensions {
   // ============================================================================
 
   /// Size for POI markers on the map
-  static double get mapPoiMarkerSize => kIsWeb ? 90 : 105.w;
+  ///
+  /// NOTE: On large Android tablets, raw `.w` scaling made markers too large.
+  /// Clamp native size so marker proportions stay close to phone sizing.
+  static double get mapPoiMarkerSize =>
+      kIsWeb ? 90 : (105.w).clamp(98.0, 108.0).toDouble();
 
   /// Size for user avatar FAB
   static double get userAvatarSize => kIsWeb ? 88.4 : 90.0;
@@ -22,14 +26,17 @@ class AppDimensions {
   static double get avatarEditIconSize => kIsWeb ? 26.0 : 28.0;
 
   /// Size for icon inside the edit icon overlay
-  static double get avatarEditIconInnerSize => kIsWeb ? 15.6 : 15.w;
+  static double get avatarEditIconInnerSize => kIsWeb ? 15.6 : 13.0;
 
   // ============================================================================
   // CLUSTER MARKER SIZES
   // ============================================================================
 
   /// Container size for main cluster markers
-  static double get mainClusterSize => kIsWeb ? 80.0 : 72.w;
+  ///
+  /// NOTE: Keep native tablet sizing close to phone proportions.
+  static double get mainClusterSize =>
+      kIsWeb ? 80.0 : (72.w).clamp(65.0, 78.0).toDouble();
 
   /// Font size for main cluster marker text
   static double get mainClusterFontSize => kIsWeb ? 25.0 : 20;
@@ -38,7 +45,8 @@ class AppDimensions {
   static double get mainClusterBorderWidth => kIsWeb ? 2.0 : 4.0;
 
   /// Container size for sub-cluster markers
-  static double get subClusterSize => kIsWeb ? 60.0 : 65.w;
+  static double get subClusterSize =>
+      kIsWeb ? 60.0 : (65.w).clamp(58.0, 70.0).toDouble();
 
   /// Font size for sub-cluster marker text
   static double get subClusterFontSize => kIsWeb ? 22 : 17;

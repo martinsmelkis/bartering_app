@@ -107,6 +107,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         .of(context)
         .size;
     final deviceSize = ResponsiveBreakpoints.getDeviceSize(context);
+    final isLargeNonWeb = !kIsWeb && context.canShowSideBySide;
+    final iconSizeScale = isLargeNonWeb ? 1.5 : 1.0;
 
     // Calculate number of icons based on screen size
     int avatarIconCount;
@@ -137,7 +139,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     // Generate avatar icons
     for (int i = 0; i < avatarIconCount; i++) {
-      final size = random.nextDouble() * 40 + 28; // 30-70
+      final size = (random.nextDouble() * 40 + 28) / iconSizeScale; // 30-70
       icons.add(_FloatingIcon(
         svgAsset: _getSvgAsset(random.nextInt(_svgAssetCount) + 1),
         // 1-based index
@@ -152,7 +154,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     // Generate onboarding category icons
     for (int i = 0; i < onboardingIconCount; i++) {
-      final size = random.nextDouble() * 30 + 25; // 25-55 (slightly smaller)
+      final size = (random.nextDouble() * 30 + 25) / iconSizeScale; // 25-55 (slightly smaller)
       icons.add(_FloatingIcon(
         iconData: _onboardingIcons[random.nextInt(_onboardingIcons.length)],
         iconColor:
@@ -311,8 +313,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Use smaller sizes on web, original sizes on mobile
-    final double fontScale = kIsWeb ? 1.5 : 1.0;
+    // On large non-web screens (tablets/desktop-like), make welcome text/icons 2x smaller.
+    final bool isLargeNonWeb = !kIsWeb && context.canShowSideBySide;
+    // Keep existing web behavior, but enforce stronger downscale for large non-web.
+    final double fontScale = isLargeNonWeb ? 2.0 : (kIsWeb ? 1.5 : 1.0);
 
     return Scaffold(
       body: Container(
@@ -506,9 +510,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       IconData icon,
       String title,
       String description,) {
-    // Use smaller sizes on web, original sizes on mobile
-    final double fontScale = kIsWeb ? 1.2 : 1.0;
-    final double iconScale = kIsWeb ? 2.0 : 1.0;
+    final bool isLargeNonWeb = !kIsWeb && context.canShowSideBySide;
+    // Keep existing web tuning, but apply 2x downscale on large non-web screens.
+    final double fontScale = isLargeNonWeb ? 1.5 : (kIsWeb ? 1.2 : 1.0);
+    final double iconScale = isLargeNonWeb ? 2.0 : (kIsWeb ? 2.0 : 1.0);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

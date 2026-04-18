@@ -74,7 +74,7 @@ class _SearchInMapTextFieldState extends State<SearchInMapTextField> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return SizedBox(
-      height: kIsWeb ? 48 : 38.h,
+      height: kIsWeb ? 48 : 46,
       child: Card(
         color: Colors.white,
         elevation: 2,

@@ -252,12 +252,13 @@ class _RightPanelsContent extends StatelessWidget {
             }
             
             // Dynamic flex: when both POI and Chat are open, give more space to bottom panel
-            // since it needs to accommodate both panels stacked vertically
-            final searchFlex = hasSearchResults 
-                ? (bothPoiAndChatOpen ? 35 : 50)  // Less space for search when both open
+            // since it needs to accommodate both panels stacked vertically.
+            // On large/tab screens, expand bottom panel by ~10% relative height.
+            final searchFlex = hasSearchResults
+                ? (bothPoiAndChatOpen ? 28 : 45)
                 : 60;
-            final bottomFlex = hasSearchResults 
-                ? (bothPoiAndChatOpen ? 65 : 50)  // More space for POI+Chat when both open
+            final bottomFlex = hasSearchResults
+                ? (bothPoiAndChatOpen ? 72 : 55)
                 : 40;
             
             return SizedBox(

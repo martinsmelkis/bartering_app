@@ -212,8 +212,8 @@ class PoiMarkerWidget {
           // Glow effect for relevant POIs
           if (glowColor != null)
             Positioned(
-              left: 25,
-              top: 25,
+              left: 23,
+              top: 23,
               child: Container(
                 width: circleSize - circleSize / 2.4,
                 height: circleSize - circleSize / 2.4,

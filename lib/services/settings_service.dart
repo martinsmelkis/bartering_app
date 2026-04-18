@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:injectable/injectable.dart';
 import 'dart:ui' as ui;
@@ -166,22 +165,22 @@ class SettingsService {
   }
 
   /// Get whether to show search results as list
-  /// Defaults to true on desktop web, false on mobile and mobile-sized web
+  /// Defaults to true on large screens (>= 840dp) across all platforms,
+  /// false on smaller screens.
   Future<bool> getShowSearchResultsAsList() async {
     final prefs = await _preferences;
     return prefs.getBool(_showSearchResultsAsListKey) ?? _defaultShowSearchResultsAsList();
   }
 
   /// Get synchronously if already initialized
-  /// Defaults to true on desktop web, false on mobile and mobile-sized web
+  /// Defaults to true on large screens (>= 840dp) across all platforms,
+  /// false on smaller screens.
   bool getShowSearchResultsAsListSync() {
     return _prefs?.getBool(_showSearchResultsAsListKey) ?? _defaultShowSearchResultsAsList();
   }
 
   bool _defaultShowSearchResultsAsList() {
-    if (!kIsWeb) return false;
-
-    // Disable by default on mobile-sized web viewports.
+    // Enable by default on large screens (tablet/desktop) across all platforms.
     final width = ui.PlatformDispatcher.instance.views.first.physicalSize.width /
         ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
     return width >= 840;
