@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:barter_app/models/reviews/reputation_response.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/wallet/wallet_models.dart';
@@ -40,16 +38,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../configure_dependencies.dart';
-import '../../data/local/platform/platform.dart';
 import '../../l10n/app_localizations.dart';
-import '../../repositories/chat_repository.dart';
 import '../../router/app_router.dart';
-import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/settings_service.dart';
 import '../../theme/app_colors.dart';
 import 'widgets/badges_info_dialog.dart';
@@ -86,7 +79,8 @@ class UserProfileScreen extends StatefulWidget {
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
-class _UserProfileScreenState extends State<UserProfileScreen> {
+class _UserProfileScreenState extends State<UserProfileScreen>
+    with WidgetsBindingObserver {
   String? _userLocation;
   Map<String, double>? _profileKeywordDataMap;
   
@@ -109,6 +103,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     _inAppPurchasesCubit = InAppPurchasesCubit(
       appUserId: widget.userId,
@@ -116,6 +111,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       apiClient: getIt<ApiClient>(),
       webPurchaseLinkBaseUrl:
           dotenv.env['REVENUECAT_WEB_PREMIUM_LINK_BASE_URL'] ?? '',
+      webCoins20PurchaseLinkBaseUrl:
+          dotenv.env['REVENUECAT_WEB_COINS_20_LINK_BASE_URL'] ?? '',
       texts: () {
         final l10n = AppLocalizations.of(context)!;
         return InAppPurchasesTexts(
@@ -140,6 +137,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _inAppPurchasesCubit.initialize();
+      _maybeSyncPendingPurchase();
     });
 
     _userProfileScreenCubit = UserProfileScreenCubit(getIt<ApiClient>());
@@ -168,9 +166,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _inAppPurchasesCubit.close();
     _userProfileScreenCubit.close();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _maybeSyncPendingPurchase();
+    }
   }
 
   /// Load reputation data with 10-minute caching
@@ -287,6 +293,30 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       setState(() {
         _isPremiumActive = false;
       });
+    }
+  }
+
+  Future<void> _maybeSyncPendingPurchase() async {
+    if (!kIsWeb || !mounted) return;
+
+    final settingsService = getIt<SettingsService>();
+    final hasPending = await settingsService.hasPendingPurchase();
+    if (!hasPending || !mounted) return;
+
+    try {
+      await getIt<ApiClient>().syncPremiumNow();
+      await _loadWalletData();
+      await settingsService.clearPendingPurchase();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Coins purchase sync completed.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      logDebug('Error syncing pending web coins purchase: $e');
     }
   }
 
@@ -1160,12 +1190,43 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       builder: (dialogContext) {
         return const PurchaseCoinsOptionsDialog();
       },
-    ).then((selectedAmount) {
+    ).then((selectedAmount) async {
       if (!mounted || selectedAmount == null) return;
+
+      if (selectedAmount == 20) {
+        await _inAppPurchasesCubit.purchase20Coins();
+        final state = _inAppPurchasesCubit.state;
+
+        if (!mounted) return;
+
+        if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage!),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        final message = state.statusMessage?.isNotEmpty == true
+            ? state.statusMessage!
+            : AppLocalizations.of(context)!
+                .selectedCoinPackage(selectedAmount.toString());
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: Colors.green,
+          ),
+        );
+        _loadWalletData();
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context)!.selectedCoinPackage(selectedAmount.toString()),
+            'Coin pack $selectedAmount is a placeholder for now.',
           ),
         ),
       );
@@ -1330,9 +1391,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Future<void> _deleteProfile(BuildContext context) async {
     final l10n = AppLocalizations.of(this.context)!;
-    
+
     try {
-      // Show loading dialog
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -1346,49 +1406,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         },
       );
 
-      // End the session (unregister push token and unsubscribe from topics)
-      final authService = FCMTokenService();
-      await authService.onSessionEnded(widget.userId);
+      await _userProfileScreenCubit.deleteProfile(widget.userId);
 
-      // Call the API to delete the user
-      await _userProfileScreenCubit.deleteUser(widget.userId);
-      
-      // Delete the database file to prevent encryption key mismatch on next registration
-      try {
-        final path = await getApplicationDocumentsDirectory();
-        final dbFile = File(p.join(path.path, 'app.db.enc'));
-        if (await dbFile.exists()) {
-          await dbFile.delete();
-          logDebug('✅ Database file deleted');
-        }
-      } catch (dbError) {
-        logDebug('⚠️ Failed to delete database file: $dbError');
-        // Continue anyway - the error handling in platform_app.dart will handle this
-      }
-      
-      // Clear all secure storage data
-      await SecureStorageService().clearStorage();
-      
-      // Clear all SharedPreferences settings
-      await getIt<SettingsService>().clearAll();
-      
-      // Clear all local chat data
-      await getIt<ChatRepository>().clearAllChats();
-      
-      // Clear browser storage (IndexedDB, localStorage) on web
-      if (kIsWeb) {
-        await Platform.clearAllBrowserStorage();
-      }
-      
-      // Dismiss loading dialog
       if (!mounted) return;
       if (kIsWeb) {
         Navigator.of(context, rootNavigator: true).pop();
       } else {
         Navigator.of(context).pop();
       }
-      
-      // Show success message
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1396,14 +1422,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           backgroundColor: Colors.green,
         ),
       );
-      
-      // Navigate to welcome screen and clear navigation stack
+
       if (!mounted) return;
       if (kIsWeb) {
-        // On web, use SystemNavigator to exit and let the app restart
         SystemNavigator.pop();
       } else {
-        // On mobile, navigate to InitializeScreen
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (_) => const InitializeScreen(),
@@ -1414,9 +1437,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     } catch (e) {
       logDebugError('Error deleting profile', e);
       if (mounted) {
-        // Dismiss loading dialog if showing
         Navigator.of(context, rootNavigator: true).pop();
-        
+
         ScaffoldMessenger.of(this.context).showSnackBar(
           SnackBar(
             content: Text(l10n.errorDeletingProfile),

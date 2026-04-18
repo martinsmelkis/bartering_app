@@ -1,9 +1,22 @@
+import 'dart:io';
+
+import 'package:barter_app/configure_dependencies.dart';
+import 'package:barter_app/data/local/platform/platform.dart';
 import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/models/reviews/reputation_response.dart';
 import 'package:barter_app/models/reviews/review_response.dart';
 import 'package:barter_app/models/wallet/wallet_models.dart';
+import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/services/messaging/firebase_auth_service.dart';
+import 'package:barter_app/services/secure_storage_service.dart';
+import 'package:barter_app/services/settings_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
+import '../../../utils/debug_utils.dart';
 
 class UserProfileScreenState {
   final ReputationResponse? reputationData;
@@ -129,6 +142,39 @@ class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
     emit(state.copyWith(clearError: true));
     try {
       await _apiClient.deleteUser(userId);
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+      rethrow;
+    }
+  }
+
+  Future<void> deleteProfile(String userId) async {
+    emit(state.copyWith(clearError: true));
+
+    try {
+      final authService = FCMTokenService();
+      await authService.onSessionEnded(userId);
+
+      await _apiClient.deleteUser(userId);
+
+      try {
+        final path = await getApplicationDocumentsDirectory();
+        final dbFile = File(p.join(path.path, 'app.db.enc'));
+        if (await dbFile.exists()) {
+          await dbFile.delete();
+        }
+      } catch (dbError) {
+        logDebug('⚠️ Failed to delete database file: $dbError');
+        // Continue anyway - the error handling in platform_app.dart will handle this
+      }
+
+      await SecureStorageService().clearStorage();
+      await getIt<SettingsService>().clearAll();
+      await getIt<ChatRepository>().clearAllChats();
+
+      if (kIsWeb) {
+        await Platform.clearAllBrowserStorage();
+      }
     } catch (e) {
       emit(state.copyWith(errorMessage: e.toString()));
       rethrow;

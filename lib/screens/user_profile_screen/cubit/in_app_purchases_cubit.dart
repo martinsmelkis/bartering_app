@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:barter_app/models/wallet/wallet_models.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/services/settings_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -87,6 +91,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
   final InAppPurchasesTexts Function() texts;
   final ApiClient apiClient;
   final String webPurchaseLinkBaseUrl;
+  final String webCoins20PurchaseLinkBaseUrl;
 
   static bool _isConfigured = false;
 
@@ -96,6 +101,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     required this.texts,
     required this.apiClient,
     required this.webPurchaseLinkBaseUrl,
+    required this.webCoins20PurchaseLinkBaseUrl,
     this.premiumEntitlementId = 'Bartering App Premium',
   }) : super(const InAppPurchasesState());
 
@@ -278,6 +284,128 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     }
   }
 
+  Future<void> purchase20Coins() async {
+    emit(state.copyWith(isPurchasing: true, clearError: true, clearStatus: true));
+
+    final localized = texts();
+
+    try {
+      if (kIsWeb) {
+        if (webCoins20PurchaseLinkBaseUrl.trim().isEmpty) {
+          _logPurchaseError('coins20_web_config_missing', 'webCoins20PurchaseLinkBaseUrl is empty');
+          emit(state.copyWith(
+            isPurchasing: false,
+            errorMessage:
+                '${localized.purchaseFailed}: missing web coins purchase URL configuration',
+          ));
+          return;
+        }
+
+        final settingsService = SettingsService();
+        await settingsService.setPendingPurchase(true);
+
+        final webCoinsPurchaseLink = _buildWebCoins20PurchaseLink();
+        final launched = await launchUrl(
+          webCoinsPurchaseLink,
+          mode: LaunchMode.platformDefault,
+          webOnlyWindowName: '_self',
+        );
+
+        if (!launched) {
+          _logPurchaseError(
+            'coins20_web_launch_failed',
+            'Could not launch $webCoinsPurchaseLink',
+          );
+          await settingsService.clearPendingPurchase();
+        }
+
+        emit(state.copyWith(
+          isPurchasing: false,
+          statusMessage: launched
+              ? localized.purchaseCompletedEntitlementNotActiveYet
+              : null,
+          errorMessage: launched
+              ? null
+              : '${localized.purchaseFailed}: unable to open coins purchase page',
+        ));
+        return;
+      }
+
+      var packages = state.availablePackages;
+      if (packages.isEmpty) {
+        await loadOfferings();
+        packages = state.availablePackages;
+      }
+
+      final coin20Package = packages.where((package) {
+        final packageId = package.identifier.toLowerCase();
+        final productId = package.storeProduct.identifier.toLowerCase();
+        return packageId.contains('coins_20') || productId.contains('coins_20');
+      }).firstOrNull;
+
+      if (coin20Package == null) {
+        emit(state.copyWith(
+          isPurchasing: false,
+          errorMessage: '20-coin package is not configured yet.',
+        ));
+        return;
+      }
+
+      await Purchases.purchase(
+        PurchaseParams.storeProduct(coin20Package.storeProduct),
+      );
+
+      final purchaseResponse = await apiClient.purchaseCoinPack(
+        PurchaseCoinPackRequest(
+          userId: appUserId,
+          coinAmount: 20,
+          currency: 'EUR',
+          amountMinor: 111,
+          externalRef: 'rc_coins_20_${DateTime.now().millisecondsSinceEpoch}',
+          metadataJson: jsonEncode({
+            'source': 'revenuecat_draft',
+            'entitlementId': 'coins_20',
+            'productId': coin20Package.storeProduct.identifier,
+            'packageId': coin20Package.identifier,
+          }),
+        ),
+      );
+
+      emit(state.copyWith(
+        isPurchasing: false,
+        statusMessage: purchaseResponse.message.isNotEmpty
+            ? purchaseResponse.message
+            : '20 coins purchase completed.',
+      ));
+    } on PlatformException catch (e, st) {
+      final errorCode = PurchasesErrorHelper.getErrorCode(e);
+      if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
+        emit(state.copyWith(
+          isPurchasing: false,
+          statusMessage: localized.purchaseCancelled,
+        ));
+        return;
+      }
+
+      _logPurchaseError(
+        'coins20_platform_exception',
+        'code=${e.code}, message=${e.message ?? 'n/a'}, details=${e.details ?? 'n/a'}',
+        st,
+      );
+      emit(state.copyWith(
+        isPurchasing: false,
+        errorMessage:
+            '${localized.purchaseFailed}: code=${e.code}, message=${e.message ?? 'n/a'}',
+      ));
+    } catch (e, st) {
+      _logPurchaseError('coins20_unexpected_exception', e, st);
+      emit(state.copyWith(
+        isPurchasing: false,
+        errorMessage: '${localized.purchaseFailed}: $e',
+      ));
+    }
+  }
+
   Future<void> restorePurchases() async {
     emit(state.copyWith(isRestoring: true, clearError: true, clearStatus: true));
 
@@ -319,6 +447,16 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
 
   Uri _buildWebPurchaseLink() {
     final normalizedBase = webPurchaseLinkBaseUrl.trim();
+    final baseUri = Uri.parse(normalizedBase);
+    final cleanPath = baseUri.path.endsWith('/')
+        ? baseUri.path.substring(0, baseUri.path.length - 1)
+        : baseUri.path;
+
+    return baseUri.replace(path: '$cleanPath/$appUserId');
+  }
+
+  Uri _buildWebCoins20PurchaseLink() {
+    final normalizedBase = webCoins20PurchaseLinkBaseUrl.trim();
     final baseUri = Uri.parse(normalizedBase);
     final cleanPath = baseUri.path.endsWith('/')
         ? baseUri.path.substring(0, baseUri.path.length - 1)

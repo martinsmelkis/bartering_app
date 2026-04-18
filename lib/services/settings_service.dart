@@ -24,6 +24,7 @@ class SettingsService {
   static const String _gdprAnalyticsCookiesConsentKey = 'gdpr_analytics_cookies_consent';
   static const String _termsVersionKey = 'terms_version';
   static const String _termsAcceptedAtKey = 'terms_accepted_at';
+  static const String _pendingPurchaseKey = 'pending_purchase';
 
   // Default values
   static const double defaultNearbyUsersRadius = 50.0; // km
@@ -300,6 +301,21 @@ class SettingsService {
   Future<String?> getTermsAcceptedAt() async {
     final prefs = await _preferences;
     return prefs.getString(_termsAcceptedAtKey);
+  }
+
+  Future<bool> setPendingPurchase(bool value) async {
+    final prefs = await _preferences;
+    return await prefs.setBool(_pendingPurchaseKey, value);
+  }
+
+  Future<bool> hasPendingPurchase() async {
+    final prefs = await _preferences;
+    return prefs.getBool(_pendingPurchaseKey) ?? false;
+  }
+
+  Future<bool> clearPendingPurchase() async {
+    final prefs = await _preferences;
+    return await prefs.remove(_pendingPurchaseKey);
   }
 
   /// Clear all settings from SharedPreferences
