@@ -60,3 +60,12 @@ pubspec.yaml.backup
 
 # FVM Version Cache
 .fvm/
+
+# Jan's Custom Docs
+_jan-docs/
+# Local build outputs
+ios/build/
+macos/build/
+build/
+.antigravity/
+

@@ -1,3 +1,5 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
 platform :ios, '15.0'
 
 # Disable CocoaPods analytics to speed up Flutter builds.
@@ -37,30 +39,80 @@ target 'Runner' do
 end
 
 post_install do |installer|
+  # Fix rive_native simulator linker paths.
+  # We MUST append to the existing OTHER_LDFLAGS and LIBRARY_SEARCH_PATHS in the generated xcconfig files.
+  rive_symlink = File.expand_path('../.symlinks/plugins/rive_native', __FILE__)
+  rive_emulator_path = "#{rive_symlink}/native/build/iphoneos/bin/emulator"
+  rive_release_path  = "#{rive_symlink}/native/build/iphoneos/bin/release"
+
+  puts "[rive_native] 🛠️  Injecting Rive native library flags into xcconfigs..."
+  
+  sandbox_root = installer.sandbox.root.to_s
+  runner_xcconfig_dir = "#{sandbox_root}/Target Support Files/Pods-Runner"
+
+  if Dir.exist?(runner_xcconfig_dir)
+    Dir.glob("#{runner_xcconfig_dir}/Pods-Runner.*.xcconfig") do |xcconfig_path|
+      config_name = File.basename(xcconfig_path, '.xcconfig').sub('Pods-Runner.', '')
+      rive_path = (config_name.downcase.include?('debug')) ? rive_emulator_path : rive_release_path
+      
+      # Find all .a files to force load
+      rive_lib_files = Dir["#{rive_path}/*.a"]
+      force_loads = rive_lib_files.map { |f| "-Wl,-force_load,#{f}" }.join(' ')
+      
+      content = File.read(xcconfig_path)
+      
+      # Correctly append to LIBRARY_SEARCH_PATHS
+      if content.include?('LIBRARY_SEARCH_PATHS =')
+        content.gsub!(/(LIBRARY_SEARCH_PATHS = .*)/, "\\1 \"#{rive_path}\"")
+      else
+        content += "\nLIBRARY_SEARCH_PATHS = $(inherited) \"#{rive_path}\"\n"
+      end
+      
+      # Correctly append to OTHER_LDFLAGS
+      if content.include?('OTHER_LDFLAGS =')
+        content.gsub!(/(OTHER_LDFLAGS = .*)/, "\\1 #{force_loads}")
+      else
+        content += "\nOTHER_LDFLAGS = $(inherited) #{force_loads}\n"
+      end
+      
+      File.write(xcconfig_path, content)
+    end
+    puts "[rive_native] ✅ Successfully patched Pods-Runner xcconfigs (with correct merging)."
+  end
+
+  # Dynamically add RiveLinkerFix.cpp to the Runner project if needed
+  project_path = 'Runner.xcodeproj'
+  if File.exist?(project_path)
+    project = Xcodeproj::Project.open(project_path)
+    runner_target = project.targets.find { |t| t.name == 'Runner' }
+    
+    if runner_target
+      fix_file_path = 'Runner/RiveLinkerFix.cpp'
+      if File.exist?(fix_file_path) && !runner_target.source_build_phase.files_references.any? { |f| f.path && f.path.include?('RiveLinkerFix.cpp') }
+        puts "[rive_native] 🏗️  Adding RiveLinkerFix.cpp to Runner project..."
+        # Find or create the Runner group
+        group = project.main_group['Runner'] || project.main_group
+        file_ref = group.find_file_by_path('RiveLinkerFix.cpp') || group.new_file('RiveLinkerFix.cpp')
+        runner_target.add_file_references([file_ref])
+        project.save
+        puts "[rive_native] ✅ RiveLinkerFix.cpp added to build."
+      end
+    end
+  end
 
   installer.pods_project.targets.each do |target|
-
     flutter_additional_ios_build_settings(target)
-
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'x86_64,x86'
-
       config.build_settings['CLANG_ENABLE_EXPLICIT_MODULES'] = 'NO'
-
       config.build_settings['SWIFT_ENABLE_EXPLICIT_MODULES'] = 'NO'
-
       config.build_settings['COMPILER_INDEX_STORE_ENABLE'] = 'NO'
-
       config.build_settings['CLANG_MODULE_CACHE_PATH'] = '${PROJECT_TEMP_DIR}/ModuleCache.noindex'
       config.build_settings['CLANG_MODULES_BUILD_SESSION_FILE'] = '${PROJECT_TEMP_DIR}/ModuleCache.noindex/Session.modulevalidation'
-
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
         'PERMISSION_LOCATION=1',
       ]
-
     end
   end
 end
