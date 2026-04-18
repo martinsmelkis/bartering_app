@@ -2645,11 +2645,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Trades with diverse partners (high diversity score).';
 
   @override
-  String get badgeVerifiedBusinessTitle => 'Verified Business';
+  String get badgeVerifiedBusinessTitle => 'Local Legend';
 
   @override
-  String get badgeVerifiedBusinessDescription =>
-      'Business registration is verified.';
+  String get badgeVerifiedBusinessDescription => 'Favorited by 30+ Users.';
 
   @override
   String get badgeDisputeFreeTitle => 'Dispute-Free History';

@@ -33,7 +33,7 @@ class BadgesInfoDialog extends StatelessWidget {
         return l10n.badgeQuickResponderTitle;
       case ReputationBadge.COMMUNITY_CONNECTOR:
         return l10n.badgeCommunityConnectorTitle;
-      case ReputationBadge.VERIFIED_BUSINESS:
+      case ReputationBadge.LOCAL_LEGEND:
         return l10n.badgeVerifiedBusinessTitle;
       case ReputationBadge.DISPUTE_FREE:
         return l10n.badgeDisputeFreeTitle;
@@ -61,7 +61,7 @@ class BadgesInfoDialog extends StatelessWidget {
         return l10n.badgeQuickResponderDescription;
       case ReputationBadge.COMMUNITY_CONNECTOR:
         return l10n.badgeCommunityConnectorDescription;
-      case ReputationBadge.VERIFIED_BUSINESS:
+      case ReputationBadge.LOCAL_LEGEND:
         return l10n.badgeVerifiedBusinessDescription;
       case ReputationBadge.DISPUTE_FREE:
         return l10n.badgeDisputeFreeDescription;

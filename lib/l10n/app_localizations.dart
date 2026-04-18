@@ -5051,13 +5051,13 @@ abstract class AppLocalizations {
   /// No description provided for @badgeVerifiedBusinessTitle.
   ///
   /// In en, this message translates to:
-  /// **'Verified Business'**
+  /// **'Local Legend'**
   String get badgeVerifiedBusinessTitle;
 
   /// No description provided for @badgeVerifiedBusinessDescription.
   ///
   /// In en, this message translates to:
-  /// **'Business registration is verified.'**
+  /// **'Favorited by 30+ Users.'**
   String get badgeVerifiedBusinessDescription;
 
   /// No description provided for @badgeDisputeFreeTitle.

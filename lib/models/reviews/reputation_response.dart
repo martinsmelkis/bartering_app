@@ -8,9 +8,9 @@ enum ReputationBadge {
   PREMIUM_USER('PREMIUM_USER', 'Premium User'),
   TOP_1000('TOP_1000', 'Early Adopter - First 1000 Users'),
   DISPUTE_FREE('DISPUTE_FREE', 'Dispute-Free History'),
+  LOCAL_LEGEND('LOCAL_LEGEND', 'Favorited by 30+ Users'),
   FAST_TRADER('FAST_TRADER', 'Fast & Reliable'),
-  IDENTITY_VERIFIED('IDENTITY_VERIFIED', 'Identity Verified'),
-  VERIFIED_BUSINESS('VERIFIED_BUSINESS', 'Verified Business');
+  IDENTITY_VERIFIED('IDENTITY_VERIFIED', 'Identity Verified');
 
   const ReputationBadge(this.value, this.description);
 
