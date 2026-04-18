@@ -1,4 +1,4 @@
-package app.bartering.barter_app
+package app.bartering.bartering_app
 
 import android.content.Context
 import android.content.pm.PackageManager

@@ -1028,7 +1028,7 @@
   "privacyPolicyDataUsageTitle": "Purposes and GDPR Legal Bases",
   "privacyPolicyDataUsageContent": "Processing supports service delivery (Art. 6(1)(b)), security and abuse prevention (Art. 6(1)(f)), and legal/compliance obligations (Art. 6(1)(c), 6(1)(f)). Where applicable, optional features and consents are processed under Art. 6(1)(a).",
   "privacyPolicyDataSharingTitle": "Processors, Infrastructure and Transfers",
-  "privacyPolicyDataSharingContent": "Current integrations may include PostgreSQL, Mailjet, Firebase/FCM, Ollama, and Nginx + Docker infrastructure. Optional federation peers are used only when enabled and trusted. If data is processed outside your country/EEA, legally required safeguards (such as SCCs) are applied.",
+  "privacyPolicyDataSharingContent": "Current integrations include PostgreSQL, Mailjet, Firebase/FCM, Ollama, and Nginx + Docker infrastructure. Optional federation peers are used only when enabled and trusted. If data is processed outside your country/EEA, legally required safeguards (such as SCCs) are applied.",
   "privacyPolicyDataSecurityTitle": "Security, Retention and Deletion",
   "privacyPolicyDataSecurityContent": "We apply measures such as authenticated request-signature checks, access controls, transport security, and audit logging. Retention controls and scheduled cleanup are used for operational/compliance records, with legal-hold-aware handling where required.",
   "privacyPolicyUserRightsTitle": "Your Rights, Erasure and Portability",

@@ -35,16 +35,16 @@
 
 # ==================== SECURITY CLASSES ====================
 # Keep our security classes but obfuscate internals
--keep class app.bartering.barter_app.IntegrityHelper {
+-keep class app.bartering.bartering_app.IntegrityHelper {
     public <methods>;
 }
 
--keep class app.bartering.barter_app.MainActivity {
+-keep class app.bartering.bartering_app.MainActivity {
     public <methods>;
 }
 
 # Keep MethodChannel callbacks
--keepclassmembers class app.bartering.barter_app.MainActivity {
+-keepclassmembers class app.bartering.bartering_app.MainActivity {
     public void configureFlutterEngine(io.flutter.embedding.engine.FlutterEngine);
 }
 

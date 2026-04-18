@@ -1,4 +1,4 @@
-package app.bartering.barter_app
+package app.bartering.bartering_app
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine

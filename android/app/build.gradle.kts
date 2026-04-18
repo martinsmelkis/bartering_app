@@ -16,9 +16,9 @@ if (keyPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "app.bartering.barter_app"
+    namespace = "app.bartering.bartering_app"
     compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -35,7 +35,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "app.bartering.barter_app"
+        applicationId = "app.bartering.bartering_app"
         minSdk = 26
         targetSdk = 36
         versionCode = 6

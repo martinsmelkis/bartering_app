@@ -2833,7 +2833,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicyDataSharingContent =>
-      'Current integrations may include PostgreSQL, Mailjet, Firebase/FCM, Ollama, and Nginx + Docker infrastructure. Optional federation peers are used only when enabled and trusted. If data is processed outside your country/EEA, legally required safeguards (such as SCCs) are applied.';
+      'Current integrations include PostgreSQL, Mailjet, Firebase/FCM, Ollama, and Nginx + Docker infrastructure. Optional federation peers are used only when enabled and trusted. If data is processed outside your country/EEA, legally required safeguards (such as SCCs) are applied.';
 
   @override
   String get privacyPolicyDataSecurityTitle =>

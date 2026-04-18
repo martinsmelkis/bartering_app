@@ -283,14 +283,20 @@ flutter pub get
    flutterfire configure
    ```
 
-4. **Configure Backend URL**
+4. **Configure Backend URLs for dev and production flavours**
    
-   Edit `lib/services/app_module.dart` and update the `serviceBaseUrl`:
-   ```dart
-   @Named('serviceBaseUrl')
-   String get serviceBaseUrl {
-     return 'http://YOUR_BACKEND_URL:PORT';
-   }
+   Edit `env_properties.dev.env` and `env_properties.prod.env` and update the values:
+   ```bash
+    # Service Base URLs
+    SERVICE_BASE_URL_WEB=http://localhost:8081
+    SERVICE_BASE_URL_MOBILE=http://10.0.2.2:8081
+    
+    # WebSocket URLs
+    WSS_URL_WEB=ws://localhost:8081/chat
+    WSS_URL_MOBILE=ws://10.0.2.2:8081/chat
+    
+    # Environment
+    ENV_NAME=development
    ```
 
 5. **Generate code**

@@ -649,10 +649,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 kIsWeb && !widget.showAppBar && context.canShowSideBySide;
             final double listPadding = isWebSideBySide ? 4 : 12;
 
-            // Use state.messages directly - rebuild through BlocBuilder
+            // Use cubit messages as fallback too, so transient states (e.g. ChatError)
+            // don't temporarily clear the visible chat history.
             final displayMessages = state.messages.isNotEmpty
                 ? state.messages
-                : _messages;
+                : (_chatCubit.messages.isNotEmpty ? _chatCubit.messages : _messages);
 
             return Column(
               children: [

@@ -84,7 +84,7 @@ class ChatCubit extends Cubit<ChatState> {
     logDebug('🌐 Federated recipient ID set: $federatedId');
   }
 
-  void _listenToMessages() {
+  void _listenToMessages(String conversationId) {
     // Listen to message status updates
     _statusUpdateSubscription = _webSocketService?.statusUpdates.listen((statusUpdate) async {
       logDebug('📬 Received status update: ${statusUpdate.messageId} -> ${statusUpdate.status}');
@@ -156,7 +156,7 @@ class ChatCubit extends Cubit<ChatState> {
           }
 
           // Save message to database ONLY - DB stream will update UI
-          if (_chatRepository != null && _currentConversationId != null) {
+          if (_chatRepository != null && _currentConversationId == conversationId) {
             try {
               logDebug(
                   '@@@@@@@@@@@@ Current chat recipientUserId: $recipientUserId, '
@@ -183,9 +183,9 @@ class ChatCubit extends Cubit<ChatState> {
                 // Message belongs to CURRENT conversation
                 logDebug(
                     '✅ Message is part of current chat (from: $isFromCurrentRecipient, to: $isToCurrentRecipient), '
-                        'saving to current conversation: $_currentConversationId');
+                        'saving to current conversation: $conversationId');
                 await _chatRepository!.saveMessage(
-                    chatMessage, _currentConversationId!);
+                    chatMessage, conversationId);
                 logDebug(
                     '✅ Message saved to CURRENT conversation (will appear in current chat)');
               } else {
@@ -219,20 +219,25 @@ class ChatCubit extends Cubit<ChatState> {
         });
 
     // Database stream is the SINGLE SOURCE OF TRUTH for messages
-    if (_chatRepository != null && _currentConversationId != null) {
+    if (_chatRepository != null) {
       _dbMessagesSubscription = _chatRepository!
-          .watchMessagesForConversation(_currentConversationId!)
+          .watchMessagesForConversation(conversationId)
           .listen((dbMessages) {
-        // IMPORTANT: Only process messages for the CURRENT conversation
-        // Filter out any messages that don't belong to this conversation
+        // Ignore stale emissions from previous chat sessions.
+        if (_currentConversationId != conversationId) {
+          logDebug('⏭️ Ignoring stale DB stream emission for $conversationId (current: $_currentConversationId)');
+          return;
+        }
+
+        // IMPORTANT: Only process messages for this bound conversation
         final filteredMessages = dbMessages.where((msg) =>
-        msg.conversationId == _currentConversationId
+        msg.conversationId == conversationId
         ).toList();
 
           logDebug(
             '@@@@@@@@@ DB stream update: ${dbMessages.length} total messages, '
                 '${filteredMessages
-                .length} for current conversation $_currentConversationId');
+                .length} for current conversation $conversationId');
 
         // Convert DB messages to app messages
         final chatMessages = _chatRepository!.userChatsToChatMessages(
@@ -288,6 +293,18 @@ class ChatCubit extends Cubit<ChatState> {
     emit(ChatLoading());
 
     try {
+      // Reset previous realtime session to avoid stale listeners when switching chats.
+      await _messageSubscription?.cancel();
+      _messageSubscription = null;
+      await _dbMessagesSubscription?.cancel();
+      _dbMessagesSubscription = null;
+      await _statusUpdateSubscription?.cancel();
+      _statusUpdateSubscription = null;
+      await _readReceiptSubscription?.cancel();
+      _readReceiptSubscription = null;
+      _webSocketService?.dispose();
+      _webSocketService = null;
+
       try {
         _chatRepository = getIt<ChatRepository>();
           logDebug('✅ ChatRepository initialized');
@@ -404,7 +421,9 @@ class ChatCubit extends Cubit<ChatState> {
       logDebug('@@@@@@@@@@ Recipient public key loaded: ${recipientPublicKey != null}');
 
       _webSocketService?.connect(userId);
-      _listenToMessages();
+      if (_currentConversationId != null) {
+        _listenToMessages(_currentConversationId!);
+      }
 
       logDebug('@@@@@@@@@@@@@ Init chat session - Creating auth signature');
       logDebug('Key: $pubKey, userId: $userId, recipientUserId: $recipientUserId, federatedId: $_federatedRecipientId');
@@ -726,7 +745,27 @@ class ChatCubit extends Cubit<ChatState> {
 
       for (final msg in encryptedMessages) {
         try {
-          final decryptedText = cryptoService?.decrypt(msg.encryptedContent, keyPair);
+          final encryptedPayload = msg.encryptedContent.trim();
+          if (encryptedPayload.isEmpty) {
+            logDebug('⏭️ Skipping re-decrypt for ${msg.messageId}: empty encrypted payload');
+            continue;
+          }
+
+          // Guard against non-ciphertext placeholders or malformed payloads.
+          // AES-GCM payload format is: [salt(16) + iv(12) + ciphertext], so minimum is 28 bytes.
+          Uint8List payloadBytes;
+          try {
+            payloadBytes = base64Decode(encryptedPayload);
+          } catch (_) {
+            logDebug('⏭️ Skipping re-decrypt for ${msg.messageId}: invalid base64 payload');
+            continue;
+          }
+          if (payloadBytes.length < 28) {
+            logDebug('⏭️ Skipping re-decrypt for ${msg.messageId}: payload too short (${payloadBytes.length} bytes)');
+            continue;
+          }
+
+          final decryptedText = cryptoService?.decrypt(encryptedPayload, keyPair);
 
           if (decryptedText != null && decryptedText.isNotEmpty) {
             // Update message in database with decrypted text

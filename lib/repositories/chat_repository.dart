@@ -601,7 +601,8 @@ class ChatRepository {
     final query = _database.select(_database.userChats)
       ..where((tbl) => tbl.conversationId.equals(conversationId))
       ..where((tbl) => tbl.senderId.equals(senderId))
-      ..where((tbl) => tbl.decryptedContent.isNull());
+      ..where((tbl) => tbl.decryptedContent.isNull())
+      ..where((tbl) => tbl.encryptedContent.isNotValue(''));
 
     return await query.get();
   }
@@ -702,13 +703,13 @@ class ChatRepository {
       }
 
       return ChatMessage(
-        id: dbMessage.messageId ?? 'unknown',
-        senderId: dbMessage.senderId ?? '',
-        senderName: dbMessage.senderName ?? '',
+        id: dbMessage.messageId,
+        senderId: dbMessage.senderId,
+        senderName: dbMessage.senderName,
         recipientId: dbMessage.recipientId ?? '',
         plainText: plainText,
-        encryptedTextPayload: dbMessage.encryptedContent ?? '',
-        timestamp: dbMessage.timestamp ?? DateTime.now(),
+        encryptedTextPayload: dbMessage.encryptedContent,
+        timestamp: dbMessage.timestamp,
         status: convertedStatus,
         isSentByCurrentUser: dbMessage.senderId == currentUserId,
         fileAttachment: fileAttachment,
