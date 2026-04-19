@@ -1,4 +1,5 @@
 import 'package:barter_app/models/map/point_of_interest.dart';
+import 'package:barter_app/screens/avatar_shop_screen/avatar_shop_screen.dart';
 import 'package:barter_app/screens/chat_screen/chat_screen.dart';
 import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
 import 'package:barter_app/screens/device_migration_screen/device_migration_screen.dart';
@@ -207,6 +208,13 @@ class AppRouter {
         path: '/',
         name: 'home',
         redirect: (context, state) => '/map',
+      ),
+
+      // Avatar Shop Screen
+      GoRoute(
+        path: '/avatar-shop',
+        name: 'avatar-shop',
+        builder: (context, state) => const AvatarShopScreen(),
       ),
 
       // Purchase success redirect screen (web + deep-link callback target)

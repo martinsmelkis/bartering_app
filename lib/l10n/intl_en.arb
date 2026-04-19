@@ -835,6 +835,70 @@
     }
   },
   "purchaseCoinsFlowComingSoon": "Purchase coins flow coming soon",
+  "avatarShopTitle": "Avatar Shop",
+  "avatarShopDescription": "Buy and apply a custom avatar icon.",
+  "avatarShopRefresh": "Refresh",
+  "avatarShopBalance": "Balance: {amount} ₿",
+  "@avatarShopBalance": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopEachAvatarPrice": "Each avatar: {price} ₿",
+  "@avatarShopEachAvatarPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopLoadFailed": "Failed to load avatar shop: {error}",
+  "@avatarShopLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopUnableToProcessPurchase": "Unable to process purchase right now.",
+  "avatarShopAvatarAlreadySelected": "This avatar is already selected.",
+  "avatarShopNotEnoughCoins": "Not enough coins. You need {coins} coins.",
+  "@avatarShopNotEnoughCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "avatarShopPurchaseFailed": "Purchase failed: {error}",
+  "@avatarShopPurchaseFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopPurchaseSuccess": "Avatar purchased and applied successfully.",
+  "avatarShopSelected": "Selected",
+  "avatarShopEquip": "Equip",
+  "avatarShopBuyButton": "Buy {coins} ₿",
+  "@avatarShopBuyButton": {
+    "placeholders": {
+      "coins": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopNeedCoins": "Need {coins} ₿",
+  "@avatarShopNeedCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "String"
+      }
+    }
+  },
   "createPostingBoostTitle": "Boost visibility",
   "createPostingBoostDescription": "Spend coins to boost this posting in search results.",
   "createPostingBoostNone": "No boost",

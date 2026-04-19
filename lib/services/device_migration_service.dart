@@ -683,16 +683,16 @@ class DeviceMigrationService {
       logDebug('🔄 Fetching user profile from server...');
       try {
         final profileData = await _apiClient.getProfileInfo(recoveredUserId);
-        
+
         // Save profile data to secure storage
         await _secureStorage.setOwnUserName(profileData.name);
-        
+
         if (profileData.latitude != null && profileData.longitude != null) {
           await _secureStorage.saveOwnLocation(
             '${profileData.latitude},${profileData.longitude}',
           );
         }
-        
+
         // Parse and save attributes (interests and offerings)
         final attributes = profileData.attributes ?? [];
         final interests = attributes
@@ -739,7 +739,7 @@ class DeviceMigrationService {
         _userRepository.userInterests = interests;
         _userRepository.userOfferings = offerings;
         _userRepository.profileKeywordDataMap = profileData.profileKeywordDataMap;
-        
+
       } catch (e) {
         logDebugError('⚠️ Failed to fetch user profile: $e');
         // Continue with recovery even if profile fetch fails

@@ -1178,6 +1178,14 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             }
             _showPurchaseCoinsOptionsDialog();
           },
+          onBrowseAvatarShop: () {
+            if (kIsWeb) {
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+            } else {
+              Navigator.of(dialogContext).pop();
+            }
+            context.push('/avatar-shop');
+          },
         );
       },
     );

@@ -38,6 +38,7 @@ UserProfileData _$UserProfileDataFromJson(Map<String, dynamic> json) =>
         json['accountType'],
       ),
       profileAvatarIcon: json['profileAvatarIcon'] as String?,
+      profileAvatarIconId: json['profileAvatarIconId'] as String?,
       workReferenceImageUrls:
           (json['workReferenceImageUrls'] as List<dynamic>?)
               ?.map((e) => e as String)
@@ -63,6 +64,7 @@ Map<String, dynamic> _$UserProfileDataToJson(UserProfileData instance) =>
       'selfDescription': instance.selfDescription,
       'accountType': _$AccountTypeEnumMap[instance.accountType],
       'profileAvatarIcon': instance.profileAvatarIcon,
+      'profileAvatarIconId': instance.profileAvatarIconId,
       'workReferenceImageUrls': instance.workReferenceImageUrls,
       'activePostingIds': instance.activePostingIds,
       'lastOnlineAt': ?instance.lastOnlineAt,

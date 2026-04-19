@@ -2513,6 +2513,68 @@ class AppLocalizationsLv extends AppLocalizations {
   String get purchaseCoinsFlowComingSoon => 'Monētu pirkšanas plūsma drīzumā';
 
   @override
+  String get avatarShopTitle => 'Avatāru veikals';
+
+  @override
+  String get avatarShopDescription =>
+      'Nopērc un uzreiz uzliec pielāgotu avatāra ikonu.';
+
+  @override
+  String get avatarShopRefresh => 'Atjaunot';
+
+  @override
+  String avatarShopBalance(String amount) {
+    return 'Bilance: $amount ₿';
+  }
+
+  @override
+  String avatarShopEachAvatarPrice(String price) {
+    return 'Katrs avatārs: $price ₿';
+  }
+
+  @override
+  String avatarShopLoadFailed(String error) {
+    return 'Neizdevās ielādēt avatāru veikalu: $error';
+  }
+
+  @override
+  String get avatarShopUnableToProcessPurchase =>
+      'Šobrīd pirkumu nevar apstrādāt.';
+
+  @override
+  String get avatarShopAvatarAlreadySelected => 'Šis avatārs jau ir atlasīts.';
+
+  @override
+  String avatarShopNotEnoughCoins(int coins) {
+    return 'Nepietiek monētu. Nepieciešamas $coins monētas.';
+  }
+
+  @override
+  String avatarShopPurchaseFailed(String error) {
+    return 'Pirkums neizdevās: $error';
+  }
+
+  @override
+  String get avatarShopPurchaseSuccess =>
+      'Avatārs veiksmīgi nopirkts un uzlikts.';
+
+  @override
+  String get avatarShopSelected => 'Atlasīts';
+
+  @override
+  String get avatarShopEquip => 'Aprīkot';
+
+  @override
+  String avatarShopBuyButton(String coins) {
+    return 'Pirkt par $coins ₿';
+  }
+
+  @override
+  String avatarShopNeedCoins(String coins) {
+    return '$coins ₿';
+  }
+
+  @override
   String get createPostingBoostTitle => 'Redzamības boost';
 
   @override

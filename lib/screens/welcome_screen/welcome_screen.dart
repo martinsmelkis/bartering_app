@@ -178,27 +178,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   Future<void> _onGetStartedPressed() async {
-    final settingsService = getIt<SettingsService>();
-
-    final alreadyConsented =
-        await settingsService.hasAcceptedGdprConsentVersion(_gdprConsentVersion);
-
-    if (!mounted) return;
-
-    if (alreadyConsented) {
-      context.pushReplacement('/onboarding?isInitialOnboarding=true');
-      return;
-    }
-
-    final consent = await _showGdprConsentDialog(context);
+    final consent = await _ensureConsentBeforeProceed();
     if (!mounted || consent == null) return;
-
-    await settingsService.setGdprConsent(
-      version: _gdprConsentVersion,
-      locationConsent: consent.locationConsent,
-      aiProcessingConsent: consent.aiProcessingConsent,
-      analyticsCookiesConsent: consent.analyticsCookiesConsent,
-    );
 
     try {
       final userRepository = getIt<UserRepository>();
@@ -289,6 +270,44 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     if (!mounted) return;
     context.pushReplacement('/onboarding?isInitialOnboarding=true');
+  }
+
+  Future<GdprConsentChoice?> _ensureConsentBeforeProceed() async {
+    final settingsService = getIt<SettingsService>();
+
+    final alreadyConsented =
+        await settingsService.hasAcceptedGdprConsentVersion(_gdprConsentVersion);
+
+    if (!mounted) return null;
+
+    if (alreadyConsented) {
+      return GdprConsentChoice(
+        locationConsent:
+            (await settingsService.getStoredLocationConsent()) ?? false,
+        aiProcessingConsent:
+            (await settingsService.getStoredAiProcessingConsent()) ?? false,
+        analyticsCookiesConsent:
+            (await settingsService.getStoredAnalyticsCookiesConsent()) ?? false,
+      );
+    }
+
+    final consent = await _showGdprConsentDialog(context);
+    if (!mounted || consent == null) return null;
+
+    await settingsService.setGdprConsent(
+      version: _gdprConsentVersion,
+      locationConsent: consent.locationConsent,
+      aiProcessingConsent: consent.aiProcessingConsent,
+      analyticsCookiesConsent: consent.analyticsCookiesConsent,
+    );
+
+    return consent;
+  }
+
+  Future<void> _onImportExistingAccountPressed() async {
+    final consent = await _ensureConsentBeforeProceed();
+    if (!mounted || consent == null) return;
+    context.push('/device-migration');
   }
 
   Future<GdprConsentChoice?> _showGdprConsentDialog(BuildContext context) async {
@@ -482,7 +501,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       SizedBox(height: 24),
 
                       GestureDetector(
-                        onTap: () => context.push('/device-migration'),
+                        onTap: _onImportExistingAccountPressed,
                         child: Text(
                           l10n.importExistingAccount,
                           style: TextStyle(
@@ -679,9 +698,9 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
       Colors.orangeAccent.shade100,
     ];
 
-    final color = colors[random.nextInt(colors.length)];
-    final colorHex =
-        '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+    //final color = colors[random.nextInt(colors.length)];
+    //final colorHex =
+    //    '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
 
     // Replace the default color with the random color
     return svgString;//.replaceAll('#ffd4a3', colorHex);

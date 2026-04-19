@@ -592,6 +592,22 @@ abstract class ApiClient {
     @Body() PurchaseVisibilityBoostRequest request,
   );
 
+  /// Purchase an avatar icon unlock
+  @POST('/api/v1/purchases/avatar-icon')
+  Future<PurchaseOperationResponse> purchaseAvatarIcon(
+    @Body() PurchaseAvatarIconRequest request,
+  );
+
+  /// Get avatar icon ownership status for authenticated user
+  @GET('/api/v1/purchases/avatar-icons')
+  Future<AvatarIconOwnershipStatusResponse> getAvatarIconOwnershipStatus();
+
+  /// Equip avatar icon for authenticated user
+  @POST('/api/v1/profile/avatar/equip')
+  Future<EquipAvatarIconResponse> equipAvatarIcon(
+    @Body() EquipAvatarIconRequest request,
+  );
+
   ///////////// DEVICE MANAGEMENT ///////////////
 
   /// Registers a new device for the authenticated user

@@ -69,6 +69,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   bool _isUpdatingVisuals = false; // Prevent concurrent updates
   Region? _previousMapRegion = null;
   GeoPoint? _noUsersMarkerPosition; // Position of the "no users nearby" marker
+  GeoPoint? _savedUserLocationMarkerPosition; // Position of saved user location marker
 
   late PoiCubit poiCubit;
   late MapOperationsCubit mapOperationsCubit;
@@ -282,12 +283,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   Future<void> _zoomToSavedLocation() async {
     final locationString = await SecureStorageService().getOwnLocation();
     if (locationString != null && locationString.isNotEmpty) {
-      final parts = locationString.split(', ');
+      final parts = locationString.split(',').map((part) => part.trim()).toList();
       if (parts.length == 2) {
         final lat = double.tryParse(parts[0]);
         final lon = double.tryParse(parts[1]);
         if (lat != null && lon != null) {
-          await _safeMoveTo(GeoPoint(latitude: lat, longitude: lon));
+          final savedPoint = GeoPoint(latitude: lat, longitude: lon);
+          await _safeMoveTo(savedPoint);
+          await _showSavedUserLocationMarker(savedPoint);
           if (ResponsiveBreakpoints.isPhone(context)) {
             await _safeSetZoom(12.0);
           }
@@ -447,9 +450,17 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
   void _cleanUpMarkers() {
     logDebug('@@@@@@@@@ _cleanUpMarkers: Removing ${_currentMarkerPositions.length} markers');
+
+    // Keep saved-location marker while clearing dynamic search/cluster markers.
+    final savedLocation = _savedUserLocationMarkerPosition;
+
     // Remove all existing markers from previous render
     if (_currentMarkerPositions.isNotEmpty) {
       for (var position in _currentMarkerPositions.toList()) {
+        if (savedLocation != null && _isSamePoint(position, savedLocation)) {
+          continue;
+        }
+
         try {
           _mapController.removeMarker(position);
         } catch (e) {
@@ -462,6 +473,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
 
     // Clear the tracking set and rebuild it
     _currentMarkerPositions.clear();
+    if (savedLocation != null) {
+      _currentMarkerPositions.add(savedLocation);
+    }
     logDebug('@@@@@@@@@ _cleanUpMarkers: Complete, tracking set cleared');
   }
 
@@ -744,6 +758,34 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       userInterests: _userInterests,
       userOfferings: _userOfferings
     );
+  }
+
+  Future<void> _showSavedUserLocationMarker(GeoPoint point) async {
+    _removeSavedUserLocationMarker();
+
+    try {
+      // Use plugin default marker to avoid custom icon rasterization errors.
+      await _mapController.addMarker(point);
+    } catch (e) {
+      logDebugError('Failed to add saved user location marker', e);
+      return;
+    }
+
+    _savedUserLocationMarkerPosition = point;
+    _currentMarkerPositions.add(point);
+  }
+
+  void _removeSavedUserLocationMarker() {
+    if (_savedUserLocationMarkerPosition == null) return;
+
+    try {
+      _mapController.removeMarker(_savedUserLocationMarkerPosition!);
+      _currentMarkerPositions.remove(_savedUserLocationMarkerPosition);
+    } catch (e) {
+      logDebugError('Error removing saved user location marker', e);
+    }
+
+    _savedUserLocationMarkerPosition = null;
   }
 
   bool _useMobileSearchResultsLayout(BuildContext context) {
@@ -1182,6 +1224,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       }
       _noUsersMarkerPosition = null;
     }
+  }
+
+  bool _isSamePoint(GeoPoint a, GeoPoint b) {
+    return a.latitude == b.latitude && a.longitude == b.longitude;
   }
 
   void _showInviteFriendsDialog() {

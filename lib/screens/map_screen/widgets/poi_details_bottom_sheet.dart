@@ -1,13 +1,11 @@
-import 'dart:convert';
-
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/models/postings/posting_data_response.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/attribute_matching_utils.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
-import 'package:barter_app/utils/image_utils.dart';
-import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:barter_app/utils/avatar_icon_utils.dart';
+import 'package:barter_app/utils/image_utils.dart';import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/utils/text_utils.dart';
 import 'package:barter_app/widgets/attribute_bubble.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
@@ -17,7 +15,6 @@ import 'package:barter_app/widgets/webp_network_image.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -269,31 +266,7 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
 
   _loadAvatarIcon() async {
     try {
-      final profileAvatarIcon = widget.poi.profile.profileAvatarIcon?.trim();
-      String svgString;
-
-      if (profileAvatarIcon != null && profileAvatarIcon.isNotEmpty) {
-        if (profileAvatarIcon.contains('<svg')) {
-          svgString = profileAvatarIcon;
-        } else if (profileAvatarIcon.startsWith('data:image/svg+xml;base64,')) {
-          final encoded = profileAvatarIcon.split(',').last;
-          svgString = utf8.decode(base64Decode(encoded), allowMalformed: true);
-        } else {
-          // Fallback to generated avatar if payload is not recognized.
-          const int svgAssetCount = 29;
-          final userIdHashCode = widget.poi.profile.userId.hashCode;
-          final index = userIdHashCode.abs() % svgAssetCount;
-          final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
-          svgString = await rootBundle.loadString(selectedIconPath);
-        }
-      } else {
-        // Fallback to generated avatar when profile icon is missing.
-        const int svgAssetCount = 29;
-        final userIdHashCode = widget.poi.profile.userId.hashCode;
-        final index = userIdHashCode.abs() % svgAssetCount;
-        final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
-        svgString = await rootBundle.loadString(selectedIconPath);
-      }
+      final svgString = await AvatarIconUtils.resolveSvgForProfile(widget.poi.profile);
 
       if (mounted) {
         setState(() {
@@ -1023,63 +996,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                                   overflow: TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                              const SizedBox(width: 6),
-                                              PointerInterceptor(
-                                                child: InkWell(
-                                                  onTap: _showPoiBadgesInfoDialog,
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.symmetric(
-                                                      horizontal: 4,
-                                                      vertical: 2,
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        Container(
-                                                          width: 16,
-                                                          height: 16,
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                (widget.poi.badges != null &&
-                                                                    widget.poi.badges!.isNotEmpty)
-                                                                ? Colors.amber
-                                                                : Colors.orange[300],
-                                                            shape: BoxShape.circle,
-                                                          ),
-                                                          alignment: Alignment.center,
-                                                          child: const Text(
-                                                            'B',
-                                                            style: TextStyle(
-                                                              fontSize: 10,
-                                                              fontWeight:
-                                                                  FontWeight.w700,
-                                                              color: Colors.white,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        const SizedBox(width: 4),
-                                                        Text(
-                                                          '${widget.poi.badges?.length ?? 0}',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color:
-                                                                (widget.poi.badges != null &&
-                                                                    widget.poi.badges!.isNotEmpty)
-                                                                ? Colors.grey[700]
-                                                                : Colors.grey[500],
-                                                            fontWeight:
-                                                                (widget.poi.badges != null &&
-                                                                    widget.poi.badges!.isNotEmpty)
-                                                                ? FontWeight.w600
-                                                                : FontWeight.w500,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
                                             ],
                                           ),
                                           if (!widget.isLargeScreen && widget.poi.distanceKm != null) ...[
@@ -1120,83 +1036,167 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                         ],
                                       ),
                                     ),
-                                    // Rating widget - positioned just before the avatar
                                     Builder(
                                       builder: (context) {
                                         final poiRating = widget.poi.averageRating;
-                                        if (poiRating != null && poiRating > 0) {
-                                          return Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 4,
-                                              vertical: 2,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AvatarColorUtils.getRatingColor(poiRating),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: Colors.white,
-                                                width: 1.5,
+                                        final hasRating = poiRating != null && poiRating > 0;
+
+                                        final badgesIndicator = PointerInterceptor(
+                                          child: InkWell(
+                                            onTap: _showPoiBadgesInfoDialog,
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 4,
+                                                vertical: 2,
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Container(
+                                                    width: 16,
+                                                    height: 16,
+                                                    decoration: BoxDecoration(
+                                                      color: (widget.poi.badges != null &&
+                                                              widget.poi.badges!.isNotEmpty)
+                                                          ? Colors.amber
+                                                          : Colors.orange[300],
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: const Text(
+                                                      'B',
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight: FontWeight.w700,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    '${widget.poi.badges?.length ?? 0}',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: (widget.poi.badges != null &&
+                                                              widget.poi.badges!.isNotEmpty)
+                                                          ? Colors.grey[700]
+                                                          : Colors.grey[500],
+                                                      fontWeight: (widget.poi.badges != null &&
+                                                              widget.poi.badges!.isNotEmpty)
+                                                          ? FontWeight.w600
+                                                          : FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  Icons.star,
-                                                  size: 10,
-                                                  color: Colors.white,
+                                          ),
+                                        );
+
+                                        final ratingWidget = hasRating
+                                            ? Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                  horizontal: 4,
+                                                  vertical: 2,
                                                 ),
-                                                const SizedBox(width: 2),
-                                                Text(
-                                                  poiRating.toStringAsFixed(1),
-                                                  style: const TextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.bold,
+                                                decoration: BoxDecoration(
+                                                  color: AvatarColorUtils.getRatingColor(poiRating),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  border: Border.all(
                                                     color: Colors.white,
+                                                    width: 1.5,
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                          );
-                                        }
-                                        return const SizedBox.shrink();
-                                      },
-                                    ),
-                                    // Avatar/POI icon on the right with online badge
-                                    Stack(
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        SizedBox(
-                                          width: 56,
-                                          height: 56,
-                                          child: _isLoadingAvatar
-                                              ? const Center(
-                                                  child: SizedBox(
-                                                    width: 26,
-                                                    height: 26,
-                                                    child:
-                                                        CircularProgressIndicator(
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.star,
+                                                      size: 10,
+                                                      color: Colors.white,
+                                                    ),
+                                                    const SizedBox(width: 2),
+                                                    Text(
+                                                      poiRating.toStringAsFixed(1),
+                                                      style: const TextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            : const SizedBox.shrink();
+
+                                        final avatarWidget = Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            SizedBox(
+                                              width: 56,
+                                              height: 56,
+                                              child: _isLoadingAvatar
+                                                  ? const Center(
+                                                      child: SizedBox(
+                                                        width: 26,
+                                                        height: 26,
+                                                        child: CircularProgressIndicator(
                                                           strokeWidth: 2,
                                                         ),
+                                                      ),
+                                                    )
+                                                  : _avatarIcon ??
+                                                        const Icon(
+                                                          Icons.person,
+                                                          size: 35,
+                                                        ),
+                                            ),
+                                            // Online status badge - positioned at bottom-right
+                                            PositionedOnlineStatusBadge(
+                                              isOnline: widget.poi.isOnline,
+                                              isAway: widget.poi.isAway,
+                                              size: 16.0,
+                                              right: 5,
+                                              bottom: 5,
+                                              borderWidth: 2.5,
+                                            ),
+                                          ],
+                                        );
+
+                                        return hasRating
+                                            ? Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: [
+                                                  Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      ratingWidget,
+                                                      const SizedBox(width: 8),
+                                                      avatarWidget,
+                                                    ],
                                                   ),
-                                                )
-                                              : _avatarIcon ??
-                                                    const Icon(
-                                                      Icons.person,
-                                                      size: 35,
-                                                    ),
-                                        ),
-                                        // Online status badge - positioned at bottom-right
-                                        PositionedOnlineStatusBadge(
-                                          isOnline: widget.poi.isOnline,
-                                          isAway: widget.poi.isAway,
-                                          size: 16.0,
-                                          right: 5,
-                                          bottom: 5,
-                                          borderWidth: 2.5,
-                                        ),
-                                      ],
+                                                  Align(
+                                                    alignment: Alignment.centerRight,
+                                                    child: badgesIndicator,
+                                                  ),
+                                                ],
+                                              )
+                                            : SizedBox(
+                                                height: 56,
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    badgesIndicator,
+                                                    const SizedBox(width: 8),
+                                                    avatarWidget,
+                                                  ],
+                                                ),
+                                              );
+                                      },
                                     ),
                                   ],
                                 ),
@@ -1258,11 +1258,10 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                               context: context,
                                               attributes:
                                                   widget.poi.profile.attributes
-                                                      ?.where(
+                                                      .where(
                                                         (a) => a.type != 1,
                                                       )
-                                                      .toList() ??
-                                                  [],
+                                                      .toList(),
                                               isPoiInterest: true,
                                             ),
                                           ),
@@ -1323,11 +1322,10 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                               context: context,
                                               attributes:
                                                   widget.poi.profile.attributes
-                                                      ?.where(
+                                                      .where(
                                                         (a) => a.type == 1,
                                                       )
-                                                      .toList() ??
-                                                  [],
+                                                      .toList(),
                                               isPoiInterest: false,
                                             ),
                                           ),

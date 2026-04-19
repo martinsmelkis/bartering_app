@@ -2481,6 +2481,68 @@ class AppLocalizationsEn extends AppLocalizations {
   String get purchaseCoinsFlowComingSoon => 'Purchase coins flow coming soon';
 
   @override
+  String get avatarShopTitle => 'Avatar Shop';
+
+  @override
+  String get avatarShopDescription => 'Buy and apply a custom avatar icon.';
+
+  @override
+  String get avatarShopRefresh => 'Refresh';
+
+  @override
+  String avatarShopBalance(String amount) {
+    return 'Balance: $amount ₿';
+  }
+
+  @override
+  String avatarShopEachAvatarPrice(String price) {
+    return 'Each avatar: $price ₿';
+  }
+
+  @override
+  String avatarShopLoadFailed(String error) {
+    return 'Failed to load avatar shop: $error';
+  }
+
+  @override
+  String get avatarShopUnableToProcessPurchase =>
+      'Unable to process purchase right now.';
+
+  @override
+  String get avatarShopAvatarAlreadySelected =>
+      'This avatar is already selected.';
+
+  @override
+  String avatarShopNotEnoughCoins(int coins) {
+    return 'Not enough coins. You need $coins coins.';
+  }
+
+  @override
+  String avatarShopPurchaseFailed(String error) {
+    return 'Purchase failed: $error';
+  }
+
+  @override
+  String get avatarShopPurchaseSuccess =>
+      'Avatar purchased and applied successfully.';
+
+  @override
+  String get avatarShopSelected => 'Selected';
+
+  @override
+  String get avatarShopEquip => 'Equip';
+
+  @override
+  String avatarShopBuyButton(String coins) {
+    return 'Buy $coins ₿';
+  }
+
+  @override
+  String avatarShopNeedCoins(String coins) {
+    return 'Need $coins ₿';
+  }
+
+  @override
   String get createPostingBoostTitle => 'Boost visibility';
 
   @override

@@ -2,6 +2,7 @@ import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/services/secure_storage_service.dart';
 import 'package:barter_app/utils/debug_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,6 +21,7 @@ class UserRepository {
   List<ParsedAttributeData>? userOfferings;
   UserProfileData? _cachedProfileInfo;
   DateTime? _cachedProfileInfoAt;
+  final ValueNotifier<int> avatarRefreshNotifier = ValueNotifier<int>(0);
 
   UserRepository(this._secureStorageService);
 
@@ -212,6 +214,7 @@ class UserRepository {
   void setCachedProfileInfo(UserProfileData profile) {
     _cachedProfileInfo = profile;
     _cachedProfileInfoAt = DateTime.now();
+    avatarRefreshNotifier.value++;
   }
 
   void invalidateCachedProfileInfo() {

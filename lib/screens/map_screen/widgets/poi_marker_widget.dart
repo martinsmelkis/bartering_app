@@ -5,8 +5,8 @@ import 'package:barter_app/models/map/point_of_interest.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/theme/app_colors.dart';
 import 'package:barter_app/theme/app_dimensions.dart';
-import 'package:barter_app/utils/category_stats_utils.dart';
-import 'package:barter_app/utils/debug_utils.dart';
+import 'package:barter_app/utils/avatar_icon_utils.dart';
+import 'package:barter_app/utils/category_stats_utils.dart';import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/text_utils.dart';
 import 'package:barter_app/widgets/online_status_badge.dart';
 import 'package:flutter/foundation.dart';
@@ -17,12 +17,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 /// Widget class for creating POI markers on the map
 class PoiMarkerWidget {
-  // Avatar SVG/SI assets (dynamically generated)
-  static const int _svgAssetCount = 29;
-
-  // Generate SVG asset path by index (1-based)
-  static String _getSvgAsset(int index) => 'assets/icons/avatars/path$index.svg';
-
   /// Creates a marker icon for a POI with high-resolution rendering for web
   static Future<MarkerIcon> createMarker({
     required PointOfInterest poi,
@@ -34,8 +28,9 @@ class PoiMarkerWidget {
     // Use the POI's userId to get a consistent random icon fallback
     final userIdHashCode = poi.profile.userId.hashCode;
     logDebug('@@@@@@@@@@ Creating POI marker for ${poi.profile.userId}, hashCode: $userIdHashCode');
-    final index = userIdHashCode.abs() % _svgAssetCount;
-    final selectedIconPath = _getSvgAsset(index + 1); // 1-based index
+    final selectedIconPath = poi.profile.profileAvatarIconId != null
+        ? AvatarIconUtils.assetPathFromIconId(poi.profile.profileAvatarIconId)
+        : AvatarIconUtils.deterministicFallbackAssetPath(poi.profile.userId);
 
     // Check if there's a match between user interests/offerings and POI offerings/interests
     final hasMatch = TextUtils.checkForAttributeBarterMatch(poi, userInterests, userOfferings);
@@ -139,10 +134,10 @@ class PoiMarkerWidget {
           );
           isCustomProfileAvatar = true;
         } else {
-          svgString = await rootBundle.loadString(selectedIconPath);
+          svgString = await rootBundle.loadString(selectedIconPath ?? 'assets/icons/avatars/path1.svg');
         }
       } else {
-        svgString = await rootBundle.loadString(selectedIconPath);
+        svgString = await rootBundle.loadString(selectedIconPath ?? 'assets/icons/avatars/path1.svg');
       }
 
       // Calculate color segments for the border
@@ -192,10 +187,10 @@ class PoiMarkerWidget {
         );
         isCustomProfileAvatar = true;
       } else {
-        svgString = await rootBundle.loadString(selectedIconPath);
+        svgString = await rootBundle.loadString(selectedIconPath ?? 'assets/icons/avatars/path1.svg');
       }
     } else {
-      svgString = await rootBundle.loadString(selectedIconPath);
+      svgString = await rootBundle.loadString(selectedIconPath ?? 'assets/icons/avatars/path1.svg');
     }
 
     final localSvgCopy = isCustomProfileAvatar

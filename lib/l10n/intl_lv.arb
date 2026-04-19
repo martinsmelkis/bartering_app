@@ -836,6 +836,70 @@
     }
   },
   "purchaseCoinsFlowComingSoon": "Monētu pirkšanas plūsma drīzumā",
+  "avatarShopTitle": "Avatāru veikals",
+  "avatarShopDescription": "Nopērc un uzreiz uzliec pielāgotu avatāra ikonu.",
+  "avatarShopRefresh": "Atjaunot",
+  "avatarShopBalance": "Bilance: {amount} ₿",
+  "@avatarShopBalance": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopEachAvatarPrice": "Katrs avatārs: {price} ₿",
+  "@avatarShopEachAvatarPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopLoadFailed": "Neizdevās ielādēt avatāru veikalu: {error}",
+  "@avatarShopLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopUnableToProcessPurchase": "Šobrīd pirkumu nevar apstrādāt.",
+  "avatarShopAvatarAlreadySelected": "Šis avatārs jau ir atlasīts.",
+  "avatarShopNotEnoughCoins": "Nepietiek monētu. Nepieciešamas {coins} monētas.",
+  "@avatarShopNotEnoughCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "avatarShopPurchaseFailed": "Pirkums neizdevās: {error}",
+  "@avatarShopPurchaseFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopPurchaseSuccess": "Avatārs veiksmīgi nopirkts un uzlikts.",
+  "avatarShopSelected": "Atlasīts",
+  "avatarShopEquip": "Aprīkot",
+  "avatarShopBuyButton": "Pirkt par {coins} ₿",
+  "@avatarShopBuyButton": {
+    "placeholders": {
+      "coins": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarShopNeedCoins": "{coins} ₿",
+  "@avatarShopNeedCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "String"
+      }
+    }
+  },
   "createPostingBoostTitle": "Redzamības boost",
   "createPostingBoostDescription": "Tērē monētas, lai izceltu šo sludinājumu meklēšanas rezultātos.",
   "createPostingBoostNone": "Bez boost",

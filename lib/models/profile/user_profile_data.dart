@@ -78,6 +78,8 @@ class UserProfileData {
   final String? selfDescription;
   final AccountType? accountType;
   final String? profileAvatarIcon;
+  // Canonical purchased icon ID used for entitlement checks on update
+  final String? profileAvatarIconId;
   final List<String> workReferenceImageUrls;
   final List<String> activePostingIds;
   @JsonKey(includeIfNull: false)
@@ -94,6 +96,7 @@ class UserProfileData {
     this.selfDescription,
     this.accountType,
     this.profileAvatarIcon,
+    this.profileAvatarIconId,
     this.workReferenceImageUrls = const [],
     this.activePostingIds = const [],
     this.lastOnlineAt,
@@ -167,6 +170,7 @@ class UserProfileData {
     String? selfDescription,
     AccountType? accountType,
     String? profileAvatarIcon,
+    String? profileAvatarIconId,
     List<String>? workReferenceImageUrls,
     List<String>? activePostingIds,
     int? lastOnlineAt,
@@ -182,6 +186,7 @@ class UserProfileData {
       selfDescription: selfDescription ?? this.selfDescription,
       accountType: accountType ?? this.accountType,
       profileAvatarIcon: profileAvatarIcon ?? this.profileAvatarIcon,
+      profileAvatarIconId: profileAvatarIconId ?? this.profileAvatarIconId,
       workReferenceImageUrls: workReferenceImageUrls ?? this.workReferenceImageUrls,
       activePostingIds: activePostingIds ?? this.activePostingIds,
       lastOnlineAt: lastOnlineAt ?? this.lastOnlineAt,

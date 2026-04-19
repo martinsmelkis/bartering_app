@@ -813,6 +813,14 @@ extension AppLocalizationsExtension on AppLocalizations {
       'purchaseCoins' => purchaseCoins,
       'selectCoinPackage' => selectCoinPackage,
       'purchaseCoinsFlowComingSoon' => purchaseCoinsFlowComingSoon,
+      'avatarShopTitle' => avatarShopTitle,
+      'avatarShopDescription' => avatarShopDescription,
+      'avatarShopRefresh' => avatarShopRefresh,
+      'avatarShopUnableToProcessPurchase' => avatarShopUnableToProcessPurchase,
+      'avatarShopAvatarAlreadySelected' => avatarShopAvatarAlreadySelected,
+      'avatarShopPurchaseSuccess' => avatarShopPurchaseSuccess,
+      'avatarShopSelected' => avatarShopSelected,
+      'avatarShopEquip' => avatarShopEquip,
       'createPostingBoostTitle' => createPostingBoostTitle,
       'createPostingBoostDescription' => createPostingBoostDescription,
       'createPostingBoostNone' => createPostingBoostNone,
@@ -1083,6 +1091,40 @@ extension AppLocalizationsExtension on AppLocalizations {
       'selectedCoinPackage' => switch (args) {
         [final String amount] => selectedCoinPackage(amount),
         _ => throw ArgumentError('selectedCoinPackage requires 1 arguments'),
+      },
+      'avatarShopBalance' => switch (args) {
+        [final String amount] => avatarShopBalance(amount),
+        _ => throw ArgumentError('avatarShopBalance requires 1 arguments'),
+      },
+      'avatarShopEachAvatarPrice' => switch (args) {
+        [final String price] => avatarShopEachAvatarPrice(price),
+        _ => throw ArgumentError(
+          'avatarShopEachAvatarPrice requires 1 arguments',
+        ),
+      },
+      'avatarShopLoadFailed' => switch (args) {
+        [final String error] => avatarShopLoadFailed(error),
+        _ => throw ArgumentError('avatarShopLoadFailed requires 1 arguments'),
+      },
+      'avatarShopNotEnoughCoins' => switch (args) {
+        [final int coins] => avatarShopNotEnoughCoins(coins),
+        _ => throw ArgumentError(
+          'avatarShopNotEnoughCoins requires 1 arguments',
+        ),
+      },
+      'avatarShopPurchaseFailed' => switch (args) {
+        [final String error] => avatarShopPurchaseFailed(error),
+        _ => throw ArgumentError(
+          'avatarShopPurchaseFailed requires 1 arguments',
+        ),
+      },
+      'avatarShopBuyButton' => switch (args) {
+        [final String coins] => avatarShopBuyButton(coins),
+        _ => throw ArgumentError('avatarShopBuyButton requires 1 arguments'),
+      },
+      'avatarShopNeedCoins' => switch (args) {
+        [final String coins] => avatarShopNeedCoins(coins),
+        _ => throw ArgumentError('avatarShopNeedCoins requires 1 arguments'),
       },
       'downloadingFile' => switch (args) {
         [final String filename] => downloadingFile(filename),

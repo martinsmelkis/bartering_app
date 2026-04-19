@@ -40,5 +40,5 @@ const _$ReputationBadgeEnumMap = {
   ReputationBadge.DISPUTE_FREE: 'DISPUTE_FREE',
   ReputationBadge.LOCAL_LEGEND: 'LOCAL_LEGEND',
   ReputationBadge.FAST_TRADER: 'FAST_TRADER',
-  ReputationBadge.IDENTITY_VERIFIED: 'IDENTITY_VERIFIED'
+  ReputationBadge.IDENTITY_VERIFIED: 'IDENTITY_VERIFIED',
 };

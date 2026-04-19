@@ -7,9 +7,11 @@ class ProfileCoinsInfoDialog extends StatelessWidget {
   const ProfileCoinsInfoDialog({
     super.key,
     this.onPurchaseCoins,
+    this.onBrowseAvatarShop,
   });
 
   final VoidCallback? onPurchaseCoins;
+  final VoidCallback? onBrowseAvatarShop;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,16 @@ class ProfileCoinsInfoDialog extends StatelessWidget {
               }
             },
             child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: onBrowseAvatarShop ?? () {
+              if (kIsWeb) {
+                Navigator.of(context, rootNavigator: true).pop();
+              } else {
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text(l10n.avatarShopTitle),
           ),
           ElevatedButton(
             onPressed: onPurchaseCoins ?? () {

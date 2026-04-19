@@ -289,6 +289,115 @@ class PurchaseVisibilityBoostRequest {
   }
 }
 
+/// Request model for purchasing avatar icon unlock
+class PurchaseAvatarIconRequest {
+  final String userId;
+  final String iconId;
+  final int costCoins;
+  final String externalRef;
+  final String? metadataJson;
+
+  PurchaseAvatarIconRequest({
+    required this.userId,
+    required this.iconId,
+    required this.costCoins,
+    required this.externalRef,
+    this.metadataJson,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'iconId': iconId,
+      'costCoins': costCoins,
+      'externalRef': externalRef,
+      if (metadataJson != null) 'metadataJson': metadataJson,
+    };
+  }
+}
+
+/// Avatar ownership status response model
+class AvatarIconOwnershipStatusResponse {
+  final String userId;
+  final String? activeAvatarIconId;
+  final List<String> purchasedIconIds;
+  final bool isPremium;
+
+  AvatarIconOwnershipStatusResponse({
+    required this.userId,
+    this.activeAvatarIconId,
+    required this.purchasedIconIds,
+    required this.isPremium,
+  });
+
+  factory AvatarIconOwnershipStatusResponse.fromJson(Map<String, dynamic> json) {
+    final purchasedRaw = (json['purchasedIconIds'] as List<dynamic>?);
+
+    return AvatarIconOwnershipStatusResponse(
+      userId: json['userId'] as String,
+      activeAvatarIconId: json['activeAvatarIconId'] as String?,
+      purchasedIconIds: purchasedRaw?.map((e) => e.toString()).toList() ?? const <String>[],
+      isPremium: json['isPremium'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'activeAvatarIconId': activeAvatarIconId,
+      'purchasedIconIds': purchasedIconIds,
+      'isPremium': isPremium,
+    };
+  }
+}
+
+/// Request model for equipping an avatar icon
+class EquipAvatarIconRequest {
+  final String userId;
+  final String iconId;
+
+  EquipAvatarIconRequest({
+    required this.userId,
+    required this.iconId,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'iconId': iconId,
+    };
+  }
+}
+
+/// Equip avatar icon operation response model
+class EquipAvatarIconResponse {
+  final bool success;
+  final String message;
+  final String? equippedIconId;
+
+  EquipAvatarIconResponse({
+    required this.success,
+    required this.message,
+    this.equippedIconId,
+  });
+
+  factory EquipAvatarIconResponse.fromJson(Map<String, dynamic> json) {
+    return EquipAvatarIconResponse(
+      success: json['success'] as bool? ?? false,
+      message: json['message'] as String? ?? '',
+      equippedIconId: json['equippedIconId'] as String? ?? json['iconId'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'message': message,
+      if (equippedIconId != null) 'equippedIconId': equippedIconId,
+    };
+  }
+}
+
 /// Purchase record response model
 class PurchaseResponse {
   final String id;

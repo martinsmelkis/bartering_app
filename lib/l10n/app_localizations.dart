@@ -4778,6 +4778,96 @@ abstract class AppLocalizations {
   /// **'Purchase coins flow coming soon'**
   String get purchaseCoinsFlowComingSoon;
 
+  /// No description provided for @avatarShopTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar Shop'**
+  String get avatarShopTitle;
+
+  /// No description provided for @avatarShopDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy and apply a custom avatar icon.'**
+  String get avatarShopDescription;
+
+  /// No description provided for @avatarShopRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get avatarShopRefresh;
+
+  /// No description provided for @avatarShopBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance: {amount} ₿'**
+  String avatarShopBalance(String amount);
+
+  /// No description provided for @avatarShopEachAvatarPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Each avatar: {price} ₿'**
+  String avatarShopEachAvatarPrice(String price);
+
+  /// No description provided for @avatarShopLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load avatar shop: {error}'**
+  String avatarShopLoadFailed(String error);
+
+  /// No description provided for @avatarShopUnableToProcessPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to process purchase right now.'**
+  String get avatarShopUnableToProcessPurchase;
+
+  /// No description provided for @avatarShopAvatarAlreadySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'This avatar is already selected.'**
+  String get avatarShopAvatarAlreadySelected;
+
+  /// No description provided for @avatarShopNotEnoughCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough coins. You need {coins} coins.'**
+  String avatarShopNotEnoughCoins(int coins);
+
+  /// No description provided for @avatarShopPurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed: {error}'**
+  String avatarShopPurchaseFailed(String error);
+
+  /// No description provided for @avatarShopPurchaseSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar purchased and applied successfully.'**
+  String get avatarShopPurchaseSuccess;
+
+  /// No description provided for @avatarShopSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get avatarShopSelected;
+
+  /// No description provided for @avatarShopEquip.
+  ///
+  /// In en, this message translates to:
+  /// **'Equip'**
+  String get avatarShopEquip;
+
+  /// No description provided for @avatarShopBuyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {coins} ₿'**
+  String avatarShopBuyButton(String coins);
+
+  /// No description provided for @avatarShopNeedCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'Need {coins} ₿'**
+  String avatarShopNeedCoins(String coins);
+
   /// No description provided for @createPostingBoostTitle.
   ///
   /// In en, this message translates to:

@@ -1,13 +1,10 @@
-import 'dart:convert';
-
-import 'package:barter_app/widgets/full_screen_image_viewer.dart';
-import 'package:barter_app/widgets/image_viewer_dialog.dart';
+import 'package:barter_app/utils/avatar_icon_utils.dart';
+import 'package:barter_app/widgets/full_screen_image_viewer.dart';import 'package:barter_app/widgets/image_viewer_dialog.dart';
 import 'package:barter_app/widgets/webp_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
@@ -26,9 +23,7 @@ import '../../../widgets/attribute_bubble.dart';
 import '../../../widgets/online_status_badge.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/poi_panel_cubit.dart';
-import '../cubit/chat_panel_cubit.dart';
 import '../../chat_screen/widgets/chat_panel_header.dart';
-import 'poi_details_bottom_sheet.dart';
 import '../../chat_screen/chat_screen.dart';
 
 class SearchResultsListView extends StatefulWidget {
@@ -130,12 +125,11 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       final List<PostingWithUser> allPostings = [];
 
       for (final poi in widget.pois) {
-        if (poi.profile.activePostingIds == null ||
-            poi.profile.activePostingIds!.isEmpty) {
+        if (poi.profile.activePostingIds.isEmpty) {
           continue;
         }
 
-        final postingIds = poi.profile.activePostingIds!;
+        final postingIds = poi.profile.activePostingIds;
         final userPostings = <UserPostingData>[];
 
         for (final postingId in postingIds) {
@@ -1348,11 +1342,9 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     final l10n = AppLocalizations.of(context)!;
 
     // Separate interests (type != 1) and offerings (type == 1)
-    final interests =
-        poi.profile.attributes?.where((a) => a.type != 1).toList() ?? [];
-    final offerings =
-        poi.profile.attributes?.where((a) => a.type == 1).toList() ?? [];
-    final postings = poi.profile.activePostingIds ?? [];
+    final interests = poi.profile.attributes.where((a) => a.type != 1).toList();
+    final offerings = poi.profile.attributes.where((a) => a.type == 1).toList();
+    final postings = poi.profile.activePostingIds;
 
     // Check if there are more items to show
     final hasMoreItems =
@@ -1633,23 +1625,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
   }
 
   Future<String> _loadSvg(PointOfInterest poi) async {
-    final profileAvatarIcon = poi.profile.profileAvatarIcon?.trim();
-    if (profileAvatarIcon != null && profileAvatarIcon.isNotEmpty) {
-      if (profileAvatarIcon.contains('<svg')) {
-        return profileAvatarIcon;
-      }
-      if (profileAvatarIcon.startsWith('data:image/svg+xml;base64,')) {
-        final encoded = profileAvatarIcon.split(',').last;
-        return utf8.decode(base64Decode(encoded), allowMalformed: true);
-      }
-    }
-
-    final userIdHashCode = poi.profile.userId.hashCode;
-    final index = userIdHashCode.abs() % 29; // Assuming 29 avatars
-    final selectedIconPath = 'assets/icons/avatars/path${index + 1}.svg';
-
-    // Load SVG without color modification
-    return await rootBundle.loadString(selectedIconPath);
+    return AvatarIconUtils.resolveSvgForProfile(poi.profile);
   }
 }
 
