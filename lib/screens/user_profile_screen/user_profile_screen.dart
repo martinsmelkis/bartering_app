@@ -1340,7 +1340,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       builder: (dialogContext) {
         return DeleteProfileConfirmationDialog(
           onConfirmDelete: () async {
-            await _deleteProfile(dialogContext);
+            await _deleteProfile();
           },
         );
       },
@@ -1397,15 +1397,17 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     }
   }
 
-  Future<void> _deleteProfile(BuildContext context) async {
+  Future<void> _deleteProfile() async {
     final l10n = AppLocalizations.of(this.context)!;
 
+    BuildContext? loadingDialogContext;
     try {
       showDialog(
-        context: context,
+        context: this.context,
         barrierDismissible: false,
         useRootNavigator: kIsWeb,
-        builder: (BuildContext context) {
+        builder: (dialogContext) {
+          loadingDialogContext = dialogContext;
           return PointerInterceptor(
             child: const Center(
               child: CircularProgressIndicator(),
@@ -1417,25 +1419,22 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       await _userProfileScreenCubit.deleteProfile(widget.userId);
 
       if (!mounted) return;
-      if (kIsWeb) {
-        Navigator.of(context, rootNavigator: true).pop();
-      } else {
-        Navigator.of(context).pop();
+
+      if (loadingDialogContext != null && loadingDialogContext!.mounted) {
+        Navigator.of(loadingDialogContext!, rootNavigator: kIsWeb).pop();
       }
 
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(this.context).showSnackBar(
         SnackBar(
           content: Text(l10n.profileDeleted),
           backgroundColor: Colors.green,
         ),
       );
 
-      if (!mounted) return;
       if (kIsWeb) {
         SystemNavigator.pop();
       } else {
-        Navigator.of(context).pushAndRemoveUntil(
+        Navigator.of(this.context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (_) => const InitializeScreen(),
           ),
@@ -1444,16 +1443,18 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       }
     } catch (e) {
       logDebugError('Error deleting profile', e);
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
 
-        ScaffoldMessenger.of(this.context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.errorDeletingProfile),
-            backgroundColor: Colors.red,
-          ),
-        );
+      if (loadingDialogContext != null && loadingDialogContext!.mounted) {
+        Navigator.of(loadingDialogContext!, rootNavigator: kIsWeb).pop();
       }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorDeletingProfile),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

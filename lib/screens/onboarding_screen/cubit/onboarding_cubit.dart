@@ -86,9 +86,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       if (profileData.isEmpty) {
         profileData = await _userRepository.getProfileKeywordDataMap();
       }
-      final userId = _userRepository.userId;
+      var userId = _userRepository.userId;
 
-      if (userId == null) {
+      if (userId == null || userId.isEmpty) {
+        await _userRepository.init();
+        userId = await _userRepository.getUserId();
+      }
+
+      if (userId == null || userId.isEmpty) {
         throw Exception("User ID is null, cannot complete onboarding.");
       }
 

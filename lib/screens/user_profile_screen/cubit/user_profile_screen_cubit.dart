@@ -153,9 +153,31 @@ class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
 
     try {
       final authService = FCMTokenService();
-      await authService.onSessionEnded(userId);
+      try {
+        await authService.onSessionEnded(userId);
+      } catch (sessionEndError) {
+        logDebug('⚠️ Session cleanup failed during profile deletion: $sessionEndError');
+      }
 
       await _apiClient.deleteUser(userId);
+
+      try {
+        await getIt<ChatRepository>().clearAllChats();
+      } catch (chatClearError) {
+        logDebug('⚠️ Failed to clear local chats during profile deletion: $chatClearError');
+      }
+
+      try {
+        await SecureStorageService().clearStorage();
+      } catch (secureStorageError) {
+        logDebug('⚠️ Failed to clear secure storage during profile deletion: $secureStorageError');
+      }
+
+      try {
+        await getIt<SettingsService>().clearAll();
+      } catch (settingsClearError) {
+        logDebug('⚠️ Failed to clear settings during profile deletion: $settingsClearError');
+      }
 
       try {
         final path = await getApplicationDocumentsDirectory();
@@ -165,15 +187,14 @@ class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
         }
       } catch (dbError) {
         logDebug('⚠️ Failed to delete database file: $dbError');
-        // Continue anyway - the error handling in platform_app.dart will handle this
       }
 
-      await SecureStorageService().clearStorage();
-      await getIt<SettingsService>().clearAll();
-      await getIt<ChatRepository>().clearAllChats();
-
       if (kIsWeb) {
-        await Platform.clearAllBrowserStorage();
+        try {
+          await Platform.clearAllBrowserStorage();
+        } catch (browserStorageError) {
+          logDebug('⚠️ Failed to clear browser storage during profile deletion: $browserStorageError');
+        }
       }
     } catch (e) {
       emit(state.copyWith(errorMessage: e.toString()));

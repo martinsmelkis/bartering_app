@@ -1046,8 +1046,8 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                             onTap: _showPoiBadgesInfoDialog,
                                             borderRadius: BorderRadius.circular(10),
                                             child: Padding(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 4,
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: hasRating ? 12 : 4,
                                                 vertical: 2,
                                               ),
                                               child: Row(
