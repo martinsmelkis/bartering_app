@@ -172,6 +172,24 @@ class ConfirmMigrationResponse {
   }
 }
 
+/// Public account deletion response for email-link based flow
+class AccountDeletionByEmailResponse {
+  final bool success;
+  final String? message;
+
+  AccountDeletionByEmailResponse({
+    required this.success,
+    this.message,
+  });
+
+  factory AccountDeletionByEmailResponse.fromJson(Map<String, dynamic> json) {
+    return AccountDeletionByEmailResponse(
+      success: json['success'] as bool? ?? false,
+      message: json['message'] as String?,
+    );
+  }
+}
+
 /// Migration status response
 class MigrationStatusResponse {
   final bool success;

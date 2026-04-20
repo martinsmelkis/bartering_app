@@ -521,13 +521,13 @@ abstract class AppLocalizations {
   /// No description provided for @termsConditionsSectionAccountUseTitle.
   ///
   /// In en, this message translates to:
-  /// **'3. Account Use'**
+  /// **'3. Account Use, Recovery and Deletion'**
   String get termsConditionsSectionAccountUseTitle;
 
   /// No description provided for @termsConditionsSectionAccountUseContent.
   ///
   /// In en, this message translates to:
-  /// **'You are responsible for maintaining your account security and activities performed through your account.'**
+  /// **'You are responsible for maintaining your account security and activities performed through your account. You must provide your e-mail in Profile - Notification Preferences to be able to migrate/recover your account and to request it\'s deletion if you lose access to your device.'**
   String get termsConditionsSectionAccountUseContent;
 
   /// No description provided for @termsConditionsSectionProhibitedConductTitle.
@@ -6187,6 +6187,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add image'**
   String get premiumProfileEditorAddImage;
+
+  /// No description provided for @accountDeletionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get accountDeletionTitle;
+
+  /// No description provided for @accountDeletionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Request account deletion'**
+  String get accountDeletionHeader;
+
+  /// No description provided for @accountDeletionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this page to request permanent account deletion. Once completed, your profile and related account data will be removed according to our retention policy.'**
+  String get accountDeletionInfo;
+
+  /// No description provided for @accountDeletionTokenInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deletion request confirmed. This action is permanent and cannot be undone.'**
+  String get accountDeletionTokenInfo;
+
+  /// No description provided for @accountDeletionSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Steps:\n1. Enter your account email\n2. Submit to receive a verification code\n3. Enter the code to confirm deletion'**
+  String get accountDeletionSteps;
+
+  /// No description provided for @accountDeletionEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Account email'**
+  String get accountDeletionEmailLabel;
+
+  /// No description provided for @accountDeletionCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code'**
+  String get accountDeletionCodeLabel;
+
+  /// No description provided for @accountDeletionCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter code from email'**
+  String get accountDeletionCodeHint;
+
+  /// No description provided for @accountDeletionSendCodeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send verification code'**
+  String get accountDeletionSendCodeButton;
+
+  /// No description provided for @accountDeletionConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm account deletion'**
+  String get accountDeletionConfirmButton;
+
+  /// No description provided for @accountDeletionCodeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code sent. Please check your email.'**
+  String get accountDeletionCodeSent;
+
+  /// No description provided for @accountDeletionCodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid verification code.'**
+  String get accountDeletionCodeInvalid;
+
+  /// No description provided for @accountDeletionSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Deletion request submitted successfully. Our team will process your request and your account will be deleted after verification.'**
+  String get accountDeletionSuccessMessage;
+
+  /// No description provided for @accountDeletionDataDeletedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'If confirmed, we will permanently delete:'**
+  String get accountDeletionDataDeletedTitle;
+
+  /// No description provided for @accountDeletionDataDeletedTitleAfterConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Your user profile with the following data has been deleted:'**
+  String get accountDeletionDataDeletedTitleAfterConfirmed;
+
+  /// No description provided for @accountDeletionDataDeletedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'- Account registration data and profile\n- Device keys and migration/recovery sessions\n- Postings and associated uploaded images\n- Attributes, relationships, reports, and favorites/match history\n- Messages, read receipts, encrypted file metadata, and chat response stats\n- Reviews, reputation, transactions, moderation/appeals, and review audit data\n- Notification contacts and notification preferences\n- Presence/activity cache entries and related analytics/location tracking rows'**
+  String get accountDeletionDataDeletedItems;
 }
 
 class _AppLocalizationsDelegate

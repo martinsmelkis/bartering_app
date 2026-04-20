@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
-import '../../utils/text_utils.dart';
 import '../../utils/debug_utils.dart';
 import '../../widgets/responsive_center_container.dart';
 import 'cubit/onboarding_cubit.dart';
@@ -265,7 +264,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                           // Category cards
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 50.0),
+                            padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 60.0),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: _categories.asMap().entries.map((entry) {

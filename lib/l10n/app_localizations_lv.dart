@@ -241,7 +241,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get termsConditionsSectionScopeContent =>
-      'Šie noteikumi attiecas uz Barter App lietošanu un nosaka lietotāja tiesības un pienākumus.';
+      'Šie noteikumi attiecas uz Bartering App lietošanu un nosaka lietotāja tiesības un pienākumus.';
 
   @override
   String get termsConditionsSectionMinimumAgeTitle => '2. Minimālais vecums';
@@ -251,11 +251,12 @@ class AppLocalizationsLv extends AppLocalizations {
       'Lietotne paredzēta personām no 16 gadu vecuma. Reģistrējoties, jūs apliecināt, ka jums ir vismaz 16 gadi.';
 
   @override
-  String get termsConditionsSectionAccountUseTitle => '3. Konta lietošana';
+  String get termsConditionsSectionAccountUseTitle =>
+      '3. Konta lietošana, atjaunošana un dzēšana';
 
   @override
   String get termsConditionsSectionAccountUseContent =>
-      'Jūs esat atbildīgs par sava konta drošību un par aktivitātēm, kas notiek, izmantojot jūsu kontu.';
+      'Jūs esat atbildīgs par sava konta drošību un par aktivitātēm, kas notiek, izmantojot jūsu kontu. Jums jāieveda jūsu e-pasta adrese Profila sadaļā - Paziņojumu iestatījumos lai varētu atjaunot profilu, vai pieprasīt tā dzēšanu, ja zaudējat piekļuvi ierīcei.';
 
   @override
   String get termsConditionsSectionProhibitedConductTitle =>
@@ -3340,4 +3341,61 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get premiumProfileEditorAddImage => 'Pievienot attēlu';
+
+  @override
+  String get accountDeletionTitle => 'Dzēst kontu';
+
+  @override
+  String get accountDeletionHeader => 'Pieprasīt konta dzēšanu';
+
+  @override
+  String get accountDeletionInfo =>
+      'Izmantojiet šo lapu, lai pieprasītu neatgriezenisku konta dzēšanu. Pēc procesa pabeigšanas jūsu profils un saistītie konta dati tiks dzēsti saskaņā ar mūsu datu glabāšanas politiku.';
+
+  @override
+  String get accountDeletionTokenInfo =>
+      'Konta dzēšanas pieprasījums apstiprināts. Šī darbība ir neatgriezeniska un to nevar atsaukt.';
+
+  @override
+  String get accountDeletionSteps =>
+      'Soļi:\n1. Ievadiet sava konta e-pastu\n2. Iesniedziet pieprasījumu, lai saņemtu verifikācijas kodu\n3. Ievadiet kodu, lai apstiprinātu dzēšanu';
+
+  @override
+  String get accountDeletionEmailLabel => 'Konta e-pasts';
+
+  @override
+  String get accountDeletionCodeLabel => 'Verifikācijas kods';
+
+  @override
+  String get accountDeletionCodeHint => 'Ievadiet kodu no e-pasta';
+
+  @override
+  String get accountDeletionSendCodeButton => 'Nosūtīt verifikācijas kodu';
+
+  @override
+  String get accountDeletionConfirmButton => 'Apstiprināt konta dzēšanu';
+
+  @override
+  String get accountDeletionCodeSent =>
+      'Verifikācijas kods nosūtīts. Lūdzu, pārbaudiet savu e-pastu.';
+
+  @override
+  String get accountDeletionCodeInvalid =>
+      'Lūdzu, ievadiet derīgu verifikācijas kodu.';
+
+  @override
+  String get accountDeletionSuccessMessage =>
+      'Dzēšanas pieprasījums veiksmīgi iesniegts. Mūsu komanda apstrādās jūsu pieprasījumu, un konts tiks dzēsts pēc verifikācijas.';
+
+  @override
+  String get accountDeletionDataDeletedTitle =>
+      'Pēc apstiprinājuma mēs neatgriezeniski dzēsīsim:';
+
+  @override
+  String get accountDeletionDataDeletedTitleAfterConfirmed =>
+      'Jūsu lietotāja profils ir dzēsts, ar šādiem datiem:';
+
+  @override
+  String get accountDeletionDataDeletedItems =>
+      '- Konta reģistrācijas datus un profilu\n- Ierīču atslēgas un migrācijas/atjaunošanas sesijas\n- Sludinājumus un saistītos augšupielādētos attēlus\n- Atribūtus, saites, ziņojumus un favorītu/atbilstību vēsturi\n- Ziņojumus, izlasīšanas statusus, šifrēto failu metadatus un čata atbilžu statistiku\n- Atsauksmes, reputāciju, darījumus, moderēšanas/apelāciju un atsauksmju audita datus\n- Paziņojumu kontaktus un paziņojumu iestatījumus\n- Klātbūtnes/aktivitātes keša ierakstus un saistītās analītikas/atrašanās vietas izsekošanas rindas';
 }

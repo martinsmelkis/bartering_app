@@ -78,7 +78,11 @@ abstract class ApiClient {
 
        onRequest:(options, handler) async {
 
-         if (options.path.startsWith('/api/')) {
+         final isPublicAccountDeletionEndpoint =
+             options.path == '/api/v1/authentication/account-deletion/request' ||
+             options.path == '/api/v1/authentication/account-deletion/confirm';
+
+         if (options.path.startsWith('/api/') && !isPublicAccountDeletionEndpoint) {
            // 1. Get dependencies for user ID and private key
            final userRepository = getIt<UserRepository>();
            final cryptoService = await CryptoService.create(); // Assumes CryptoService holds the session's private key
@@ -469,6 +473,18 @@ abstract class ApiClient {
 
   @DELETE('/api/v1/authentication/user/{userId}')
   Future<void> deleteUser(@Path('userId') String userId);
+
+  /// Public endpoint: request account deletion by email
+  @POST('/api/v1/authentication/account-deletion/request')
+  Future<AccountDeletionByEmailResponse> requestAccountDeletionByEmail(
+    @Body() Map<String, dynamic> request,
+  );
+
+  /// Public endpoint: confirm account deletion using email link token
+  @POST('/api/v1/authentication/account-deletion/confirm')
+  Future<AccountDeletionByEmailResponse> confirmAccountDeletionByToken(
+    @Body() Map<String, dynamic> request,
+  );
 
   /// Request GDPR data export for authenticated user
   @POST('/api/v1/profile/export-data')

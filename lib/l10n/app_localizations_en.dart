@@ -247,11 +247,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'The app is intended for users aged 16 or older. By registering, you confirm you are at least 16 years old.';
 
   @override
-  String get termsConditionsSectionAccountUseTitle => '3. Account Use';
+  String get termsConditionsSectionAccountUseTitle =>
+      '3. Account Use, Recovery and Deletion';
 
   @override
   String get termsConditionsSectionAccountUseContent =>
-      'You are responsible for maintaining your account security and activities performed through your account.';
+      'You are responsible for maintaining your account security and activities performed through your account. You must provide your e-mail in Profile - Notification Preferences to be able to migrate/recover your account and to request it\'s deletion if you lose access to your device.';
 
   @override
   String get termsConditionsSectionProhibitedConductTitle =>
@@ -3307,4 +3308,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumProfileEditorAddImage => 'Add image';
+
+  @override
+  String get accountDeletionTitle => 'Delete account';
+
+  @override
+  String get accountDeletionHeader => 'Request account deletion';
+
+  @override
+  String get accountDeletionInfo =>
+      'Use this page to request permanent account deletion. Once completed, your profile and related account data will be removed according to our retention policy.';
+
+  @override
+  String get accountDeletionTokenInfo =>
+      'Account deletion request confirmed. This action is permanent and cannot be undone.';
+
+  @override
+  String get accountDeletionSteps =>
+      'Steps:\n1. Enter your account email\n2. Submit to receive a verification code\n3. Enter the code to confirm deletion';
+
+  @override
+  String get accountDeletionEmailLabel => 'Account email';
+
+  @override
+  String get accountDeletionCodeLabel => 'Verification code';
+
+  @override
+  String get accountDeletionCodeHint => 'Enter code from email';
+
+  @override
+  String get accountDeletionSendCodeButton => 'Send verification code';
+
+  @override
+  String get accountDeletionConfirmButton => 'Confirm account deletion';
+
+  @override
+  String get accountDeletionCodeSent =>
+      'Verification code sent. Please check your email.';
+
+  @override
+  String get accountDeletionCodeInvalid =>
+      'Please enter a valid verification code.';
+
+  @override
+  String get accountDeletionSuccessMessage =>
+      'Deletion request submitted successfully. Our team will process your request and your account will be deleted after verification.';
+
+  @override
+  String get accountDeletionDataDeletedTitle =>
+      'If confirmed, we will permanently delete:';
+
+  @override
+  String get accountDeletionDataDeletedTitleAfterConfirmed =>
+      'Your user profile with the following data has been deleted:';
+
+  @override
+  String get accountDeletionDataDeletedItems =>
+      '- Account registration data and profile\n- Device keys and migration/recovery sessions\n- Postings and associated uploaded images\n- Attributes, relationships, reports, and favorites/match history\n- Messages, read receipts, encrypted file metadata, and chat response stats\n- Reviews, reputation, transactions, moderation/appeals, and review audit data\n- Notification contacts and notification preferences\n- Presence/activity cache entries and related analytics/location tracking rows';
 }

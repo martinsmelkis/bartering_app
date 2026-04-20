@@ -926,10 +926,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               );
 
               final safeTop = MediaQuery.of(context).viewPadding.top;
-              final topBarTop = kIsWeb ? 8.h : safeTop;
+              final topBarTop = kIsWeb ? 16.0 : safeTop;
               final searchTop = kIsWeb ? 10.0 : topBarTop;
               final searchFieldHeight = kIsWeb ? 48.0 : 46;
-              final suggestionTop = (searchTop - 6.h) + searchFieldHeight;
+              final suggestionTop = kIsWeb ? (searchFieldHeight + 8.0) : (searchTop - 6.h) + searchFieldHeight;
               final mapStack = Stack(
                 children: [
                   mapWidget,

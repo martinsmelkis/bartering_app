@@ -1,4 +1,5 @@
 import 'package:barter_app/models/map/point_of_interest.dart';
+import 'package:barter_app/screens/account_deletion_screen/account_deletion_screen.dart';
 import 'package:barter_app/screens/avatar_shop_screen/avatar_shop_screen.dart';
 import 'package:barter_app/screens/chat_screen/chat_screen.dart';
 import 'package:barter_app/screens/chats_list_screen/chats_list_screen.dart';
@@ -35,6 +36,11 @@ final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// App router configuration using go_router
 class AppRouter {
+  static bool _isDeleteAccountPath(Uri uri) {
+    final path = uri.path.trim().toLowerCase();
+    return path == '/delete-account' || path == '/account-deletion';
+  }
+
   static String? _extractUnsubscribeToken(GoRouterState state) {
     final fromState = state.uri.queryParameters['token']?.trim();
     if (fromState != null && fromState.isNotEmpty) return fromState;
@@ -70,6 +76,23 @@ class AppRouter {
     navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: true,
     initialLocation: '/initialize',
+    redirect: (context, state) {
+      final token = _extractUnsubscribeToken(state);
+      final hasToken = token != null && token.isNotEmpty;
+      final currentPath = state.uri.path;
+
+      // Ensure account-deletion links with token stay on deletion page,
+      // even when email providers append hash fragments like #/map.
+      if (hasToken && !_isDeleteAccountPath(state.uri)) {
+        final base = Uri.base;
+        if (_isDeleteAccountPath(base)) {
+          logDebug('🧭 Router global redirect to /delete-account (token detected, current: $currentPath, base: $base)');
+          return '/delete-account?token=${Uri.encodeComponent(token)}';
+        }
+      }
+
+      return null;
+    },
     routes: [
       // Initialize/Splash Screen
       GoRoute(
@@ -403,6 +426,15 @@ class AppRouter {
         path: '/terms',
         name: 'terms',
         builder: (context, state) => const TermsScreen(),
+      ),
+
+      // Public Account Deletion Screen
+      GoRoute(
+        path: '/delete-account',
+        name: 'delete-account',
+        builder: (context, state) => AccountDeletionScreen(
+          token: _extractUnsubscribeToken(state),
+        ),
       ),
     ],
 
