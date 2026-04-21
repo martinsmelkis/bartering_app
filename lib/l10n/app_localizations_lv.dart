@@ -2476,6 +2476,22 @@ class AppLocalizationsLv extends AppLocalizations {
   String get failedToSubmitReview => 'Neizdevās iesniegt atsauksmi';
 
   @override
+  String get appealReviewTitle => 'Apstrīdēt atsauksmi';
+
+  @override
+  String get appealReviewReasonHint =>
+      'Aprakstiet, kāpēc šī atsauksme būtu jāpārskata';
+
+  @override
+  String get appealReasonRequired => 'Apelācijas iemesls ir obligāts';
+
+  @override
+  String get failedToSubmitAppeal => 'Neizdevās iesniegt apelāciju';
+
+  @override
+  String get unableToSubmitAppealNow => 'Pašlaik nevar iesniegt apelāciju';
+
+  @override
   String get archiveConversationTitle => 'Arhivēt sarunu?';
 
   @override

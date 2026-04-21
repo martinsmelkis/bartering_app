@@ -4712,6 +4712,36 @@ abstract class AppLocalizations {
   /// **'Failed to submit review'**
   String get failedToSubmitReview;
 
+  /// No description provided for @appealReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appeal review'**
+  String get appealReviewTitle;
+
+  /// No description provided for @appealReviewReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe why this review should be reconsidered'**
+  String get appealReviewReasonHint;
+
+  /// No description provided for @appealReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Appeal reason is required'**
+  String get appealReasonRequired;
+
+  /// No description provided for @failedToSubmitAppeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit appeal'**
+  String get failedToSubmitAppeal;
+
+  /// No description provided for @unableToSubmitAppealNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to submit appeal right now'**
+  String get unableToSubmitAppealNow;
+
   /// No description provided for @archiveConversationTitle.
   ///
   /// In en, this message translates to:

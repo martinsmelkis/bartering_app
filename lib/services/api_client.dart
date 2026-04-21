@@ -414,6 +414,13 @@ abstract class ApiClient {
   @POST('/api/v1/reviews/submit')
   Future<SubmitReviewResponse> submitReview(@Body() SubmitReviewRequest reviewRequest);
 
+  /// Submit an appeal for an existing review
+  /// Request body should include: reviewId, appealedBy, reason, evidenceItems (optional)
+  /// Returns SubmitReviewAppealResponse with success status and appeal ID
+  @POST('/api/v1/reviews/appeal')
+  Future<SubmitReviewAppealResponse> submitReviewAppeal(
+      @Body() SubmitReviewAppealRequest appealRequest);
+
   /// Get all visible reviews for a user
   /// Returns UserReviewsResponse with reviews list, totalCount, and averageRating
   @GET('/api/v1/reviews/user/{userId}')

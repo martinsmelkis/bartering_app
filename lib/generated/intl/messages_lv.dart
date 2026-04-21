@@ -120,6 +120,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "archiveConversationTitle": MessageLookupByLibrary.simpleMessage(
       "Arhivēt sarunu?",
     ),
+    "appealReasonRequired": MessageLookupByLibrary.simpleMessage(
+      "Apelācijas iemesls ir obligāts",
+    ),
+    "appealReviewReasonHint": MessageLookupByLibrary.simpleMessage(
+      "Aprakstiet, kāpēc šī atsauksme būtu jāpārskata",
+    ),
+    "appealReviewTitle": MessageLookupByLibrary.simpleMessage(
+      "Apstrīdēt atsauksmi",
+    ),
     "archiveWishlist": MessageLookupByLibrary.simpleMessage("Arhivēt"),
     "atLeastOneKeyword": MessageLookupByLibrary.simpleMessage(
       "Lūdzu, ievadiet vismaz vienu atslēgvārdu",
@@ -942,6 +951,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "failedToSubmitReview": MessageLookupByLibrary.simpleMessage(
       "Neizdevās iesniegt atsauksmi",
     ),
+    "failedToSubmitAppeal": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās iesniegt apelāciju",
+    ),
     "failedToUnblockUser": MessageLookupByLibrary.simpleMessage(
       "Neizdevās atbloķēt lietotāju",
     ),
@@ -1679,6 +1691,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "unableToReviewUser": MessageLookupByLibrary.simpleMessage(
       "Šobrīd nav iespējams atsauksmēt šo lietotāju",
+    ),
+    "unableToSubmitAppealNow": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik nevar iesniegt apelāciju",
     ),
     "unableToShareAtThisTime": MessageLookupByLibrary.simpleMessage(
       "Šobrīd nevar dalīties",

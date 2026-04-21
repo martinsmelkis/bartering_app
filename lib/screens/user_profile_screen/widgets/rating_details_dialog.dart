@@ -5,11 +5,15 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 class PublicReviewItem {
   const PublicReviewItem({
+    required this.reviewId,
+    required this.reviewerId,
     this.text,
     this.rating,
     this.submittedAt,
   });
 
+  final String reviewId;
+  final String reviewerId;
   final String? text;
   final double? rating;
   final DateTime? submittedAt;
@@ -20,11 +24,15 @@ class RatingDetailsDialog extends StatelessWidget {
     super.key,
     required this.reviewCount,
     required this.publicReviews,
+    required this.currentUserId,
+    required this.onAppealReview,
     required this.onClose,
   });
 
   final int reviewCount;
   final List<PublicReviewItem> publicReviews;
+  final String? currentUserId;
+  final Future<void> Function(PublicReviewItem review) onAppealReview;
   final VoidCallback onClose;
 
   String _formatReviewDate(BuildContext context, DateTime date) {
@@ -64,6 +72,9 @@ class RatingDetailsDialog extends StatelessWidget {
                     separatorBuilder: (_, __) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final review = publicReviews[index];
+                      final canAppeal =
+                          currentUserId != null;
+
                       return Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -106,6 +117,17 @@ class RatingDetailsDialog extends StatelessWidget {
                                 review.text!.trim(),
                                 style: const TextStyle(fontSize: 13),
                               ),
+                            if (canAppeal) ...[
+                              const SizedBox(height: 10),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton.icon(
+                                  onPressed: () => onAppealReview(review),
+                                  icon: const Icon(Icons.gavel, size: 16),
+                                  label: const Text('Appeal review'),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       );

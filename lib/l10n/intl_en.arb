@@ -817,6 +817,11 @@
     }
   },
   "failedToSubmitReview": "Failed to submit review",
+  "appealReviewTitle": "Appeal review",
+  "appealReviewReasonHint": "Describe why this review should be reconsidered",
+  "appealReasonRequired": "Appeal reason is required",
+  "failedToSubmitAppeal": "Failed to submit appeal",
+  "unableToSubmitAppealNow": "Unable to submit appeal right now",
   "archiveConversationTitle": "Archive Conversation?",
   "archiveConversationMessage": "Would you like to archive this conversation now?",
   "keep": "Keep",

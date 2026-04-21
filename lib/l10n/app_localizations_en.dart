@@ -2445,6 +2445,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToSubmitReview => 'Failed to submit review';
 
   @override
+  String get appealReviewTitle => 'Appeal review';
+
+  @override
+  String get appealReviewReasonHint =>
+      'Describe why this review should be reconsidered';
+
+  @override
+  String get appealReasonRequired => 'Appeal reason is required';
+
+  @override
+  String get failedToSubmitAppeal => 'Failed to submit appeal';
+
+  @override
+  String get unableToSubmitAppealNow => 'Unable to submit appeal right now';
+
+  @override
   String get archiveConversationTitle => 'Archive Conversation?';
 
   @override

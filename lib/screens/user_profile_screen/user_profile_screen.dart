@@ -1,4 +1,5 @@
 import 'package:barter_app/models/reviews/reputation_response.dart';
+import 'package:barter_app/models/reviews/review_submission.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/wallet/wallet_models.dart';
 import 'package:barter_app/repositories/user_repository.dart';
@@ -89,6 +90,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   List<BadgeDetail>? _userBadges;
   WalletResponse? _walletData;
   List<PublicReviewItem> _publicReviews = const [];
+  String? _currentUserId;
   bool _isPremiumActive = false;
   bool _isLoadingReputation = false;
   bool _isLoadingBadges = false;
@@ -144,6 +146,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
     _loadUserLocation();
     _loadProfileKeywordData();
+    _loadCurrentUserId();
     _loadPremiumStatus();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -209,6 +212,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             })
             .map(
               (review) => PublicReviewItem(
+                reviewId: review.id,
+                reviewerId: review.reviewerId,
                 text: review.reviewText?.trim(),
                 rating: review.rating > 0 ? review.rating.toDouble() : null,
                 submittedAt: DateTime.fromMillisecondsSinceEpoch(review.submittedAt),
@@ -324,6 +329,14 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     final location = await SecureStorageService().getOwnLocation();
     setState(() {
       _userLocation = _formatLocationForDisplay(location);
+    });
+  }
+
+  Future<void> _loadCurrentUserId() async {
+    final userId = await getIt<UserRepository>().getUserId();
+    if (!mounted) return;
+    setState(() {
+      _currentUserId = userId;
     });
   }
 
@@ -1129,6 +1142,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         return RatingDetailsDialog(
           reviewCount: reviewCount,
           publicReviews: _publicReviews,
+          currentUserId: _currentUserId,
+          onAppealReview: _handleAppealReview,
           onClose: () {
             if (kIsWeb) {
               Navigator.of(dialogContext, rootNavigator: true).pop();
@@ -1139,6 +1154,112 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         );
       },
     );
+  }
+
+  Future<void> _handleAppealReview(PublicReviewItem review) async {
+    final l10n = AppLocalizations.of(context)!;
+    final appealedBy = _currentUserId;
+
+    if (appealedBy == null || appealedBy.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.unableToSubmitAppealNow),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final reason = await showDialog<String>(
+      context: context,
+      useRootNavigator: kIsWeb,
+      builder: (dialogContext) {
+        String reasonText = '';
+
+        return PointerInterceptor(
+          child: AlertDialog(
+            title: Text(l10n.appealReviewTitle),
+            content: TextField(
+              maxLines: 4,
+              maxLength: 500,
+              onChanged: (value) => reasonText = value,
+              decoration: InputDecoration(
+                hintText: l10n.appealReviewReasonHint,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(dialogContext).pop(reasonText.trim()),
+                child: Text(l10n.submitReview),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (!mounted || reason == null) return;
+
+    if (reason.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.appealReasonRequired),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final response = await getIt<ApiClient>().submitReviewAppeal(
+        SubmitReviewAppealRequest(
+          reviewId: review.reviewId,
+          appealedBy: appealedBy,
+          reason: reason,
+        ),
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.message),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } on DioException catch (e) {
+      final message = _extractApiErrorMessage(e) ?? l10n.failedToSubmitAppeal;
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.failedToSubmitAppeal),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  String? _extractApiErrorMessage(DioException e) {
+    final data = e.response?.data;
+    if (data is Map<String, dynamic>) {
+      final message = data['error'] ?? data['message'];
+      if (message is String && message.trim().isNotEmpty) {
+        return message.trim();
+      }
+    }
+    return null;
   }
 
   void _showBadgesInfoDialog() {

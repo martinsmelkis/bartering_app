@@ -818,6 +818,11 @@
     }
   },
   "failedToSubmitReview": "Neizdevās iesniegt atsauksmi",
+  "appealReviewTitle": "Apstrīdēt atsauksmi",
+  "appealReviewReasonHint": "Aprakstiet, kāpēc šī atsauksme būtu jāpārskata",
+  "appealReasonRequired": "Apelācijas iemesls ir obligāts",
+  "failedToSubmitAppeal": "Neizdevās iesniegt apelāciju",
+  "unableToSubmitAppealNow": "Pašlaik nevar iesniegt apelāciju",
   "archiveConversationTitle": "Arhivēt sarunu?",
   "archiveConversationMessage": "Vai vēlaties tagad arhivēt šo sarunu?",
   "keep": "Paturēt",

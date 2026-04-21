@@ -114,6 +114,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "archiveConversationTitle": MessageLookupByLibrary.simpleMessage(
       "Archive Conversation?",
     ),
+    "appealReasonRequired": MessageLookupByLibrary.simpleMessage(
+      "Appeal reason is required",
+    ),
+    "appealReviewReasonHint": MessageLookupByLibrary.simpleMessage(
+      "Describe why this review should be reconsidered",
+    ),
+    "appealReviewTitle": MessageLookupByLibrary.simpleMessage("Appeal review"),
     "archiveWishlist": MessageLookupByLibrary.simpleMessage("Archive"),
     "atLeastOneKeyword": MessageLookupByLibrary.simpleMessage(
       "Please enter at least one keyword",
@@ -826,6 +833,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "failedToSubmitReview": MessageLookupByLibrary.simpleMessage(
       "Failed to submit review",
     ),
+    "failedToSubmitAppeal": MessageLookupByLibrary.simpleMessage(
+      "Failed to submit appeal",
+    ),
     "failedToUnblockUser": MessageLookupByLibrary.simpleMessage(
       "Failed to unblock user",
     ),
@@ -1521,6 +1531,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "typeAMessage": MessageLookupByLibrary.simpleMessage("Type a message..."),
     "unableToReviewUser": MessageLookupByLibrary.simpleMessage(
       "Unable to review this user at this time",
+    ),
+    "unableToSubmitAppealNow": MessageLookupByLibrary.simpleMessage(
+      "Unable to submit appeal right now",
     ),
     "unableToShareAtThisTime": MessageLookupByLibrary.simpleMessage(
       "Unable to share at this time",
