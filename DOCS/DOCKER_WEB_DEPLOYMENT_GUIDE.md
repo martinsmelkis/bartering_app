@@ -213,7 +213,14 @@ server {
     resolver 8.8.8.8 8.8.4.4 valid=300s;
     resolver_timeout 5s;
 
-    # Gzip compression
+    # Compression
+    # Brotli (better compression ratio) + gzip fallback for older clients/proxies
+    brotli on;
+    brotli_comp_level 5;
+    brotli_min_length 1024;
+    brotli_static on;
+    brotli_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml+rss application/json image/svg+xml;
+
     gzip on;
     gzip_vary on;
     gzip_min_length 1024;
@@ -398,7 +405,7 @@ server {
     # PROFILE UPDATE ENDPOINTS - MODERATE LIMITS
     # ========================================================================
 
-    location ~ ^/api/v1/profile-(update|create|info)$ {
+    location ~ ^/api/v1/profile-(update|create|info|info-extended)$ {
         # Moderate: 60 per minute, burst of 20
         limit_req zone=api_profile burst=20 nodelay;
 

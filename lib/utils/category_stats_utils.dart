@@ -202,8 +202,8 @@ class CategoryStatsUtils {
           categoryCircle,
           // Avatar/child centered inside
           SizedBox(
-            width: size - (strokeWidth * 2) - 4,
-            height: size - (strokeWidth * 2) - 4,
+            width: size - (strokeWidth * 3) - 4,
+            height: size - (strokeWidth * 3) - 4,
             child: child,
           ),
         ],

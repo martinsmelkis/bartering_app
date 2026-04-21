@@ -14,6 +14,7 @@ class PremiumProfileEditorState {
   final bool isSaving;
   final bool isUploadingAvatar;
   final bool isUploadingReference;
+  final bool isAvatarExplicitlyRemoved;
   final String? name;
   final String? description;
   final XFile? avatarSvgFile;
@@ -27,6 +28,7 @@ class PremiumProfileEditorState {
     this.isSaving = false,
     this.isUploadingAvatar = false,
     this.isUploadingReference = false,
+    this.isAvatarExplicitlyRemoved = false,
     this.name,
     this.description,
     this.avatarSvgFile,
@@ -41,6 +43,7 @@ class PremiumProfileEditorState {
     bool? isSaving,
     bool? isUploadingAvatar,
     bool? isUploadingReference,
+    bool? isAvatarExplicitlyRemoved,
     String? name,
     String? description,
     XFile? avatarSvgFile,
@@ -57,6 +60,8 @@ class PremiumProfileEditorState {
       isSaving: isSaving ?? this.isSaving,
       isUploadingAvatar: isUploadingAvatar ?? this.isUploadingAvatar,
       isUploadingReference: isUploadingReference ?? this.isUploadingReference,
+      isAvatarExplicitlyRemoved:
+          clearAvatar ? true : (isAvatarExplicitlyRemoved ?? this.isAvatarExplicitlyRemoved),
       name: name ?? this.name,
       description: description ?? this.description,
       avatarSvgFile: clearAvatar ? null : (avatarSvgFile ?? this.avatarSvgFile),
@@ -132,6 +137,7 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
           name: cached.name,
           description: cached.selfDescription,
           existingAvatarSvgContent: cached.profileAvatarIcon,
+          isAvatarExplicitlyRemoved: false,
           existingWorkReferenceImageUrls: cached.workReferenceImageUrls,
           clearError: true,
           clearStatus: true,
@@ -145,6 +151,7 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
         name: profile.name,
         description: profile.selfDescription,
         existingAvatarSvgContent: profile.profileAvatarIcon,
+        isAvatarExplicitlyRemoved: false,
         existingWorkReferenceImageUrls: profile.workReferenceImageUrls,
         clearError: true,
         clearStatus: true,
@@ -222,6 +229,7 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
       emit(state.copyWith(
         isUploadingAvatar: false,
         avatarSvgFile: image,
+        isAvatarExplicitlyRemoved: false,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -431,9 +439,15 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
       }
 
       final keywordMap = await _userRepository.getProfileKeywordDataMap();
-      final profileAvatarIcon = state.avatarSvgFile != null
-          ? await _toSvgContent(state.avatarSvgFile)
-          : state.existingAvatarSvgContent;
+      final String? profileAvatarIcon;
+
+      if (state.isAvatarExplicitlyRemoved) {
+        profileAvatarIcon = "";
+      } else if (state.avatarSvgFile != null) {
+        profileAvatarIcon = await _toSvgContent(state.avatarSvgFile);
+      } else {
+        profileAvatarIcon = state.existingAvatarSvgContent;
+      }
 
       final existingWorkReferenceImageUrls =
           _normalizeToHttpImageUrls(state.existingWorkReferenceImageUrls);

@@ -44,7 +44,7 @@ class PoiMarkerWidget {
 
     // Calculate sizes using original AppDimensions.mapPoiMarkerSize
     final circleSize = AppDimensions.mapPoiMarkerSize;
-    final strokeWidth = kIsWeb ? 7.5 : 7.0;
+    final strokeWidth = kIsWeb ? 7.5 : 6.0;
     final gap = strokeWidth + 2;
     final svgSize = circleSize - gap;
 
@@ -249,15 +249,15 @@ class PoiMarkerWidget {
             isOnline: poi.isOnline,
             isAway: poi.isAway,
             size: 21,
-            right: 23,
-            top: 23,
+            right: 20,
+            top: 20,
             borderWidth: 2.625,
           ),
           // Match indicator - positioned at bottom right
           if (hasMatch)
             Positioned(
-              right: 20,
-              bottom: 20,
+              right: 16,
+              bottom: 16,
               child: Container(
                 width: 29,
                 height: 29,

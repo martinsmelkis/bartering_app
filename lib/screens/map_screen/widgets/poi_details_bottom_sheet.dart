@@ -917,34 +917,104 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                 padding: const EdgeInsets.all(4.0),
                                 child: Row(
                                   children: [
-                                    // Favorite icon button on the left
-                                    SizedBox(
-                                      width: 30,
-                                      height: 30,
-                                      child: _isLoadingFavorite
-                                          ? const Padding(
-                                              padding: EdgeInsets.all(8.0),
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
+                                    // Favorite icon + badges on the left
+                                    Builder(
+                                      builder: (context) {
+                                        final badgesContent = PointerInterceptor(
+                                          child: InkWell(
+                                            onTap: _showPoiBadgesInfoDialog,
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 4,
+                                                vertical: 2,
                                               ),
-                                            )
-                                          : IconButton(
-                                              padding: EdgeInsets.only(
-                                                left: 4,
-                                                top: 0,
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Container(
+                                                    width: 16,
+                                                    height: 16,
+                                                    decoration: BoxDecoration(
+                                                      color: (widget.poi.badges != null &&
+                                                              widget.poi.badges!.isNotEmpty)
+                                                          ? Colors.amber
+                                                          : Colors.orange[300],
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: const Text(
+                                                      'B',
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight: FontWeight.w700,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    '${widget.poi.badges?.length ?? 0}',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: (widget.poi.badges != null &&
+                                                              widget.poi.badges!.isNotEmpty)
+                                                          ? Colors.grey[700]
+                                                          : Colors.grey[500],
+                                                      fontWeight: (widget.poi.badges != null &&
+                                                              widget.poi.badges!.isNotEmpty)
+                                                          ? FontWeight.w600
+                                                          : FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              icon: Icon(
-                                                _isFavorite
-                                                    ? Icons.star
-                                                    : Icons.star_border,
-                                                color: _isFavorite
-                                                    ? AppColors.primary
-                                                    : Colors.grey,
-                                              ),
-                                              onPressed: _isTogglingFavorite
-                                                  ? null
-                                                  : _toggleFavorite,
                                             ),
+                                          ),
+                                        );
+
+                                        return SizedBox(
+                                          width: 48,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                width: 30,
+                                                height: 30,
+                                                child: _isLoadingFavorite
+                                                    ? const Padding(
+                                                        padding: EdgeInsets.all(8.0),
+                                                        child: CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                        ),
+                                                      )
+                                                    : IconButton(
+                                                        padding: const EdgeInsets.only(
+                                                          left: 4,
+                                                          top: 0,
+                                                        ),
+                                                        icon: Icon(
+                                                          _isFavorite
+                                                              ? Icons.star
+                                                              : Icons.star_border,
+                                                          color: _isFavorite
+                                                              ? AppColors.primary
+                                                              : Colors.grey,
+                                                        ),
+                                                        onPressed: _isTogglingFavorite
+                                                            ? null
+                                                            : _toggleFavorite,
+                                                      ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 4.0, bottom: 4.0),
+                                                child: badgesContent,
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
                                     ),
                                     const SizedBox(width: 6),
                                     // Name in the center
@@ -1041,59 +1111,6 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                         final poiRating = widget.poi.averageRating;
                                         final hasRating = poiRating != null && poiRating > 0;
 
-                                        final badgesIndicator = PointerInterceptor(
-                                          child: InkWell(
-                                            onTap: _showPoiBadgesInfoDialog,
-                                            borderRadius: BorderRadius.circular(10),
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: hasRating ? 12 : 4,
-                                                vertical: 2,
-                                              ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Container(
-                                                    width: 16,
-                                                    height: 16,
-                                                    decoration: BoxDecoration(
-                                                      color: (widget.poi.badges != null &&
-                                                              widget.poi.badges!.isNotEmpty)
-                                                          ? Colors.amber
-                                                          : Colors.orange[300],
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    alignment: Alignment.center,
-                                                    child: const Text(
-                                                      'B',
-                                                      style: TextStyle(
-                                                        fontSize: 10,
-                                                        fontWeight: FontWeight.w700,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 4),
-                                                  Text(
-                                                    '${widget.poi.badges?.length ?? 0}',
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: (widget.poi.badges != null &&
-                                                              widget.poi.badges!.isNotEmpty)
-                                                          ? Colors.grey[700]
-                                                          : Colors.grey[500],
-                                                      fontWeight: (widget.poi.badges != null &&
-                                                              widget.poi.badges!.isNotEmpty)
-                                                          ? FontWeight.w600
-                                                          : FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-
                                         final ratingWidget = hasRating
                                             ? Container(
                                                 padding: const EdgeInsets.symmetric(
@@ -1164,38 +1181,23 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                                           ],
                                         );
 
-                                        return hasRating
-                                            ? Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: [
-                                                  Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                                    children: [
-                                                      ratingWidget,
-                                                      const SizedBox(width: 8),
-                                                      avatarWidget,
-                                                    ],
-                                                  ),
-                                                  Align(
-                                                    alignment: Alignment.centerRight,
-                                                    child: badgesIndicator,
-                                                  ),
-                                                ],
-                                              )
-                                            : SizedBox(
-                                                height: 56,
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    badgesIndicator,
-                                                    const SizedBox(width: 8),
-                                                    avatarWidget,
-                                                  ],
-                                                ),
-                                              );
+                                        return Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            hasRating ? Transform.translate(
+                                              offset: const Offset(0, -8),
+                                              child: avatarWidget,
+                                            ) : avatarWidget,
+                                            if (hasRating) ...[
+                                              Transform.translate(
+                                                offset: const Offset(0, -8),
+                                                child: ratingWidget,
+                                              ),
+                                            ],
+                                          ],
+                                        );
+                                        //);
                                       },
                                     ),
                                   ],
