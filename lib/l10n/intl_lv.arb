@@ -1260,6 +1260,33 @@
   "accountDeletionSuccessMessage": "Dzēšanas pieprasījums veiksmīgi iesniegts. Mūsu komanda apstrādās jūsu pieprasījumu, un konts tiks dzēsts pēc verifikācijas.",
   "accountDeletionDataDeletedTitle": "Pēc apstiprinājuma mēs neatgriezeniski dzēsīsim:",
   "accountDeletionDataDeletedTitleAfterConfirmed": "Jūsu lietotāja profils ir dzēsts, ar šādiem datiem:",
-  "accountDeletionDataDeletedItems": "- Konta reģistrācijas datus un profilu\n- Ierīču atslēgas un migrācijas/atjaunošanas sesijas\n- Sludinājumus un saistītos augšupielādētos attēlus\n- Atribūtus, saites, ziņojumus un favorītu/atbilstību vēsturi\n- Ziņojumus, izlasīšanas statusus, šifrēto failu metadatus un čata atbilžu statistiku\n- Atsauksmes, reputāciju, darījumus, moderēšanas/apelāciju un atsauksmju audita datus\n- Paziņojumu kontaktus un paziņojumu iestatījumus\n- Klātbūtnes/aktivitātes keša ierakstus un saistītās analītikas/atrašanās vietas izsekošanas rindas"
+  "accountDeletionDataDeletedItems": "- Konta reģistrācijas datus un profilu\n- Ierīču atslēgas un migrācijas/atjaunošanas sesijas\n- Sludinājumus un saistītos augšupielādētos attēlus\n- Atribūtus, saites, ziņojumus un favorītu/atbilstību vēsturi\n- Ziņojumus, izlasīšanas statusus, šifrēto failu metadatus un čata atbilžu statistiku\n- Atsauksmes, reputāciju, darījumus, moderēšanas/apelāciju un atsauksmju audita datus\n- Paziņojumu kontaktus un paziņojumu iestatījumus\n- Klātbūtnes/aktivitātes keša ierakstus un saistītās analītikas/atrašanās vietas izsekošanas rindas",
+  "lastOnlinePrefix": "Pēdējoreiz tiešsaistē:",
+  "lastOnlineUnknown": "Nezināms",
+  "lastOnlineJustNow": "tikko",
+  "lastOnlineMinutesAgo": "pirms {count} min",
+  "@lastOnlineMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lastOnlineHoursAgo": "pirms {count} st",
+  "@lastOnlineHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lastOnlineDaysAgo": "pirms {count} d",
+  "@lastOnlineDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 
 }

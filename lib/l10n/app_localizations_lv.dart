@@ -3414,4 +3414,28 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get accountDeletionDataDeletedItems =>
       '- Konta reģistrācijas datus un profilu\n- Ierīču atslēgas un migrācijas/atjaunošanas sesijas\n- Sludinājumus un saistītos augšupielādētos attēlus\n- Atribūtus, saites, ziņojumus un favorītu/atbilstību vēsturi\n- Ziņojumus, izlasīšanas statusus, šifrēto failu metadatus un čata atbilžu statistiku\n- Atsauksmes, reputāciju, darījumus, moderēšanas/apelāciju un atsauksmju audita datus\n- Paziņojumu kontaktus un paziņojumu iestatījumus\n- Klātbūtnes/aktivitātes keša ierakstus un saistītās analītikas/atrašanās vietas izsekošanas rindas';
+
+  @override
+  String get lastOnlinePrefix => 'Pēdējoreiz tiešsaistē:';
+
+  @override
+  String get lastOnlineUnknown => 'Nezināms';
+
+  @override
+  String get lastOnlineJustNow => 'tikko';
+
+  @override
+  String lastOnlineMinutesAgo(int count) {
+    return 'pirms $count min';
+  }
+
+  @override
+  String lastOnlineHoursAgo(int count) {
+    return 'pirms $count st';
+  }
+
+  @override
+  String lastOnlineDaysAgo(int count) {
+    return 'pirms $count d';
+  }
 }

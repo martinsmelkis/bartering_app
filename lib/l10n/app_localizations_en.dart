@@ -3381,4 +3381,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountDeletionDataDeletedItems =>
       '- Account registration data and profile\n- Device keys and migration/recovery sessions\n- Postings and associated uploaded images\n- Attributes, relationships, reports, and favorites/match history\n- Messages, read receipts, encrypted file metadata, and chat response stats\n- Reviews, reputation, transactions, moderation/appeals, and review audit data\n- Notification contacts and notification preferences\n- Presence/activity cache entries and related analytics/location tracking rows';
+
+  @override
+  String get lastOnlinePrefix => 'Last online:';
+
+  @override
+  String get lastOnlineUnknown => 'Unknown';
+
+  @override
+  String get lastOnlineJustNow => 'just now';
+
+  @override
+  String lastOnlineMinutesAgo(int count) {
+    return '$count min ago';
+  }
+
+  @override
+  String lastOnlineHoursAgo(int count) {
+    return '$count h ago';
+  }
+
+  @override
+  String lastOnlineDaysAgo(int count) {
+    return '$count d ago';
+  }
 }

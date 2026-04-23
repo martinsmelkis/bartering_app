@@ -4,6 +4,7 @@ import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/text_utils.dart';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
@@ -176,9 +177,70 @@ class InterestsCubit extends Cubit<InterestsState> {
     } catch (e) {
       emit(state.copyWith(
         status: InterestsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: _extractApiErrorMessage(e),
       ));
     }
+  }
+
+  String _extractApiErrorMessage(Object error) {
+    if (error is DioException) {
+      final responseData = error.response?.data;
+
+      // Backend may return plain text (content-type: text/plain)
+      if (responseData is String && responseData.trim().isNotEmpty) {
+        return _toFriendlyErrorMessage(responseData.trim());
+      }
+
+      // JSON error formats
+      if (responseData is Map<String, dynamic>) {
+        final candidates = [
+          responseData['message'],
+          responseData['error'],
+          responseData['detail'],
+        ];
+
+        for (final candidate in candidates) {
+          if (candidate is String && candidate.trim().isNotEmpty) {
+            return _toFriendlyErrorMessage(candidate.trim());
+          }
+        }
+      }
+
+      final statusCode = error.response?.statusCode;
+      if (statusCode == 400) {
+        return 'Your interests could not be processed. Please review and try again.';
+      }
+      if (statusCode == 429) {
+        return 'Too many requests. Please wait a moment and try again.';
+      }
+      if (statusCode != null && statusCode >= 500) {
+        return 'Server is temporarily unavailable. Please try again later.';
+      }
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.sendTimeout ||
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.connectionError) {
+        return 'Network error. Please check your internet connection and try again.';
+      }
+    }
+
+    return 'Could not process your interests. Please try again.';
+  }
+
+  String _toFriendlyErrorMessage(String message) {
+    final normalized = message.toLowerCase();
+
+    if (normalized.contains('too many attributes') &&
+        normalized.contains('maximum allowed')) {
+      final match = RegExp(r'maximum allowed:\s*(\d+)', caseSensitive: false)
+          .firstMatch(message);
+      final maxAllowed = match?.group(1);
+      return maxAllowed != null
+          ? 'You can select up to $maxAllowed interests. Please remove some and try again.'
+          : 'You selected too many interests. Please remove some and try again.';
+    }
+
+    return message;
   }
 
   void updateOffersList(List<ParsedAttributeData> parsedOffers) {

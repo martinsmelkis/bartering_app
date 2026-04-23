@@ -1267,6 +1267,33 @@
   "accountDeletionSuccessMessage": "Deletion request submitted successfully. Our team will process your request and your account will be deleted after verification.",
   "accountDeletionDataDeletedTitle": "If confirmed, we will permanently delete:",
   "accountDeletionDataDeletedTitleAfterConfirmed": "Your user profile with the following data has been deleted:",
-  "accountDeletionDataDeletedItems": "- Account registration data and profile\n- Device keys and migration/recovery sessions\n- Postings and associated uploaded images\n- Attributes, relationships, reports, and favorites/match history\n- Messages, read receipts, encrypted file metadata, and chat response stats\n- Reviews, reputation, transactions, moderation/appeals, and review audit data\n- Notification contacts and notification preferences\n- Presence/activity cache entries and related analytics/location tracking rows"
+  "accountDeletionDataDeletedItems": "- Account registration data and profile\n- Device keys and migration/recovery sessions\n- Postings and associated uploaded images\n- Attributes, relationships, reports, and favorites/match history\n- Messages, read receipts, encrypted file metadata, and chat response stats\n- Reviews, reputation, transactions, moderation/appeals, and review audit data\n- Notification contacts and notification preferences\n- Presence/activity cache entries and related analytics/location tracking rows",
+  "lastOnlinePrefix": "Last online:",
+  "lastOnlineUnknown": "Unknown",
+  "lastOnlineJustNow": "just now",
+  "lastOnlineMinutesAgo": "{count} min ago",
+  "@lastOnlineMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lastOnlineHoursAgo": "{count} h ago",
+  "@lastOnlineHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lastOnlineDaysAgo": "{count} d ago",
+  "@lastOnlineDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 
 }

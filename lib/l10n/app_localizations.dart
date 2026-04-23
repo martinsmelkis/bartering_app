@@ -6313,6 +6313,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'- Account registration data and profile\n- Device keys and migration/recovery sessions\n- Postings and associated uploaded images\n- Attributes, relationships, reports, and favorites/match history\n- Messages, read receipts, encrypted file metadata, and chat response stats\n- Reviews, reputation, transactions, moderation/appeals, and review audit data\n- Notification contacts and notification preferences\n- Presence/activity cache entries and related analytics/location tracking rows'**
   String get accountDeletionDataDeletedItems;
+
+  /// No description provided for @lastOnlinePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Last online:'**
+  String get lastOnlinePrefix;
+
+  /// No description provided for @lastOnlineUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get lastOnlineUnknown;
+
+  /// No description provided for @lastOnlineJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get lastOnlineJustNow;
+
+  /// No description provided for @lastOnlineMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min ago'**
+  String lastOnlineMinutesAgo(int count);
+
+  /// No description provided for @lastOnlineHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} h ago'**
+  String lastOnlineHoursAgo(int count);
+
+  /// No description provided for @lastOnlineDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} d ago'**
+  String lastOnlineDaysAgo(int count);
 }
 
 class _AppLocalizationsDelegate

@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../configure_dependencies.dart';
 import '../../../l10n/app_localizations.dart';
@@ -76,6 +75,7 @@ class _SearchInMapTextFieldState extends State<SearchInMapTextField> {
     return SizedBox(
       height: kIsWeb ? 48 : 46,
       child: Card(
+        margin: const EdgeInsets.fromLTRB(0, 0, 0, 8),
         color: Colors.white,
         elevation: 2,
         shape: RoundedRectangleBorder(

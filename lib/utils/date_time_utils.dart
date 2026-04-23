@@ -70,4 +70,37 @@ class DateTimeUtils {
       return DateFormat('MMM d, y').format(date);
     }
   }
+
+  static String formatLastOnlineText(int? lastOnlineAtMs, AppLocalizations l10n) {
+    if (lastOnlineAtMs == null || lastOnlineAtMs <= 0) {
+      return '${l10n.lastOnlinePrefix} ${l10n.lastOnlineUnknown}';
+    }
+
+    final lastOnline = DateTime.fromMillisecondsSinceEpoch(lastOnlineAtMs);
+    final now = DateTime.now();
+    final diff = now.difference(lastOnline);
+
+    if (diff.inMinutes < 1) {
+      return '${l10n.lastOnlinePrefix} ${l10n.lastOnlineJustNow}';
+    }
+
+    if (diff.inHours < 1) {
+      return '${l10n.lastOnlinePrefix} ${l10n.lastOnlineMinutesAgo(diff.inMinutes)}';
+    }
+
+    if (diff.inDays < 1) {
+      return '${l10n.lastOnlinePrefix} ${l10n.lastOnlineHoursAgo(diff.inHours)}';
+    }
+
+    if (diff.inDays == 1) {
+      return '${l10n.lastOnlinePrefix} ${l10n.yesterday}';
+    }
+
+    if (diff.inDays < 7) {
+      return '${l10n.lastOnlinePrefix} ${l10n.lastOnlineDaysAgo(diff.inDays)}';
+    }
+
+    return '${l10n.lastOnlinePrefix} ${DateFormat('MMM d, y').format(lastOnline)}';
+  }
+
 }

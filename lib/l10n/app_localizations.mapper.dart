@@ -1058,6 +1058,9 @@ extension AppLocalizationsExtension on AppLocalizations {
       'accountDeletionDataDeletedTitleAfterConfirmed' =>
         accountDeletionDataDeletedTitleAfterConfirmed,
       'accountDeletionDataDeletedItems' => accountDeletionDataDeletedItems,
+      'lastOnlinePrefix' => lastOnlinePrefix,
+      'lastOnlineUnknown' => lastOnlineUnknown,
+      'lastOnlineJustNow' => lastOnlineJustNow,
       'errorWithMessage' => switch (args) {
         [final Object errorMessage] => errorWithMessage(errorMessage),
         _ => throw ArgumentError('errorWithMessage requires 1 arguments'),
@@ -1233,6 +1236,18 @@ extension AppLocalizationsExtension on AppLocalizations {
         _ => throw ArgumentError(
           'premiumProfileEditorSelectedFile requires 1 arguments',
         ),
+      },
+      'lastOnlineMinutesAgo' => switch (args) {
+        [final int count] => lastOnlineMinutesAgo(count),
+        _ => throw ArgumentError('lastOnlineMinutesAgo requires 1 arguments'),
+      },
+      'lastOnlineHoursAgo' => switch (args) {
+        [final int count] => lastOnlineHoursAgo(count),
+        _ => throw ArgumentError('lastOnlineHoursAgo requires 1 arguments'),
+      },
+      'lastOnlineDaysAgo' => switch (args) {
+        [final int count] => lastOnlineDaysAgo(count),
+        _ => throw ArgumentError('lastOnlineDaysAgo requires 1 arguments'),
       },
       _ => null,
     };

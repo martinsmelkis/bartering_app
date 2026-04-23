@@ -5,7 +5,8 @@ import 'package:barter_app/services/api_client.dart';
 import 'package:barter_app/utils/attribute_matching_utils.dart';
 import 'package:barter_app/utils/category_stats_utils.dart';
 import 'package:barter_app/utils/avatar_icon_utils.dart';
-import 'package:barter_app/utils/image_utils.dart';import 'package:barter_app/utils/responsive_breakpoints.dart';
+import 'package:barter_app/utils/image_utils.dart';
+import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/utils/text_utils.dart';
 import 'package:barter_app/widgets/attribute_bubble.dart';
 import 'package:barter_app/widgets/full_screen_image_viewer.dart';
@@ -23,6 +24,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../models/map/point_of_interest.dart';
 import '../../../models/reviews/reputation_response.dart';
 import '../../../theme/app_colors.dart';
+import '../../../utils/date_time_utils.dart';
 import '../../user_profile_screen/widgets/badges_info_dialog.dart';
 import '../../../utils/avatar_color_utils.dart';
 
@@ -1352,23 +1354,39 @@ class _PoiDetailsBottomSheetState extends State<PoiDetailsBottomSheet> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(
                     16,
-                    12,
+                    8,
                     16,
                     16 + MediaQuery.of(context).viewPadding.bottom,
                   ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.chat_bubble_outline),
-                      label: Text(l10n.chat, style: TextStyle(fontSize: 14)),
-                      onPressed: widget.onChatButtonPressed!,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Text(
+                          DateTimeUtils.formatLastOnlineText(widget.poi.profile.lastOnlineAt, l10n),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
-                    ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.chat_bubble_outline),
+                          label: Text(l10n.chat, style: TextStyle(fontSize: 14)),
+                          onPressed: widget.onChatButtonPressed!,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
             ],
