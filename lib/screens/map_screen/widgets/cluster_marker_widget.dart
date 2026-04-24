@@ -36,7 +36,7 @@ class ClusterMarkerWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: primaryColor.withValues(alpha: 0.8),
+          color: primaryColor.withValues(alpha: 0.9),
           shape: BoxShape.circle,
           border: Border.all(
             color: Colors.white,
@@ -44,7 +44,7 @@ class ClusterMarkerWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 3,
               offset: const Offset(0, 4),
             ),

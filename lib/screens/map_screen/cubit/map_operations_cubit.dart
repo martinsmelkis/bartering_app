@@ -731,4 +731,22 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
       ),
     );
   }
+
+  MarkerIcon createPlainSvgMarker(String svgString) {
+    final markerSize = AppDimensions.mapPoiMarkerSize * (kIsWeb ? 0.5 : 0.3);
+    return MarkerIcon(
+      iconWidget:
+      SvgUtils.buildSharpSvg(
+        svgString: svgString,
+        width: markerSize * 2,
+        height: markerSize * 2,
+        devicePixelRatio: 1,
+        fit: BoxFit.contain,
+        clipBehavior: kIsWeb ? Clip.antiAlias : Clip.none,
+        key: const ValueKey('no_users_marker'),
+        allowDrawingOutsideViewBox: false,
+      ),
+    );
+  }
+
 }

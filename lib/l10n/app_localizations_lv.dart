@@ -9,7 +9,7 @@ class AppLocalizationsLv extends AppLocalizations {
   AppLocalizationsLv([String locale = 'lv']) : super(locale);
 
   @override
-  String get appTitle => 'Bartera Lietotne';
+  String get appTitle => 'Barters.lv';
 
   @override
   String get category_green =>

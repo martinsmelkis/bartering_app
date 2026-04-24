@@ -764,8 +764,19 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _removeSavedUserLocationMarker();
 
     try {
-      // Use plugin default marker to avoid custom icon rasterization errors.
-      await _mapController.addMarker(point);
+      final useCustomIosMarker =
+          !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+      if (useCustomIosMarker) {
+        final svgString = await rootBundle.loadString(
+          'assets/icons/marker_user_location.svg',
+        );
+        final markerIcon = mapOperationsCubit.createPlainSvgMarker(svgString);
+        await _mapController.addMarker(point, markerIcon: markerIcon);
+      } else {
+        // Keep plugin default marker on non-iOS platforms.
+        await _mapController.addMarker(point);
+      }
     } catch (e) {
       logDebugError('Failed to add saved user location marker', e);
       return;
