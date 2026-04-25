@@ -52,6 +52,8 @@ class _AvatarShopView extends StatelessWidget {
           final text = switch (state.infoMessage) {
             'unable_to_process_purchase' => l10n.avatarShopUnableToProcessPurchase,
             'avatar_already_selected' => l10n.avatarShopAvatarAlreadySelected,
+            _ when state.infoMessage!.startsWith('not_enough_coins::') =>
+              l10n.avatarShopNotEnoughCoins(int.tryParse(state.infoMessage!.split('::').last) ?? AvatarShopCubit.avatarPriceCoins),
             'not_enough_coins' => l10n.avatarShopNotEnoughCoins(AvatarShopCubit.avatarPriceCoins),
             _ => state.infoMessage!,
           };
@@ -135,8 +137,6 @@ class _AvatarShopView extends StatelessWidget {
       );
     }
 
-    final canAffordGlobal = state.availableCoins >= AvatarShopCubit.avatarPriceCoins;
-
     return Column(
       children: [
         Padding(
@@ -178,85 +178,149 @@ class _AvatarShopView extends StatelessWidget {
             builder: (context, constraints) {
               final crossAxisCount =
                   (constraints.maxWidth / 180).floor().clamp(3, 6);
+              final standardAssets = cubit.standardAvatarAssetPaths;
+              final premiumAssets = cubit.premiumAvatarAssetPaths;
 
-              return GridView.builder(
+              return ListView(
                 padding: const EdgeInsets.all(12),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.78,
-                ),
-                itemCount: cubit.avatarAssetPaths.length,
-                itemBuilder: (context, index) {
-                  final assetPath = cubit.avatarAssetPaths[index];
-                  final svgContent = state.avatarSvgByAssetPath[assetPath];
-                  final isCurrent = cubit.isCurrentAvatar(assetPath);
-                  final isOwned = cubit.isOwnedAvatar(assetPath);
-                  final isProcessing = state.processingAsset == assetPath;
-
-                  return Card(
-                    elevation: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              padding: const EdgeInsets.all(4),
-                              child: svgContent == null
-                                  ? const Center(child: CircularProgressIndicator())
-                                  : SvgPicture.string(svgContent),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: (isCurrent || isProcessing || state.isPurchasing || (!isOwned && !canAffordGlobal))
-                                  ? null
-                                  : () => cubit.buyAndApplyAvatar(assetPath),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isCurrent ? Colors.green : AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                              ),
-                              child: isProcessing
-                                  ? const SizedBox(
-                                      width: 14,
-                                      height: 14,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : Text(
-                                      isCurrent
-                                          ? l10n.avatarShopSelected
-                                          : (isOwned
-                                              ? l10n.avatarShopEquip
-                                              : (canAffordGlobal
-                                                  ? l10n.avatarShopBuyButton(AvatarShopCubit.avatarPriceCoins.toString())
-                                                  : l10n.avatarShopNeedCoins(AvatarShopCubit.avatarPriceCoins.toString()))),
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                children: [
+                  _buildSectionHeader(
+                    title: 'Standard Icons',
+                    subtitle: '${AvatarShopCubit.avatarPriceCoins} coins each',
+                  ),
+                  _buildAvatarGrid(
+                    context,
+                    state,
+                    cubit,
+                    l10n,
+                    standardAssets,
+                    crossAxisCount,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSectionHeader(
+                    title: 'Premium Icons',
+                    subtitle: '${AvatarShopCubit.premiumAvatarPriceCoins} coins each',
+                  ),
+                  _buildAvatarGrid(
+                    context,
+                    state,
+                    cubit,
+                    l10n,
+                    premiumAssets,
+                    crossAxisCount,
+                  ),
+                ],
               );
             },
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSectionHeader({required String title, required String subtitle}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            subtitle,
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvatarGrid(
+    BuildContext context,
+    AvatarShopState state,
+    AvatarShopCubit cubit,
+    AppLocalizations l10n,
+    List<String> assetPaths,
+    int crossAxisCount,
+  ) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.78,
+      ),
+      itemCount: assetPaths.length,
+      itemBuilder: (context, index) {
+        final assetPath = assetPaths[index];
+        final svgContent = state.avatarSvgByAssetPath[assetPath];
+        final isCurrent = cubit.isCurrentAvatar(assetPath);
+        final isOwned = cubit.isOwnedAvatar(assetPath);
+        final isProcessing = state.processingAsset == assetPath;
+        final avatarPrice = cubit.avatarPriceForAssetPath(assetPath);
+        final canAfford = state.availableCoins >= avatarPrice;
+
+        return Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: svgContent == null
+                        ? const Center(child: CircularProgressIndicator())
+                        : SvgPicture.string(svgContent),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: (isCurrent || isProcessing || state.isPurchasing || (!isOwned && !canAfford))
+                        ? null
+                        : () => cubit.buyAndApplyAvatar(assetPath),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isCurrent ? Colors.green : AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    child: isProcessing
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            isCurrent
+                                ? l10n.avatarShopSelected
+                                : (isOwned
+                                    ? l10n.avatarShopEquip
+                                    : (canAfford
+                                        ? l10n.avatarShopBuyButton(avatarPrice.toString())
+                                        : l10n.avatarShopNeedCoins(avatarPrice.toString()))),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

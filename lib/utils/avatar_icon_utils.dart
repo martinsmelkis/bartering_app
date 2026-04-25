@@ -4,7 +4,8 @@ import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:flutter/services.dart';
 
 class AvatarIconUtils {
-  static const int avatarCount = 29;
+  static const int avatarCount = 35;
+  static const int freeDeterministicAvatarCount = 29;
 
   static String iconIdFromAssetPath(String assetPath) {
     final match = RegExp(r'path(\d+)\.svg$').firstMatch(assetPath);
@@ -27,7 +28,7 @@ class AvatarIconUtils {
   }
 
   static String deterministicFallbackAssetPath(String userId) {
-    final index = (userId.hashCode.abs() % avatarCount) + 1;
+    final index = (userId.hashCode.abs() % freeDeterministicAvatarCount) + 1;
     return 'assets/icons/avatars/path$index.svg';
   }
 

@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face -->
+    <ellipse cx="256" cy="278" rx="107" ry="110" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="8" />
+
+    <!-- Hair - short bob -->
+    <path d="M 256 146
+          C 206 146, 165 170, 150 215
+          L 150 245
+          C 165 230, 185 220, 208 217
+          Q 232 212, 256 214
+          Q 280 212, 304 217
+          C 327 220, 347 230, 362 245
+          L 362 215
+          C 347 170, 306 146, 256 146 Z" fill="#1A1A1A" />
+
+    <!-- Bob sides -->
+    <path d="M 170 210 L 159 340" fill="none" stroke="#1A1A1A" stroke-width="26" stroke-linecap="butt" />
+    <path d="M 342 210 L 353 340" fill="none" stroke="#1A1A1A" stroke-width="26" stroke-linecap="butt" />
+
+    <!-- Hair detail lines -->
+    <path d="M 176 225 L 168 327" fill="none" stroke="#2E2E2E" stroke-width="4" stroke-linecap="round" opacity="0.45" />
+    <path d="M 336 225 L 344 327" fill="none" stroke="#2E2E2E" stroke-width="4" stroke-linecap="round" opacity="0.45" />
+
+    <!-- Eyes -->
+    <circle cx="219" cy="264" r="11" fill="#1A1A1A" />
+    <circle cx="223" cy="261" r="3" fill="#FFFFFF" opacity="0.9" />
+    <circle cx="293" cy="264" r="11" fill="#1A1A1A" />
+    <circle cx="297" cy="261" r="3" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Nose ring -->
+    <circle cx="256" cy="297" r="5" fill="#1A1A1A" />
+    <path d="M 249 305 Q 256 311, 263 305" fill="none" stroke="#D4AF37" stroke-width="3" />
+
+    <!-- Ear studs -->
+    <circle cx="150" cy="286" r="4" fill="#D4AF37" />
+    <circle cx="362" cy="286" r="4" fill="#D4AF37" />
+
+    <!-- Smile -->
+    <path d="M 226 332 Q 256 344, 286 332" fill="none" stroke="#1A1A1A" stroke-width="6" stroke-linecap="round" />
+</svg>

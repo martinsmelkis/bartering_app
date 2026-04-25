@@ -1,0 +1,43 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face -->
+    <ellipse cx="256" cy="271.5" rx="108" ry="120.5" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - medium waves -->
+    <path d="M 256 146
+          C 205 146, 164 169, 150 210
+          L 150 246
+          C 163 230, 182 218, 205 213
+          Q 230 208, 256 212
+          Q 282 208, 307 213
+          C 330 218, 349 230, 362 246
+          L 362 210
+          C 348 169, 307 146, 256 146 Z" fill="#1A1A1A" />
+
+    <!-- Wave strands -->
+    <path d="M 168 224 Q 182 236, 194 224" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+    <path d="M 196 214 Q 210 226, 222 214" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+    <path d="M 224 209 Q 238 221, 250 209" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+    <path d="M 262 209 Q 274 221, 288 209" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+    <path d="M 290 214 Q 302 226, 316 214" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+    <path d="M 318 224 Q 330 236, 344 224" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Eyes -->
+    <circle cx="219" cy="266" r="11" fill="#1A1A1A" />
+    <circle cx="223" cy="263" r="3" fill="#FFFFFF" opacity="0.9" />
+    <circle cx="293" cy="266" r="11" fill="#1A1A1A" />
+    <circle cx="297" cy="263" r="3" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Nose -->
+    <circle cx="256" cy="299" r="5" fill="#1A1A1A" />
+
+    <!-- Lips -->
+    <path d="M 228 333 Q 256 345, 284 333" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round" />
+    <path d="M 236 337 Q 256 346, 276 337" fill="none" stroke="#D0677D" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Dangling earrings -->
+    <circle cx="147" cy="286" r="4" fill="#D4AF37" />
+    <path d="M 147 290 L 147 304" stroke="#D4AF37" stroke-width="3" stroke-linecap="round" />
+    <circle cx="365" cy="286" r="4" fill="#D4AF37" />
+    <path d="M 365 290 L 365 304" stroke="#D4AF37" stroke-width="3" stroke-linecap="round" />
+</svg>

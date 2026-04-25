@@ -1,0 +1,38 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face -->
+    <circle cx="256" cy="278" r="112" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="12" />
+
+    <!-- Hair - side shave with swept top -->
+    <path d="M 256 145
+          C 205 145, 165 165, 152 205
+          L 152 251
+          C 155 226, 170 211, 188 204
+          Q 222 188, 256 194
+          Q 305 186, 338 211
+          Q 354 224, 360 251
+          L 360 221
+          C 345 168, 308 145, 256 145 Z" fill="#1A1A1A" />
+
+    <!-- Shaved line detail -->
+    <path d="M 172 218 Q 190 212, 205 220" fill="none" stroke="#FFFFFF" stroke-width="4" opacity="0.55" />
+
+    <!-- Eyes -->
+    <circle cx="220" cy="265" r="11" fill="#1A1A1A" />
+    <circle cx="224" cy="262" r="3" fill="#FFFFFF" opacity="0.9" />
+    <circle cx="292" cy="265" r="11" fill="#1A1A1A" />
+    <circle cx="296" cy="262" r="3" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Small hoop earrings -->
+    <circle cx="146" cy="282" r="9" fill="none" stroke="#D4AF37" stroke-width="4" />
+    <circle cx="366" cy="282" r="9" fill="none" stroke="#D4AF37" stroke-width="4" />
+
+    <!-- Nose -->
+    <circle cx="256" cy="296" r="5" fill="#1A1A1A" />
+
+    <!-- Smile -->
+    <path d="M 224 332 Q 256 346, 288 332" fill="none" stroke="#1A1A1A" stroke-width="6" stroke-linecap="round" />
+
+    <!-- Small beard -->
+    <path d="M 236 344 Q 256 360, 276 344 Q 274 357, 256 364 Q 238 357, 236 344 Z" fill="#1A1A1A" opacity="0.85" />
+</svg>

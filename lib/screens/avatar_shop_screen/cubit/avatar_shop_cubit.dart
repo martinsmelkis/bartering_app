@@ -13,7 +13,9 @@ part 'avatar_shop_state.dart';
 
 class AvatarShopCubit extends Cubit<AvatarShopState> {
   static const int avatarPriceCoins = 100;
-  static const int avatarCount = 29;
+  static const int premiumAvatarPriceCoins = 150;
+  static const int avatarCount = 35;
+  static const int premiumAvatarStartIndex = 30;
 
   final ApiClient _apiClient;
   final UserRepository _userRepository;
@@ -28,7 +30,25 @@ class AvatarShopCubit extends Cubit<AvatarShopState> {
   List<String> get avatarAssetPaths =>
       List.generate(avatarCount, (index) => 'assets/icons/avatars/path${index + 1}.svg');
 
+  List<String> get standardAvatarAssetPaths =>
+      avatarAssetPaths.where((path) => _assetIndex(path) < premiumAvatarStartIndex).toList();
+
+  List<String> get premiumAvatarAssetPaths =>
+      avatarAssetPaths.where((path) => _assetIndex(path) >= premiumAvatarStartIndex).toList();
+
   String iconIdForAssetPath(String assetPath) => AvatarIconUtils.iconIdFromAssetPath(assetPath);
+
+  int avatarPriceForAssetPath(String assetPath) {
+    if (_assetIndex(assetPath) >= premiumAvatarStartIndex) {
+      return premiumAvatarPriceCoins;
+    }
+    return avatarPriceCoins;
+  }
+
+  int _assetIndex(String assetPath) {
+    final match = RegExp(r'path(\d+)\.svg$').firstMatch(assetPath);
+    return int.tryParse(match?.group(1) ?? '') ?? 1;
+  }
 
   bool isOwnedAvatar(String assetPath) =>
       state.ownedIconIds.contains(iconIdForAssetPath(assetPath));
@@ -151,12 +171,13 @@ class AvatarShopCubit extends Cubit<AvatarShopState> {
       var ownedIconIds = state.ownedIconIds;
 
       if (!wasOwnedBefore) {
-        if (state.availableCoins < avatarPriceCoins) {
+        final avatarPrice = avatarPriceForAssetPath(assetPath);
+        if (state.availableCoins < avatarPrice) {
           emit(
             state.copyWith(
               isPurchasing: false,
               processingAsset: null,
-              infoMessage: 'not_enough_coins',
+              infoMessage: 'not_enough_coins::$avatarPrice',
             ),
           );
           return;
@@ -166,12 +187,13 @@ class AvatarShopCubit extends Cubit<AvatarShopState> {
           PurchaseAvatarIconRequest(
             userId: userId,
             iconId: iconId,
-            costCoins: avatarPriceCoins,
+            costCoins: avatarPrice,
             externalRef: 'avatar_shop_${userId}_${DateTime.now().millisecondsSinceEpoch}',
             metadataJson: jsonEncode({
               'source': 'avatar_shop',
               'avatarAssetPath': assetPath,
               'iconId': iconId,
+              'avatarPrice': avatarPrice,
             }),
           ),
         );

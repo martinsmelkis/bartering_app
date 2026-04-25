@@ -1,0 +1,40 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face -->
+    <ellipse cx="256" cy="273.5" rx="102" ry="113.5" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="8" />
+
+    <!-- Hair - textured crop -->
+    <path d="M 256 156
+          C 212 156, 172 178, 156 216
+          L 156 246
+          C 169 229, 186 217, 210 212
+          Q 232 206, 256 208
+          Q 280 206, 302 212
+          C 326 217, 343 229, 356 246
+          L 356 216
+          C 340 178, 300 156, 256 156 Z" fill="#1A1A1A" />
+
+    <!-- Hair texture cuts -->
+    <path d="M 196 206 L 210 216" stroke="#2E2E2E" stroke-width="4" stroke-linecap="round" />
+    <path d="M 224 198 L 238 210" stroke="#2E2E2E" stroke-width="4" stroke-linecap="round" />
+    <path d="M 252 194 L 266 208" stroke="#2E2E2E" stroke-width="4" stroke-linecap="round" />
+    <path d="M 280 198 L 294 210" stroke="#2E2E2E" stroke-width="4" stroke-linecap="round" />
+    <path d="M 308 206 L 322 216" stroke="#2E2E2E" stroke-width="4" stroke-linecap="round" />
+    <path d="M 210 210 L 222 220" stroke="#2E2E2E" stroke-width="3" stroke-linecap="round" opacity="0.9" />
+    <path d="M 238 202 L 250 214" stroke="#2E2E2E" stroke-width="3" stroke-linecap="round" opacity="0.9" />
+    <path d="M 292 202 L 304 214" stroke="#2E2E2E" stroke-width="3" stroke-linecap="round" opacity="0.9" />
+    <path d="M 182 212 L 194 222" stroke="#2E2E2E" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+    <path d="M 266 196 L 278 208" stroke="#2E2E2E" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+    <path d="M 316 212 L 328 222" stroke="#2E2E2E" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+
+    <!-- Aviator shades -->
+    <ellipse cx="220" cy="266" rx="26.89" ry="21.13" fill="#2A2A2A" stroke="#1A1A1A" stroke-width="3" />
+    <ellipse cx="292" cy="266" rx="26.89" ry="21.13" fill="#2A2A2A" stroke="#1A1A1A" stroke-width="3" />
+    <path d="M 246.4 266 L 265.6 266" stroke="#1A1A1A" stroke-width="4" />
+
+    <!-- Nose -->
+    <circle cx="256" cy="302" r="5" fill="#1A1A1A" />
+
+    <!-- Smile -->
+    <path d="M 224 336 Q 256 350, 288 336" fill="none" stroke="#1A1A1A" stroke-width="6" stroke-linecap="round" />
+</svg>

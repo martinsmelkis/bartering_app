@@ -1,0 +1,42 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Face -->
+    <ellipse cx="256" cy="280" rx="110" ry="111" fill="#ffd4a3" stroke="#1A1A1A" stroke-width="10" />
+
+    <!-- Hair - high ponytail -->
+    <path d="M 256 146
+          C 206 146, 166 170, 151 214
+          L 151 245
+          C 165 228, 186 217, 210 213
+          Q 234 208, 256 210
+          Q 278 208, 302 213
+          C 326 217, 347 228, 361 245
+          L 361 214
+          C 346 170, 306 146, 256 146 Z" fill="#1A1A1A" />
+
+    <!-- Ponytail -->
+    <path d="M 305 165
+          C 341 155, 369 172, 375 200
+          C 381 226, 362 246, 331 248
+          C 351 231, 352 209, 339 192
+          C 330 179, 318 173, 305 165 Z" fill="#1A1A1A" />
+
+    <!-- Eyes -->
+    <circle cx="220" cy="266" r="11" fill="#1A1A1A" />
+    <circle cx="224" cy="263" r="3" fill="#FFFFFF" opacity="0.9" />
+    <circle cx="292" cy="266" r="11" fill="#1A1A1A" />
+    <circle cx="296" cy="263" r="3" fill="#FFFFFF" opacity="0.9" />
+
+    <!-- Brows -->
+    <path d="M 202 248 Q 220 242, 238 248" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" />
+    <path d="M 274 248 Q 292 242, 310 248" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Nose -->
+    <circle cx="256" cy="298" r="5" fill="#1A1A1A" />
+
+    <!-- Mouth -->
+    <path d="M 226 333 Q 256 347, 286 333" fill="none" stroke="#1A1A1A" stroke-width="6" stroke-linecap="round" />
+
+    <!-- Star earring -->
+    <path d="M 145 286 L 149 294 L 158 295 L 151 301 L 153 310 L 145 305 L 137 310 L 139 301 L 132 295 L 141 294 Z" fill="#D4AF37" />
+</svg>
