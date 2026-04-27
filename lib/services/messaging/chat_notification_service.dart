@@ -119,28 +119,45 @@ class ChatNotificationService with WidgetsBindingObserver {
   /// GDPR-compliant: Records user consent via updateNotificationContacts when permission granted
   /// Only records consent when permission transitions from false/null to true
   Future<bool?> requestNotificationPermission() async {
-    if (!kIsWeb) {
-      final androidImplementation = _notificationService.plugin
-          .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+    if (kIsWeb) return null;
 
-      final permissionGranted = await androidImplementation?.requestNotificationsPermission();
-      
-      // GDPR: Only record consent when permission transitions from false/null to true
-      // This prevents redundant API calls and respects the "only on change" principle
-      final previousState = _previousPermissionState;
-      _previousPermissionState = permissionGranted;
-      
-      if (permissionGranted == true && previousState != true) {
-        logDebug('🔔 Notification permission granted (transitioned from $previousState to true)');
-        await _recordNotificationConsent();
-      } else if (permissionGranted == true) {
-        logDebug('🔔 Notification permission already granted (no state change), skipping consent record');
-      }
-      
-      return permissionGranted;
+    bool? permissionGranted;
+
+    final androidImplementation = _notificationService.plugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    final iosImplementation = _notificationService.plugin
+        .resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+
+    // Android 13+ runtime notification permission
+    if (androidImplementation != null) {
+      permissionGranted = await androidImplementation.requestNotificationsPermission();
     }
-    return null;
+
+    // iOS/macOS runtime notification permission
+    // This is explicitly triggered by user action (not at app startup)
+    if (iosImplementation != null) {
+      permissionGranted = await iosImplementation.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
+
+    // GDPR: Only record consent when permission transitions from false/null to true
+    // This prevents redundant API calls and respects the "only on change" principle
+    final previousState = _previousPermissionState;
+    _previousPermissionState = permissionGranted;
+
+    if (permissionGranted == true && previousState != true) {
+      logDebug('🔔 Notification permission granted (transitioned from $previousState to true)');
+      await _recordNotificationConsent();
+    } else if (permissionGranted == true) {
+      logDebug('🔔 Notification permission already granted (no state change), skipping consent record');
+    }
+
+    return permissionGranted;
   }
   
   /// GDPR-compliant: Records user consent for push notifications to backend

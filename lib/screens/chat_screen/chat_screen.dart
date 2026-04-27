@@ -245,6 +245,14 @@ class _ChatScreenState extends State<ChatScreen> {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (fileAttachment != null) {
+        // For locally sent files on mobile, preserve source path so image preview can open instantly.
+        if (!kIsWeb && pickedFile.path.isNotEmpty) {
+          fileAttachment = fileAttachment.copyWith(
+            localPath: pickedFile.path,
+            isDownloaded: true,
+          );
+        }
+
         // Create message with file attachment
         final messageId = "client_${DateTime.now().millisecondsSinceEpoch}";
         final chatMessage = ChatMessage(
@@ -835,9 +843,33 @@ class _ChatScreenState extends State<ChatScreen> {
                 style: TextStyle(color: textColor, fontSize: messageFontSize),
                 linkStyle: TextStyle(color: Colors.blue),
                 onOpen: (link) async {
-                  if (await canLaunchUrl(Uri.parse(link.url))) {
-                    await launchUrl(Uri.parse(link.url));
+                  final raw = link.url.trim();
+                  if (raw.isEmpty) return;
+
+                  Uri? uri = Uri.tryParse(raw);
+                  if (uri == null) return;
+
+                  if (uri.scheme.isEmpty) {
+                    // Phone numbers are often linkified without a scheme.
+                    final compact = raw.replaceAll(RegExp(r'[^0-9+]'), '');
+                    final digits = compact.replaceAll('+', '');
+                    if (digits.length >= 7) {
+                      uri = Uri(scheme: 'tel', path: compact);
+                    } else {
+                      // Scheme-less web links (e.g. example.com)
+                      final httpsUri = Uri.tryParse('https://$raw');
+                      if (httpsUri == null || httpsUri.host.isEmpty) return;
+                      uri = httpsUri;
+                    }
                   }
+
+                  final isWebLink = uri.scheme == 'http' || uri.scheme == 'https';
+                  await launchUrl(
+                    uri,
+                    mode: isWebLink
+                        ? LaunchMode.externalApplication
+                        : LaunchMode.platformDefault,
+                  );
                 },
                 contextMenuBuilder: (context, editableTextState) {
                   return AdaptiveTextSelectionToolbar.editableText(
@@ -908,7 +940,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final fontSize = isWebSideBySide ? 13.0 : 12.0;
 
     return GestureDetector(
-      onTap: () => _handleFileAttachmentTap(attachment),
+      onTap: () => _handleFileAttachmentTap(
+        attachment,
+        isSentByCurrentUser: isMe,
+      ),
       child: Container(
         constraints: BoxConstraints(maxWidth: isWebSideBySide ? 260 : 0.6.sw),
         decoration: BoxDecoration(
@@ -1135,7 +1170,25 @@ class _ChatScreenState extends State<ChatScreen> {
   // Track active downloads to prevent duplicate requests
   final Set<String> _activeDownloads = {};
 
-  Future<void> _handleFileAttachmentTap(FileAttachment attachment) async {
+  Future<void> _handleFileAttachmentTap(
+    FileAttachment attachment, {
+    bool isSentByCurrentUser = false,
+  }) async {
+    // For own sent images, open preview immediately from local file/cache.
+    if (isSentByCurrentUser && attachment.isImage) {
+      final previewPath = attachment.localPath;
+      final previewUrl = _buildFileUrl(attachment.fileId);
+      if (mounted) {
+        await ImageViewerDialog.show(
+          context: context,
+          imageUrls: [previewPath ?? previewUrl],
+          initialIndex: 0,
+          heroTag: null,
+        );
+      }
+      return;
+    }
+
     // Prevent duplicate downloads
     if (_activeDownloads.contains(attachment.fileId)) {
       logDebug('@@@@@@@@@ Download already in progress for ${attachment.fileId}, ignoring tap');

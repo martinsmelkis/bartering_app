@@ -43,6 +43,12 @@ class WebSocketChatService {
   String _currentUserName;
   String _serverUrl;
 
+  // Connection/auth state
+  bool _isAuthenticated = false;
+  String? _lastAuthToken;
+  final List<String> _pendingOutboundPayloads = [];
+  static const int _maxPendingOutboundPayloads = 50;
+
   // Cache of contact public keys: userId -> base64 public key
   final Map<String, String> _publicKeyCache = {};
 
@@ -128,7 +134,12 @@ class WebSocketChatService {
       return;
     }
     try {
-      final uri = Uri.parse("$_serverUrl?token=$authToken");
+      _isAuthenticated = false;
+      if (authToken.isNotEmpty) {
+        _lastAuthToken = authToken;
+      }
+      final token = (authToken.isNotEmpty ? authToken : (_lastAuthToken ?? ''));
+      final uri = Uri.parse("$_serverUrl?token=$token");
       _channel = WebSocketChannel.connect(uri);
       print("WebSocket: Connecting to $uri...");
 
@@ -141,6 +152,15 @@ class WebSocketChatService {
           }
           try {
             final Map<String, dynamic> messageJson = jsonDecode(rawMessage as String);
+
+            // Mark connection authenticated only after explicit auth success from server
+            if (messageJson['messageType']?.toString().contains('AuthResponse') == true) {
+              final success = messageJson['success'] == true;
+              if (success) {
+                _isAuthenticated = true;
+                _flushPendingOutboundPayloads();
+              }
+            }
 
             // Handle public key exchange (from server auth response)
             if (messageJson['publicKey'] != null) {
@@ -570,8 +590,7 @@ class WebSocketChatService {
 
   Future<void> sendAuthMessage(String auth) async {
     if (_channel == null || _channel!.closeCode != null) {
-      print("WebSocket: Not connected. Cannot send message.");
-      // Optionally, queue the message and try to send after reconnecting
+      print("WebSocket: Not connected. Cannot send auth message.");
       return;
     }
     _channel!.sink.add(auth);
@@ -580,16 +599,9 @@ class WebSocketChatService {
 
   Future<void> sendMessage(String plainText, String text,
       String recipientId) async {
-    if (_channel == null || _channel!.closeCode != null) {
-      print("WebSocket: Not connected. Cannot send message.");
-      connect("");
-      // Optionally, queue the message and try to send after reconnecting
-      return;
-    }
-
     try {
       // 1. ENCRYPTION
-      String? encryptedPayload = text.isEmpty == true ? "" : text;
+      final encryptedPayload = text.isEmpty == true ? "" : text;
 
       final messageId = "client_${DateTime.now().millisecondsSinceEpoch}";
 
@@ -607,7 +619,23 @@ class WebSocketChatService {
         }
       };
 
-      _channel!.sink.add(jsonEncode(networkMessagePayload));
+      final payload = jsonEncode(networkMessagePayload);
+
+      // Gate send until authenticated to prevent pre-auth payload race.
+      if (_channel == null || _channel!.closeCode != null) {
+        print("WebSocket: Not connected. Queueing message and reconnecting...");
+        _enqueueOutboundPayload(payload);
+        await connect(_lastAuthToken ?? '');
+        return;
+      }
+
+      if (!_isAuthenticated) {
+        print("WebSocket: Connected but not authenticated. Queueing message.");
+        _enqueueOutboundPayload(payload);
+        return;
+      }
+
+      _channel!.sink.add(payload);
       print("WebSocket: Sent message to $recipientId");
     } catch (e) {
       print("WebSocket: Error sending message: $e");
@@ -637,17 +665,50 @@ class WebSocketChatService {
     }
   }
 
+  void _enqueueOutboundPayload(String payload) {
+    _pendingOutboundPayloads.add(payload);
+    if (_pendingOutboundPayloads.length > _maxPendingOutboundPayloads) {
+      _pendingOutboundPayloads.removeAt(0);
+    }
+  }
+
+  void _flushPendingOutboundPayloads() {
+    if (_channel == null || _channel!.closeCode != null || !_isAuthenticated) {
+      return;
+    }
+
+    if (_pendingOutboundPayloads.isEmpty) return;
+
+    final pending = List<String>.from(_pendingOutboundPayloads);
+    _pendingOutboundPayloads.clear();
+
+    for (final payload in pending) {
+      try {
+        _channel!.sink.add(payload);
+      } catch (e) {
+        // Re-queue unsent payload and stop flushing
+        _enqueueOutboundPayload(payload);
+        break;
+      }
+    }
+  }
+
   /// Disconnect WebSocket without disposing streams (for reconnection)
   void disconnect() {
     print("WebSocket: Disconnecting...");
-    _channel?.sink.close(status.goingAway);
+    _isAuthenticated = false;
+    // Use normal closure code (1000). 1001 is invalid for this package adapter.
+    _channel?.sink.close(status.normalClosure);
     _channel = null;
   }
 
   /// Dispose service completely (closes streams too)
   void dispose() {
     print("WebSocket: Disposing service and closing connection.");
-    _channel?.sink.close(status.goingAway);
+    _isAuthenticated = false;
+    _channel?.sink.close(status.normalClosure);
+    _channel = null;
+    _pendingOutboundPayloads.clear();
     _messageController.close();
     _statusUpdateController.close();
     _readReceiptController.close();

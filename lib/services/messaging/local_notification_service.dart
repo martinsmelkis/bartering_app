@@ -39,9 +39,11 @@ class LocalNotificationService {
 
     const androidSettings = AndroidInitializationSettings('ic_notification');
     const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      // Defer iOS permission prompts until explicit user action
+      // (e.g. entering chat, creating posting, or enabling notifications)
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
     );
 
     const initSettings = InitializationSettings(
