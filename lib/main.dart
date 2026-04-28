@@ -1,6 +1,7 @@
 import 'dart:async' show unawaited;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:barter_app/services/device_validation_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 
 import 'application.dart';
 import 'flavor_config.dart';
@@ -9,12 +10,12 @@ import 'services/messaging/firebase_service.dart';
 import 'utils/debug_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'configure_dependencies.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
-import 'services/security_test_helper.dart';
 
 // The main entry point of the Flutter application.
 void main() async {
@@ -35,6 +36,11 @@ void main() async {
     print('Stack: ${details.stack}');
     FlutterError.presentError(details);
   };
+
+  DeviceValidationResult? deviceValidationResult;
+  if (!kDebugMode) {
+    deviceValidationResult = await DeviceValidationService.validateDevice();
+  }
 
   // TODO eventually, in release version, run security tests
   //if (!kDebugMode) {
@@ -62,11 +68,15 @@ void main() async {
   }
 
   logDebug('⏳ Running Application widget...');
-  runApp(const Application());
+  runApp(
+    _GuardedApp(
+      deviceValidationResult: deviceValidationResult,
+    ),
+  );
   logDebug('✅ Application widget started');
 
   // Defer non-critical FCM/service setup until after first frame.
-  if (!kIsWeb) {
+  if (!kIsWeb && deviceValidationResult?.isValid == true) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       logDebug('⏳ Initializing FirebaseService after first frame...');
       unawaited(FirebaseService().initialize());
@@ -75,6 +85,76 @@ void main() async {
 }
 
 /// The root widget of the application.
+class _GuardedApp extends StatelessWidget {
+  final DeviceValidationResult? deviceValidationResult;
+
+  const _GuardedApp({
+    required this.deviceValidationResult,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final result = deviceValidationResult;
+
+    if (result != null && !result.isValid) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: _InvalidDeviceScreen(reason: result.reason),
+      );
+    }
+
+    return const Application();
+  }
+}
+
+class _InvalidDeviceScreen extends StatefulWidget {
+  final String reason;
+
+  const _InvalidDeviceScreen({required this.reason});
+
+  @override
+  State<_InvalidDeviceScreen> createState() => _InvalidDeviceScreenState();
+}
+
+class _InvalidDeviceScreenState extends State<_InvalidDeviceScreen> {
+  bool _dialogShown = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_dialogShown) return;
+    _dialogShown = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Text('Device validation failed'),
+          content: Text(widget.reason),
+          actions: [
+            TextButton(
+              onPressed: () {
+                SystemNavigator.pop();
+              },
+              child: const Text('Close app'),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: Colors.white,
+      body: SizedBox.expand(),
+    );
+  }
+}
+
 class BarterApp extends StatelessWidget {
   const BarterApp({super.key});
 
