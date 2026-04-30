@@ -154,12 +154,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     // Generate onboarding category icons
     for (int i = 0; i < onboardingIconCount; i++) {
-      final size = (random.nextDouble() * 30 + 25) / iconSizeScale; // 25-55 (slightly smaller)
+      final size = (random.nextDouble() * 30 + 12) / iconSizeScale; // 25-55 (slightly smaller)
       icons.add(_FloatingIcon(
         iconData: _onboardingIcons[random.nextInt(_onboardingIcons.length)],
         iconColor:
             _onboardingCategoryColors[random.nextInt(_onboardingCategoryColors.length)]
-                .withValues(alpha: 0.60),
+                .withValues(alpha: 0.70),
         left: random.nextDouble() * (screenSize.width - size),
         top: random.nextDouble() * screenSize.height,
         size: size,
@@ -691,18 +691,18 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
     final colors = [
       Colors.red.shade200,
       Colors.deepOrange.shade100,
-      Colors.brown.shade200,
+      //Colors.brown.shade200,
       Colors.purple.shade100,
       Colors.orange.shade100,
       Colors.yellow.shade100,
       Colors.orangeAccent.shade100,
     ];
 
-    //final color = colors[random.nextInt(colors.length)];
-    //final colorHex =
-    //    '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+    final color = colors[random.nextInt(colors.length)];
+    final colorHex =
+        '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
 
     // Replace the default color with the random color
-    return svgString;//.replaceAll('#ffd4a3', colorHex);
+    return svgString.replaceAll('#ffd4a3', colorHex);
   }
 }

@@ -1,4 +1,6 @@
 // lib/theme/app_dimensions.dart
+import 'dart:ui' as ui;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -14,10 +16,30 @@ class AppDimensions {
 
   /// Size for POI markers on the map
   ///
-  /// NOTE: On large Android tablets, raw `.w` scaling made markers too large.
-  /// Clamp native size so marker proportions stay close to phone sizing.
-  static double get mapPoiMarkerSize =>
-      kIsWeb ? 90 : (105.w).clamp(98.0, 108.0).toDouble();
+  /// Keeps physical size visually closer across Android density buckets.
+  /// Devices with higher pixel density (same physical screen size) get a
+  /// slight boost to reduce the "icons look smaller" effect.
+  static double get mapPoiMarkerSize {
+    if (kIsWeb) return 90;
+
+    final logicalSize = (105.w).clamp(98.0, 108.0).toDouble();
+
+    // Use the current view DPR to apply a mild compensation for high-density
+    // Android displays where icons can appear physically smaller.
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      return logicalSize;
+    }
+
+    final dpr = ui.PlatformDispatcher.instance.views.isNotEmpty
+        ? ui.PlatformDispatcher.instance.views.first.devicePixelRatio
+        : 1.0;
+
+    final minAvatarSize = dpr >= 3.25 ? 115 : dpr >= 2.85 ? 110 : dpr >= 2.55 ? 100 : dpr >= 2.25 ? 95 : 90;
+
+    final compensation = dpr >= 3.25 ? 1.45 : dpr >= 2.85 ? 1.25 : dpr >= 2.55 ? 1.05 : dpr >= 2.25 ? 1.02 : 1.0;
+
+    return (logicalSize * compensation).clamp(minAvatarSize, 145.0).toDouble();
+  }
 
   /// Size for user avatar FAB
   static double get userAvatarSize => kIsWeb ? 88.4 : 90.0;

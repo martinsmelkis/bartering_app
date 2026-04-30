@@ -42,10 +42,14 @@ class PoiMarkerWidget {
     // Debug: Always log relevancy score to diagnose issues
     logDebug('@@@@@@@@@@ POI ${poi.profile.userId} RAW matchRelevancyScore: ${poi.matchRelevancyScore} (${(relevancyScore * 100).toStringAsFixed(1)}%)');
 
-    // Calculate sizes using original AppDimensions.mapPoiMarkerSize
+    // Calculate sizes from base marker size.
+    // Native internals scale uniformly with circleSize to keep proportions stable
+    // across Android density buckets.
+    const nativeBaseMarkerSize = 105.0;
     final circleSize = AppDimensions.mapPoiMarkerSize;
-    final strokeWidth = kIsWeb ? 7.5 : 6.0;
-    final gap = strokeWidth + 2;
+    final markerScale = kIsWeb ? 1.0 : (circleSize / nativeBaseMarkerSize);
+    final strokeWidth = kIsWeb ? 7.5 : (6.0 * markerScale);
+    final gap = strokeWidth + (kIsWeb ? 2.0 : (2.0 * markerScale));
     final svgSize = circleSize - gap;
 
     // Calculate gradient glow color and alpha based on relevance score
@@ -207,8 +211,8 @@ class PoiMarkerWidget {
           // Glow effect for relevant POIs
           if (glowColor != null)
             Positioned(
-              left: 23,
-              top: 23,
+              left: 23 * markerScale - 2,
+              top: 23 * markerScale - 2,
               child: Container(
                 width: circleSize - circleSize / 2.4,
                 height: circleSize - circleSize / 2.4,
@@ -217,8 +221,8 @@ class PoiMarkerWidget {
                   boxShadow: [
                     BoxShadow(
                       color: glowColor.withValues(alpha: glowAlpha),
-                      blurRadius: 3.0,
-                      spreadRadius: 3.0,
+                      blurRadius: 3.0 * markerScale,
+                      spreadRadius: 3.0 * markerScale,
                     ),
                   ],
                 ),
@@ -248,37 +252,37 @@ class PoiMarkerWidget {
           PositionedOnlineStatusBadge(
             isOnline: poi.isOnline,
             isAway: poi.isAway,
-            size: 21,
-            right: 20,
-            top: 20,
-            borderWidth: 2.625,
+            size: 21 * markerScale,
+            right: 20 * markerScale,
+            top: 20 * markerScale,
+            borderWidth: 2.625 * markerScale,
           ),
           // Match indicator - positioned at bottom right
           if (hasMatch)
             Positioned(
-              right: 16,
-              bottom: 16,
+              right: 16 * markerScale,
+              bottom: 16 * markerScale,
               child: Container(
-                width: 29,
-                height: 29,
+                width: 29 * markerScale,
+                height: 29 * markerScale,
                 decoration: BoxDecoration(
                   color: AppColors.secondary,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white,
-                    width: 2.1,
+                    width: 2.1 * markerScale,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 4.2,
-                      offset: Offset(0, 2.1),
+                      blurRadius: 4.2 * markerScale,
+                      offset: Offset(0, 2.1 * markerScale),
                     ),
                   ],
                 ),
                 child: Icon(
                   Icons.handshake,
-                  size: 18,
+                  size: 18 * markerScale,
                   color: Colors.white,
                 ),
               ),
