@@ -459,9 +459,16 @@ class ChatCubit extends Cubit<ChatState> {
       _webSocketService?.sendAuthMessage(authJson);
 
       emit(ChatLoaded(List.from(messages)));
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getErrorMessage(
+        e,
+        'Unable to open this chat right now. Please try again.',
+      );
+      logDebug('@@@@@@@@@@@@@ Chat initialization error: $errorMessage');
+      emit(ChatError(errorMessage));
     } catch (e) {
-          logDebug('@@@@@@@@@@@@@ Chat initialization error: $e');
-      emit(ChatError("Chat session initialization failed: ${e.toString()}"));
+      logDebug('@@@@@@@@@@@@@ Chat initialization error: $e');
+      emit(ChatError('Unable to open this chat right now. Please try again.'));
     }
   }
 
@@ -617,7 +624,7 @@ class ChatCubit extends Cubit<ChatState> {
       emit(ChatTransactionError(errorMessage));
     } catch (e) {
       logDebug('@@@@@@@@@ Error finishing transaction: $e');
-      emit(ChatTransactionError(e.toString()));
+      emit(ChatTransactionError('Unable to finish the transaction right now. Please try again.'));
     }
 
   }
@@ -653,8 +660,8 @@ class ChatCubit extends Cubit<ChatState> {
       emit(ChatUserBlockError(errorMessage));
       return false;
     } catch (e) {
-          logDebug('Error blocking user: $e');
-      emit(ChatUserBlockError(e.toString()));
+      logDebug('Error blocking user: $e');
+      emit(ChatUserBlockError('Unable to block this user right now. Please try again.'));
       return false;
     }
   }
@@ -688,8 +695,8 @@ class ChatCubit extends Cubit<ChatState> {
       emit(ChatUserUnblockError(errorMessage));
       return false;
     } catch (e) {
-          logDebug('Error unblocking user: $e');
-      emit(ChatUserUnblockError(e.toString()));
+      logDebug('Error unblocking user: $e');
+      emit(ChatUserUnblockError('Unable to unblock this user right now. Please try again.'));
       return false;
     }
   }
@@ -820,8 +827,8 @@ class ChatCubit extends Cubit<ChatState> {
       emit(ChatUserReportError(errorMessage));
       return null;
     } catch (e) {
-          logDebug('Error reporting user: $e');
-      emit(ChatUserReportError(e.toString()));
+      logDebug('Error reporting user: $e');
+      emit(ChatUserReportError('Unable to submit your report right now. Please try again.'));
       return null;
     }
   }

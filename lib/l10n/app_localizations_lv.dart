@@ -2616,6 +2616,30 @@ class AppLocalizationsLv extends AppLocalizations {
       'Nevar nosūtīt failu: Saņēmēja publiskā atslēga nav pieejama';
 
   @override
+  String get chatOpenFailed =>
+      'Šobrīd nevar atvērt šo čatu. Lūdzu, mēģiniet vēlreiz.';
+
+  @override
+  String get fileReadFailed =>
+      'Neizdevās nolasīt izvēlēto failu. Lūdzu, izvēlieties citu failu.';
+
+  @override
+  String get fileSendFailed =>
+      'Šobrīd failu nosūtīt neizdevās. Lūdzu, mēģiniet vēlreiz.';
+
+  @override
+  String get fileDownloadFailed =>
+      'Šobrīd failu lejupielādēt neizdevās. Lūdzu, mēģiniet vēlreiz.';
+
+  @override
+  String get fileDecryptKeyMissing =>
+      'Šo failu vēl nevar atšifrēt. Mēģiniet vēlreiz, kad čata atslēgas būs sinhronizētas.';
+
+  @override
+  String get couldNotOpenFileGeneric =>
+      'Neizdevās atvērt šo failu. Lūdzu, mēģiniet citu lietotni vai pārbaudiet faila ceļu.';
+
+  @override
   String get gallery => 'Iekārta';
 
   @override

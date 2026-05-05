@@ -2584,6 +2584,30 @@ class AppLocalizationsEn extends AppLocalizations {
       'Cannot send file: Recipient public key not available';
 
   @override
+  String get chatOpenFailed =>
+      'Unable to open this chat right now. Please try again.';
+
+  @override
+  String get fileReadFailed =>
+      'Could not read the selected file. Please try another file.';
+
+  @override
+  String get fileSendFailed =>
+      'Unable to send the file right now. Please try again.';
+
+  @override
+  String get fileDownloadFailed =>
+      'Unable to download this file right now. Please try again.';
+
+  @override
+  String get fileDecryptKeyMissing =>
+      'Cannot decrypt this file yet. Try again after the chat keys are synchronized.';
+
+  @override
+  String get couldNotOpenFileGeneric =>
+      'Could not open this file. Please try another app or check the file path.';
+
+  @override
   String get gallery => 'Device';
 
   @override

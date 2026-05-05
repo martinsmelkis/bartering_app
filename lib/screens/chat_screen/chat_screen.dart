@@ -11,6 +11,7 @@ import 'package:barter_app/utils/back_button_handler.dart';
 import 'package:barter_app/utils/responsive_breakpoints.dart';
 import 'package:barter_app/utils/debug_utils.dart';
 import 'package:barter_app/utils/date_time_utils.dart';
+import 'package:barter_app/utils/dio_error_handler.dart';
 import 'package:barter_app/models/relationships/report_models.dart';
 import 'package:barter_app/screens/chat_screen/widgets/report_user_dialog.dart';
 import 'package:barter_app/screens/chat_screen/widgets/message_status_indicator.dart';
@@ -19,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -59,6 +61,30 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   late ChatCubit _chatCubit;
+
+  String _mapChatErrorMessage(BuildContext context, String message) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (message.contains('chatError_')) {
+      return context.parseL10n(message);
+    }
+
+    switch (message) {
+      case 'User ID not found':
+      case 'Public key not found':
+      case 'CryptoService initialization failed':
+      case 'Failed to generate authentication signature':
+      case 'Failed to parse recipient\'s public key.':
+      case "Recipient's public key not found. Cannot encrypt message.":
+      case 'Encryption failed. Message not sent.':
+      case 'Unable to open this chat right now. Please try again.':
+        return l10n.chatOpenFailed;
+      case 'Failed to send file message':
+        return l10n.fileSendFailed;
+      default:
+        return message;
+    }
+  }
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
@@ -186,7 +212,7 @@ class _ChatScreenState extends State<ChatScreen> {
           logDebug('❌ Failed to read image bytes on web: $e');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to read image file. Please try again.'),
+              content: Text(l10n.fileReadFailed),
               backgroundColor: Colors.red,
             ),
           );
@@ -277,11 +303,22 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         );
       }
+    } on DioException catch (e) {
+      final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
+        e,
+        l10n,
+        fallbackMessage: l10n.fileSendFailed,
+      );
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+      );
     } catch (e) {
+      logDebugError('File upload failed', e);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.errorWithMessage(e.toString())),
+          content: Text(l10n.fileSendFailed),
           backgroundColor: Colors.red,
         ),
       );
@@ -578,11 +615,9 @@ class _ChatScreenState extends State<ChatScreen> {
           }
           if (state is ChatError) {
             logDebugError('Chat Error', state.message);
-            var errorText = state.message.contains("chatError_")
-                ? Text(context.parseL10n(state.message))
-                : Text(state.message);
+            final mappedMessage = _mapChatErrorMessage(context, state.message);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: errorText, backgroundColor: Colors.red),
+              SnackBar(content: Text(mappedMessage), backgroundColor: Colors.red),
             );
           }
           // Block user states
@@ -1263,7 +1298,7 @@ class _ChatScreenState extends State<ChatScreen> {
       );
 
       if (senderPublicKey == null) {
-        throw Exception('Sender public key not found. Cannot decrypt file.');
+        throw StateError('chat_file_missing_sender_key');
       }
 
       logDebug(
@@ -1370,12 +1405,37 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         );
       }
-    } catch (e) {
+    } on DioException catch (e) {
+      final l10n = AppLocalizations.of(context)!;
+      final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
+        e,
+        l10n,
+        fallbackMessage: l10n.fileDownloadFailed,
+      );
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+      );
+    } on StateError catch (e) {
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.downloadFailed(e.toString())),
+          content: Text(
+            e.message == 'chat_file_missing_sender_key'
+                ? l10n.fileDecryptKeyMissing
+                : l10n.fileDownloadFailed,
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      final l10n = AppLocalizations.of(context)!;
+      logDebugError('File download failed', e);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.fileDownloadFailed),
           backgroundColor: Colors.red,
         ),
       );
@@ -1482,7 +1542,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.couldNotOpenFile(e.toString())),
+          content: Text(l10n.couldNotOpenFileGeneric),
           backgroundColor: Colors.red,
           action: SnackBarAction(
             label: l10n.showPath,

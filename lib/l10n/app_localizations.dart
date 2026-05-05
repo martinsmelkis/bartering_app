@@ -4940,6 +4940,42 @@ abstract class AppLocalizations {
   /// **'Cannot send file: Recipient public key not available'**
   String get cannotSendFileNoRecipientKey;
 
+  /// No description provided for @chatOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open this chat right now. Please try again.'**
+  String get chatOpenFailed;
+
+  /// No description provided for @fileReadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the selected file. Please try another file.'**
+  String get fileReadFailed;
+
+  /// No description provided for @fileSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to send the file right now. Please try again.'**
+  String get fileSendFailed;
+
+  /// No description provided for @fileDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to download this file right now. Please try again.'**
+  String get fileDownloadFailed;
+
+  /// No description provided for @fileDecryptKeyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot decrypt this file yet. Try again after the chat keys are synchronized.'**
+  String get fileDecryptKeyMissing;
+
+  /// No description provided for @couldNotOpenFileGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this file. Please try another app or check the file path.'**
+  String get couldNotOpenFileGeneric;
+
   /// No description provided for @gallery.
   ///
   /// In en, this message translates to:
