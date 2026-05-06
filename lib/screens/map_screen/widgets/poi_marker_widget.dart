@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:io';
 
 import 'package:barter_app/models/map/point_of_interest.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
@@ -62,7 +63,7 @@ class PoiMarkerWidget {
       if (kIsWeb) {
         // Web platform: 0.50-0.90 range, alpha 0.2 to 1.0
         final normalizedScore = ((relevancyScore - 0.50) / 0.40).clamp(0.0, 1.0);
-        
+
         logDebug('@@@@@@@@@@ WEB NORMALIZATION: score=$relevancyScore, normalized=$normalizedScore');
 
         // Tiered boost system
@@ -109,10 +110,12 @@ class PoiMarkerWidget {
         final boostedColorScore = (normalizedScore * colorBoost).clamp(0.0, 0.9);
 
         // Interpolate color from orange to deep orange
-        glowColor = Color.lerp(Colors.orange.shade500, Colors.deepOrange.shade400, boostedColorScore);
+        glowColor = Platform.isIOS
+            ? Color.lerp(Colors.orange.shade700, Colors.deepOrange.shade700, boostedColorScore)
+          : Color.lerp(Colors.orange.shade500, Colors.deepOrange.shade400, boostedColorScore);
 
         // Interpolate alpha from 0.3 to 0.6, then apply boost
-        final baseAlpha = 0.3 + (normalizedScore * 0.35);
+        final baseAlpha = (Platform.isIOS ? 0.5 : 0.3) + (normalizedScore * 0.35);
         glowAlpha = (baseAlpha * alphaBoost).clamp(0.35, 0.85);
 
         logDebug('@@@@@@@@@@ NATIVE RESULT: boostedColor=$boostedColorScore, color=$glowColor, alpha=${glowAlpha.toStringAsFixed(3)}');
@@ -211,8 +214,8 @@ class PoiMarkerWidget {
           // Glow effect for relevant POIs
           if (glowColor != null)
             Positioned(
-              left: 23 * markerScale - 2,
-              top: 23 * markerScale - 2,
+              left: 23 * markerScale - (Platform.isIOS ? 1 : 2),
+              top: 23 * markerScale - (Platform.isIOS ? 1 : 2),
               child: Container(
                 width: circleSize - circleSize / 2.4,
                 height: circleSize - circleSize / 2.4,
@@ -359,8 +362,8 @@ class PoiMarkerWidget {
     }
 
     // Determine background color based on glow
-    final backgroundColor = glowColor != null 
-        ? _colorToHex(glowColor) 
+    final backgroundColor = glowColor != null
+        ? _colorToHex(glowColor)
         : '#F5F5F5';
 
     // Build online status badge

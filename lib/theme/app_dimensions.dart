@@ -1,6 +1,7 @@
 // lib/theme/app_dimensions.dart
 import 'dart:ui' as ui;
 
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -22,7 +23,7 @@ class AppDimensions {
   static double get mapPoiMarkerSize {
     if (kIsWeb) return 90;
 
-    final logicalSize = (105.w).clamp(98.0, 108.0).toDouble();
+    final logicalSize = (Platform.isIOS ? 90.w : 105.w).clamp(98.0, 108.0).toDouble();
 
     // Use the current view DPR to apply a mild compensation for high-density
     // Android displays where icons can appear physically smaller.
@@ -38,7 +39,7 @@ class AppDimensions {
 
     final compensation = dpr >= 3.25 ? 1.45 : dpr >= 2.85 ? 1.25 : dpr >= 2.55 ? 1.05 : dpr >= 2.25 ? 1.02 : 1.0;
 
-    return (logicalSize * compensation).clamp(minAvatarSize, 145.0).toDouble();
+    return (logicalSize * compensation).clamp(minAvatarSize, Platform.isIOS ? 1.05 : 145.0).toDouble();
   }
 
   /// Size for user avatar FAB
@@ -58,17 +59,17 @@ class AppDimensions {
   ///
   /// NOTE: Keep native tablet sizing close to phone proportions.
   static double get mainClusterSize =>
-      kIsWeb ? 80.0 : (72.w).clamp(65.0, 78.0).toDouble();
+      kIsWeb ? 80.0 : (Platform.isIOS ? 60.w : 72.w).clamp(65.0, 78.0).toDouble();
 
   /// Font size for main cluster marker text
-  static double get mainClusterFontSize => kIsWeb ? 25.0 : 20;
+  static double get mainClusterFontSize => kIsWeb ? 25.0 : (Platform.isIOS ? 18 : 20);
 
   /// Border width for main cluster markers
   static double get mainClusterBorderWidth => kIsWeb ? 2.0 : 4.0;
 
   /// Container size for sub-cluster markers
   static double get subClusterSize =>
-      kIsWeb ? 60.0 : (65.w).clamp(58.0, 70.0).toDouble();
+      kIsWeb ? 60.0 : (Platform.isIOS ? 56.w : 65.w).clamp(58.0, 70.0).toDouble();
 
   /// Font size for sub-cluster marker text
   static double get subClusterFontSize => kIsWeb ? 22 : 17;
