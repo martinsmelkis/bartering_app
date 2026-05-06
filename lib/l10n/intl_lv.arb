@@ -55,6 +55,7 @@
   "searchForALocation": "Meklēt atrašanās vietu",
   "searchForAKeyword": "Meklēt atslēgvārdu",
   "saveLocation": "Saglabāt atrašanās vietu",
+  "locationSetAtMarkerInfo": "Jūsu atrašanās vieta tiks iestatīta marķiera atrašanās vietā",
   "chatError_Offline": "Lietotājs bezsaistē",
   "mockPoiNotFound": "Testa POI ar id {id} nav atrasts servisā",
   "mockPoiNotFoundForUpdate": "Testa POI ar id {id} nav atrasts atjaunināšanai",

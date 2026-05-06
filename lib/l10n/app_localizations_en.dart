@@ -190,6 +190,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveLocation => 'Save Location';
 
   @override
+  String get locationSetAtMarkerInfo =>
+      'Your location will be set at the marker location';
+
+  @override
   String get chatError_Offline => 'User Offline';
 
   @override

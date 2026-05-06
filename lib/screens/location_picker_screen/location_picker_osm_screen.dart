@@ -336,6 +336,30 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
                 ],
               ),
             ),
+            Positioned(
+              bottom: 20,
+              left: 76,
+              right: 76,
+              child: IgnorePointer(
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!.locationSetAtMarkerInfo,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             // Save location button at bottom right
             Positioned(
               bottom: 12,

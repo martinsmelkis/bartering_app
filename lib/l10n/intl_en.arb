@@ -55,6 +55,7 @@
   "searchForALocation": "Search for a location",
   "searchForAKeyword": "Search for a keyword",
   "saveLocation": "Save Location",
+  "locationSetAtMarkerInfo": "Your location will be set at the marker location",
   "chatError_Offline": "User Offline",
   "mockPoiNotFound": "Mock POI with id {id} not found in service",
   "mockPoiNotFoundForUpdate": "Mock POI with id {id} not found for update",

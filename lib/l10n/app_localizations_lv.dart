@@ -193,6 +193,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get saveLocation => 'Saglabāt atrašanās vietu';
 
   @override
+  String get locationSetAtMarkerInfo =>
+      'Jūsu atrašanās vieta tiks iestatīta marķiera atrašanās vietā';
+
+  @override
   String get chatError_Offline => 'Lietotājs bezsaistē';
 
   @override

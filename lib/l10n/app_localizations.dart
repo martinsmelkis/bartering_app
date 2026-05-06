@@ -416,6 +416,12 @@ abstract class AppLocalizations {
   /// **'Save Location'**
   String get saveLocation;
 
+  /// No description provided for @locationSetAtMarkerInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location will be set at the marker location'**
+  String get locationSetAtMarkerInfo;
+
   /// No description provided for @chatError_Offline.
   ///
   /// In en, this message translates to:
