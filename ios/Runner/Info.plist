@@ -26,10 +26,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Barter App uses your location to help you discover nearby users, even when the app is active in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Barter App uses your location to show nearby users and improve match relevance.</string>
+	<string>Barter App can use your location while you use the app to show nearby users and improve match relevance. Location access is optional and can be enabled in settings.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -70,14 +68,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Barter App uses your location to show nearby users and improve match relevance.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Barter App uses your location to help you discover nearby users, even when the app is active in the background.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -89,6 +79,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>tel</string>
