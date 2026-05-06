@@ -14,6 +14,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../configure_dependencies.dart';
+import '../../firebase_options.dart';
 import '../../models/notifications/notification_models.dart';
 import '../api_client.dart';
 import 'local_notification_service.dart';
@@ -22,7 +23,9 @@ import 'local_notification_service.dart';
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     logDebug('Firebase initialized in background handler');
   } catch (e) {
     logDebug('Firebase already initialized (this is normal): $e');
