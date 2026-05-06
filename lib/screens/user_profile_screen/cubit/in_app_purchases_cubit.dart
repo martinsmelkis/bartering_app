@@ -121,6 +121,10 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       }
 
       if (revenueCatApiKey.isEmpty) {
+        _debugLogErrorState(
+          'initialize_missing_api_key',
+          localized.revenueCatApiKeyMissing,
+        );
         emit(state.copyWith(
           isInitializing: false,
           errorMessage: localized.revenueCatApiKeyMissing,
@@ -140,7 +144,8 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
 
       await loadOfferings();
       await refreshPremiumStatus();
-    } catch (e) {
+    } catch (e, st) {
+      _debugLogErrorState('initialize_exception', e, st);
       emit(state.copyWith(
         errorMessage: '${localized.failedToInitializePurchases}: $e',
       ));
@@ -162,11 +167,22 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     try {
       final offerings = await Purchases.getOfferings();
       final packages = offerings.current?.availablePackages ?? <Package>[];
+
+      if (packages.isEmpty) {
+        _debugLogErrorState(
+          'load_offerings_empty_packages',
+          'No packages in current offering. '
+              'currentOffering=${offerings.current?.identifier ?? 'null'}, '
+              'allOfferingKeys=${offerings.all.keys.join(',')}',
+        );
+      }
+
       emit(state.copyWith(
         isLoadingOfferings: false,
         availablePackages: packages,
       ));
-    } catch (e) {
+    } catch (e, st) {
+      _debugLogErrorState('load_offerings_exception', e, st);
       emit(state.copyWith(
         isLoadingOfferings: false,
         errorMessage: '${localized.failedToLoadOfferings}: $e',
@@ -221,6 +237,10 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       }
 
       if (packages.isEmpty) {
+        _debugLogErrorState(
+          'purchase_premium_no_packages_available',
+          'No packages found after loading offerings',
+        );
         _logPurchaseError(
           'no_packages_available',
           'No packages found after loading offerings',
@@ -265,6 +285,11 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         return;
       }
 
+      _debugLogErrorState(
+        'purchase_premium_platform_exception',
+        'code=${e.code}, message=${e.message ?? 'n/a'}, details=${e.details ?? 'n/a'}',
+        st,
+      );
       _logPurchaseError(
         'platform_exception',
         'code=${e.code}, message=${e.message ?? 'n/a'}, details=${e.details ?? 'n/a'}',
@@ -276,6 +301,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
             '${localized.purchaseFailed}: code=${e.code}, message=${e.message ?? 'n/a'}',
       ));
     } catch (e, st) {
+      _debugLogErrorState('purchase_premium_unexpected_exception', e, st);
       _logPurchaseError('unexpected_exception', e, st);
       emit(state.copyWith(
         isPurchasing: false,
@@ -344,6 +370,10 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       }).firstOrNull;
 
       if (coin20Package == null) {
+        _debugLogErrorState(
+          'purchase_coins20_package_not_found',
+          'No package matched coins_20 by package/product identifier',
+        );
         emit(state.copyWith(
           isPurchasing: false,
           errorMessage: '20-coin package is not configured yet.',
@@ -387,6 +417,11 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         return;
       }
 
+      _debugLogErrorState(
+        'purchase_coins20_platform_exception',
+        'code=${e.code}, message=${e.message ?? 'n/a'}, details=${e.details ?? 'n/a'}',
+        st,
+      );
       _logPurchaseError(
         'coins20_platform_exception',
         'code=${e.code}, message=${e.message ?? 'n/a'}, details=${e.details ?? 'n/a'}',
@@ -398,6 +433,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
             '${localized.purchaseFailed}: code=${e.code}, message=${e.message ?? 'n/a'}',
       ));
     } catch (e, st) {
+      _debugLogErrorState('purchase_coins20_unexpected_exception', e, st);
       _logPurchaseError('coins20_unexpected_exception', e, st);
       emit(state.copyWith(
         isPurchasing: false,
@@ -422,7 +458,8 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
             ? localized.premiumRestoredSuccessfully
             : localized.noActivePremiumPurchasesToRestore,
       ));
-    } catch (e) {
+    } catch (e, st) {
+      _debugLogErrorState('restore_purchases_exception', e, st);
       emit(state.copyWith(
         isRestoring: false,
         errorMessage: '${localized.restoreFailed}: $e',
@@ -440,7 +477,8 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
 
       final customerInfo = await Purchases.getCustomerInfo();
       emit(state.copyWith(isPremium: _isPremiumActive(customerInfo)));
-    } catch (e) {
+    } catch (e, st) {
+      _debugLogErrorState('refresh_premium_status_exception', e, st);
       debugPrint('Failed to refresh premium status: $e');
     }
   }
@@ -473,6 +511,27 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     debugPrint('[IAP][purchasePremium][$context] $error');
     if (st != null) {
       debugPrint('[IAP][purchasePremium][$context][stack] $st');
+    }
+  }
+
+  void _debugLogErrorState(String context, Object error, [StackTrace? st]) {
+    if (!kDebugMode) return;
+
+    debugPrint('[IAP][debug][$context] $error');
+    debugPrint(
+      '[IAP][debug][$context][state] '
+      'isInitializing=${state.isInitializing}, '
+      'isLoadingOfferings=${state.isLoadingOfferings}, '
+      'isPurchasing=${state.isPurchasing}, '
+      'isRestoring=${state.isRestoring}, '
+      'isPremium=${state.isPremium}, '
+      'availablePackages=${state.availablePackages.length}, '
+      'hasError=${state.errorMessage != null}, '
+      'hasStatus=${state.statusMessage != null}',
+    );
+
+    if (st != null) {
+      debugPrint('[IAP][debug][$context][stack] $st');
     }
   }
 
