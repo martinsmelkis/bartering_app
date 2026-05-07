@@ -124,7 +124,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    if (_selectedImages.length >= 3) {
+    if (_selectedImages.length >= 4) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(AppLocalizations.of(context)!.maxImagesReached),
@@ -389,6 +389,20 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
           ),
         );
         Navigator.of(context).pop(true);
+      }
+    } on dio.DioException catch (e) {
+      if (mounted) {
+        final statusCode = e.response?.statusCode;
+        final message = statusCode == 413
+            ? 'Image size too large, each image must be < 5 MB'
+            : '${AppLocalizations.of(context)!.error}: $e';
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -714,7 +728,7 @@ class _CreatePostingScreenState extends State<CreatePostingScreen> {
                 SizedBox(height: 12),
 
                 // Add Image Button
-                if (_selectedImages.length < 3)
+                if (_selectedImages.length < 4)
                   OutlinedButton.icon(
                     onPressed: _showImageSourceDialog,
                     icon: const Icon(Icons.add_photo_alternate),

@@ -115,6 +115,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           dotenv.env['REVENUECAT_WEB_PREMIUM_LINK_BASE_URL'] ?? '',
       webCoins20PurchaseLinkBaseUrl:
           dotenv.env['REVENUECAT_WEB_COINS_20_LINK_BASE_URL'] ?? '',
+      webCoins50PurchaseLinkBaseUrl:
+          dotenv.env['REVENUECAT_WEB_COINS_50_LINK_BASE_URL'] ?? '',
+      webCoins200PurchaseLinkBaseUrl:
+          dotenv.env['REVENUECAT_WEB_COINS_200_LINK_BASE_URL'] ?? '',
       texts: () {
         final l10n = AppLocalizations.of(context)!;
         return InAppPurchasesTexts(
@@ -1326,43 +1330,51 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     ).then((selectedAmount) async {
       if (!mounted || selectedAmount == null) return;
 
-      if (selectedAmount == 20) {
-        await _inAppPurchasesCubit.purchase20Coins();
-        final state = _inAppPurchasesCubit.state;
-
-        if (!mounted) return;
-
-        if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
+      switch (selectedAmount) {
+        case 20:
+          await _inAppPurchasesCubit.purchase20Coins();
+          break;
+        case 50:
+          await _inAppPurchasesCubit.purchase50Coins();
+          break;
+        case 200:
+          await _inAppPurchasesCubit.purchase200Coins();
+          break;
+        default:
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.errorMessage!),
-              backgroundColor: Colors.red,
+              content: Text('Coin pack $selectedAmount is not supported.'),
             ),
           );
           return;
-        }
+      }
 
-        final message = state.statusMessage?.isNotEmpty == true
-            ? state.statusMessage!
-            : AppLocalizations.of(context)!
-                .selectedCoinPackage(selectedAmount.toString());
+      final state = _inAppPurchasesCubit.state;
+
+      if (!mounted) return;
+
+      if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.green,
+            content: Text(state.errorMessage!),
+            backgroundColor: Colors.red,
           ),
         );
-        _loadWalletData();
         return;
       }
 
+      final message = state.statusMessage?.isNotEmpty == true
+          ? state.statusMessage!
+          : AppLocalizations.of(context)!
+              .selectedCoinPackage(selectedAmount.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Coin pack $selectedAmount is a placeholder for now.',
-          ),
+          content: Text(message),
+          backgroundColor: Colors.green,
         ),
       );
+      _loadWalletData();
     });
   }
 

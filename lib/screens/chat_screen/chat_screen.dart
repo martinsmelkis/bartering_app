@@ -1,4 +1,5 @@
 import 'package:barter_app/l10n/app_localizations.mapper.dart';
+import 'package:barter_app/repositories/chat_repository.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/router/app_router.dart';
 import 'package:barter_app/services/api_client.dart';
@@ -1259,11 +1260,18 @@ class _ChatScreenState extends State<ChatScreen> {
     _activeDownloads.add(attachment.fileId);
 
     final l10n = AppLocalizations.of(context)!;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    var hasShownDecryptingSnackBar = false;
+    ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? progressSnackBarController;
+
+    void dismissProgressSnackBar() {
+      progressSnackBarController?.close();
+      progressSnackBarController = null;
+    }
 
     try {
       // Show initial downloading progress
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-      scaffoldMessenger.showSnackBar(
+      progressSnackBarController = scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Row(
             children: [
@@ -1314,8 +1322,10 @@ class _ChatScreenState extends State<ChatScreen> {
         onProgress: (progress) {
           // Progress updates disabled to prevent stack overflow on WASM
           // Show decrypting message once at 50%
-          if (progress > 0.5 && progress < 0.6 && mounted) {
-            scaffoldMessenger.showSnackBar(
+          if (!hasShownDecryptingSnackBar && progress > 0.5 && progress < 0.6 && mounted) {
+            hasShownDecryptingSnackBar = true;
+            dismissProgressSnackBar();
+            progressSnackBarController = scaffoldMessenger.showSnackBar(
               SnackBar(
                 content: Row(
                   children: [
@@ -1337,9 +1347,11 @@ class _ChatScreenState extends State<ChatScreen> {
         },
       );
 
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      dismissProgressSnackBar();
 
       if (downloadResult.localPath != null) {
+        final savedLocalPath = downloadResult.localPath!;
+
         // Mobile/Desktop: File saved locally
         // Add to global image cache for preview
         if (attachment.isImage) {
@@ -1349,27 +1361,42 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         }
 
-        // Update the message with local path
-        final message = _chatCubit.messages.firstWhere(
-              (msg) => msg.fileAttachment?.fileId == attachment.fileId,
+        // Persist local attachment state so previews/browsing still work
+        // even if remote file has expired.
+        try {
+          final chatRepository = getIt<ChatRepository>();
+          await chatRepository.updateFileAttachmentLocalState(
+            fileId: attachment.fileId,
+            localPath: savedLocalPath,
+            isDownloaded: true,
+          );
+        } catch (e) {
+          logDebugError('Failed to persist local file state', e);
+        }
+
+        // Update in-memory message state immediately
+        final messageIndex = _chatCubit.messages.indexWhere(
+          (msg) => msg.fileAttachment?.fileId == attachment.fileId,
         );
 
-        _chatCubit.messages[_chatCubit.messages.indexOf(message)] = message
-            .copyWith(
-          fileAttachment: attachment.copyWith(
-            localPath: downloadResult.localPath,
-            isDownloaded: true,
-          ),
-        );
+        if (messageIndex != -1) {
+          final message = _chatCubit.messages[messageIndex];
+          _chatCubit.messages[messageIndex] = message.copyWith(
+            fileAttachment: attachment.copyWith(
+              localPath: savedLocalPath,
+              isDownloaded: true,
+            ),
+          );
+        }
 
         // Defer setState to avoid calling during build phase
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) setState(() {});
         });
 
-        // Automatically open the file
+        // Automatically open from local saved path
         await _openFile(
-          downloadResult.localPath!,
+          savedLocalPath,
           isImage: attachment.isImage,
           imageUrl: _buildFileUrl(attachment.fileId),
         );
@@ -1412,14 +1439,14 @@ class _ChatScreenState extends State<ChatScreen> {
         l10n,
         fallbackMessage: l10n.fileDownloadFailed,
       );
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
+      dismissProgressSnackBar();
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
       );
     } on StateError catch (e) {
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
+      dismissProgressSnackBar();
+      scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text(
             e.message == 'chat_file_missing_sender_key'
@@ -1432,22 +1459,17 @@ class _ChatScreenState extends State<ChatScreen> {
     } catch (e) {
       final l10n = AppLocalizations.of(context)!;
       logDebugError('File download failed', e);
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
+      dismissProgressSnackBar();
+      scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text(l10n.fileDownloadFailed),
           backgroundColor: Colors.red,
         ),
       );
     } finally {
-      // Remove from active downloads and ensure snackbar is dismissed
+      // Remove from active downloads and ensure progress snackbar is dismissed
       _activeDownloads.remove(attachment.fileId);
-      // Delayed hide to ensure it works even if called during build
-      Future.delayed(Duration(milliseconds: 50), () {
-        if (mounted) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        }
-      });
+      dismissProgressSnackBar();
     }
   }
 

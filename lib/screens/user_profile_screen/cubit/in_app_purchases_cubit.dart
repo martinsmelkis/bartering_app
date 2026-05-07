@@ -85,6 +85,12 @@ class InAppPurchasesState {
 }
 
 class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
+  static const Map<int, _CoinPackConfig> _coinPackConfigs = {
+    20: _CoinPackConfig(productId: 'android_coins_20', amountMinor: 111),
+    50: _CoinPackConfig(productId: 'android_coins_50', amountMinor: 222),
+    200: _CoinPackConfig(productId: 'android_coins_200', amountMinor: 555),
+  };
+
   final String appUserId;
   final String revenueCatApiKey;
   final String premiumEntitlementId;
@@ -92,6 +98,8 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
   final ApiClient apiClient;
   final String webPurchaseLinkBaseUrl;
   final String webCoins20PurchaseLinkBaseUrl;
+  final String webCoins50PurchaseLinkBaseUrl;
+  final String webCoins200PurchaseLinkBaseUrl;
 
   static bool _isConfigured = false;
 
@@ -102,6 +110,8 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     required this.apiClient,
     required this.webPurchaseLinkBaseUrl,
     required this.webCoins20PurchaseLinkBaseUrl,
+    required this.webCoins50PurchaseLinkBaseUrl,
+    required this.webCoins200PurchaseLinkBaseUrl,
     this.premiumEntitlementId = 'Bartering App Premium',
   }) : super(const InAppPurchasesState());
 
@@ -310,15 +320,45 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     }
   }
 
-  Future<void> purchase20Coins() async {
+  Future<void> purchase20Coins() => _purchaseCoinPack(20);
+
+  Future<void> purchase50Coins() => _purchaseCoinPack(50);
+
+  Future<void> purchase200Coins() => _purchaseCoinPack(200);
+
+  Future<void> _purchaseCoinPack(int coinAmount) async {
     emit(state.copyWith(isPurchasing: true, clearError: true, clearStatus: true));
 
     final localized = texts();
+    final config = _coinPackConfigs[coinAmount];
+
+    if (config == null) {
+      emit(state.copyWith(
+        isPurchasing: false,
+        errorMessage: 'Coin pack $coinAmount is not configured yet.',
+      ));
+      return;
+    }
 
     try {
       if (kIsWeb) {
-        if (webCoins20PurchaseLinkBaseUrl.trim().isEmpty) {
-          _logPurchaseError('coins20_web_config_missing', 'webCoins20PurchaseLinkBaseUrl is empty');
+        final webCoinsPurchaseLinkBaseUrl = _webCoinsPurchaseLinkBaseUrlByAmount(
+          coinAmount,
+        );
+
+        if (webCoinsPurchaseLinkBaseUrl == null) {
+          emit(state.copyWith(
+            isPurchasing: false,
+            errorMessage: 'Coin pack $coinAmount is not available on web yet.',
+          ));
+          return;
+        }
+
+        if (webCoinsPurchaseLinkBaseUrl.trim().isEmpty) {
+          _logPurchaseError(
+            'coins${coinAmount}_web_config_missing',
+            'web coins link base URL is empty for amount=$coinAmount',
+          );
           emit(state.copyWith(
             isPurchasing: false,
             errorMessage:
@@ -330,7 +370,9 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         final settingsService = SettingsService();
         await settingsService.setPendingPurchase(true);
 
-        final webCoinsPurchaseLink = _buildWebCoins20PurchaseLink();
+        final webCoinsPurchaseLink = _buildWebCoinsPurchaseLink(
+          webCoinsPurchaseLinkBaseUrl,
+        );
         final launched = await launchUrl(
           webCoinsPurchaseLink,
           mode: LaunchMode.platformDefault,
@@ -339,7 +381,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
 
         if (!launched) {
           _logPurchaseError(
-            'coins20_web_launch_failed',
+            'coins${coinAmount}_web_launch_failed',
             'Could not launch $webCoinsPurchaseLink',
           );
           await settingsService.clearPendingPurchase();
@@ -357,46 +399,36 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         return;
       }
 
-      var packages = state.availablePackages;
-      if (packages.isEmpty) {
-        await loadOfferings();
-        packages = state.availablePackages;
-      }
+      final products = await Purchases.getProducts([config.productId]);
+      final coinProduct = products.firstOrNull;
 
-      final coin20Package = packages.where((package) {
-        final packageId = package.identifier.toLowerCase();
-        final productId = package.storeProduct.identifier.toLowerCase();
-        return packageId.contains('coins_20') || productId.contains('coins_20');
-      }).firstOrNull;
-
-      if (coin20Package == null) {
+      if (coinProduct == null) {
         _debugLogErrorState(
-          'purchase_coins20_package_not_found',
-          'No package matched coins_20 by package/product identifier',
+          'purchase_coins_product_not_found',
+          'No product matched ${config.productId}',
         );
         emit(state.copyWith(
           isPurchasing: false,
-          errorMessage: '20-coin package is not configured yet.',
+          errorMessage: '$coinAmount-coin product is not configured yet.',
         ));
         return;
       }
 
       await Purchases.purchase(
-        PurchaseParams.storeProduct(coin20Package.storeProduct),
+        PurchaseParams.storeProduct(coinProduct),
       );
 
       final purchaseResponse = await apiClient.purchaseCoinPack(
         PurchaseCoinPackRequest(
           userId: appUserId,
-          coinAmount: 20,
+          coinAmount: coinAmount,
           currency: 'EUR',
-          amountMinor: 111,
-          externalRef: 'rc_coins_20_${DateTime.now().millisecondsSinceEpoch}',
+          amountMinor: config.amountMinor,
+          externalRef:
+              'rc_${config.productId}_${DateTime.now().millisecondsSinceEpoch}',
           metadataJson: jsonEncode({
             'source': 'revenuecat_draft',
-            'entitlementId': 'coins_20',
-            'productId': coin20Package.storeProduct.identifier,
-            'packageId': coin20Package.identifier,
+            'productId': coinProduct.identifier,
           }),
         ),
       );
@@ -405,7 +437,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         isPurchasing: false,
         statusMessage: purchaseResponse.message.isNotEmpty
             ? purchaseResponse.message
-            : '20 coins purchase completed.',
+            : '$coinAmount coins purchase completed.',
       ));
     } on PlatformException catch (e, st) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
@@ -418,12 +450,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       }
 
       _debugLogErrorState(
-        'purchase_coins20_platform_exception',
-        'code=${e.code}, message=${e.message ?? 'n/a'}, details=${e.details ?? 'n/a'}',
-        st,
-      );
-      _logPurchaseError(
-        'coins20_platform_exception',
+        'purchase_coins_platform_exception',
         'code=${e.code}, message=${e.message ?? 'n/a'}, details=${e.details ?? 'n/a'}',
         st,
       );
@@ -433,8 +460,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
             '${localized.purchaseFailed}: code=${e.code}, message=${e.message ?? 'n/a'}',
       ));
     } catch (e, st) {
-      _debugLogErrorState('purchase_coins20_unexpected_exception', e, st);
-      _logPurchaseError('coins20_unexpected_exception', e, st);
+      _debugLogErrorState('purchase_coins_unexpected_exception', e, st);
       emit(state.copyWith(
         isPurchasing: false,
         errorMessage: '${localized.purchaseFailed}: $e',
@@ -493,8 +519,21 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     return baseUri.replace(path: '$cleanPath/$appUserId');
   }
 
-  Uri _buildWebCoins20PurchaseLink() {
-    final normalizedBase = webCoins20PurchaseLinkBaseUrl.trim();
+  String? _webCoinsPurchaseLinkBaseUrlByAmount(int coinAmount) {
+    switch (coinAmount) {
+      case 20:
+        return webCoins20PurchaseLinkBaseUrl;
+      case 50:
+        return webCoins50PurchaseLinkBaseUrl;
+      case 200:
+        return webCoins200PurchaseLinkBaseUrl;
+      default:
+        return null;
+    }
+  }
+
+  Uri _buildWebCoinsPurchaseLink(String baseUrl) {
+    final normalizedBase = baseUrl.trim();
     final baseUri = Uri.parse(normalizedBase);
     final cleanPath = baseUri.path.endsWith('/')
         ? baseUri.path.substring(0, baseUri.path.length - 1)
@@ -534,5 +573,14 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       debugPrint('[IAP][debug][$context][stack] $st');
     }
   }
+}
 
+class _CoinPackConfig {
+  final String productId;
+  final int amountMinor;
+
+  const _CoinPackConfig({
+    required this.productId,
+    required this.amountMinor,
+  });
 }

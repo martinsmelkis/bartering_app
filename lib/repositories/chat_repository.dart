@@ -593,6 +593,22 @@ class ChatRepository {
     ));
   }
 
+  /// Persist local file path + download state for an attachment
+  /// so previously downloaded files can still be previewed/opened later.
+  Future<void> updateFileAttachmentLocalState({
+    required String fileId,
+    required String localPath,
+    bool isDownloaded = true,
+  }) async {
+    await (_database.update(_database.userChats)
+      ..where((tbl) => tbl.fileId.equals(fileId)))
+        .write(UserChatsCompanion(
+      localPath: Value(localPath),
+      isDownloaded: Value(isDownloaded),
+      updatedAt: Value(DateTime.now()),
+    ));
+  }
+
   /// Get encrypted messages from a specific sender that haven't been decrypted yet
   Future<List<UserChat>> getEncryptedMessages({
     required String conversationId,
