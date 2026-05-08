@@ -171,7 +171,7 @@ class _SuggestionKeywordsListState extends State<SuggestionKeywordsList> {
 
     return PointerInterceptor(
       child: Container(
-        height: 52.h,
+        height: 58,
         color: Colors.transparent,
         child: Listener(
           onPointerSignal: (event) {

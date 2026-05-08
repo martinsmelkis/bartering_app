@@ -14,7 +14,8 @@ class MainNavigation extends StatelessWidget {
       },
       heroTag: "MainMenuFab",
       mini: true,
-      backgroundColor: AppColors.background,
+      elevation: 0,
+      backgroundColor: AppColors.fabColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
       ),

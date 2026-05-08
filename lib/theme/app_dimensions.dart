@@ -62,7 +62,7 @@ class AppDimensions {
       kIsWeb ? 80.0 : (Platform.isIOS ? 60.w : 72.w).clamp(65.0, 78.0).toDouble();
 
   /// Font size for main cluster marker text
-  static double get mainClusterFontSize => kIsWeb ? 25.0 : (Platform.isIOS ? 18 : 20);
+  static double get mainClusterFontSize => kIsWeb ? 24.0 : 18.0;
 
   /// Border width for main cluster markers
   static double get mainClusterBorderWidth => kIsWeb ? 2.0 : 4.0;

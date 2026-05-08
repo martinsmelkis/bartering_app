@@ -73,11 +73,11 @@ class _SearchInMapTextFieldState extends State<SearchInMapTextField> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return SizedBox(
-      height: kIsWeb ? 48 : 46,
+      height: kIsWeb ? 48 : 50,
       child: Card(
-        margin: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+        margin: const EdgeInsets.fromLTRB(0, !kIsWeb ? 4 : 0, 0, 8),
         color: Colors.white,
-        elevation: 2,
+        elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),

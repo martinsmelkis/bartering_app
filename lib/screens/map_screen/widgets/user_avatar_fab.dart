@@ -210,7 +210,7 @@ class _UserAvatarFabState extends State<UserAvatarFab> {
                               width: AppDimensions.avatarEditIconSize,
                               height: AppDimensions.avatarEditIconSize,
                               decoration: BoxDecoration(
-                                color: AppColors.background,
+                                color: AppColors.fabColor,
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(

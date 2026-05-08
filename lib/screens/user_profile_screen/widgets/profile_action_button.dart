@@ -20,7 +20,7 @@ class ProfileActionButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4.h),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8.0),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(8.r),

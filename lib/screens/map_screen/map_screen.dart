@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
@@ -937,10 +939,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               );
 
               final safeTop = MediaQuery.of(context).viewPadding.top;
-              final topBarTop = kIsWeb ? 20.0 : safeTop;
-              final searchTop = topBarTop + 4;
-              final searchFieldHeight = 48;
-              final suggestionTop = kIsWeb ? (searchFieldHeight + 8.0) : (searchTop - 6.h) + searchFieldHeight;
+              final topBarTop = kIsWeb ? 21.0 : safeTop + 8.0;
+              final suggestionTop = kIsWeb ? 55.0 : safeTop + 46.0;
               final mapStack = Stack(
                 children: [
                   mapWidget,
@@ -962,7 +962,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     ),
                   ),
                   Positioned(
-                    top: searchTop,
+                    top: topBarTop,
                     left: 64 + MediaQuery.of(context).viewPadding.left,
                     right: 100 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
@@ -1020,7 +1020,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                                 },
                                 heroTag: "ChatsFab",
                                 mini: true,
-                                backgroundColor: AppColors.background,
+                                backgroundColor: AppColors.fabColor,
+                                elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),

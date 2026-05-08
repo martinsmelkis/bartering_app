@@ -86,9 +86,21 @@ class InAppPurchasesState {
 
 class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
   static const Map<int, _CoinPackConfig> _coinPackConfigs = {
-    20: _CoinPackConfig(productId: 'android_coins_20', amountMinor: 111),
-    50: _CoinPackConfig(productId: 'android_coins_50', amountMinor: 222),
-    200: _CoinPackConfig(productId: 'android_coins_200', amountMinor: 555),
+    20: _CoinPackConfig(
+      androidProductId: 'android_coins_20',
+      iosProductId: 'coins_20_ios',
+      amountMinor: 111,
+    ),
+    50: _CoinPackConfig(
+      androidProductId: 'android_coins_50',
+      iosProductId: 'coins_50_ios',
+      amountMinor: 222,
+    ),
+    200: _CoinPackConfig(
+      androidProductId: 'android_coins_200',
+      iosProductId: 'coins_200_ios',
+      amountMinor: 555,
+    ),
   };
 
   final String appUserId;
@@ -399,13 +411,14 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         return;
       }
 
-      final products = await Purchases.getProducts([config.productId]);
+      final productId = config.productIdForCurrentPlatform;
+      final products = await Purchases.getProducts([productId]);
       final coinProduct = products.firstOrNull;
 
       if (coinProduct == null) {
         _debugLogErrorState(
           'purchase_coins_product_not_found',
-          'No product matched ${config.productId}',
+          'No product matched $productId',
         );
         emit(state.copyWith(
           isPurchasing: false,
@@ -425,7 +438,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
           currency: 'EUR',
           amountMinor: config.amountMinor,
           externalRef:
-              'rc_${config.productId}_${DateTime.now().millisecondsSinceEpoch}',
+              'rc_${coinProduct.identifier}_${DateTime.now().millisecondsSinceEpoch}',
           metadataJson: jsonEncode({
             'source': 'revenuecat_draft',
             'productId': coinProduct.identifier,
@@ -576,11 +589,18 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
 }
 
 class _CoinPackConfig {
-  final String productId;
+  final String androidProductId;
+  final String iosProductId;
   final int amountMinor;
 
   const _CoinPackConfig({
-    required this.productId,
+    required this.androidProductId,
+    required this.iosProductId,
     required this.amountMinor,
   });
+
+  String get productIdForCurrentPlatform =>
+      defaultTargetPlatform == TargetPlatform.iOS
+          ? iosProductId
+          : androidProductId;
 }

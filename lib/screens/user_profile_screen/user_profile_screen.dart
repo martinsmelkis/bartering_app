@@ -590,7 +590,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4.h),
+                        horizontal: 12, vertical: 8.0),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(8.r),
@@ -709,7 +709,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4.h),
+                        horizontal: 12, vertical: 8.0),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(8.r),

@@ -125,7 +125,7 @@ class SelectableAttributeBubble extends StatelessWidget {
       backgroundColor = baseColor;
       textColor = Colors.white;
       borderColor = Colors.white;
-      borderWidth = 2.0;
+      borderWidth = 1.0;
     } else {
       // Unselected: semi-transparent background matching AttributeBubble (alpha 0.2),
       // with a darker outline of the main color
@@ -134,7 +134,7 @@ class SelectableAttributeBubble extends StatelessWidget {
       // Create a darker version of the base color for the border
       final hsl = HSLColor.fromColor(baseColor);
       borderColor = hsl.withLightness((hsl.lightness * 0.7).clamp(0.0, 1.0)).toColor();
-      borderWidth = 1.5;
+      borderWidth = 1.0;
     }
 
     return ChoiceChip(
