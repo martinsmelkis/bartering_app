@@ -48,6 +48,11 @@ class TermsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             _section(
+              title: l10n.termsConditionsSectionKidsSafetyTitle,
+              content: l10n.termsConditionsSectionKidsSafetyContent,
+            ),
+            const SizedBox(height: 20),
+            _section(
               title: l10n.termsConditionsSectionChangesTitle,
               content: l10n.termsConditionsSectionChangesContent,
             ),

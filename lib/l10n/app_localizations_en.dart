@@ -283,7 +283,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'Users are responsible for their own exchanges and interactions. The platform provides an intermediary environment to the extent permitted by law.';
 
   @override
-  String get termsConditionsSectionChangesTitle => '7. Changes to Terms';
+  String get termsConditionsSectionKidsSafetyTitle =>
+      '8. Child Safety and CSAE Standards';
+
+  @override
+  String get termsConditionsSectionKidsSafetyContent =>
+      'We have zero tolerance for child sexual abuse and exploitation (CSAE), including child sexual abuse material (CSAM), grooming, trafficking, and any sexual exploitation of minors.\n\nThe following are strictly prohibited on this platform:\n- Sharing, requesting, promoting, or storing CSAM\n- Sexualized communication involving minors\n- Grooming, coercion, trafficking, or exploitation of minors\n- Any attempt to use this service to endanger a child\n\nWe may remove content, suspend or terminate accounts, and report relevant cases to competent authorities as required by law. Users can report concerns through in-app reporting tools or by contacting info@bartering.app.\n\nWe review safety reports as quickly as possible and cooperate with lawful requests from authorities regarding CSAE-related violations.';
+
+  @override
+  String get termsConditionsSectionChangesTitle => '8. Changes to Terms';
 
   @override
   String get termsConditionsSectionChangesContent =>
@@ -726,9 +734,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_acting => 'Acting';
 
   @override
-  String get attr_amateur_radio => 'Amateur radio';
-
-  @override
   String get attr_animation => 'Animation';
 
   @override
@@ -736,9 +741,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attr_beekeeping => 'Beekeeping';
-
-  @override
-  String get attr_blogging => 'Blogging';
 
   @override
   String get attr_board_games => 'Board games';
@@ -754,9 +756,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attr_construction => 'Construction';
-
-  @override
-  String get attr_candle_making => 'Candle making';
 
   @override
   String get attr_car_maintenance => 'Car maintenance';
@@ -780,9 +779,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_clothesmaking => 'Clothesmaking';
 
   @override
-  String get attr_coffee => 'Coffee';
-
-  @override
   String get attr_software_development => 'Software development';
 
   @override
@@ -792,22 +788,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_couponing => 'Couponing';
 
   @override
-  String get attr_creative_writing => 'Creative writing';
-
-  @override
   String get attr_crocheting => 'Crocheting';
 
   @override
   String get attr_cross_stitch => 'Cross-stitch';
 
   @override
-  String get attr_dance => 'Dance';
-
-  @override
   String get attr_digital_arts => 'Digital arts';
 
   @override
-  String get attr_djing => 'DJing';
+  String get attr_dj_ing => 'DJing';
 
   @override
   String get attr_diy => 'DIY';
@@ -828,31 +818,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_event_hosting => 'Event hosting';
 
   @override
-  String get attr_fashion => 'Fashion';
-
-  @override
   String get attr_fashion_design => 'Fashion design';
 
   @override
   String get attr_flower_arranging => 'Flower arranging';
 
   @override
-  String get attr_furniture_building => 'Furniture building';
+  String get attr_furniture_assembly => 'Furniture assembly';
 
   @override
   String get attr_gaming => 'Gaming';
 
   @override
-  String get attr_genealogy => 'Genealogy';
-
-  @override
-  String get attr_graphic_design => 'Graphic design';
-
-  @override
   String get attr_hacking => 'Hacking';
-
-  @override
-  String get attr_herp_keeping => 'Herp keeping';
 
   @override
   String get attr_home_improvement => 'Home improvement';
@@ -864,7 +842,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_houseplant_care => 'Houseplant care';
 
   @override
-  String get attr_hydroponics => 'Hydroponics';
+  String get attr_home_decor => 'Home decor';
 
   @override
   String get attr_jewelry => 'Jewelry';
@@ -877,9 +855,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attr_leather_crafting => 'Leather crafting';
-
-  @override
-  String get attr_podcasts => 'Podcasts';
 
   @override
   String get attr_machining => 'Machining';
@@ -897,9 +872,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_metalworking => 'Metalworking';
 
   @override
-  String get attr_nail_art => 'Nail art';
-
-  @override
   String get attr_painting => 'Painting';
 
   @override
@@ -909,10 +881,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_pottery => 'Pottery';
 
   @override
-  String get attr_powerlifting => 'Powerlifting';
-
-  @override
-  String get attr_puzzles => 'Puzzles';
+  String get attr_workout_planning => 'Workout planning';
 
   @override
   String get attr_quilting => 'Quilting';
@@ -933,34 +902,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_shoemaking => 'Shoemaking';
 
   @override
-  String get attr_singing => 'Singing';
-
-  @override
-  String get attr_skateboarding => 'Skateboarding';
-
-  @override
-  String get attr_sketching => 'Sketching';
-
-  @override
-  String get attr_soapmaking => 'Soapmaking';
-
-  @override
   String get attr_social_media => 'Social media';
 
   @override
   String get attr_stand_up_comedy => 'Stand-up comedy';
-
-  @override
-  String get attr_storytelling => 'Storytelling';
-
-  @override
-  String get attr_sudoku => 'Sudoku';
-
-  @override
-  String get attr_table_tennis => 'Table tennis';
-
-  @override
-  String get attr_thrifting => 'Thrifting';
 
   @override
   String get attr_video_editing => 'Video editing';
@@ -996,28 +941,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_hiking => 'Hiking';
 
   @override
-  String get attr_reading => 'Reading';
-
-  @override
   String get attr_gardening => 'Gardening';
 
   @override
-  String get attr_music => 'Music';
+  String get attr_music_production => 'Music production';
 
   @override
   String get attr_dancing => 'Dancing';
-
-  @override
-  String get attr_aerobics => 'Aerobics';
 
   @override
   String get attr_traveling => 'Traveling';
 
   @override
   String get attr_coding => 'Coding';
-
-  @override
-  String get attr_sports => 'Sports';
 
   @override
   String get attr_movies => 'Movies';
@@ -1032,13 +968,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_crafting => 'Crafting';
 
   @override
+  String get attr_sales => 'Sales';
+
+  @override
+  String get attr_networking => 'Networking';
+
+  @override
+  String get attr_bookkeeping => 'Bookkeeping';
+
+  @override
+  String get attr_administrative_work => 'Administrative work';
+
+  @override
   String get attr_astronomy => 'Astronomy';
 
   @override
   String get attr_backpacking => 'Backpacking';
-
-  @override
-  String get attr_bird_watching => 'Bird watching';
 
   @override
   String get attr_camping => 'Camping';
@@ -1048,9 +993,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attr_car_restoration => 'Car restoration';
-
-  @override
-  String get attr_climbing => 'Climbing';
 
   @override
   String get attr_cryptocurrency => 'Cryptocurrency';
@@ -1065,10 +1007,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_drones => 'Drones';
 
   @override
-  String get attr_fermentation => 'Fermentation';
-
-  @override
-  String get attr_film_making => 'Film making';
+  String get attr_filmmaking => 'Film making';
 
   @override
   String get attr_financial_investing => 'Financial investing';
@@ -1080,28 +1019,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_foraging => 'Foraging';
 
   @override
-  String get attr_geocaching => 'Geocaching';
-
-  @override
-  String get attr_kayaking => 'Kayaking';
-
-  @override
   String get attr_martial_arts => 'Martial arts';
 
   @override
   String get attr_mindfulness => 'Mindfulness';
 
   @override
-  String get attr_mushroom_hunting => 'Mushroom hunting';
+  String get attr_pc_building => 'PC building';
 
   @override
   String get attr_personal_finance => 'Personal finance';
 
   @override
   String get attr_rock_climbing => 'Rock climbing';
-
-  @override
-  String get attr_running => 'Running';
 
   @override
   String get attr_sustainable_living => 'Sustainable living';
@@ -1116,9 +1046,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_biohacking => 'Biohacking';
 
   @override
-  String get attr_cold_plunging => 'Cold plunging';
-
-  @override
   String get attr_community_gardening => 'Community gardening';
 
   @override
@@ -1128,10 +1055,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_day_trading => 'Day trading';
 
   @override
-  String get attr_deep_cleaning => 'Deep cleaning';
+  String get attr_web_development => 'Web Development';
 
   @override
-  String get attr_digital_nomadism => 'Digital nomadism';
+  String get attr_deep_cleaning => 'Deep cleaning';
 
   @override
   String get attr_recipes => 'Recipes';
@@ -1140,25 +1067,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_bodybuilding => 'Bodybuilding';
 
   @override
-  String get attr_memes => 'Memes';
-
-  @override
   String get attr_metal_detecting => 'Metal detecting';
-
-  @override
-  String get attr_minimalism => 'Minimalism';
 
   @override
   String get attr_pet_grooming => 'Pet grooming';
 
   @override
-  String get attr_podcasting => 'Podcasting';
-
-  @override
   String get attr_record_collecting => 'Record collecting';
 
   @override
-  String get attr_tiny_homes => 'Tiny homes';
+  String get attr_marketing => 'Marketing';
 
   @override
   String get attr_upcycling => 'Upcycling';
@@ -1167,13 +1085,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_virtual_reality => 'Virtual reality';
 
   @override
-  String get attr_pc_building => 'PC building';
-
-  @override
   String get attr_babysitting => 'Babysitting';
-
-  @override
-  String get attr_backgammon => 'Backgammon';
 
   @override
   String get attr_bicycles => 'Bicycles';
@@ -1197,9 +1109,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_comic_books => 'Comic books';
 
   @override
-  String get attr_computer_hardware => 'Computer hardware';
-
-  @override
   String get attr_computer_repair => 'Computer repair';
 
   @override
@@ -1209,7 +1118,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_co_op_gaming => 'Co-op gaming';
 
   @override
-  String get attr_creative_brainstorming => 'Creative brainstorming';
+  String get attr_brainstorming => 'Brainstorming';
 
   @override
   String get attr_dance_lessons => 'Dance lessons';
@@ -1233,28 +1142,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_fitness_coaching => 'Fitness coaching';
 
   @override
-  String get attr_fresh_eggs => 'Fresh eggs';
-
-  @override
   String get attr_chicken_eggs => 'Chicken eggs';
 
   @override
-  String get attr_furniture_repair => 'Furniture repair';
+  String get attr_nutrition_advice => 'Nutrition advice';
 
   @override
   String get attr_gardening_advice => 'Gardening advice';
 
   @override
-  String get attr_graphic_novels => 'Graphic novels';
-
-  @override
-  String get attr_guitar => 'Guitar';
-
-  @override
-  String get attr_handmade => 'Handmade';
-
-  @override
-  String get attr_home_decor => 'Home decor';
+  String get attr_handmade_items => 'Handmade items';
 
   @override
   String get attr_handyman_services => 'Handyman services';
@@ -1266,16 +1163,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_herbal_remedies => 'Herbal remedies';
 
   @override
-  String get attr_horseback_riding => 'Horseback riding';
-
-  @override
   String get attr_interview_practice => 'Interview practice';
 
   @override
   String get attr_language_exchange => 'Language exchange';
-
-  @override
-  String get attr_lawn_mowing => 'Lawn mowing';
 
   @override
   String get attr_local_tours => 'Local tours';
@@ -1296,9 +1187,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_musical_instruments => 'Musical instruments';
 
   @override
-  String get attr_pair_programming => 'Pair programming';
-
-  @override
   String get attr_pet_sitting => 'Pet sitting';
 
   @override
@@ -1308,16 +1196,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_piano_lessons => 'Piano lessons';
 
   @override
-  String get attr_plant_cuttings => 'Plant cuttings';
-
-  @override
   String get attr_proofreading => 'Proofreading';
 
   @override
-  String get attr_resume_writing => 'Resume writing';
-
-  @override
-  String get attr_rpg_games => 'RPG games';
+  String get attr_multiplayer_games => 'Multiplayer games';
 
   @override
   String get attr_scrap_metal => 'Scrap metal';
@@ -1344,22 +1226,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_translation_services => 'Translation services';
 
   @override
-  String get attr_used_books => 'Used books';
-
-  @override
   String get attr_used_electronics => 'Used electronics';
 
   @override
-  String get attr_used_furniture => 'Used furniture';
+  String get attr_homemade_goods => 'Homemade goods';
 
   @override
   String get attr_vehicle_repair => 'Vehicle repair';
 
   @override
-  String get attr_video_game_consoles => 'Video game consoles';
-
-  @override
-  String get attr_vintage_clothing => 'Vintage clothing';
+  String get attr_video_game_hardware => 'Video game hardware';
 
   @override
   String get attr_voice_lessons => 'Voice lessons';
@@ -1368,10 +1244,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_ux_design => 'UX design';
 
   @override
-  String get attr_window_cleaning => 'Window cleaning';
+  String get attr_graphic_design => 'Graphic design';
 
   @override
-  String get attr_yard_work => 'Yard work';
+  String get attr_music_performance => 'Music performance';
+
+  @override
+  String get attr_transport_service => 'Transport service';
+
+  @override
+  String get attr_ai_consulting => 'AI Consulting';
 
   @override
   String get attr_drumming => 'Drumming';
@@ -1425,10 +1307,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_environmentalism => 'Environmentalism';
 
   @override
-  String get attr_fresh_vegetables => 'Fresh vegetables';
-
-  @override
-  String get attr_fresh_fruits => 'Fresh fruits';
+  String get attr_fruits => 'Fruits';
 
   @override
   String get attr_fresh_herbs => 'Fresh herbs';
@@ -1449,7 +1328,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_poker => 'Poker';
 
   @override
-  String get attr_trees => 'Trees';
+  String get attr_socializing => 'Socializing';
 
   @override
   String get attr_plants => 'Plants';
@@ -1461,10 +1340,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_organic_food => 'Organic food';
 
   @override
-  String get attr_technician => 'Technician';
+  String get attr_mechanisms => 'Mechanisms';
 
   @override
-  String get attr_tractor => 'Tractor';
+  String get attr_farm_machinery => 'Farm machinery';
 
   @override
   String get attr_driving => 'Driving';
@@ -1473,22 +1352,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_machinery_operation => 'Machinery operation';
 
   @override
-  String get attr_truck_driving => 'Truck driving';
-
-  @override
-  String get attr_assembly => 'Assembly';
-
-  @override
   String get attr_animal_care => 'Animal care';
 
   @override
   String get attr_horses => 'Horses';
-
-  @override
-  String get attr_goats => 'Goats';
-
-  @override
-  String get attr_cows => 'Cows';
 
   @override
   String get attr_self_sufficiency => 'Self-sufficiency';
@@ -1497,10 +1364,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_ridesharing => 'Ridesharing';
 
   @override
-  String get attr_fruit_harvesting => 'Fruit harvesting';
-
-  @override
-  String get attr_vegetable_harvesting => 'Vegetable harvesting';
+  String get attr_vegetables => 'Vegetables';
 
   @override
   String get attr_car_cleaning => 'Car cleaning';
@@ -1510,9 +1374,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attr_house_maintenance => 'House maintenance';
-
-  @override
-  String get attr_shepherding => 'Shepherding';
 
   @override
   String get attr_renovation => 'Renovation';
@@ -1536,7 +1397,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_alternative_healing => 'Alternative healing';
 
   @override
-  String get attr_socializing => 'Socializing';
+  String get attr_pet_supplies => 'Pet supplies';
+
+  @override
+  String get attr_kids_toys => 'Kids toys';
+
+  @override
+  String get attr_power_tools => 'Power tools';
+
+  @override
+  String get attr_camping_gear => 'Camping gear';
+
+  @override
+  String get attr_kitchen_appliances => 'Kitchen appliances';
+
+  @override
+  String get attr_device_lending => 'Device lending';
+
+  @override
+  String get attr_computer_accessories => 'Computer accessories';
+
+  @override
+  String get attr_clothing => 'Clothing';
+
+  @override
+  String get attr_sports_equipment => 'Sports equipment';
+
+  @override
+  String get attr_bicycle_parts => 'Bicycle parts';
+
+  @override
+  String get attr_errand_running => 'Errand running';
+
+  @override
+  String get attr_phone_repair => 'Phone repair';
+
+  @override
+  String get attr_lawn_care => 'Lawn care';
+
+  @override
+  String get attr_digital_products => 'Digital products';
+
+  @override
+  String get attr_software_accounts => 'Software accounts';
+
+  @override
+  String get attr_reviewing => 'Reviewing';
+
+  @override
+  String get attr_virtual_assistance => 'Virtual assistance';
 
   @override
   String get userLocation => 'Location:';

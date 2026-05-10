@@ -179,17 +179,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             return previous.status != current.status || previous.questions != current.questions;
           },
           listener: (context, state) {
-            debugPrint('@@@@@@@@@@@ OnboardingScreen BlocConsumer listener - Status: ${state.status}');
+            debugPrint('@@@@@@@@@@@ OnboardingScreen BlocConsumer listener - Status: ${state.status} ${state.errorMessage}');
             if (state.status == OnboardingStatus.error) {
               debugPrint('@@@@@@@@@@@ Handling error status');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage ??
-                      AppLocalizations.of(context)!.anUnknownErrorOccurred),
-                  backgroundColor: Colors.red,
-                  duration: const Duration(seconds: 5),
-                ),
-              );
+              final bottomInset = MediaQuery.of(context).padding.bottom;
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      state.errorMessage ??
+                          AppLocalizations.of(context)!.anUnknownErrorOccurred,
+                    ),
+                    backgroundColor: Colors.red,
+                    duration: const Duration(seconds: 5),
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.fromLTRB(16, 0, 16, 100 + bottomInset),
+                  ),
+                );
             } else if (state.status == OnboardingStatus.success) {
               debugPrint('@@@@@@@@@@@ Handling success status');
               // Save the full ParsedAttributeData with all metadata

@@ -572,10 +572,22 @@ abstract class AppLocalizations {
   /// **'Users are responsible for their own exchanges and interactions. The platform provides an intermediary environment to the extent permitted by law.'**
   String get termsConditionsSectionLiabilityDisputesContent;
 
+  /// No description provided for @termsConditionsSectionKidsSafetyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'8. Child Safety and CSAE Standards'**
+  String get termsConditionsSectionKidsSafetyTitle;
+
+  /// No description provided for @termsConditionsSectionKidsSafetyContent.
+  ///
+  /// In en, this message translates to:
+  /// **'We have zero tolerance for child sexual abuse and exploitation (CSAE), including child sexual abuse material (CSAM), grooming, trafficking, and any sexual exploitation of minors.\n\nThe following are strictly prohibited on this platform:\n- Sharing, requesting, promoting, or storing CSAM\n- Sexualized communication involving minors\n- Grooming, coercion, trafficking, or exploitation of minors\n- Any attempt to use this service to endanger a child\n\nWe may remove content, suspend or terminate accounts, and report relevant cases to competent authorities as required by law. Users can report concerns through in-app reporting tools or by contacting info@bartering.app.\n\nWe review safety reports as quickly as possible and cooperate with lawful requests from authorities regarding CSAE-related violations.'**
+  String get termsConditionsSectionKidsSafetyContent;
+
   /// No description provided for @termsConditionsSectionChangesTitle.
   ///
   /// In en, this message translates to:
-  /// **'7. Changes to Terms'**
+  /// **'8. Changes to Terms'**
   String get termsConditionsSectionChangesTitle;
 
   /// No description provided for @termsConditionsSectionChangesContent.
@@ -1400,12 +1412,6 @@ abstract class AppLocalizations {
   /// **'Acting'**
   String get attr_acting;
 
-  /// No description provided for @attr_amateur_radio.
-  ///
-  /// In en, this message translates to:
-  /// **'Amateur radio'**
-  String get attr_amateur_radio;
-
   /// No description provided for @attr_animation.
   ///
   /// In en, this message translates to:
@@ -1423,12 +1429,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Beekeeping'**
   String get attr_beekeeping;
-
-  /// No description provided for @attr_blogging.
-  ///
-  /// In en, this message translates to:
-  /// **'Blogging'**
-  String get attr_blogging;
 
   /// No description provided for @attr_board_games.
   ///
@@ -1459,12 +1459,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Construction'**
   String get attr_construction;
-
-  /// No description provided for @attr_candle_making.
-  ///
-  /// In en, this message translates to:
-  /// **'Candle making'**
-  String get attr_candle_making;
 
   /// No description provided for @attr_car_maintenance.
   ///
@@ -1508,12 +1502,6 @@ abstract class AppLocalizations {
   /// **'Clothesmaking'**
   String get attr_clothesmaking;
 
-  /// No description provided for @attr_coffee.
-  ///
-  /// In en, this message translates to:
-  /// **'Coffee'**
-  String get attr_coffee;
-
   /// No description provided for @attr_software_development.
   ///
   /// In en, this message translates to:
@@ -1532,12 +1520,6 @@ abstract class AppLocalizations {
   /// **'Couponing'**
   String get attr_couponing;
 
-  /// No description provided for @attr_creative_writing.
-  ///
-  /// In en, this message translates to:
-  /// **'Creative writing'**
-  String get attr_creative_writing;
-
   /// No description provided for @attr_crocheting.
   ///
   /// In en, this message translates to:
@@ -1550,23 +1532,17 @@ abstract class AppLocalizations {
   /// **'Cross-stitch'**
   String get attr_cross_stitch;
 
-  /// No description provided for @attr_dance.
-  ///
-  /// In en, this message translates to:
-  /// **'Dance'**
-  String get attr_dance;
-
   /// No description provided for @attr_digital_arts.
   ///
   /// In en, this message translates to:
   /// **'Digital arts'**
   String get attr_digital_arts;
 
-  /// No description provided for @attr_djing.
+  /// No description provided for @attr_dj_ing.
   ///
   /// In en, this message translates to:
   /// **'DJing'**
-  String get attr_djing;
+  String get attr_dj_ing;
 
   /// No description provided for @attr_diy.
   ///
@@ -1604,12 +1580,6 @@ abstract class AppLocalizations {
   /// **'Event hosting'**
   String get attr_event_hosting;
 
-  /// No description provided for @attr_fashion.
-  ///
-  /// In en, this message translates to:
-  /// **'Fashion'**
-  String get attr_fashion;
-
   /// No description provided for @attr_fashion_design.
   ///
   /// In en, this message translates to:
@@ -1622,11 +1592,11 @@ abstract class AppLocalizations {
   /// **'Flower arranging'**
   String get attr_flower_arranging;
 
-  /// No description provided for @attr_furniture_building.
+  /// No description provided for @attr_furniture_assembly.
   ///
   /// In en, this message translates to:
-  /// **'Furniture building'**
-  String get attr_furniture_building;
+  /// **'Furniture assembly'**
+  String get attr_furniture_assembly;
 
   /// No description provided for @attr_gaming.
   ///
@@ -1634,29 +1604,11 @@ abstract class AppLocalizations {
   /// **'Gaming'**
   String get attr_gaming;
 
-  /// No description provided for @attr_genealogy.
-  ///
-  /// In en, this message translates to:
-  /// **'Genealogy'**
-  String get attr_genealogy;
-
-  /// No description provided for @attr_graphic_design.
-  ///
-  /// In en, this message translates to:
-  /// **'Graphic design'**
-  String get attr_graphic_design;
-
   /// No description provided for @attr_hacking.
   ///
   /// In en, this message translates to:
   /// **'Hacking'**
   String get attr_hacking;
-
-  /// No description provided for @attr_herp_keeping.
-  ///
-  /// In en, this message translates to:
-  /// **'Herp keeping'**
-  String get attr_herp_keeping;
 
   /// No description provided for @attr_home_improvement.
   ///
@@ -1676,11 +1628,11 @@ abstract class AppLocalizations {
   /// **'Houseplant care'**
   String get attr_houseplant_care;
 
-  /// No description provided for @attr_hydroponics.
+  /// No description provided for @attr_home_decor.
   ///
   /// In en, this message translates to:
-  /// **'Hydroponics'**
-  String get attr_hydroponics;
+  /// **'Home decor'**
+  String get attr_home_decor;
 
   /// No description provided for @attr_jewelry.
   ///
@@ -1705,12 +1657,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Leather crafting'**
   String get attr_leather_crafting;
-
-  /// No description provided for @attr_podcasts.
-  ///
-  /// In en, this message translates to:
-  /// **'Podcasts'**
-  String get attr_podcasts;
 
   /// No description provided for @attr_machining.
   ///
@@ -1742,12 +1688,6 @@ abstract class AppLocalizations {
   /// **'Metalworking'**
   String get attr_metalworking;
 
-  /// No description provided for @attr_nail_art.
-  ///
-  /// In en, this message translates to:
-  /// **'Nail art'**
-  String get attr_nail_art;
-
   /// No description provided for @attr_painting.
   ///
   /// In en, this message translates to:
@@ -1766,17 +1706,11 @@ abstract class AppLocalizations {
   /// **'Pottery'**
   String get attr_pottery;
 
-  /// No description provided for @attr_powerlifting.
+  /// No description provided for @attr_workout_planning.
   ///
   /// In en, this message translates to:
-  /// **'Powerlifting'**
-  String get attr_powerlifting;
-
-  /// No description provided for @attr_puzzles.
-  ///
-  /// In en, this message translates to:
-  /// **'Puzzles'**
-  String get attr_puzzles;
+  /// **'Workout planning'**
+  String get attr_workout_planning;
 
   /// No description provided for @attr_quilting.
   ///
@@ -1814,30 +1748,6 @@ abstract class AppLocalizations {
   /// **'Shoemaking'**
   String get attr_shoemaking;
 
-  /// No description provided for @attr_singing.
-  ///
-  /// In en, this message translates to:
-  /// **'Singing'**
-  String get attr_singing;
-
-  /// No description provided for @attr_skateboarding.
-  ///
-  /// In en, this message translates to:
-  /// **'Skateboarding'**
-  String get attr_skateboarding;
-
-  /// No description provided for @attr_sketching.
-  ///
-  /// In en, this message translates to:
-  /// **'Sketching'**
-  String get attr_sketching;
-
-  /// No description provided for @attr_soapmaking.
-  ///
-  /// In en, this message translates to:
-  /// **'Soapmaking'**
-  String get attr_soapmaking;
-
   /// No description provided for @attr_social_media.
   ///
   /// In en, this message translates to:
@@ -1849,30 +1759,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stand-up comedy'**
   String get attr_stand_up_comedy;
-
-  /// No description provided for @attr_storytelling.
-  ///
-  /// In en, this message translates to:
-  /// **'Storytelling'**
-  String get attr_storytelling;
-
-  /// No description provided for @attr_sudoku.
-  ///
-  /// In en, this message translates to:
-  /// **'Sudoku'**
-  String get attr_sudoku;
-
-  /// No description provided for @attr_table_tennis.
-  ///
-  /// In en, this message translates to:
-  /// **'Table tennis'**
-  String get attr_table_tennis;
-
-  /// No description provided for @attr_thrifting.
-  ///
-  /// In en, this message translates to:
-  /// **'Thrifting'**
-  String get attr_thrifting;
 
   /// No description provided for @attr_video_editing.
   ///
@@ -1940,35 +1826,23 @@ abstract class AppLocalizations {
   /// **'Hiking'**
   String get attr_hiking;
 
-  /// No description provided for @attr_reading.
-  ///
-  /// In en, this message translates to:
-  /// **'Reading'**
-  String get attr_reading;
-
   /// No description provided for @attr_gardening.
   ///
   /// In en, this message translates to:
   /// **'Gardening'**
   String get attr_gardening;
 
-  /// No description provided for @attr_music.
+  /// No description provided for @attr_music_production.
   ///
   /// In en, this message translates to:
-  /// **'Music'**
-  String get attr_music;
+  /// **'Music production'**
+  String get attr_music_production;
 
   /// No description provided for @attr_dancing.
   ///
   /// In en, this message translates to:
   /// **'Dancing'**
   String get attr_dancing;
-
-  /// No description provided for @attr_aerobics.
-  ///
-  /// In en, this message translates to:
-  /// **'Aerobics'**
-  String get attr_aerobics;
 
   /// No description provided for @attr_traveling.
   ///
@@ -1981,12 +1855,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Coding'**
   String get attr_coding;
-
-  /// No description provided for @attr_sports.
-  ///
-  /// In en, this message translates to:
-  /// **'Sports'**
-  String get attr_sports;
 
   /// No description provided for @attr_movies.
   ///
@@ -2012,6 +1880,30 @@ abstract class AppLocalizations {
   /// **'Crafting'**
   String get attr_crafting;
 
+  /// No description provided for @attr_sales.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales'**
+  String get attr_sales;
+
+  /// No description provided for @attr_networking.
+  ///
+  /// In en, this message translates to:
+  /// **'Networking'**
+  String get attr_networking;
+
+  /// No description provided for @attr_bookkeeping.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookkeeping'**
+  String get attr_bookkeeping;
+
+  /// No description provided for @attr_administrative_work.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrative work'**
+  String get attr_administrative_work;
+
   /// No description provided for @attr_astronomy.
   ///
   /// In en, this message translates to:
@@ -2023,12 +1915,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Backpacking'**
   String get attr_backpacking;
-
-  /// No description provided for @attr_bird_watching.
-  ///
-  /// In en, this message translates to:
-  /// **'Bird watching'**
-  String get attr_bird_watching;
 
   /// No description provided for @attr_camping.
   ///
@@ -2047,12 +1933,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Car restoration'**
   String get attr_car_restoration;
-
-  /// No description provided for @attr_climbing.
-  ///
-  /// In en, this message translates to:
-  /// **'Climbing'**
-  String get attr_climbing;
 
   /// No description provided for @attr_cryptocurrency.
   ///
@@ -2078,17 +1958,11 @@ abstract class AppLocalizations {
   /// **'Drones'**
   String get attr_drones;
 
-  /// No description provided for @attr_fermentation.
-  ///
-  /// In en, this message translates to:
-  /// **'Fermentation'**
-  String get attr_fermentation;
-
-  /// No description provided for @attr_film_making.
+  /// No description provided for @attr_filmmaking.
   ///
   /// In en, this message translates to:
   /// **'Film making'**
-  String get attr_film_making;
+  String get attr_filmmaking;
 
   /// No description provided for @attr_financial_investing.
   ///
@@ -2108,18 +1982,6 @@ abstract class AppLocalizations {
   /// **'Foraging'**
   String get attr_foraging;
 
-  /// No description provided for @attr_geocaching.
-  ///
-  /// In en, this message translates to:
-  /// **'Geocaching'**
-  String get attr_geocaching;
-
-  /// No description provided for @attr_kayaking.
-  ///
-  /// In en, this message translates to:
-  /// **'Kayaking'**
-  String get attr_kayaking;
-
   /// No description provided for @attr_martial_arts.
   ///
   /// In en, this message translates to:
@@ -2132,11 +1994,11 @@ abstract class AppLocalizations {
   /// **'Mindfulness'**
   String get attr_mindfulness;
 
-  /// No description provided for @attr_mushroom_hunting.
+  /// No description provided for @attr_pc_building.
   ///
   /// In en, this message translates to:
-  /// **'Mushroom hunting'**
-  String get attr_mushroom_hunting;
+  /// **'PC building'**
+  String get attr_pc_building;
 
   /// No description provided for @attr_personal_finance.
   ///
@@ -2149,12 +2011,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rock climbing'**
   String get attr_rock_climbing;
-
-  /// No description provided for @attr_running.
-  ///
-  /// In en, this message translates to:
-  /// **'Running'**
-  String get attr_running;
 
   /// No description provided for @attr_sustainable_living.
   ///
@@ -2180,12 +2036,6 @@ abstract class AppLocalizations {
   /// **'Biohacking'**
   String get attr_biohacking;
 
-  /// No description provided for @attr_cold_plunging.
-  ///
-  /// In en, this message translates to:
-  /// **'Cold plunging'**
-  String get attr_cold_plunging;
-
   /// No description provided for @attr_community_gardening.
   ///
   /// In en, this message translates to:
@@ -2204,17 +2054,17 @@ abstract class AppLocalizations {
   /// **'Day trading'**
   String get attr_day_trading;
 
+  /// No description provided for @attr_web_development.
+  ///
+  /// In en, this message translates to:
+  /// **'Web Development'**
+  String get attr_web_development;
+
   /// No description provided for @attr_deep_cleaning.
   ///
   /// In en, this message translates to:
   /// **'Deep cleaning'**
   String get attr_deep_cleaning;
-
-  /// No description provided for @attr_digital_nomadism.
-  ///
-  /// In en, this message translates to:
-  /// **'Digital nomadism'**
-  String get attr_digital_nomadism;
 
   /// No description provided for @attr_recipes.
   ///
@@ -2228,23 +2078,11 @@ abstract class AppLocalizations {
   /// **'Bodybuilding'**
   String get attr_bodybuilding;
 
-  /// No description provided for @attr_memes.
-  ///
-  /// In en, this message translates to:
-  /// **'Memes'**
-  String get attr_memes;
-
   /// No description provided for @attr_metal_detecting.
   ///
   /// In en, this message translates to:
   /// **'Metal detecting'**
   String get attr_metal_detecting;
-
-  /// No description provided for @attr_minimalism.
-  ///
-  /// In en, this message translates to:
-  /// **'Minimalism'**
-  String get attr_minimalism;
 
   /// No description provided for @attr_pet_grooming.
   ///
@@ -2252,23 +2090,17 @@ abstract class AppLocalizations {
   /// **'Pet grooming'**
   String get attr_pet_grooming;
 
-  /// No description provided for @attr_podcasting.
-  ///
-  /// In en, this message translates to:
-  /// **'Podcasting'**
-  String get attr_podcasting;
-
   /// No description provided for @attr_record_collecting.
   ///
   /// In en, this message translates to:
   /// **'Record collecting'**
   String get attr_record_collecting;
 
-  /// No description provided for @attr_tiny_homes.
+  /// No description provided for @attr_marketing.
   ///
   /// In en, this message translates to:
-  /// **'Tiny homes'**
-  String get attr_tiny_homes;
+  /// **'Marketing'**
+  String get attr_marketing;
 
   /// No description provided for @attr_upcycling.
   ///
@@ -2282,23 +2114,11 @@ abstract class AppLocalizations {
   /// **'Virtual reality'**
   String get attr_virtual_reality;
 
-  /// No description provided for @attr_pc_building.
-  ///
-  /// In en, this message translates to:
-  /// **'PC building'**
-  String get attr_pc_building;
-
   /// No description provided for @attr_babysitting.
   ///
   /// In en, this message translates to:
   /// **'Babysitting'**
   String get attr_babysitting;
-
-  /// No description provided for @attr_backgammon.
-  ///
-  /// In en, this message translates to:
-  /// **'Backgammon'**
-  String get attr_backgammon;
 
   /// No description provided for @attr_bicycles.
   ///
@@ -2342,12 +2162,6 @@ abstract class AppLocalizations {
   /// **'Comic books'**
   String get attr_comic_books;
 
-  /// No description provided for @attr_computer_hardware.
-  ///
-  /// In en, this message translates to:
-  /// **'Computer hardware'**
-  String get attr_computer_hardware;
-
   /// No description provided for @attr_computer_repair.
   ///
   /// In en, this message translates to:
@@ -2366,11 +2180,11 @@ abstract class AppLocalizations {
   /// **'Co-op gaming'**
   String get attr_co_op_gaming;
 
-  /// No description provided for @attr_creative_brainstorming.
+  /// No description provided for @attr_brainstorming.
   ///
   /// In en, this message translates to:
-  /// **'Creative brainstorming'**
-  String get attr_creative_brainstorming;
+  /// **'Brainstorming'**
+  String get attr_brainstorming;
 
   /// No description provided for @attr_dance_lessons.
   ///
@@ -2414,23 +2228,17 @@ abstract class AppLocalizations {
   /// **'Fitness coaching'**
   String get attr_fitness_coaching;
 
-  /// No description provided for @attr_fresh_eggs.
-  ///
-  /// In en, this message translates to:
-  /// **'Fresh eggs'**
-  String get attr_fresh_eggs;
-
   /// No description provided for @attr_chicken_eggs.
   ///
   /// In en, this message translates to:
   /// **'Chicken eggs'**
   String get attr_chicken_eggs;
 
-  /// No description provided for @attr_furniture_repair.
+  /// No description provided for @attr_nutrition_advice.
   ///
   /// In en, this message translates to:
-  /// **'Furniture repair'**
-  String get attr_furniture_repair;
+  /// **'Nutrition advice'**
+  String get attr_nutrition_advice;
 
   /// No description provided for @attr_gardening_advice.
   ///
@@ -2438,29 +2246,11 @@ abstract class AppLocalizations {
   /// **'Gardening advice'**
   String get attr_gardening_advice;
 
-  /// No description provided for @attr_graphic_novels.
+  /// No description provided for @attr_handmade_items.
   ///
   /// In en, this message translates to:
-  /// **'Graphic novels'**
-  String get attr_graphic_novels;
-
-  /// No description provided for @attr_guitar.
-  ///
-  /// In en, this message translates to:
-  /// **'Guitar'**
-  String get attr_guitar;
-
-  /// No description provided for @attr_handmade.
-  ///
-  /// In en, this message translates to:
-  /// **'Handmade'**
-  String get attr_handmade;
-
-  /// No description provided for @attr_home_decor.
-  ///
-  /// In en, this message translates to:
-  /// **'Home decor'**
-  String get attr_home_decor;
+  /// **'Handmade items'**
+  String get attr_handmade_items;
 
   /// No description provided for @attr_handyman_services.
   ///
@@ -2480,12 +2270,6 @@ abstract class AppLocalizations {
   /// **'Herbal remedies'**
   String get attr_herbal_remedies;
 
-  /// No description provided for @attr_horseback_riding.
-  ///
-  /// In en, this message translates to:
-  /// **'Horseback riding'**
-  String get attr_horseback_riding;
-
   /// No description provided for @attr_interview_practice.
   ///
   /// In en, this message translates to:
@@ -2497,12 +2281,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language exchange'**
   String get attr_language_exchange;
-
-  /// No description provided for @attr_lawn_mowing.
-  ///
-  /// In en, this message translates to:
-  /// **'Lawn mowing'**
-  String get attr_lawn_mowing;
 
   /// No description provided for @attr_local_tours.
   ///
@@ -2540,12 +2318,6 @@ abstract class AppLocalizations {
   /// **'Musical instruments'**
   String get attr_musical_instruments;
 
-  /// No description provided for @attr_pair_programming.
-  ///
-  /// In en, this message translates to:
-  /// **'Pair programming'**
-  String get attr_pair_programming;
-
   /// No description provided for @attr_pet_sitting.
   ///
   /// In en, this message translates to:
@@ -2564,29 +2336,17 @@ abstract class AppLocalizations {
   /// **'Piano lessons'**
   String get attr_piano_lessons;
 
-  /// No description provided for @attr_plant_cuttings.
-  ///
-  /// In en, this message translates to:
-  /// **'Plant cuttings'**
-  String get attr_plant_cuttings;
-
   /// No description provided for @attr_proofreading.
   ///
   /// In en, this message translates to:
   /// **'Proofreading'**
   String get attr_proofreading;
 
-  /// No description provided for @attr_resume_writing.
+  /// No description provided for @attr_multiplayer_games.
   ///
   /// In en, this message translates to:
-  /// **'Resume writing'**
-  String get attr_resume_writing;
-
-  /// No description provided for @attr_rpg_games.
-  ///
-  /// In en, this message translates to:
-  /// **'RPG games'**
-  String get attr_rpg_games;
+  /// **'Multiplayer games'**
+  String get attr_multiplayer_games;
 
   /// No description provided for @attr_scrap_metal.
   ///
@@ -2636,23 +2396,17 @@ abstract class AppLocalizations {
   /// **'Translation services'**
   String get attr_translation_services;
 
-  /// No description provided for @attr_used_books.
-  ///
-  /// In en, this message translates to:
-  /// **'Used books'**
-  String get attr_used_books;
-
   /// No description provided for @attr_used_electronics.
   ///
   /// In en, this message translates to:
   /// **'Used electronics'**
   String get attr_used_electronics;
 
-  /// No description provided for @attr_used_furniture.
+  /// No description provided for @attr_homemade_goods.
   ///
   /// In en, this message translates to:
-  /// **'Used furniture'**
-  String get attr_used_furniture;
+  /// **'Homemade goods'**
+  String get attr_homemade_goods;
 
   /// No description provided for @attr_vehicle_repair.
   ///
@@ -2660,17 +2414,11 @@ abstract class AppLocalizations {
   /// **'Vehicle repair'**
   String get attr_vehicle_repair;
 
-  /// No description provided for @attr_video_game_consoles.
+  /// No description provided for @attr_video_game_hardware.
   ///
   /// In en, this message translates to:
-  /// **'Video game consoles'**
-  String get attr_video_game_consoles;
-
-  /// No description provided for @attr_vintage_clothing.
-  ///
-  /// In en, this message translates to:
-  /// **'Vintage clothing'**
-  String get attr_vintage_clothing;
+  /// **'Video game hardware'**
+  String get attr_video_game_hardware;
 
   /// No description provided for @attr_voice_lessons.
   ///
@@ -2684,17 +2432,29 @@ abstract class AppLocalizations {
   /// **'UX design'**
   String get attr_ux_design;
 
-  /// No description provided for @attr_window_cleaning.
+  /// No description provided for @attr_graphic_design.
   ///
   /// In en, this message translates to:
-  /// **'Window cleaning'**
-  String get attr_window_cleaning;
+  /// **'Graphic design'**
+  String get attr_graphic_design;
 
-  /// No description provided for @attr_yard_work.
+  /// No description provided for @attr_music_performance.
   ///
   /// In en, this message translates to:
-  /// **'Yard work'**
-  String get attr_yard_work;
+  /// **'Music performance'**
+  String get attr_music_performance;
+
+  /// No description provided for @attr_transport_service.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport service'**
+  String get attr_transport_service;
+
+  /// No description provided for @attr_ai_consulting.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Consulting'**
+  String get attr_ai_consulting;
 
   /// No description provided for @attr_drumming.
   ///
@@ -2798,17 +2558,11 @@ abstract class AppLocalizations {
   /// **'Environmentalism'**
   String get attr_environmentalism;
 
-  /// No description provided for @attr_fresh_vegetables.
+  /// No description provided for @attr_fruits.
   ///
   /// In en, this message translates to:
-  /// **'Fresh vegetables'**
-  String get attr_fresh_vegetables;
-
-  /// No description provided for @attr_fresh_fruits.
-  ///
-  /// In en, this message translates to:
-  /// **'Fresh fruits'**
-  String get attr_fresh_fruits;
+  /// **'Fruits'**
+  String get attr_fruits;
 
   /// No description provided for @attr_fresh_herbs.
   ///
@@ -2846,11 +2600,11 @@ abstract class AppLocalizations {
   /// **'Poker'**
   String get attr_poker;
 
-  /// No description provided for @attr_trees.
+  /// No description provided for @attr_socializing.
   ///
   /// In en, this message translates to:
-  /// **'Trees'**
-  String get attr_trees;
+  /// **'Socializing'**
+  String get attr_socializing;
 
   /// No description provided for @attr_plants.
   ///
@@ -2870,17 +2624,17 @@ abstract class AppLocalizations {
   /// **'Organic food'**
   String get attr_organic_food;
 
-  /// No description provided for @attr_technician.
+  /// No description provided for @attr_mechanisms.
   ///
   /// In en, this message translates to:
-  /// **'Technician'**
-  String get attr_technician;
+  /// **'Mechanisms'**
+  String get attr_mechanisms;
 
-  /// No description provided for @attr_tractor.
+  /// No description provided for @attr_farm_machinery.
   ///
   /// In en, this message translates to:
-  /// **'Tractor'**
-  String get attr_tractor;
+  /// **'Farm machinery'**
+  String get attr_farm_machinery;
 
   /// No description provided for @attr_driving.
   ///
@@ -2894,18 +2648,6 @@ abstract class AppLocalizations {
   /// **'Machinery operation'**
   String get attr_machinery_operation;
 
-  /// No description provided for @attr_truck_driving.
-  ///
-  /// In en, this message translates to:
-  /// **'Truck driving'**
-  String get attr_truck_driving;
-
-  /// No description provided for @attr_assembly.
-  ///
-  /// In en, this message translates to:
-  /// **'Assembly'**
-  String get attr_assembly;
-
   /// No description provided for @attr_animal_care.
   ///
   /// In en, this message translates to:
@@ -2917,18 +2659,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Horses'**
   String get attr_horses;
-
-  /// No description provided for @attr_goats.
-  ///
-  /// In en, this message translates to:
-  /// **'Goats'**
-  String get attr_goats;
-
-  /// No description provided for @attr_cows.
-  ///
-  /// In en, this message translates to:
-  /// **'Cows'**
-  String get attr_cows;
 
   /// No description provided for @attr_self_sufficiency.
   ///
@@ -2942,17 +2672,11 @@ abstract class AppLocalizations {
   /// **'Ridesharing'**
   String get attr_ridesharing;
 
-  /// No description provided for @attr_fruit_harvesting.
+  /// No description provided for @attr_vegetables.
   ///
   /// In en, this message translates to:
-  /// **'Fruit harvesting'**
-  String get attr_fruit_harvesting;
-
-  /// No description provided for @attr_vegetable_harvesting.
-  ///
-  /// In en, this message translates to:
-  /// **'Vegetable harvesting'**
-  String get attr_vegetable_harvesting;
+  /// **'Vegetables'**
+  String get attr_vegetables;
 
   /// No description provided for @attr_car_cleaning.
   ///
@@ -2971,12 +2695,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'House maintenance'**
   String get attr_house_maintenance;
-
-  /// No description provided for @attr_shepherding.
-  ///
-  /// In en, this message translates to:
-  /// **'Shepherding'**
-  String get attr_shepherding;
 
   /// No description provided for @attr_renovation.
   ///
@@ -3020,11 +2738,107 @@ abstract class AppLocalizations {
   /// **'Alternative healing'**
   String get attr_alternative_healing;
 
-  /// No description provided for @attr_socializing.
+  /// No description provided for @attr_pet_supplies.
   ///
   /// In en, this message translates to:
-  /// **'Socializing'**
-  String get attr_socializing;
+  /// **'Pet supplies'**
+  String get attr_pet_supplies;
+
+  /// No description provided for @attr_kids_toys.
+  ///
+  /// In en, this message translates to:
+  /// **'Kids toys'**
+  String get attr_kids_toys;
+
+  /// No description provided for @attr_power_tools.
+  ///
+  /// In en, this message translates to:
+  /// **'Power tools'**
+  String get attr_power_tools;
+
+  /// No description provided for @attr_camping_gear.
+  ///
+  /// In en, this message translates to:
+  /// **'Camping gear'**
+  String get attr_camping_gear;
+
+  /// No description provided for @attr_kitchen_appliances.
+  ///
+  /// In en, this message translates to:
+  /// **'Kitchen appliances'**
+  String get attr_kitchen_appliances;
+
+  /// No description provided for @attr_device_lending.
+  ///
+  /// In en, this message translates to:
+  /// **'Device lending'**
+  String get attr_device_lending;
+
+  /// No description provided for @attr_computer_accessories.
+  ///
+  /// In en, this message translates to:
+  /// **'Computer accessories'**
+  String get attr_computer_accessories;
+
+  /// No description provided for @attr_clothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Clothing'**
+  String get attr_clothing;
+
+  /// No description provided for @attr_sports_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Sports equipment'**
+  String get attr_sports_equipment;
+
+  /// No description provided for @attr_bicycle_parts.
+  ///
+  /// In en, this message translates to:
+  /// **'Bicycle parts'**
+  String get attr_bicycle_parts;
+
+  /// No description provided for @attr_errand_running.
+  ///
+  /// In en, this message translates to:
+  /// **'Errand running'**
+  String get attr_errand_running;
+
+  /// No description provided for @attr_phone_repair.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone repair'**
+  String get attr_phone_repair;
+
+  /// No description provided for @attr_lawn_care.
+  ///
+  /// In en, this message translates to:
+  /// **'Lawn care'**
+  String get attr_lawn_care;
+
+  /// No description provided for @attr_digital_products.
+  ///
+  /// In en, this message translates to:
+  /// **'Digital products'**
+  String get attr_digital_products;
+
+  /// No description provided for @attr_software_accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Software accounts'**
+  String get attr_software_accounts;
+
+  /// No description provided for @attr_reviewing.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewing'**
+  String get attr_reviewing;
+
+  /// No description provided for @attr_virtual_assistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual assistance'**
+  String get attr_virtual_assistance;
 
   /// No description provided for @userLocation.
   ///

@@ -287,7 +287,15 @@ class AppLocalizationsLv extends AppLocalizations {
       'Lietotāji ir atbildīgi par savām vienošanām un mijiedarbību. Platforma sniedz starpniecības vidi, cik to atļauj tiesību akti.';
 
   @override
-  String get termsConditionsSectionChangesTitle => '7. Izmaiņas noteikumos';
+  String get termsConditionsSectionKidsSafetyTitle =>
+      '7. Bērnu drošības un CSAE standarti';
+
+  @override
+  String get termsConditionsSectionKidsSafetyContent =>
+      'Mums ir nulles tolerance pret bērnu seksuālu izmantošanu un vardarbību (CSAE), tostarp bērnu seksuālas izmantošanas materiāliem (CSAM), pavedināšanu, cilvēku tirdzniecību un jebkādu nepilngadīgo seksuālu ekspluatāciju.\n\nŠajā platformā ir stingri aizliegts:\n- publicēt, pieprasīt, izplatīt vai glabāt CSAM\n- seksualizēta saziņa ar nepilngadīgajiem\n- pavedināšana, piespiešana, cilvēku tirdzniecība vai nepilngadīgo ekspluatācija\n- jebkāds mēģinājums izmantot šo pakalpojumu, lai apdraudētu bērnu\n\nMēs varam dzēst saturu, ierobežot vai dzēst kontus, un likumā noteiktajos gadījumos ziņot kompetentajām iestādēm. Lietotāji var ziņot par pārkāpumiem lietotnē vai rakstot uz info@bartering.app.\n\nMēs drošības ziņojumus izskatām pēc iespējas ātri un sadarbojamies ar iestādēm to likumīgo pieprasījumu ietvaros, kas saistīti ar CSAE pārkāpumiem.';
+
+  @override
+  String get termsConditionsSectionChangesTitle => '8. Izmaiņas noteikumos';
 
   @override
   String get termsConditionsSectionChangesContent =>
@@ -738,9 +746,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_acting => 'Aktierspēle';
 
   @override
-  String get attr_amateur_radio => 'Amatierradio';
-
-  @override
   String get attr_animation => 'Animācija';
 
   @override
@@ -748,9 +753,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get attr_beekeeping => 'Biškopība';
-
-  @override
-  String get attr_blogging => 'Blogošana';
 
   @override
   String get attr_board_games => 'Galda spēles';
@@ -766,9 +768,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get attr_construction => 'Celtniecība';
-
-  @override
-  String get attr_candle_making => 'Sveču darināšana';
 
   @override
   String get attr_car_maintenance => 'Auto apkope';
@@ -792,9 +791,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_clothesmaking => 'Apģērbu šūšana';
 
   @override
-  String get attr_coffee => 'Kafija';
-
-  @override
   String get attr_software_development => 'Programmatūras izstrāde';
 
   @override
@@ -804,22 +800,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_couponing => 'Kuponu izmantošana';
 
   @override
-  String get attr_creative_writing => 'Radošā rakstīšana';
-
-  @override
   String get attr_crocheting => 'Tamborēšana';
 
   @override
   String get attr_cross_stitch => 'Krustdūriena izšūšana';
 
   @override
-  String get attr_dance => 'Dejas';
-
-  @override
   String get attr_digital_arts => 'Digitālā māksla';
 
   @override
-  String get attr_djing => 'DJ darbs';
+  String get attr_dj_ing => 'DJing';
 
   @override
   String get attr_diy => 'Dari pats';
@@ -840,31 +830,19 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_event_hosting => 'Pasākumu organizēšana';
 
   @override
-  String get attr_fashion => 'Mode';
-
-  @override
   String get attr_fashion_design => 'Modes dizains';
 
   @override
   String get attr_flower_arranging => 'Ziedu kompozīcijas';
 
   @override
-  String get attr_furniture_building => 'Mēbeļu būvniecība';
+  String get attr_furniture_assembly => 'Furniture assembly';
 
   @override
   String get attr_gaming => 'Spēles';
 
   @override
-  String get attr_genealogy => 'Ģenealoģija';
-
-  @override
-  String get attr_graphic_design => 'Grafiskais dizains';
-
-  @override
   String get attr_hacking => 'Hakings';
-
-  @override
-  String get attr_herp_keeping => 'Rāpuļu audzēšana';
 
   @override
   String get attr_home_improvement => 'Mājas uzlabošana';
@@ -876,7 +854,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_houseplant_care => 'Istabas augu kopšana';
 
   @override
-  String get attr_hydroponics => 'Hidroponika';
+  String get attr_home_decor => 'Mājas dekors';
 
   @override
   String get attr_jewelry => 'Juvelierizstrādājumi';
@@ -889,9 +867,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get attr_leather_crafting => 'Ādas apstrāde';
-
-  @override
-  String get attr_podcasts => 'Podkāsti';
 
   @override
   String get attr_machining => 'Metālveidošana';
@@ -909,9 +884,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_metalworking => 'Metāla apstrāde';
 
   @override
-  String get attr_nail_art => 'Nagu dizains';
-
-  @override
   String get attr_painting => 'Gleznošana';
 
   @override
@@ -921,10 +893,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_pottery => 'Podnieku māksla';
 
   @override
-  String get attr_powerlifting => 'Spēka sports';
-
-  @override
-  String get attr_puzzles => 'Mīklas';
+  String get attr_workout_planning => 'Treniņu plānošana';
 
   @override
   String get attr_quilting => 'Segas šūšana';
@@ -945,34 +914,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_shoemaking => 'Kurpnieku darbs';
 
   @override
-  String get attr_singing => 'Dziedāšana';
-
-  @override
-  String get attr_skateboarding => 'Skrituļošana';
-
-  @override
-  String get attr_sketching => 'Skicēšana';
-
-  @override
-  String get attr_soapmaking => 'Ziepju darināšana';
-
-  @override
   String get attr_social_media => 'Sociālie mediji';
 
   @override
   String get attr_stand_up_comedy => 'Stendup komēdija';
-
-  @override
-  String get attr_storytelling => 'Stāstu stāstīšana';
-
-  @override
-  String get attr_sudoku => 'Sudoku';
-
-  @override
-  String get attr_table_tennis => 'Galda teniss';
-
-  @override
-  String get attr_thrifting => 'Lietotu lietu iepirkšanās';
 
   @override
   String get attr_video_editing => 'Video rediģēšana';
@@ -1008,28 +953,19 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_hiking => 'Pārgājieni';
 
   @override
-  String get attr_reading => 'Lasīšana';
-
-  @override
   String get attr_gardening => 'Dārzkopība';
 
   @override
-  String get attr_music => 'Mūzika';
+  String get attr_music_production => 'M\\u016Bzikas produc\\u0113\\u0161ana';
 
   @override
   String get attr_dancing => 'Dejas';
-
-  @override
-  String get attr_aerobics => 'Aerobika';
 
   @override
   String get attr_traveling => 'Ceļošana';
 
   @override
   String get attr_coding => 'Programmēšana';
-
-  @override
-  String get attr_sports => 'Sports';
 
   @override
   String get attr_movies => 'Filmas';
@@ -1044,13 +980,22 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_crafting => 'Amatniecība';
 
   @override
+  String get attr_sales => 'Pārdošana';
+
+  @override
+  String get attr_networking => 'Tīklošanās';
+
+  @override
+  String get attr_bookkeeping => 'Grāmatvedība';
+
+  @override
+  String get attr_administrative_work => 'Administratīvais darbs';
+
+  @override
   String get attr_astronomy => 'Astronomija';
 
   @override
   String get attr_backpacking => 'Backpacking';
-
-  @override
-  String get attr_bird_watching => 'Putnu vērošana';
 
   @override
   String get attr_camping => 'Kempings';
@@ -1060,9 +1005,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get attr_car_restoration => 'Auto restaurācija';
-
-  @override
-  String get attr_climbing => 'Kāpšana';
 
   @override
   String get attr_cryptocurrency => 'Kriptovalūta';
@@ -1077,10 +1019,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_drones => 'Droni';
 
   @override
-  String get attr_fermentation => 'Fermentācija';
-
-  @override
-  String get attr_film_making => 'Filmu veidošana';
+  String get attr_filmmaking => 'Filmu veidošana';
 
   @override
   String get attr_financial_investing => 'Finanšu investīcijas';
@@ -1092,28 +1031,19 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_foraging => 'Pārtikas meklēšana dabā';
 
   @override
-  String get attr_geocaching => 'Ģeoslēpšana';
-
-  @override
-  String get attr_kayaking => 'Airēšana ar kajaku';
-
-  @override
   String get attr_martial_arts => 'Cīņas mākslas';
 
   @override
   String get attr_mindfulness => 'Apzinātība';
 
   @override
-  String get attr_mushroom_hunting => 'Sēņošana';
+  String get attr_pc_building => 'Datoru būvēšana';
 
   @override
   String get attr_personal_finance => 'Personīgās finanses';
 
   @override
   String get attr_rock_climbing => 'Klinšu kāpšana';
-
-  @override
-  String get attr_running => 'Skriešana';
 
   @override
   String get attr_sustainable_living => 'Ilgtspējīga dzīvesveida';
@@ -1128,9 +1058,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_biohacking => 'Biohakings';
 
   @override
-  String get attr_cold_plunging => 'Aukstā ūdens vannošana';
-
-  @override
   String get attr_community_gardening => 'Kopienas dārzkopība';
 
   @override
@@ -1140,10 +1067,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_day_trading => 'Dienas tirdzniecība';
 
   @override
-  String get attr_deep_cleaning => 'Dziļā tīrīšana';
+  String get attr_web_development => 'Tīmekļa izstrāde';
 
   @override
-  String get attr_digital_nomadism => 'Digitālais nomādisms';
+  String get attr_deep_cleaning => 'Dziļā tīrīšana';
 
   @override
   String get attr_recipes => 'Receptes';
@@ -1152,25 +1079,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_bodybuilding => 'Bodibildings';
 
   @override
-  String get attr_memes => 'Mēmi';
-
-  @override
   String get attr_metal_detecting => 'Metāla meklēšana';
-
-  @override
-  String get attr_minimalism => 'Minimālisms';
 
   @override
   String get attr_pet_grooming => 'Mājdzīvnieku kopšana';
 
   @override
-  String get attr_podcasting => 'Podkāstu veidošana';
-
-  @override
   String get attr_record_collecting => 'Ierakstu kolekcionēšana';
 
   @override
-  String get attr_tiny_homes => 'Mazās mājas';
+  String get attr_marketing => 'Mārketings';
 
   @override
   String get attr_upcycling => 'Pārstrāde';
@@ -1179,13 +1097,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_virtual_reality => 'Virtuālā realitāte';
 
   @override
-  String get attr_pc_building => 'Datoru būvēšana';
-
-  @override
   String get attr_babysitting => 'Bērnu pieskatīšana';
-
-  @override
-  String get attr_backgammon => 'Nardi';
 
   @override
   String get attr_bicycles => 'Velosipēdi';
@@ -1197,7 +1109,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_canned_goods => 'Konservēti produkti';
 
   @override
-  String get attr_car_detailing => 'Auto detalizēta tīrīšana';
+  String get attr_car_detailing => 'Auto tjūnings';
 
   @override
   String get attr_carpentry => 'Namdaru darbi';
@@ -1209,19 +1121,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_comic_books => 'Komiksi';
 
   @override
-  String get attr_computer_hardware => 'Datoru aparatūra';
-
-  @override
   String get attr_computer_repair => 'Datoru remonts';
 
   @override
   String get attr_concert_tickets => 'Koncerta biļetes';
 
   @override
-  String get attr_co_op_gaming => 'Kooperatīvas spēles';
+  String get attr_co_op_gaming => 'Multi-player spēles';
 
   @override
-  String get attr_creative_brainstorming => 'Radoša ideju ģenerēšana';
+  String get attr_brainstorming => 'Brainstorming';
 
   @override
   String get attr_dance_lessons => 'Deju nodarbības';
@@ -1245,28 +1154,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_fitness_coaching => 'Fitnesa trenēšana';
 
   @override
-  String get attr_fresh_eggs => 'Svaigas olas';
-
-  @override
   String get attr_chicken_eggs => 'Vistu olas';
 
   @override
-  String get attr_furniture_repair => 'Mēbeļu remonts';
+  String get attr_nutrition_advice => 'Uztura konsult\\u0101cijas';
 
   @override
   String get attr_gardening_advice => 'Dārzkopības padomi';
 
   @override
-  String get attr_graphic_novels => 'Grafiskas noveles';
-
-  @override
-  String get attr_guitar => 'Ģitāra';
-
-  @override
-  String get attr_handmade => 'Roku darbs';
-
-  @override
-  String get attr_home_decor => 'Mājas dekors';
+  String get attr_handmade_items => 'Rokdarbi';
 
   @override
   String get attr_handyman_services => 'Santehniķa pakalpojumi';
@@ -1278,16 +1175,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_herbal_remedies => 'Zāļu līdzekļi';
 
   @override
-  String get attr_horseback_riding => 'Jāšana';
-
-  @override
   String get attr_interview_practice => 'Intervijas prakse';
 
   @override
   String get attr_language_exchange => 'Valodu apmaiņa';
-
-  @override
-  String get attr_lawn_mowing => 'Zāles pļaušana';
 
   @override
   String get attr_local_tours => 'Vietējās ekskursijas';
@@ -1308,9 +1199,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_musical_instruments => 'Mūzikas instrumenti';
 
   @override
-  String get attr_pair_programming => 'Pāra programmēšana';
-
-  @override
   String get attr_pet_sitting => 'Mājdzīvnieku pieskatīšana';
 
   @override
@@ -1320,16 +1208,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_piano_lessons => 'Klavieru nodarbības';
 
   @override
-  String get attr_plant_cuttings => 'Augu spraudeņi';
-
-  @override
   String get attr_proofreading => 'Korektūra';
 
   @override
-  String get attr_resume_writing => 'CV rakstīšana';
-
-  @override
-  String get attr_rpg_games => 'RPG spēles';
+  String get attr_multiplayer_games => 'Multiplayer games';
 
   @override
   String get attr_scrap_metal => 'Lūžņu metāls';
@@ -1356,22 +1238,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_translation_services => 'Tulkošanas pakalpojumi';
 
   @override
-  String get attr_used_books => 'Lietotas grāmatas';
-
-  @override
   String get attr_used_electronics => 'Lietota elektronika';
 
   @override
-  String get attr_used_furniture => 'Lietotas mēbeles';
+  String get attr_homemade_goods => 'Pa\\u0161darin\\u0101tas preces';
 
   @override
   String get attr_vehicle_repair => 'Transportlīdzekļu remonts';
 
   @override
-  String get attr_video_game_consoles => 'Videospēļu konsoles';
-
-  @override
-  String get attr_vintage_clothing => 'Vintage apģērbs';
+  String get attr_video_game_hardware => 'Videospēļu aparatūra';
 
   @override
   String get attr_voice_lessons => 'Vokālās nodarbības';
@@ -1380,10 +1256,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_ux_design => 'UX dizains';
 
   @override
-  String get attr_window_cleaning => 'Logu tīrīšana';
+  String get attr_graphic_design => 'Grafiskais dizains';
 
   @override
-  String get attr_yard_work => 'Pagalma darbi';
+  String get attr_music_performance => 'Mūzikas uzstāšanās';
+
+  @override
+  String get attr_transport_service => 'Transporta pakalpojums';
+
+  @override
+  String get attr_ai_consulting => 'MI konsultācijas';
 
   @override
   String get attr_drumming => 'Bungu spēle';
@@ -1437,10 +1319,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_environmentalism => 'Vides aizsardzība';
 
   @override
-  String get attr_fresh_vegetables => 'Svaigi dārzeņi';
-
-  @override
-  String get attr_fresh_fruits => 'Svaigi augļi';
+  String get attr_fruits => 'Aug\\u013Ci';
 
   @override
   String get attr_fresh_herbs => 'Svaigi garšaugi';
@@ -1461,7 +1340,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_poker => 'Pokers';
 
   @override
-  String get attr_trees => 'Koki';
+  String get attr_socializing => 'Socializēšanās';
 
   @override
   String get attr_plants => 'Augi';
@@ -1473,10 +1352,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_organic_food => 'Bioloģiskā pārtika';
 
   @override
-  String get attr_technician => 'Tehniķis';
+  String get attr_mechanisms => 'Meh\\u0101nismi';
 
   @override
-  String get attr_tractor => 'Traktors';
+  String get attr_farm_machinery => 'Lauksaimniecības tehnika';
 
   @override
   String get attr_driving => 'Vadīšana';
@@ -1485,22 +1364,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_machinery_operation => 'Smagā tehnika';
 
   @override
-  String get attr_truck_driving => 'Kravas auto vadīšana';
-
-  @override
-  String get attr_assembly => 'Montāža';
-
-  @override
   String get attr_animal_care => 'Dzīvnieku aprūpe';
 
   @override
   String get attr_horses => 'Zirgi';
-
-  @override
-  String get attr_goats => 'Kazas';
-
-  @override
-  String get attr_cows => 'Govis';
 
   @override
   String get attr_self_sufficiency => 'Pašpietiekamība';
@@ -1509,10 +1376,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_ridesharing => 'Braucienu koplietošana';
 
   @override
-  String get attr_fruit_harvesting => 'Augļu novākšana';
-
-  @override
-  String get attr_vegetable_harvesting => 'Dārzeņu novākšana';
+  String get attr_vegetables => 'D\\u0101rze\\u0146i';
 
   @override
   String get attr_car_cleaning => 'Auto tīrīšana';
@@ -1522,9 +1386,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get attr_house_maintenance => 'Mājas apkope';
-
-  @override
-  String get attr_shepherding => 'Ganu darbs';
 
   @override
   String get attr_renovation => 'Renovācija';
@@ -1548,7 +1409,55 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_alternative_healing => 'Alternatīvā dziedināšana';
 
   @override
-  String get attr_socializing => 'Socializēšanās';
+  String get attr_pet_supplies => 'Mājdzīvnieku piederumi';
+
+  @override
+  String get attr_kids_toys => 'Bērnu rotaļlietas';
+
+  @override
+  String get attr_power_tools => 'Elektroinstrumenti';
+
+  @override
+  String get attr_camping_gear => 'Kempinga aprīkojums';
+
+  @override
+  String get attr_kitchen_appliances => 'Virtuves tehnika';
+
+  @override
+  String get attr_device_lending => 'Ierīču aizdošana';
+
+  @override
+  String get attr_computer_accessories => 'Datoru aksesuāri';
+
+  @override
+  String get attr_clothing => 'Apģērbs';
+
+  @override
+  String get attr_sports_equipment => 'Sporta aprīkojums';
+
+  @override
+  String get attr_bicycle_parts => 'Velosipēdu detaļas';
+
+  @override
+  String get attr_errand_running => 'Uzdevumu veikšana';
+
+  @override
+  String get attr_phone_repair => 'Tālruņu remonts';
+
+  @override
+  String get attr_lawn_care => 'Zāliena kopšana';
+
+  @override
+  String get attr_digital_products => 'Digitālie produkti';
+
+  @override
+  String get attr_software_accounts => 'Programmatūras konti';
+
+  @override
+  String get attr_reviewing => 'Vērtēšana';
+
+  @override
+  String get attr_virtual_assistance => 'Virtuālā asistēšana';
 
   @override
   String get userLocation => 'Atrašanās vieta:';

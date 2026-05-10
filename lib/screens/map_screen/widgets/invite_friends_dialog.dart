@@ -21,7 +21,7 @@ class InviteFriendsDialog extends StatelessWidget {
 
   // Get app share link from environment variables
   static String get appShareLink => 
-      dotenv.env['SERVICE_BASE_URL_WEB'] ?? 'https://barters.lv';
+      dotenv.env['SERVICE_BASE_URL_WEB'] ?? 'https://bartering.app';
 
   Future<void> _shareApp(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
