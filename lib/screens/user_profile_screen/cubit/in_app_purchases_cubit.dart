@@ -88,7 +88,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
   static const Map<int, _CoinPackConfig> _coinPackConfigs = {
     20: _CoinPackConfig(
       androidProductId: 'android_coins_20',
-      iosProductId: 'coins_20_ios',
+      iosProductId: '20_coins_ios',
       amountMinor: 111,
     ),
     50: _CoinPackConfig(

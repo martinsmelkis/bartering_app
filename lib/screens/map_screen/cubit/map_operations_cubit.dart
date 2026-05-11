@@ -28,9 +28,9 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
   static const int MIN_POIS_FOR_SUB_CLUSTER_DISPLAY = 2;
 
   static const double MAIN_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD = 14.0;
-  static const double SUB_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD = 16.0;
+  static const double SUB_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD = 15.5;
   static const double MAIN_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD = 13.0;
-  static const double SUB_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD = 15.5;
+  static const double SUB_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD = 14.5;
 
   List<PoiClusterOsm> mainPoiClusters = [];
   List<PoiSubClusterOsm> looseSubClusters = [];
@@ -141,9 +141,20 @@ class MapOperationsCubit extends Cubit<MapOperationsState> {
         previousZoomAtMethodEntry >= MAIN_CLUSTER_AUTO_EXPAND_ZOOM_THRESHOLD &&
             currentZoomAtMethodEntry <= MAIN_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD;
 
+    final bool crossedSubExpandToCollapseThreshold =
+        currentZoomAtMethodEntry >= SUB_CLUSTER_AUTO_COLLAPSE_ZOOM_THRESHOLD &&
+        previousZoomAtMethodEntry - currentZoomAtMethodEntry >= 1.0;
+
     _previousPerformMainClusteringZoom = currentZoomAtMethodEntry;
 
-    if (clustersChanged && emitUpdate || crossedMainExpandToCollapseThreshold) {
+    if (crossedSubExpandToCollapseThreshold) {
+      final result = _performSubClustering(poisNotFormingMainClusters, "loose_sub_");
+      looseSubClusters = result.$1;
+      individualPois = result.$2;
+    }
+
+    if ((clustersChanged && emitUpdate) || (crossedMainExpandToCollapseThreshold ||
+      crossedSubExpandToCollapseThreshold)) {
       emit(MapOperationsClusterUpdateSuccess(currentZoom));
     }
   }
