@@ -248,7 +248,7 @@ class AppLocalizationsLv extends AppLocalizations {
       'Šie noteikumi attiecas uz Bartering App lietošanu un nosaka lietotāja tiesības un pienākumus.';
 
   @override
-  String get termsConditionsSectionMinimumAgeTitle => '2. Minimālais vecums';
+  String get termsConditionsSectionMinimumAgeTitle => 'Minimālais vecums';
 
   @override
   String get termsConditionsSectionMinimumAgeContent =>

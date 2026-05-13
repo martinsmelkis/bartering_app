@@ -119,6 +119,22 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           dotenv.env['REVENUECAT_WEB_COINS_50_LINK_BASE_URL'] ?? '',
       webCoins200PurchaseLinkBaseUrl:
           dotenv.env['REVENUECAT_WEB_COINS_200_LINK_BASE_URL'] ?? '',
+      premiumAndroidProductId:
+          dotenv.env['REVENUECAT_ANDROID_PREMIUM_PRODUCT_ID'],
+      premiumIosProductId:
+          dotenv.env['REVENUECAT_IOS_PREMIUM_PRODUCT_ID'],
+      coins20AndroidProductId:
+          dotenv.env['REVENUECAT_ANDROID_COINS_20_PRODUCT_ID'],
+      coins20IosProductId:
+          dotenv.env['REVENUECAT_IOS_COINS_20_PRODUCT_ID'],
+      coins50AndroidProductId:
+          dotenv.env['REVENUECAT_ANDROID_COINS_50_PRODUCT_ID'],
+      coins50IosProductId:
+          dotenv.env['REVENUECAT_IOS_COINS_50_PRODUCT_ID'],
+      coins200AndroidProductId:
+          dotenv.env['REVENUECAT_ANDROID_COINS_200_PRODUCT_ID'],
+      coins200IosProductId:
+          dotenv.env['REVENUECAT_IOS_COINS_200_PRODUCT_ID'],
       texts: () {
         final l10n = AppLocalizations.of(context)!;
         return InAppPurchasesTexts(
@@ -137,7 +153,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           restoreFailed: l10n.inAppRestoreFailed,
         );
       },
-      premiumEntitlementId: 'Bartering App Premium',
+      premiumEntitlementId: 'entl1d4151c05d',
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {

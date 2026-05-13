@@ -23,7 +23,7 @@ class TermsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             _section(
-              title: l10n.termsConditionsSectionMinimumAgeTitle,
+              title: '2. ${l10n.termsConditionsSectionMinimumAgeTitle}',
               content: l10n.termsConditionsSectionMinimumAgeContent,
             ),
             const SizedBox(height: 20),

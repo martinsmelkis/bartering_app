@@ -54,6 +54,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             _buildSection(
+              title: l10n.termsConditionsSectionMinimumAgeTitle,
+              content: l10n.termsConditionsSectionMinimumAgeContent,
+            ),
+            const SizedBox(height: 24),
+            _buildSection(
               title: l10n.privacyPolicyChangesTitle,
               content: l10n.privacyPolicyChangesContent,
             ),
@@ -61,11 +66,6 @@ class PrivacyPolicyScreen extends StatelessWidget {
             _buildSection(
               title: l10n.privacyPolicyContactTitle,
               content: l10n.privacyPolicyContactContent,
-            ),
-            const SizedBox(height: 24),
-            _buildSection(
-              title: l10n.termsConditionsSectionMinimumAgeTitle,
-              content: l10n.termsConditionsSectionMinimumAgeContent,
             ),
             const SizedBox(height: 32),
             Center(

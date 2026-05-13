@@ -515,7 +515,7 @@ abstract class AppLocalizations {
   /// No description provided for @termsConditionsSectionMinimumAgeTitle.
   ///
   /// In en, this message translates to:
-  /// **'2. Minimum Age'**
+  /// **'Minimum Age'**
   String get termsConditionsSectionMinimumAgeTitle;
 
   /// No description provided for @termsConditionsSectionMinimumAgeContent.

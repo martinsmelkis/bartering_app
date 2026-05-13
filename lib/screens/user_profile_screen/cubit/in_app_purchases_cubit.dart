@@ -106,6 +106,14 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
   final String appUserId;
   final String revenueCatApiKey;
   final String premiumEntitlementId;
+  final String? premiumAndroidProductId;
+  final String? premiumIosProductId;
+  final String? coins20AndroidProductId;
+  final String? coins20IosProductId;
+  final String? coins50AndroidProductId;
+  final String? coins50IosProductId;
+  final String? coins200AndroidProductId;
+  final String? coins200IosProductId;
   final InAppPurchasesTexts Function() texts;
   final ApiClient apiClient;
   final String webPurchaseLinkBaseUrl;
@@ -125,6 +133,14 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     required this.webCoins50PurchaseLinkBaseUrl,
     required this.webCoins200PurchaseLinkBaseUrl,
     this.premiumEntitlementId = 'Bartering App Premium',
+    this.premiumAndroidProductId,
+    this.premiumIosProductId,
+    this.coins20AndroidProductId,
+    this.coins20IosProductId,
+    this.coins50AndroidProductId,
+    this.coins50IosProductId,
+    this.coins200AndroidProductId,
+    this.coins200IosProductId,
   }) : super(const InAppPurchasesState());
 
   Future<void> initialize() async {
@@ -164,7 +180,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         await Purchases.logIn(appUserId);
       }
 
-      await loadOfferings();
+      await loadOfferings(showUserFacingError: false);
       await refreshPremiumStatus();
     } catch (e, st) {
       _debugLogErrorState('initialize_exception', e, st);
@@ -176,7 +192,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     }
   }
 
-  Future<void> loadOfferings() async {
+  Future<void> loadOfferings({bool showUserFacingError = true}) async {
     if (kIsWeb) {
       emit(state.copyWith(isLoadingOfferings: false, availablePackages: const []));
       return;
@@ -207,7 +223,9 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       _debugLogErrorState('load_offerings_exception', e, st);
       emit(state.copyWith(
         isLoadingOfferings: false,
-        errorMessage: '${localized.failedToLoadOfferings}: $e',
+        errorMessage: showUserFacingError
+            ? '${localized.failedToLoadOfferings}: ${_purchaseErrorMessage(e)}'
+            : null,
       ));
     }
   }
@@ -254,18 +272,55 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
 
       var packages = state.availablePackages;
       if (packages.isEmpty) {
-        await loadOfferings();
+        await loadOfferings(showUserFacingError: false);
         packages = state.availablePackages;
       }
 
-      if (packages.isEmpty) {
+      if (packages.isNotEmpty) {
+        final paywallResult = await RevenueCatUI.presentPaywallIfNeeded(
+          premiumEntitlementId,
+        );
+
+        final customerInfo = await Purchases.getCustomerInfo();
+        final premiumActive = _isPremiumActive(customerInfo);
+
+        if (paywallResult == PaywallResult.cancelled) {
+          emit(state.copyWith(
+            isPurchasing: false,
+            statusMessage: localized.purchaseCancelled,
+            isPremium: premiumActive,
+          ));
+          return;
+        }
+
+        await _syncPremiumAfterPurchase(
+          productId: packages.first.storeProduct.identifier,
+          premiumActive: premiumActive,
+        );
+
+        emit(state.copyWith(
+          isPurchasing: false,
+          isPremium: premiumActive,
+          statusMessage: premiumActive
+              ? localized.premiumActivatedSuccessfully
+              : localized.purchaseCompletedEntitlementNotActiveYet,
+        ));
+        return;
+      }
+
+      final premiumProduct = await _loadStoreProduct(
+        _premiumProductIdsForCurrentPlatform,
+        productCategory: ProductCategory.nonSubscription,
+      );
+      if (premiumProduct == null) {
         _debugLogErrorState(
-          'purchase_premium_no_packages_available',
-          'No packages found after loading offerings',
+          'purchase_premium_no_packages_or_product_available',
+          'No offerings packages or direct premium product found. '
+              'productIds=${_premiumProductIdsForCurrentPlatform.join(',')}',
         );
         _logPurchaseError(
-          'no_packages_available',
-          'No packages found after loading offerings',
+          'no_packages_or_product_available',
+          'No offerings packages or direct premium product found',
         );
         emit(state.copyWith(
           isPurchasing: false,
@@ -274,21 +329,16 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         return;
       }
 
-      final paywallResult = await RevenueCatUI.presentPaywallIfNeeded(
-        premiumEntitlementId,
+      await Purchases.purchase(
+        PurchaseParams.storeProduct(premiumProduct),
       );
 
       final customerInfo = await Purchases.getCustomerInfo();
       final premiumActive = _isPremiumActive(customerInfo);
-
-      if (paywallResult == PaywallResult.cancelled) {
-        emit(state.copyWith(
-          isPurchasing: false,
-          statusMessage: localized.purchaseCancelled,
-          isPremium: premiumActive,
-        ));
-        return;
-      }
+      await _syncPremiumAfterPurchase(
+        productId: premiumProduct.identifier,
+        premiumActive: premiumActive,
+      );
 
       emit(state.copyWith(
         isPurchasing: false,
@@ -319,15 +369,14 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       );
       emit(state.copyWith(
         isPurchasing: false,
-        errorMessage:
-            '${localized.purchaseFailed}: code=${e.code}, message=${e.message ?? 'n/a'}',
+        errorMessage: '${localized.purchaseFailed}: ${_purchaseErrorMessage(e)}',
       ));
     } catch (e, st) {
       _debugLogErrorState('purchase_premium_unexpected_exception', e, st);
       _logPurchaseError('unexpected_exception', e, st);
       emit(state.copyWith(
         isPurchasing: false,
-        errorMessage: '${localized.purchaseFailed}: $e',
+        errorMessage: '${localized.purchaseFailed}: ${_purchaseErrorMessage(e)}',
       ));
     }
   }
@@ -411,14 +460,16 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         return;
       }
 
-      final productId = config.productIdForCurrentPlatform;
-      final products = await Purchases.getProducts([productId]);
-      final coinProduct = products.firstOrNull;
+      final productIds = _coinProductIdsForCurrentPlatform(coinAmount, config);
+      final coinProduct = await _loadStoreProduct(
+        productIds,
+        productCategory: ProductCategory.nonSubscription,
+      );
 
       if (coinProduct == null) {
         _debugLogErrorState(
           'purchase_coins_product_not_found',
-          'No product matched $productId',
+          'No product matched any of ${productIds.join(',')}',
         );
         emit(state.copyWith(
           isPurchasing: false,
@@ -469,14 +520,13 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
       );
       emit(state.copyWith(
         isPurchasing: false,
-        errorMessage:
-            '${localized.purchaseFailed}: code=${e.code}, message=${e.message ?? 'n/a'}',
+        errorMessage: '${localized.purchaseFailed}: ${_purchaseErrorMessage(e)}',
       ));
     } catch (e, st) {
       _debugLogErrorState('purchase_coins_unexpected_exception', e, st);
       emit(state.copyWith(
         isPurchasing: false,
-        errorMessage: '${localized.purchaseFailed}: $e',
+        errorMessage: '${localized.purchaseFailed}: ${_purchaseErrorMessage(e)}',
       ));
     }
   }
@@ -553,6 +603,136 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
         : baseUri.path;
 
     return baseUri.replace(path: '$cleanPath/$appUserId');
+  }
+
+  List<String> get _premiumProductIdsForCurrentPlatform {
+    final configuredProductId = defaultTargetPlatform == TargetPlatform.iOS
+        ? premiumIosProductId
+        : premiumAndroidProductId;
+
+    return _normalizedProductIds([
+      configuredProductId,
+      if (defaultTargetPlatform == TargetPlatform.iOS) ...[
+        'premium_ios',
+        'ios_premium',
+        'bartering_app_premium_ios',
+      ] else ...[
+        'premium',
+        'android_premium',
+        'premium_lifetime_user_android',
+      ],
+    ]);
+  }
+
+  List<String> _coinProductIdsForCurrentPlatform(
+    int coinAmount,
+    _CoinPackConfig fallbackConfig,
+  ) {
+    final configuredProductId = switch (coinAmount) {
+      20 => defaultTargetPlatform == TargetPlatform.iOS
+          ? coins20IosProductId
+          : coins20AndroidProductId,
+      50 => defaultTargetPlatform == TargetPlatform.iOS
+          ? coins50IosProductId
+          : coins50AndroidProductId,
+      200 => defaultTargetPlatform == TargetPlatform.iOS
+          ? coins200IosProductId
+          : coins200AndroidProductId,
+      _ => null,
+    };
+
+    final legacyProductId = fallbackConfig.productIdForCurrentPlatform;
+    final platformPrefix = defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android';
+
+    return _normalizedProductIds([
+      configuredProductId,
+      legacyProductId,
+      '${platformPrefix}_coins_$coinAmount',
+      'coins_${coinAmount}_$platformPrefix',
+      '${coinAmount}_coins_$platformPrefix',
+      'coins_$coinAmount',
+    ]);
+  }
+
+  Future<StoreProduct?> _loadStoreProduct(
+    List<String> productIds, {
+    ProductCategory productCategory = ProductCategory.subscription,
+  }) async {
+    if (productIds.isEmpty) return null;
+
+    final products = await Purchases.getProducts(
+      productIds,
+      productCategory: productCategory,
+    );
+    for (final productId in productIds) {
+      final product = products.where((product) => product.identifier == productId).firstOrNull;
+      if (product != null) return product;
+    }
+
+    return products.firstOrNull;
+  }
+
+  List<String> _normalizedProductIds(Iterable<String?> productIds) {
+    final normalizedProductIds = <String>[];
+    for (final productId in productIds) {
+      final normalizedProductId = _nonBlankOrNull(productId);
+      if (normalizedProductId == null || normalizedProductIds.contains(normalizedProductId)) {
+        continue;
+      }
+      normalizedProductIds.add(normalizedProductId);
+    }
+    return normalizedProductIds;
+  }
+
+  Future<void> _syncPremiumAfterPurchase({
+    required String productId,
+    required bool premiumActive,
+  }) async {
+    try {
+      await apiClient.syncPremiumNow();
+    } catch (e, st) {
+      _debugLogErrorState('sync_premium_after_purchase_failed', e, st);
+    }
+
+    if (premiumActive) return;
+
+    try {
+      await apiClient.purchasePremiumLifetime(
+        PurchasePremiumLifetimeRequest(
+          userId: appUserId,
+          currency: 'EUR',
+          amountMinor: 0,
+          externalRef: 'rc_${productId}_${DateTime.now().millisecondsSinceEpoch}',
+          metadataJson: jsonEncode({
+            'source': 'revenuecat_native',
+            'productId': productId,
+          }),
+        ),
+      );
+    } catch (e, st) {
+      _debugLogErrorState('record_premium_after_purchase_failed', e, st);
+    }
+  }
+
+  String _purchaseErrorMessage(Object error) {
+    if (error is PlatformException) {
+      final message = error.message;
+      final details = error.details;
+      if (details is Map && details['readableErrorCode'] == 'ConfigurationError') {
+        return 'Store products are not configured for this app build yet.';
+      }
+      if (message != null && message.trim().isNotEmpty) {
+        return message;
+      }
+      return 'Store purchase failed with code ${error.code}.';
+    }
+
+    return error.toString();
+  }
+
+  String? _nonBlankOrNull(String? value) {
+    final trimmed = value?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
   }
 
   bool _isPremiumActive(CustomerInfo customerInfo) {

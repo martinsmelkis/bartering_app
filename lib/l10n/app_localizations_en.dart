@@ -244,7 +244,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'These terms govern your use of Barter App and define user rights and responsibilities.';
 
   @override
-  String get termsConditionsSectionMinimumAgeTitle => '2. Minimum Age';
+  String get termsConditionsSectionMinimumAgeTitle => 'Minimum Age';
 
   @override
   String get termsConditionsSectionMinimumAgeContent =>
