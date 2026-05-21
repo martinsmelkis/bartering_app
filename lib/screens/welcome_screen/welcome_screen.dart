@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
@@ -30,6 +31,10 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   static const String _gdprConsentVersion = 'v1';
+  static final Uri _appStoreUrl = Uri.parse('https://apps.apple.com/app/6763872867');
+  static final Uri _playStoreUrl = Uri.parse(
+    'https://play.google.com/store/apps/details?id=app.bartering.bartering_app',
+  );
 
   late AnimationController _animationController;
   List<_FloatingIcon> _floatingIcons = [];
@@ -139,7 +144,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     // Generate avatar icons
     for (int i = 0; i < avatarIconCount; i++) {
-      final size = (random.nextDouble() * 40 + 28) / iconSizeScale; // 30-70
+      final size = (random.nextDouble() * 40 + 26) / iconSizeScale; // 30-70
       icons.add(_FloatingIcon(
         svgAsset: _getSvgAsset(random.nextInt(_svgAssetCount) + 1),
         // 1-based index
@@ -154,12 +159,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     // Generate onboarding category icons
     for (int i = 0; i < onboardingIconCount; i++) {
-      final size = (random.nextDouble() * 30 + 12) / iconSizeScale; // 25-55 (slightly smaller)
+      final size = (random.nextDouble() * 30 + 10) / iconSizeScale; // 25-55 (slightly smaller)
       icons.add(_FloatingIcon(
         iconData: _onboardingIcons[random.nextInt(_onboardingIcons.length)],
         iconColor:
             _onboardingCategoryColors[random.nextInt(_onboardingCategoryColors.length)]
-                .withValues(alpha: 0.70),
+                .withValues(alpha: 0.60),
         left: random.nextDouble() * (screenSize.width - size),
         top: random.nextDouble() * screenSize.height,
         size: size,
@@ -310,6 +315,37 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     context.push('/device-migration');
   }
 
+  Future<void> _openStoreUrl(Uri url) async {
+    final launched = await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+      webOnlyWindowName: '_blank',
+    );
+
+    if (!launched) {
+      logDebug('⚠️ Failed to launch store URL: $url');
+    }
+  }
+
+  List<_StoreLink> _getStoreLinksForCurrentPlatform() {
+    if (!kIsWeb) return const [];
+
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return [_StoreLink.appStore(_appStoreUrl)];
+      case TargetPlatform.android:
+        return [_StoreLink.playStore(_playStoreUrl)];
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.macOS:
+      case TargetPlatform.windows:
+        return [
+          _StoreLink.appStore(_appStoreUrl),
+          _StoreLink.playStore(_playStoreUrl),
+        ];
+    }
+  }
+
   Future<GdprConsentChoice?> _showGdprConsentDialog(BuildContext context) async {
     final settingsService = getIt<SettingsService>();
     final initialLocationConsent = await settingsService.getStoredLocationConsent();
@@ -336,6 +372,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     final bool isLargeNonWeb = !kIsWeb && context.canShowSideBySide;
     // Keep existing web behavior, but enforce stronger downscale for large non-web.
     final double fontScale = isLargeNonWeb ? 2.0 : (kIsWeb ? 1.5 : 1.0);
+    final storeLinks = _getStoreLinksForCurrentPlatform();
 
     return Scaffold(
       body: Container(
@@ -498,6 +535,40 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ],
                         ),
                       ),
+                      if (storeLinks.isNotEmpty) ...[
+                        SizedBox(height: 16),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: storeLinks
+                              .map(
+                                (storeLink) => OutlinedButton.icon(
+                                  onPressed: () => _openStoreUrl(storeLink.url),
+                                  icon: Icon(
+                                    storeLink.icon,
+                                    color: storeLink.iconColor,
+                                  ),
+                                  label: Text(storeLink.label),
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor: AppColors.background.withValues(alpha: 0.9),
+                                    foregroundColor: Colors.black87,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20.w,
+                                      vertical: 14,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14.r),
+                                    ),
+                                    side: BorderSide(
+                                      color: Colors.white.withValues(alpha: 0.7),
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ],
                       SizedBox(height: 24),
 
                       GestureDetector(
@@ -576,6 +647,36 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ],
     );
   }
+}
+
+class _StoreLink {
+  final String label;
+  final IconData icon;
+  final Color iconColor;
+  final Uri url;
+
+  const _StoreLink({
+    required this.label,
+    required this.icon,
+    required this.iconColor,
+    required this.url,
+  });
+
+  const _StoreLink.appStore(Uri url)
+      : this(
+          label: 'App Store',
+          icon: Icons.apple,
+          iconColor: Colors.blue,
+          url: url,
+        );
+
+  const _StoreLink.playStore(Uri url)
+      : this(
+          label: 'Google Play',
+          icon: Icons.shop,
+          iconColor: Colors.green,
+          url: url,
+        );
 }
 
 // Helper class to store floating icon data
@@ -685,7 +786,7 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
 
   Future<String> _loadAndModifySvg(String assetPath) async {
     final svgString = await rootBundle.loadString(assetPath);
-    final random = Random();
+    /*final random = Random();
 
     // Generate a random color
     final colors = [
@@ -696,13 +797,13 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
       Colors.orange.shade100,
       Colors.yellow.shade100,
       Colors.orangeAccent.shade100,
-    ];
+    ];*/
 
-    final color = colors[random.nextInt(colors.length)];
-    final colorHex =
-        '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+    //final color = colors[random.nextInt(colors.length)];
+    //final colorHex =
+    //    '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
 
     // Replace the default color with the random color
-    return svgString.replaceAll('#ffd4a3', colorHex);
+    return svgString;//.replaceAll('#ffd4a3', colorHex);
   }
 }

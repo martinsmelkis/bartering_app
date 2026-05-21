@@ -303,7 +303,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
                             topRight: Radius.circular(12),
                           ),
                         ),
-                        backgroundColor: AppColors.background,
+                        backgroundColor: AppColors.fabColor,
                         padding: EdgeInsets.zero,
                         elevation: 0,
                       ),
@@ -326,7 +326,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
                             bottomRight: Radius.circular(12),
                           ),
                         ),
-                        backgroundColor: AppColors.background,
+                        backgroundColor: AppColors.fabColor,
                         padding: EdgeInsets.zero,
                       ),
                       child: const Center(
@@ -366,7 +366,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
               right: 8,
               child: PointerInterceptor(
                 child: FloatingActionButton(
-                  backgroundColor: AppColors.background,
+                  backgroundColor: AppColors.fabColor,
                   onPressed: () async {
                     if (!context.mounted) return;
                     final center = await controller.osmBaseController

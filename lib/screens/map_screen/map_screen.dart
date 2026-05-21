@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
@@ -77,7 +78,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   late MapOperationsCubit mapOperationsCubit;
   ValueNotifier<int> zoomLevelNotifier = ValueNotifier(16);
   ValueNotifier<bool> showFab = ValueNotifier(true);
-  
+
   // Search checkboxes state
   ValueNotifier<bool> _showCheckboxesNotifier = ValueNotifier(false);
   ValueNotifier<bool> _seekingCheckedNotifier = ValueNotifier(true);
@@ -307,7 +308,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       logDebug('@@@@@@@@@ _onMapReady called but already ready, ignoring');
       return;
     }
-    
+
     _isMapReady = true;
     logDebug('@@@@@@@@@ _onMapReady called with initialPois: ${widget.initialPois?.length ?? 0}');
 
@@ -401,7 +402,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         if (_showSearchResultsList || !poiPanelCubit.state.isOpen) {
           // Check if POIs have actually changed before updating
           final poisChanged = MapOperationsCubit.havePoisChanged(_allPois, _previousSearchResults);
-          
+
           if (poisChanged) {
             logDebug('@@@@@@@@@ Updating search results list with ${_allPois.length} POIs (key: $_searchResultsKey)');
             // Show/update list view
@@ -502,7 +503,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       logDebug('@@@@@@@@@@@ Already updating visuals, skipping');
       return;
     }
-    
+
     // On native platforms, add a small delay to ensure the OSM widget is fully laid out
     // This prevents the !debugNeedsPaint error when capturing marker images
     if (!kIsWeb && _allPois.length == 1) {
@@ -512,7 +513,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         return;
       }
     }
-    
+
     _cleanUpMarkers();
     _isUpdatingVisuals = true;
     _currentRenderOperation++;
@@ -554,6 +555,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               final position = GeoPoint(latitude: subCluster.centroid.latitude,
                   longitude: subCluster.centroid.longitude);
               markersToAdd.add((point: position, icon: subClusterMarker));
+              if (Platform.isIOS) {
+                await Future.delayed(const Duration(milliseconds: 30));
+              }
               _currentMarkerPositions.add(position);
             } catch (e) {
               logDebugError('Failed to prepare sub-cluster marker', e);
@@ -580,6 +584,9 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           final position = GeoPoint(latitude: mainCluster.centroid.latitude,
               longitude: mainCluster.centroid.longitude);
           markersToAdd.add((point: position, icon: mainClusterMarker));
+          if (Platform.isIOS) {
+            await Future.delayed(const Duration(milliseconds: 30));
+          }
           _currentMarkerPositions.add(position);
         } catch (e) {
           logDebugError('Failed to prepare main cluster marker', e);
@@ -656,6 +663,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               marker.point,
               markerIcon: marker.icon,
             );
+            await Future.delayed(const Duration(milliseconds: 30));
           } catch (e) {
             logDebugError('Failed to add individual marker fallback', e);
           }
@@ -679,7 +687,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       // If not, POI will show as a side panel via AdaptivePoiLayout
     } else {
       final screenHeight = MediaQuery.of(context).size.height;
-      
+
       // On small screens, show as modal bottom sheet
       // Use microtask to defer modal display outside of layout phase
       Future.microtask(() {
