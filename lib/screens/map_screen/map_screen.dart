@@ -958,7 +958,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                     child: PointerInterceptor(child: const MainNavigation()),
                   ),
                   Positioned(
-                    bottom: 32 + MediaQuery.of(context).viewPadding.bottom,
+                    bottom: 26 + MediaQuery.of(context).viewPadding.bottom,
                     right: 16 + MediaQuery.of(context).viewPadding.right,
                     child: PointerInterceptor(
                       child: UserAvatarFab(

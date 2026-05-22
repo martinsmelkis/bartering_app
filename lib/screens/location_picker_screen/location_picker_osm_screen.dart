@@ -284,7 +284,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
           children: [
             // Zoom buttons at bottom left
             Positioned(
-              bottom: 23.0,
+              bottom: 23.0 + MediaQuery.of(context).viewPadding.bottom,
               left: 15,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -337,7 +337,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
               ),
             ),
             Positioned(
-              bottom: 20,
+              bottom: 20 + MediaQuery.of(context).viewPadding.bottom,
               left: 76,
               right: 76,
               child: IgnorePointer(
@@ -362,7 +362,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
             ),
             // Save location button at bottom right
             Positioned(
-              bottom: 12,
+              bottom: 20 + MediaQuery.of(context).viewPadding.bottom,
               right: 8,
               child: PointerInterceptor(
                 child: FloatingActionButton(
