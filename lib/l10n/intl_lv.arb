@@ -1047,6 +1047,36 @@
 
   "noUsersNearbyTitle": "Nav lietotāju tuvumā",
   "noUsersNearbyMessage": "Jūsu apkārtne vēl attīstās. Uzaicini paziņas un veido kopienu — nopelni 50 monētas par pirmo ieteikumu!",
+  "nearbyUsersAlertCheckboxTitle": "Paziņot, kad tuvumā ir {count}+ lietotāji",
+  "@nearbyUsersAlertCheckboxTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nearbyUsersAlertCheckboxSubtitle": "Nosūtīsim paziņojumu, kad jūsu apkārtnē parādīsies pietiekami daudz lietotāju.",
+  "nearbyUsersAlertLoading": "Pārbaudām paziņojuma iestatījumu...",
+  "nearbyUsersAlertEnabled": "Tuvumā esošo lietotāju paziņojums ieslēgts.",
+  "nearbyUsersAlertDisabled": "Tuvumā esošo lietotāju paziņojums izslēgts.",
+  "nearbyUsersAlertSaveError": "Pašlaik neizdevās atjaunināt tuvumā esošo lietotāju paziņojumu.",
+  "nearbyUsersAlertManageDelivery": "Pārvaldiet, kur tiek nosūtīti tuvumā esošo lietotāju paziņojumi.",
+  "notificationEmailTitle": "Pievienojiet e-pastu paziņojumiem",
+  "notificationEmailSubtitle": "Pievienojiet e-pasta adresi, lai mēs varētu paziņot arī tad, ja push paziņojumi nav pieejami.",
+  "notificationEmailLabel": "E-pasta adrese",
+  "notificationEmailSave": "Saglabāt e-pastu",
+  "notificationEmailSaved": "Paziņojumu e-pasts saglabāts.",
+  "notificationEmailSaveError": "Pašlaik neizdevās saglabāt paziņojumu e-pastu.",
+  "notificationEmailRequired": "Ievadiet e-pasta adresi.",
+  "notificationEmailInvalid": "Ievadiet derīgu e-pasta adresi.",
+  "notificationEmailConfigured": "Paziņojumus var nosūtīt uz {email}",
+  "@notificationEmailConfigured": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "shareApp": "Dalīties ar lietotni",
   "copyLink": "Kopēt saiti",
   "close": "Aizvērt",

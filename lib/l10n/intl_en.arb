@@ -976,6 +976,36 @@
 
   "noUsersNearbyTitle": "No Users Nearby",
   "noUsersNearbyMessage": "Your area is currently still growing. Invite people you know and help grow the community — your first referral earns 50 coins!",
+  "nearbyUsersAlertCheckboxTitle": "Notify me when {count}+ users are nearby",
+  "@nearbyUsersAlertCheckboxTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nearbyUsersAlertCheckboxSubtitle": "We’ll send an alert when enough users appear in your area.",
+  "nearbyUsersAlertLoading": "Checking alert preference...",
+  "nearbyUsersAlertEnabled": "Nearby users alert enabled.",
+  "nearbyUsersAlertDisabled": "Nearby users alert disabled.",
+  "nearbyUsersAlertSaveError": "Unable to update nearby users alert right now.",
+  "nearbyUsersAlertManageDelivery": "Manage where nearby-user alerts are delivered.",
+  "notificationEmailTitle": "E-mail where to receive the notification",
+  "notificationEmailSubtitle": "Add an email address so we can notify you even if push notifications are unavailable.",
+  "notificationEmailLabel": "Email address",
+  "notificationEmailSave": "Save email",
+  "notificationEmailSaved": "Notification email saved.",
+  "notificationEmailSaveError": "Unable to save notification email right now.",
+  "notificationEmailRequired": "Enter an email address.",
+  "notificationEmailInvalid": "Enter a valid email address.",
+  "notificationEmailConfigured": "Alerts can be sent to {email}",
+  "@notificationEmailConfigured": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "shareApp": "Share App",
   "copyLink": "Copy Link",
   "close": "Close",

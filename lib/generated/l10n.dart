@@ -6294,6 +6294,166 @@ class S {
     );
   }
 
+  /// `Notify me when $count+ users are nearby`
+  String nearbyUsersAlertCheckboxTitle(int count) {
+    return Intl.message(
+      'Notify me when $count+ users are nearby',
+      name: 'nearbyUsersAlertCheckboxTitle',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `We’ll send an alert when enough users appear in your area.`
+  String get nearbyUsersAlertCheckboxSubtitle {
+    return Intl.message(
+      'We’ll send an alert when enough users appear in your area.',
+      name: 'nearbyUsersAlertCheckboxSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Checking alert preference...`
+  String get nearbyUsersAlertLoading {
+    return Intl.message(
+      'Checking alert preference...',
+      name: 'nearbyUsersAlertLoading',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Nearby users alert enabled.`
+  String get nearbyUsersAlertEnabled {
+    return Intl.message(
+      'Nearby users alert enabled.',
+      name: 'nearbyUsersAlertEnabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Nearby users alert disabled.`
+  String get nearbyUsersAlertDisabled {
+    return Intl.message(
+      'Nearby users alert disabled.',
+      name: 'nearbyUsersAlertDisabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to update nearby users alert right now.`
+  String get nearbyUsersAlertSaveError {
+    return Intl.message(
+      'Unable to update nearby users alert right now.',
+      name: 'nearbyUsersAlertSaveError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Manage where nearby-user alerts are delivered.`
+  String get nearbyUsersAlertManageDelivery {
+    return Intl.message(
+      'Manage where nearby-user alerts are delivered.',
+      name: 'nearbyUsersAlertManageDelivery',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add an email for alerts`
+  String get notificationEmailTitle {
+    return Intl.message(
+      'Add an email for alerts',
+      name: 'notificationEmailTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add an email address so we can notify you even if push notifications are unavailable.`
+  String get notificationEmailSubtitle {
+    return Intl.message(
+      'Add an email address so we can notify you even if push notifications are unavailable.',
+      name: 'notificationEmailSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Email address`
+  String get notificationEmailLabel {
+    return Intl.message(
+      'Email address',
+      name: 'notificationEmailLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save email`
+  String get notificationEmailSave {
+    return Intl.message(
+      'Save email',
+      name: 'notificationEmailSave',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notification email saved.`
+  String get notificationEmailSaved {
+    return Intl.message(
+      'Notification email saved.',
+      name: 'notificationEmailSaved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to save notification email right now.`
+  String get notificationEmailSaveError {
+    return Intl.message(
+      'Unable to save notification email right now.',
+      name: 'notificationEmailSaveError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter an email address.`
+  String get notificationEmailRequired {
+    return Intl.message(
+      'Enter an email address.',
+      name: 'notificationEmailRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter a valid email address.`
+  String get notificationEmailInvalid {
+    return Intl.message(
+      'Enter a valid email address.',
+      name: 'notificationEmailInvalid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Alerts can be sent to $email`
+  String notificationEmailConfigured(String email) {
+    return Intl.message(
+      'Alerts can be sent to $email',
+      name: 'notificationEmailConfigured',
+      desc: '',
+      args: [email],
+    );
+  }
+
   /// `Share App`
   String get shareApp {
     return Intl.message('Share App', name: 'shareApp', desc: '', args: []);

@@ -956,7 +956,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_gardening => 'Dārzkopība';
 
   @override
-  String get attr_music_production => 'M\\u016Bzikas produc\\u0113\\u0161ana';
+  String get attr_music_production => 'Mūzikas producēšana';
 
   @override
   String get attr_dancing => 'Dejas';
@@ -1157,7 +1157,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_chicken_eggs => 'Vistu olas';
 
   @override
-  String get attr_nutrition_advice => 'Uztura konsult\\u0101cijas';
+  String get attr_nutrition_advice => 'Uztura konsultācijas';
 
   @override
   String get attr_gardening_advice => 'Dārzkopības padomi';
@@ -1241,7 +1241,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_used_electronics => 'Lietota elektronika';
 
   @override
-  String get attr_homemade_goods => 'Pa\\u0161darin\\u0101tas preces';
+  String get attr_homemade_goods => 'Pašdarinātas preces';
 
   @override
   String get attr_vehicle_repair => 'Transportlīdzekļu remonts';
@@ -1319,7 +1319,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_environmentalism => 'Vides aizsardzība';
 
   @override
-  String get attr_fruits => 'Aug\\u013Ci';
+  String get attr_fruits => 'Augļi';
 
   @override
   String get attr_fresh_herbs => 'Svaigi garšaugi';
@@ -1352,7 +1352,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_organic_food => 'Bioloģiskā pārtika';
 
   @override
-  String get attr_mechanisms => 'Meh\\u0101nismi';
+  String get attr_mechanisms => 'Mehānismi';
 
   @override
   String get attr_farm_machinery => 'Lauksaimniecības tehnika';
@@ -1376,7 +1376,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get attr_ridesharing => 'Braucienu koplietošana';
 
   @override
-  String get attr_vegetables => 'D\\u0101rze\\u0146i';
+  String get attr_vegetables => 'Dārzeņi';
 
   @override
   String get attr_car_cleaning => 'Auto tīrīšana';
@@ -1458,6 +1458,18 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get attr_virtual_assistance => 'Virtuālā asistēšana';
+
+  @override
+  String get attr_hair_styling => 'Frizēšana';
+
+  @override
+  String get attr_beauty_products => 'Skaistumkopšanas produkti';
+
+  @override
+  String get attr_audio_equipment => 'Audio aprīkojums';
+
+  @override
+  String get attr_health_supplements => 'Uztura bagātinātāji';
 
   @override
   String get userLocation => 'Atrašanās vieta:';
@@ -2634,7 +2646,66 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get noUsersNearbyMessage =>
-      'Šķiet, ka jūsu apkārtnē vēl nav lietotāju. Esi pirmais, kas uzaicina draugus un sāk barterēšanos — nopelni 50 monētas par pirmo ieteikumu!';
+      'Jūsu apkārtne vēl attīstās. Uzaicini paziņas un veido kopienu — nopelni 50 monētas par pirmo ieteikumu!';
+
+  @override
+  String nearbyUsersAlertCheckboxTitle(int count) {
+    return 'Paziņot, kad tuvumā ir $count+ lietotāji';
+  }
+
+  @override
+  String get nearbyUsersAlertCheckboxSubtitle =>
+      'Nosūtīsim paziņojumu, kad jūsu apkārtnē parādīsies pietiekami daudz lietotāju.';
+
+  @override
+  String get nearbyUsersAlertLoading => 'Pārbaudām paziņojuma iestatījumu...';
+
+  @override
+  String get nearbyUsersAlertEnabled =>
+      'Tuvumā esošo lietotāju paziņojums ieslēgts.';
+
+  @override
+  String get nearbyUsersAlertDisabled =>
+      'Tuvumā esošo lietotāju paziņojums izslēgts.';
+
+  @override
+  String get nearbyUsersAlertSaveError =>
+      'Pašlaik neizdevās atjaunināt tuvumā esošo lietotāju paziņojumu.';
+
+  @override
+  String get nearbyUsersAlertManageDelivery =>
+      'Pārvaldiet, kur tiek nosūtīti tuvumā esošo lietotāju paziņojumi.';
+
+  @override
+  String get notificationEmailTitle => 'Pievienojiet e-pastu paziņojumiem';
+
+  @override
+  String get notificationEmailSubtitle =>
+      'Pievienojiet e-pasta adresi, lai mēs varētu paziņot arī tad, ja push paziņojumi nav pieejami.';
+
+  @override
+  String get notificationEmailLabel => 'E-pasta adrese';
+
+  @override
+  String get notificationEmailSave => 'Saglabāt e-pastu';
+
+  @override
+  String get notificationEmailSaved => 'Paziņojumu e-pasts saglabāts.';
+
+  @override
+  String get notificationEmailSaveError =>
+      'Pašlaik neizdevās saglabāt paziņojumu e-pastu.';
+
+  @override
+  String get notificationEmailRequired => 'Ievadiet e-pasta adresi.';
+
+  @override
+  String get notificationEmailInvalid => 'Ievadiet derīgu e-pasta adresi.';
+
+  @override
+  String notificationEmailConfigured(String email) {
+    return 'Paziņojumus var nosūtīt uz $email';
+  }
 
   @override
   String get shareApp => 'Dalīties ar lietotni';

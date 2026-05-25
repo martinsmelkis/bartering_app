@@ -353,6 +353,20 @@ abstract class ApiClient {
   Future<NotificationPreferencesResponse> removePushToken(
       @Path('token') String token);
 
+  /// Read nearby users alert state
+  @GET('/api/v1/notifications/nearby-users-alert')
+  Future<Map<String, dynamic>> getNearbyUsersAlert();
+
+  /// Create/update nearby users alert
+  @POST('/api/v1/notifications/nearby-users-alert')
+  Future<Map<String, dynamic>> createOrUpdateNearbyUsersAlert(
+      @Body() Map<String, dynamic> request);
+
+  /// Enable/disable nearby users alert
+  @PATCH('/api/v1/notifications/nearby-users-alert')
+  Future<Map<String, dynamic>> updateNearbyUsersAlert(
+      @Body() Map<String, dynamic> request);
+
   /// Get all attribute preferences for user
   /// Returns AttributePreferencesListResponse with preferences list and total count
   @GET('/api/v1/notifications/attributes')

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
@@ -72,6 +71,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   bool _isUpdatingVisuals = false; // Prevent concurrent updates
   Region? _previousMapRegion = null;
   GeoPoint? _noUsersMarkerPosition; // Position of the "no users nearby" marker
+  double? _lastNearbySearchRadiusMeters;
   GeoPoint? _savedUserLocationMarkerPosition; // Position of saved user location marker
 
   late PoiCubit poiCubit;
@@ -264,11 +264,14 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       }
     }
 
+    final radiusMeters = radiusKm * 1000;
+    _lastNearbySearchRadiusMeters = radiusMeters;
+
     await poiCubit.getComplementaryProfiles(
       _currentUserId ?? "",
       lat: lat,
       lon: lon,
-      radiusMeters: radiusKm * 1000,
+      radiusMeters: radiusMeters,
       fallbackToNearby: true, // Enable fallback to nearby
     );
   }
@@ -1084,20 +1087,23 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                             final useMapCenter = await settingsService.getUseMapCenterForSearch();
                             final radiusKm = await settingsService.getNearbyUsersRadius();
 
+                            final radiusMeters = radiusKm * 1000;
+                            _lastNearbySearchRadiusMeters = radiusMeters;
+
                             if (useMapCenter) {
                               final mapCenter = await _mapController.centerMap;
                               await poiCubit.getComplementaryProfiles(
                                 _currentUserId ?? "",
                                 lat: mapCenter.latitude,
                                 lon: mapCenter.longitude,
-                                radiusMeters: radiusKm * 1000, // Convert km to meters
+                                radiusMeters: radiusMeters,
                                 fallbackToNearby: true, // Enable fallback to nearby
                               );
                             } else {
                               // Use user location (default)
                               await poiCubit.getComplementaryProfiles(
                                 _currentUserId ?? "",
-                                radiusMeters: radiusKm * 1000, // Convert km to meters
+                                radiusMeters: radiusMeters,
                                 fallbackToNearby: true, // Enable fallback to nearby
                               );
                             }
@@ -1250,11 +1256,21 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     return a.latitude == b.latitude && a.longitude == b.longitude;
   }
 
-  void _showInviteFriendsDialog() {
+  Future<void> _showInviteFriendsDialog() async {
+    final markerPosition = _noUsersMarkerPosition ?? await _mapController.centerMap;
+    final radiusMeters = _lastNearbySearchRadiusMeters ??
+        await getIt<SettingsService>().getNearbyUsersRadius() * 1000;
+
+    if (!mounted) return;
+
     showDialog(
       context: context,
       builder: (context) => PointerInterceptor(
-        child: const InviteFriendsDialog(),
+        child: InviteFriendsDialog(
+          latitude: markerPosition.latitude,
+          longitude: markerPosition.longitude,
+          radiusMeters: radiusMeters,
+        ),
       ),
     );
   }

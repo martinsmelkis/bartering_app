@@ -2840,6 +2840,30 @@ abstract class AppLocalizations {
   /// **'Virtual assistance'**
   String get attr_virtual_assistance;
 
+  /// No description provided for @attr_hair_styling.
+  ///
+  /// In en, this message translates to:
+  /// **'Hair styling'**
+  String get attr_hair_styling;
+
+  /// No description provided for @attr_beauty_products.
+  ///
+  /// In en, this message translates to:
+  /// **'Beauty products'**
+  String get attr_beauty_products;
+
+  /// No description provided for @attr_audio_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio equipment'**
+  String get attr_audio_equipment;
+
+  /// No description provided for @attr_health_supplements.
+  ///
+  /// In en, this message translates to:
+  /// **'Health supplements'**
+  String get attr_health_supplements;
+
   /// No description provided for @userLocation.
   ///
   /// In en, this message translates to:
@@ -4919,8 +4943,104 @@ abstract class AppLocalizations {
   /// No description provided for @noUsersNearbyMessage.
   ///
   /// In en, this message translates to:
-  /// **'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering — first referral awards 50 coins!'**
+  /// **'Your area is currently still growing. Invite people you know and help grow the community — your first referral earns 50 coins!'**
   String get noUsersNearbyMessage;
+
+  /// No description provided for @nearbyUsersAlertCheckboxTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify me when {count}+ users are nearby'**
+  String nearbyUsersAlertCheckboxTitle(int count);
+
+  /// No description provided for @nearbyUsersAlertCheckboxSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We’ll send an alert when enough users appear in your area.'**
+  String get nearbyUsersAlertCheckboxSubtitle;
+
+  /// No description provided for @nearbyUsersAlertLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking alert preference...'**
+  String get nearbyUsersAlertLoading;
+
+  /// No description provided for @nearbyUsersAlertEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby users alert enabled.'**
+  String get nearbyUsersAlertEnabled;
+
+  /// No description provided for @nearbyUsersAlertDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby users alert disabled.'**
+  String get nearbyUsersAlertDisabled;
+
+  /// No description provided for @nearbyUsersAlertSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update nearby users alert right now.'**
+  String get nearbyUsersAlertSaveError;
+
+  /// No description provided for @nearbyUsersAlertManageDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage where nearby-user alerts are delivered.'**
+  String get nearbyUsersAlertManageDelivery;
+
+  /// No description provided for @notificationEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'E-mail where to receive the notification'**
+  String get notificationEmailTitle;
+
+  /// No description provided for @notificationEmailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an email address so we can notify you even if push notifications are unavailable.'**
+  String get notificationEmailSubtitle;
+
+  /// No description provided for @notificationEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get notificationEmailLabel;
+
+  /// No description provided for @notificationEmailSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save email'**
+  String get notificationEmailSave;
+
+  /// No description provided for @notificationEmailSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification email saved.'**
+  String get notificationEmailSaved;
+
+  /// No description provided for @notificationEmailSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save notification email right now.'**
+  String get notificationEmailSaveError;
+
+  /// No description provided for @notificationEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an email address.'**
+  String get notificationEmailRequired;
+
+  /// No description provided for @notificationEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get notificationEmailInvalid;
+
+  /// No description provided for @notificationEmailConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts can be sent to {email}'**
+  String notificationEmailConfigured(String email);
 
   /// No description provided for @shareApp.
   ///

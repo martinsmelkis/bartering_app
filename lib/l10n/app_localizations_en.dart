@@ -1448,6 +1448,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attr_virtual_assistance => 'Virtual assistance';
 
   @override
+  String get attr_hair_styling => 'Hair styling';
+
+  @override
+  String get attr_beauty_products => 'Beauty products';
+
+  @override
+  String get attr_audio_equipment => 'Audio equipment';
+
+  @override
+  String get attr_health_supplements => 'Health supplements';
+
+  @override
   String get userLocation => 'Location:';
 
   @override
@@ -2601,7 +2613,65 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noUsersNearbyMessage =>
-      'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering — first referral awards 50 coins!';
+      'Your area is currently still growing. Invite people you know and help grow the community — your first referral earns 50 coins!';
+
+  @override
+  String nearbyUsersAlertCheckboxTitle(int count) {
+    return 'Notify me when $count+ users are nearby';
+  }
+
+  @override
+  String get nearbyUsersAlertCheckboxSubtitle =>
+      'We’ll send an alert when enough users appear in your area.';
+
+  @override
+  String get nearbyUsersAlertLoading => 'Checking alert preference...';
+
+  @override
+  String get nearbyUsersAlertEnabled => 'Nearby users alert enabled.';
+
+  @override
+  String get nearbyUsersAlertDisabled => 'Nearby users alert disabled.';
+
+  @override
+  String get nearbyUsersAlertSaveError =>
+      'Unable to update nearby users alert right now.';
+
+  @override
+  String get nearbyUsersAlertManageDelivery =>
+      'Manage where nearby-user alerts are delivered.';
+
+  @override
+  String get notificationEmailTitle =>
+      'E-mail where to receive the notification';
+
+  @override
+  String get notificationEmailSubtitle =>
+      'Add an email address so we can notify you even if push notifications are unavailable.';
+
+  @override
+  String get notificationEmailLabel => 'Email address';
+
+  @override
+  String get notificationEmailSave => 'Save email';
+
+  @override
+  String get notificationEmailSaved => 'Notification email saved.';
+
+  @override
+  String get notificationEmailSaveError =>
+      'Unable to save notification email right now.';
+
+  @override
+  String get notificationEmailRequired => 'Enter an email address.';
+
+  @override
+  String get notificationEmailInvalid => 'Enter a valid email address.';
+
+  @override
+  String notificationEmailConfigured(String email) {
+    return 'Alerts can be sent to $email';
+  }
 
   @override
   String get shareApp => 'Share App';
