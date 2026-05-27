@@ -65,7 +65,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   late final MapController _mapController;
 
   List<PointOfInterest> _allPois = [];
-  Set<GeoPoint> _currentMarkerPositions = {}; // Track all marker positions
+  List<GeoPoint> _currentMarkerPositions = []; // Track all marker positions
   bool _isMapReady = false; // Track map initialization status
   int _currentRenderOperation = 0; // Track current render operation to cancel stale ones
   bool _isUpdatingVisuals = false; // Prevent concurrent updates
@@ -438,7 +438,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     if (_isMapReady && _mapController.isAllLayersVisible) {
       logDebug('@@@@@@@@@@@@ updateVisuals from _processPois');
 
-      _cleanUpMarkers();
+      await _cleanUpMarkers();
 
       mapOperationsCubit.resetClusteringTracking();
       mapOperationsCubit.performMainClustering(_allPois);
@@ -454,13 +454,15 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
   }
 
-  void _cleanUpMarkers() {
+  Future<void> _cleanUpMarkers() async {
     logDebug('@@@@@@@@@ _cleanUpMarkers: Removing ${_currentMarkerPositions.length} markers');
 
     // Keep saved-location marker while clearing dynamic search/cluster markers.
     final savedLocation = _savedUserLocationMarkerPosition;
 
-    // Remove all existing markers from previous render
+    // Remove all existing markers from previous render before adding replacements.
+    // On web, removeMarker is asynchronous; not awaiting it can leave old cluster
+    // icons on the map while the next batch is added.
     if (_currentMarkerPositions.isNotEmpty) {
       for (var position in _currentMarkerPositions.toList()) {
         if (savedLocation != null && _isSamePoint(position, savedLocation)) {
@@ -468,21 +470,33 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         }
 
         try {
-          _mapController.removeMarker(position);
+          await _mapController.removeMarker(position);
         } catch (e) {
           logDebugError('Error removing marker at $position', e);
         }
       }
     }
-    _mapController.removeAllCircle();
-    _mapController.removeAllShapes();
+
+    try {
+      await _mapController.removeAllCircle();
+      await _mapController.removeAllShapes();
+    } catch (e) {
+      logDebugError('Error removing map shapes', e);
+    }
 
     // Clear the tracking set and rebuild it
     _currentMarkerPositions.clear();
     if (savedLocation != null) {
-      _currentMarkerPositions.add(savedLocation);
+      _trackMarkerPosition(savedLocation);
     }
     logDebug('@@@@@@@@@ _cleanUpMarkers: Complete, tracking set cleared');
+  }
+
+  void _trackMarkerPosition(GeoPoint position) {
+    if (_currentMarkerPositions.any((existing) => _isSamePoint(existing, position))) {
+      return;
+    }
+    _currentMarkerPositions.add(position);
   }
 
   /// Checks if the current render operation is still valid
@@ -517,8 +531,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       }
     }
 
-    _cleanUpMarkers();
     _isUpdatingVisuals = true;
+    await _cleanUpMarkers();
     _currentRenderOperation++;
     final currentOperation = _currentRenderOperation;
     logDebug('@@@@@@@@@@@ Starting render operation #$currentOperation vs ${_currentRenderOperation}');
@@ -544,7 +558,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                 final position = GeoPoint(latitude: poi.profile.latitude ?? 0.0,
                     longitude: poi.profile.longitude ?? 0.0);
                 markersToAdd.add((point: position, icon: newMarker));
-                _currentMarkerPositions.add(position);
+                _trackMarkerPosition(position);
               } catch (e) {
                 logDebugError('Failed to prepare POI marker for ${poi.profile.userId}', e);
               }
@@ -558,10 +572,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
               final position = GeoPoint(latitude: subCluster.centroid.latitude,
                   longitude: subCluster.centroid.longitude);
               markersToAdd.add((point: position, icon: subClusterMarker));
-              if (Platform.isIOS) {
+              _trackMarkerPosition(position);
+              if (!kIsWeb && Platform.isIOS) {
                 await Future.delayed(const Duration(milliseconds: 30));
               }
-              _currentMarkerPositions.add(position);
             } catch (e) {
               logDebugError('Failed to prepare sub-cluster marker', e);
             }
@@ -575,7 +589,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                 latitude: poi.profile.latitude ?? 0.0,
                 longitude: poi.profile.longitude ?? 0.0);
             markersToAdd.add((point: position, icon: poiMarker));
-            _currentMarkerPositions.add(position);
+            _trackMarkerPosition(position);
           } catch (e) {
             logDebugError('Failed to prepare individual POI marker in cluster', e);
           }
@@ -587,10 +601,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           final position = GeoPoint(latitude: mainCluster.centroid.latitude,
               longitude: mainCluster.centroid.longitude);
           markersToAdd.add((point: position, icon: mainClusterMarker));
-          if (Platform.isIOS) {
+          _trackMarkerPosition(position);
+          if (!kIsWeb && Platform.isIOS) {
             await Future.delayed(const Duration(milliseconds: 30));
           }
-          _currentMarkerPositions.add(position);
         } catch (e) {
           logDebugError('Failed to prepare main cluster marker', e);
         }
@@ -611,7 +625,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                 latitude: poi.profile.latitude ?? 0.0,
                 longitude: poi.profile.longitude ?? 0.0);
             markersToAdd.add((point: position, icon: svg));
-            _currentMarkerPositions.add(position);
+            _trackMarkerPosition(position);
           } catch (e) {
             logDebugError('Failed to prepare loose POI marker', e);
           }
@@ -623,7 +637,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
           final position = GeoPoint(latitude: looseSubCluster.centroid.latitude,
               longitude: looseSubCluster.centroid.longitude);
           markersToAdd.add((point: position, icon: mapOperationsCubit.createSubClusterMarker(looseSubCluster)));
-          _currentMarkerPositions.add(position);
+          _trackMarkerPosition(position);
         } catch (e) {
           logDebugError('Failed to prepare loose sub-cluster marker', e);
         }
@@ -641,7 +655,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
             latitude: poi.profile.latitude ?? 0.0,
             longitude: poi.profile.longitude ?? 0.0);
         markersToAdd.add((point: position, icon: svg));
-        _currentMarkerPositions.add(position);
+        _trackMarkerPosition(position);
       } catch (e) {
         logDebugError('Failed to prepare truly individual POI marker', e);
       }
@@ -796,7 +810,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
 
     _savedUserLocationMarkerPosition = point;
-    _currentMarkerPositions.add(point);
+    _trackMarkerPosition(point);
   }
 
   void _removeSavedUserLocationMarker() {
@@ -1237,7 +1251,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       mapCenter,
       markerIcon: marker,
     );
-    _currentMarkerPositions.add(mapCenter);
+    _trackMarkerPosition(mapCenter);
   }
 
   void _removeNoUsersMarker() {
