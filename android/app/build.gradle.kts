@@ -38,8 +38,8 @@ android {
         applicationId = "app.bartering.bartering_app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 21
-        versionName = "0.2.1"
+        versionCode = 23
+        versionName = "0.2.3"
     }
 
     flavorDimensions += "environment"

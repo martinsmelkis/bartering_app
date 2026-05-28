@@ -153,7 +153,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           restoreFailed: l10n.inAppRestoreFailed,
         );
       },
-      premiumEntitlementId: 'entl1d4151c05d',
+      premiumEntitlementId: 'Bartering App Premium',
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {

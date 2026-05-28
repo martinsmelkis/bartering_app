@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.10.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -51,6 +51,7 @@ dependencies:
   web_socket_channel: ^3.0.3
   uuid: ^4.4.0
   path: ^1.9.0
+  path_provider: ^2.1.5
   flutter_osm_plugin:
     git:
       url: https://github.com/martinsmelkis/osm_flutter.git
@@ -75,9 +76,8 @@ dependencies:
   app_links: ^7.0.0
 
   # For local storage
-  drift: ^2.28.2
-  sqlcipher_flutter_libs: 0.6.0
-  sqlite3: ^2.8.0
+  drift: ^2.32.1
+  sqlite3: ^3.1.5
 
   # Firebase Core
   firebase_core: ^4.6.0
@@ -96,13 +96,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^6.0.0
   build_runner: ^2.11.0
-  drift_dev: ^2.28.2
+  drift_dev: ^2.32.1
   injectable_generator: ^2.0.0
   retrofit_generator: ^10.2.0
   json_serializable: ^6.8.0
   intl_utils: ^2.8.8
-  l10n_mapper_generator: ^3.0.0
   flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
@@ -173,3 +173,8 @@ flutter_launcher_icons:
   # Optional: Use adaptive icons for Android (better on modern devices)
   adaptive_icon_background: "#ffffff"  # White background
   adaptive_icon_foreground: "assets/icons/ic_launcher.png"
+
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc

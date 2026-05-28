@@ -470,7 +470,10 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         }
 
         try {
-          await _mapController.removeMarker(position);
+          final removeFuture = _mapController.removeMarker(position);
+          if (kIsWeb) {
+            await removeFuture;
+          }
         } catch (e) {
           logDebugError('Error removing marker at $position', e);
         }
@@ -478,8 +481,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
 
     try {
-      await _mapController.removeAllCircle();
-      await _mapController.removeAllShapes();
+      final removeCirclesFuture = _mapController.removeAllCircle();
+      final removeShapesFuture = _mapController.removeAllShapes();
+      if (kIsWeb) {
+        await removeCirclesFuture;
+        await removeShapesFuture;
+      }
     } catch (e) {
       logDebugError('Error removing map shapes', e);
     }
@@ -532,7 +539,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     }
 
     _isUpdatingVisuals = true;
-    await _cleanUpMarkers();
+    try {
+      await _cleanUpMarkers();
+    } catch (e) {
+      logDebugError('Failed to clean up markers before visual update', e);
+    }
     _currentRenderOperation++;
     final currentOperation = _currentRenderOperation;
     logDebug('@@@@@@@@@@@ Starting render operation #$currentOperation vs ${_currentRenderOperation}');
