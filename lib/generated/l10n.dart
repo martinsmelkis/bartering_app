@@ -219,10 +219,150 @@ class S {
     );
   }
 
-  /// `What would be of interest to you?`
+  /// `Your session has expired. Please sign in again.`
+  String get apiErrorAuthSessionExpired {
+    return Intl.message(
+      'Your session has expired. Please sign in again.',
+      name: 'apiErrorAuthSessionExpired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The request timed out. Please try again.`
+  String get apiErrorTimeout {
+    return Intl.message(
+      'The request timed out. Please try again.',
+      name: 'apiErrorTimeout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No internet connection. Please check your network and try again.`
+  String get apiErrorNoInternet {
+    return Intl.message(
+      'No internet connection. Please check your network and try again.',
+      name: 'apiErrorNoInternet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `There was an issue with the request. Please check your input and try again.`
+  String get apiErrorBadRequest {
+    return Intl.message(
+      'There was an issue with the request. Please check your input and try again.',
+      name: 'apiErrorBadRequest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You do not have permission to perform this action.`
+  String get apiErrorForbidden {
+    return Intl.message(
+      'You do not have permission to perform this action.',
+      name: 'apiErrorForbidden',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The requested resource was not found.`
+  String get apiErrorNotFound {
+    return Intl.message(
+      'The requested resource was not found.',
+      name: 'apiErrorNotFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Conflict with existing data. Please refresh and try again.`
+  String get apiErrorConflict {
+    return Intl.message(
+      'Conflict with existing data. Please refresh and try again.',
+      name: 'apiErrorConflict',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Some of the provided data is invalid.`
+  String get apiErrorValidation {
+    return Intl.message(
+      'Some of the provided data is invalid.',
+      name: 'apiErrorValidation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Server error. Please try again later.`
+  String get apiErrorServer {
+    return Intl.message(
+      'Server error. Please try again later.',
+      name: 'apiErrorServer',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to load nearby users right now.`
+  String get apiErrorNearbyUsersFallback {
+    return Intl.message(
+      'Unable to load nearby users right now.',
+      name: 'apiErrorNearbyUsersFallback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to search users right now.`
+  String get apiErrorSearchUsersFallback {
+    return Intl.message(
+      'Unable to search users right now.',
+      name: 'apiErrorSearchUsersFallback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to load similar users right now.`
+  String get apiErrorSimilarUsersFallback {
+    return Intl.message(
+      'Unable to load similar users right now.',
+      name: 'apiErrorSimilarUsersFallback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to load matching users right now.`
+  String get apiErrorMatchingUsersFallback {
+    return Intl.message(
+      'Unable to load matching users right now.',
+      name: 'apiErrorMatchingUsersFallback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to load favorite users right now.`
+  String get apiErrorFavoriteUsersFallback {
+    return Intl.message(
+      'Unable to load favorite users right now.',
+      name: 'apiErrorFavoriteUsersFallback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `What is of interest to you?`
   String get selectYourInterests {
     return Intl.message(
-      'What would be of interest to you?',
+      'What is of interest to you?',
       name: 'selectYourInterests',
       desc: '',
       args: [],
@@ -394,6 +534,16 @@ class S {
     );
   }
 
+  /// `Your location will be set at the marker location`
+  String get locationSetAtMarkerInfo {
+    return Intl.message(
+      'Your location will be set at the marker location',
+      name: 'locationSetAtMarkerInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `User Offline`
   String get chatError_Offline {
     return Intl.message(
@@ -499,6 +649,176 @@ class S {
     return Intl.message(
       'Privacy Policy',
       name: 'privacyPolicy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Terms & Conditions`
+  String get termsConditionsTitle {
+    return Intl.message(
+      'Terms & Conditions',
+      name: 'termsConditionsTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `1. Scope`
+  String get termsConditionsSectionScopeTitle {
+    return Intl.message(
+      '1. Scope',
+      name: 'termsConditionsSectionScopeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `These terms govern your use of Barter App and define user rights and responsibilities.`
+  String get termsConditionsSectionScopeContent {
+    return Intl.message(
+      'These terms govern your use of Barter App and define user rights and responsibilities.',
+      name: 'termsConditionsSectionScopeContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Minimum Age`
+  String get termsConditionsSectionMinimumAgeTitle {
+    return Intl.message(
+      'Minimum Age',
+      name: 'termsConditionsSectionMinimumAgeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The app is intended for users aged 16 or older. By registering, you confirm you are at least 16 years old.`
+  String get termsConditionsSectionMinimumAgeContent {
+    return Intl.message(
+      'The app is intended for users aged 16 or older. By registering, you confirm you are at least 16 years old.',
+      name: 'termsConditionsSectionMinimumAgeContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `3. Account Use, Recovery and Deletion`
+  String get termsConditionsSectionAccountUseTitle {
+    return Intl.message(
+      '3. Account Use, Recovery and Deletion',
+      name: 'termsConditionsSectionAccountUseTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You are responsible for maintaining your account security and activities performed through your account. You must provide your e-mail in Profile - Notification Preferences to be able to migrate/recover your account and to request it's deletion if you lose access to your device.`
+  String get termsConditionsSectionAccountUseContent {
+    return Intl.message(
+      'You are responsible for maintaining your account security and activities performed through your account. You must provide your e-mail in Profile - Notification Preferences to be able to migrate/recover your account and to request it\'s deletion if you lose access to your device.',
+      name: 'termsConditionsSectionAccountUseContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `4. Prohibited Conduct`
+  String get termsConditionsSectionProhibitedConductTitle {
+    return Intl.message(
+      '4. Prohibited Conduct',
+      name: 'termsConditionsSectionProhibitedConductTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fraud, harassment, unlawful content, misuse of other users’ data, and other illegal actions are prohibited.`
+  String get termsConditionsSectionProhibitedConductContent {
+    return Intl.message(
+      'Fraud, harassment, unlawful content, misuse of other users’ data, and other illegal actions are prohibited.',
+      name: 'termsConditionsSectionProhibitedConductContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `5. Account Restriction or Termination`
+  String get termsConditionsSectionAccountRestrictionTitle {
+    return Intl.message(
+      '5. Account Restriction or Termination',
+      name: 'termsConditionsSectionAccountRestrictionTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We may restrict or terminate accounts for violations of these terms or security risks.`
+  String get termsConditionsSectionAccountRestrictionContent {
+    return Intl.message(
+      'We may restrict or terminate accounts for violations of these terms or security risks.',
+      name: 'termsConditionsSectionAccountRestrictionContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `6. Liability and Disputes`
+  String get termsConditionsSectionLiabilityDisputesTitle {
+    return Intl.message(
+      '6. Liability and Disputes',
+      name: 'termsConditionsSectionLiabilityDisputesTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Users are responsible for their own exchanges and interactions. The platform provides an intermediary environment to the extent permitted by law.`
+  String get termsConditionsSectionLiabilityDisputesContent {
+    return Intl.message(
+      'Users are responsible for their own exchanges and interactions. The platform provides an intermediary environment to the extent permitted by law.',
+      name: 'termsConditionsSectionLiabilityDisputesContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `8. Child Safety and CSAE Standards`
+  String get termsConditionsSectionKidsSafetyTitle {
+    return Intl.message(
+      '8. Child Safety and CSAE Standards',
+      name: 'termsConditionsSectionKidsSafetyTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We have zero tolerance for child sexual abuse and exploitation (CSAE), including child sexual abuse material (CSAM), grooming, trafficking, and any sexual exploitation of minors.\n\nThe following are strictly prohibited on this platform:\n- Sharing, requesting, promoting, or storing CSAM\n- Sexualized communication involving minors\n- Grooming, coercion, trafficking, or exploitation of minors\n- Any attempt to use this service to endanger a child\n\nWe may remove content, suspend or terminate accounts, and report relevant cases to competent authorities as required by law. Users can report concerns through in-app reporting tools or by contacting info@bartering.app.\n\nWe review safety reports as quickly as possible and cooperate with lawful requests from authorities regarding CSAE-related violations.`
+  String get termsConditionsSectionKidsSafetyContent {
+    return Intl.message(
+      'We have zero tolerance for child sexual abuse and exploitation (CSAE), including child sexual abuse material (CSAM), grooming, trafficking, and any sexual exploitation of minors.\n\nThe following are strictly prohibited on this platform:\n- Sharing, requesting, promoting, or storing CSAM\n- Sexualized communication involving minors\n- Grooming, coercion, trafficking, or exploitation of minors\n- Any attempt to use this service to endanger a child\n\nWe may remove content, suspend or terminate accounts, and report relevant cases to competent authorities as required by law. Users can report concerns through in-app reporting tools or by contacting info@bartering.app.\n\nWe review safety reports as quickly as possible and cooperate with lawful requests from authorities regarding CSAE-related violations.',
+      name: 'termsConditionsSectionKidsSafetyContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `8. Changes to Terms`
+  String get termsConditionsSectionChangesTitle {
+    return Intl.message(
+      '8. Changes to Terms',
+      name: 'termsConditionsSectionChangesTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We may update these terms from time to time. Continued use of the app after changes means acceptance of the updated terms.`
+  String get termsConditionsSectionChangesContent {
+    return Intl.message(
+      'We may update these terms from time to time. Continued use of the app after changes means acceptance of the updated terms.',
+      name: 'termsConditionsSectionChangesContent',
       desc: '',
       args: [],
     );
@@ -1749,16 +2069,6 @@ class S {
     return Intl.message('Acting', name: 'attr_acting', desc: '', args: []);
   }
 
-  /// `Amateur radio`
-  String get attr_amateur_radio {
-    return Intl.message(
-      'Amateur radio',
-      name: 'attr_amateur_radio',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Animation`
   String get attr_animation {
     return Intl.message(
@@ -1782,11 +2092,6 @@ class S {
       desc: '',
       args: [],
     );
-  }
-
-  /// `Blogging`
-  String get attr_blogging {
-    return Intl.message('Blogging', name: 'attr_blogging', desc: '', args: []);
   }
 
   /// `Board games`
@@ -1824,16 +2129,6 @@ class S {
     return Intl.message(
       'Construction',
       name: 'attr_construction',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Candle making`
-  String get attr_candle_making {
-    return Intl.message(
-      'Candle making',
-      name: 'attr_candle_making',
       desc: '',
       args: [],
     );
@@ -1894,11 +2189,6 @@ class S {
     );
   }
 
-  /// `Coffee`
-  String get attr_coffee {
-    return Intl.message('Coffee', name: 'attr_coffee', desc: '', args: []);
-  }
-
   /// `Software development`
   String get attr_software_development {
     return Intl.message(
@@ -1924,16 +2214,6 @@ class S {
     );
   }
 
-  /// `Creative writing`
-  String get attr_creative_writing {
-    return Intl.message(
-      'Creative writing',
-      name: 'attr_creative_writing',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Crocheting`
   String get attr_crocheting {
     return Intl.message(
@@ -1954,11 +2234,6 @@ class S {
     );
   }
 
-  /// `Dance`
-  String get attr_dance {
-    return Intl.message('Dance', name: 'attr_dance', desc: '', args: []);
-  }
-
   /// `Digital arts`
   String get attr_digital_arts {
     return Intl.message(
@@ -1970,8 +2245,8 @@ class S {
   }
 
   /// `DJing`
-  String get attr_djing {
-    return Intl.message('DJing', name: 'attr_djing', desc: '', args: []);
+  String get attr_dj_ing {
+    return Intl.message('DJing', name: 'attr_dj_ing', desc: '', args: []);
   }
 
   /// `DIY`
@@ -2024,11 +2299,6 @@ class S {
     );
   }
 
-  /// `Fashion`
-  String get attr_fashion {
-    return Intl.message('Fashion', name: 'attr_fashion', desc: '', args: []);
-  }
-
   /// `Fashion design`
   String get attr_fashion_design {
     return Intl.message(
@@ -2049,11 +2319,11 @@ class S {
     );
   }
 
-  /// `Furniture building`
-  String get attr_furniture_building {
+  /// `Furniture assembly`
+  String get attr_furniture_assembly {
     return Intl.message(
-      'Furniture building',
-      name: 'attr_furniture_building',
+      'Furniture assembly',
+      name: 'attr_furniture_assembly',
       desc: '',
       args: [],
     );
@@ -2064,39 +2334,9 @@ class S {
     return Intl.message('Gaming', name: 'attr_gaming', desc: '', args: []);
   }
 
-  /// `Genealogy`
-  String get attr_genealogy {
-    return Intl.message(
-      'Genealogy',
-      name: 'attr_genealogy',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Graphic design`
-  String get attr_graphic_design {
-    return Intl.message(
-      'Graphic design',
-      name: 'attr_graphic_design',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Hacking`
   String get attr_hacking {
     return Intl.message('Hacking', name: 'attr_hacking', desc: '', args: []);
-  }
-
-  /// `Herp keeping`
-  String get attr_herp_keeping {
-    return Intl.message(
-      'Herp keeping',
-      name: 'attr_herp_keeping',
-      desc: '',
-      args: [],
-    );
   }
 
   /// `Home improvement`
@@ -2129,11 +2369,11 @@ class S {
     );
   }
 
-  /// `Hydroponics`
-  String get attr_hydroponics {
+  /// `Home decor`
+  String get attr_home_decor {
     return Intl.message(
-      'Hydroponics',
-      name: 'attr_hydroponics',
+      'Home decor',
+      name: 'attr_home_decor',
       desc: '',
       args: [],
     );
@@ -2162,11 +2402,6 @@ class S {
       desc: '',
       args: [],
     );
-  }
-
-  /// `Podcasts`
-  String get attr_podcasts {
-    return Intl.message('Podcasts', name: 'attr_podcasts', desc: '', args: []);
   }
 
   /// `Machining`
@@ -2204,11 +2439,6 @@ class S {
     );
   }
 
-  /// `Nail art`
-  String get attr_nail_art {
-    return Intl.message('Nail art', name: 'attr_nail_art', desc: '', args: []);
-  }
-
   /// `Painting`
   String get attr_painting {
     return Intl.message('Painting', name: 'attr_painting', desc: '', args: []);
@@ -2229,19 +2459,14 @@ class S {
     return Intl.message('Pottery', name: 'attr_pottery', desc: '', args: []);
   }
 
-  /// `Powerlifting`
-  String get attr_powerlifting {
+  /// `Workout planning`
+  String get attr_workout_planning {
     return Intl.message(
-      'Powerlifting',
-      name: 'attr_powerlifting',
+      'Workout planning',
+      name: 'attr_workout_planning',
       desc: '',
       args: [],
     );
-  }
-
-  /// `Puzzles`
-  String get attr_puzzles {
-    return Intl.message('Puzzles', name: 'attr_puzzles', desc: '', args: []);
   }
 
   /// `Quilting`
@@ -2284,41 +2509,6 @@ class S {
     );
   }
 
-  /// `Singing`
-  String get attr_singing {
-    return Intl.message('Singing', name: 'attr_singing', desc: '', args: []);
-  }
-
-  /// `Skateboarding`
-  String get attr_skateboarding {
-    return Intl.message(
-      'Skateboarding',
-      name: 'attr_skateboarding',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Sketching`
-  String get attr_sketching {
-    return Intl.message(
-      'Sketching',
-      name: 'attr_sketching',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Soapmaking`
-  String get attr_soapmaking {
-    return Intl.message(
-      'Soapmaking',
-      name: 'attr_soapmaking',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Social media`
   String get attr_social_media {
     return Intl.message(
@@ -2334,41 +2524,6 @@ class S {
     return Intl.message(
       'Stand-up comedy',
       name: 'attr_stand_up_comedy',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Storytelling`
-  String get attr_storytelling {
-    return Intl.message(
-      'Storytelling',
-      name: 'attr_storytelling',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Sudoku`
-  String get attr_sudoku {
-    return Intl.message('Sudoku', name: 'attr_sudoku', desc: '', args: []);
-  }
-
-  /// `Table tennis`
-  String get attr_table_tennis {
-    return Intl.message(
-      'Table tennis',
-      name: 'attr_table_tennis',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Thrifting`
-  String get attr_thrifting {
-    return Intl.message(
-      'Thrifting',
-      name: 'attr_thrifting',
       desc: '',
       args: [],
     );
@@ -2454,11 +2609,6 @@ class S {
     return Intl.message('Hiking', name: 'attr_hiking', desc: '', args: []);
   }
 
-  /// `Reading`
-  String get attr_reading {
-    return Intl.message('Reading', name: 'attr_reading', desc: '', args: []);
-  }
-
   /// `Gardening`
   String get attr_gardening {
     return Intl.message(
@@ -2469,19 +2619,19 @@ class S {
     );
   }
 
-  /// `Music`
-  String get attr_music {
-    return Intl.message('Music', name: 'attr_music', desc: '', args: []);
+  /// `Music production`
+  String get attr_music_production {
+    return Intl.message(
+      'Music production',
+      name: 'attr_music_production',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Dancing`
   String get attr_dancing {
     return Intl.message('Dancing', name: 'attr_dancing', desc: '', args: []);
-  }
-
-  /// `Aerobics`
-  String get attr_aerobics {
-    return Intl.message('Aerobics', name: 'attr_aerobics', desc: '', args: []);
   }
 
   /// `Traveling`
@@ -2497,11 +2647,6 @@ class S {
   /// `Coding`
   String get attr_coding {
     return Intl.message('Coding', name: 'attr_coding', desc: '', args: []);
-  }
-
-  /// `Sports`
-  String get attr_sports {
-    return Intl.message('Sports', name: 'attr_sports', desc: '', args: []);
   }
 
   /// `Movies`
@@ -2534,6 +2679,41 @@ class S {
     return Intl.message('Crafting', name: 'attr_crafting', desc: '', args: []);
   }
 
+  /// `Sales`
+  String get attr_sales {
+    return Intl.message('Sales', name: 'attr_sales', desc: '', args: []);
+  }
+
+  /// `Networking`
+  String get attr_networking {
+    return Intl.message(
+      'Networking',
+      name: 'attr_networking',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bookkeeping`
+  String get attr_bookkeeping {
+    return Intl.message(
+      'Bookkeeping',
+      name: 'attr_bookkeeping',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Administrative work`
+  String get attr_administrative_work {
+    return Intl.message(
+      'Administrative work',
+      name: 'attr_administrative_work',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Astronomy`
   String get attr_astronomy {
     return Intl.message(
@@ -2549,16 +2729,6 @@ class S {
     return Intl.message(
       'Backpacking',
       name: 'attr_backpacking',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Bird watching`
-  String get attr_bird_watching {
-    return Intl.message(
-      'Bird watching',
-      name: 'attr_bird_watching',
       desc: '',
       args: [],
     );
@@ -2587,11 +2757,6 @@ class S {
       desc: '',
       args: [],
     );
-  }
-
-  /// `Climbing`
-  String get attr_climbing {
-    return Intl.message('Climbing', name: 'attr_climbing', desc: '', args: []);
   }
 
   /// `Cryptocurrency`
@@ -2624,21 +2789,11 @@ class S {
     return Intl.message('Drones', name: 'attr_drones', desc: '', args: []);
   }
 
-  /// `Fermentation`
-  String get attr_fermentation {
-    return Intl.message(
-      'Fermentation',
-      name: 'attr_fermentation',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Film making`
-  String get attr_film_making {
+  String get attr_filmmaking {
     return Intl.message(
       'Film making',
-      name: 'attr_film_making',
+      name: 'attr_filmmaking',
       desc: '',
       args: [],
     );
@@ -2664,21 +2819,6 @@ class S {
     return Intl.message('Foraging', name: 'attr_foraging', desc: '', args: []);
   }
 
-  /// `Geocaching`
-  String get attr_geocaching {
-    return Intl.message(
-      'Geocaching',
-      name: 'attr_geocaching',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Kayaking`
-  String get attr_kayaking {
-    return Intl.message('Kayaking', name: 'attr_kayaking', desc: '', args: []);
-  }
-
   /// `Martial arts`
   String get attr_martial_arts {
     return Intl.message(
@@ -2699,11 +2839,11 @@ class S {
     );
   }
 
-  /// `Mushroom hunting`
-  String get attr_mushroom_hunting {
+  /// `PC building`
+  String get attr_pc_building {
     return Intl.message(
-      'Mushroom hunting',
-      name: 'attr_mushroom_hunting',
+      'PC building',
+      name: 'attr_pc_building',
       desc: '',
       args: [],
     );
@@ -2727,11 +2867,6 @@ class S {
       desc: '',
       args: [],
     );
-  }
-
-  /// `Running`
-  String get attr_running {
-    return Intl.message('Running', name: 'attr_running', desc: '', args: []);
   }
 
   /// `Sustainable living`
@@ -2774,16 +2909,6 @@ class S {
     );
   }
 
-  /// `Cold plunging`
-  String get attr_cold_plunging {
-    return Intl.message(
-      'Cold plunging',
-      name: 'attr_cold_plunging',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Community gardening`
   String get attr_community_gardening {
     return Intl.message(
@@ -2814,21 +2939,21 @@ class S {
     );
   }
 
-  /// `Deep cleaning`
-  String get attr_deep_cleaning {
+  /// `Web Development`
+  String get attr_web_development {
     return Intl.message(
-      'Deep cleaning',
-      name: 'attr_deep_cleaning',
+      'Web Development',
+      name: 'attr_web_development',
       desc: '',
       args: [],
     );
   }
 
-  /// `Digital nomadism`
-  String get attr_digital_nomadism {
+  /// `Deep cleaning`
+  String get attr_deep_cleaning {
     return Intl.message(
-      'Digital nomadism',
-      name: 'attr_digital_nomadism',
+      'Deep cleaning',
+      name: 'attr_deep_cleaning',
       desc: '',
       args: [],
     );
@@ -2849,26 +2974,11 @@ class S {
     );
   }
 
-  /// `Memes`
-  String get attr_memes {
-    return Intl.message('Memes', name: 'attr_memes', desc: '', args: []);
-  }
-
   /// `Metal detecting`
   String get attr_metal_detecting {
     return Intl.message(
       'Metal detecting',
       name: 'attr_metal_detecting',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Minimalism`
-  String get attr_minimalism {
-    return Intl.message(
-      'Minimalism',
-      name: 'attr_minimalism',
       desc: '',
       args: [],
     );
@@ -2884,16 +2994,6 @@ class S {
     );
   }
 
-  /// `Podcasting`
-  String get attr_podcasting {
-    return Intl.message(
-      'Podcasting',
-      name: 'attr_podcasting',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Record collecting`
   String get attr_record_collecting {
     return Intl.message(
@@ -2904,11 +3004,11 @@ class S {
     );
   }
 
-  /// `Tiny homes`
-  String get attr_tiny_homes {
+  /// `Marketing`
+  String get attr_marketing {
     return Intl.message(
-      'Tiny homes',
-      name: 'attr_tiny_homes',
+      'Marketing',
+      name: 'attr_marketing',
       desc: '',
       args: [],
     );
@@ -2934,31 +3034,11 @@ class S {
     );
   }
 
-  /// `PC building`
-  String get attr_pc_building {
-    return Intl.message(
-      'PC building',
-      name: 'attr_pc_building',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Babysitting`
   String get attr_babysitting {
     return Intl.message(
       'Babysitting',
       name: 'attr_babysitting',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Backgammon`
-  String get attr_backgammon {
-    return Intl.message(
-      'Backgammon',
-      name: 'attr_backgammon',
       desc: '',
       args: [],
     );
@@ -3029,16 +3109,6 @@ class S {
     );
   }
 
-  /// `Computer hardware`
-  String get attr_computer_hardware {
-    return Intl.message(
-      'Computer hardware',
-      name: 'attr_computer_hardware',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Computer repair`
   String get attr_computer_repair {
     return Intl.message(
@@ -3069,11 +3139,11 @@ class S {
     );
   }
 
-  /// `Creative brainstorming`
-  String get attr_creative_brainstorming {
+  /// `Brainstorming`
+  String get attr_brainstorming {
     return Intl.message(
-      'Creative brainstorming',
-      name: 'attr_creative_brainstorming',
+      'Brainstorming',
+      name: 'attr_brainstorming',
       desc: '',
       args: [],
     );
@@ -3144,21 +3214,21 @@ class S {
     );
   }
 
-  /// `Fresh eggs`
-  String get attr_fresh_eggs {
+  /// `Chicken eggs`
+  String get attr_chicken_eggs {
     return Intl.message(
-      'Fresh eggs',
-      name: 'attr_fresh_eggs',
+      'Chicken eggs',
+      name: 'attr_chicken_eggs',
       desc: '',
       args: [],
     );
   }
 
-  /// `Furniture repair`
-  String get attr_furniture_repair {
+  /// `Nutrition advice`
+  String get attr_nutrition_advice {
     return Intl.message(
-      'Furniture repair',
-      name: 'attr_furniture_repair',
+      'Nutrition advice',
+      name: 'attr_nutrition_advice',
       desc: '',
       args: [],
     );
@@ -3174,24 +3244,14 @@ class S {
     );
   }
 
-  /// `Graphic novels`
-  String get attr_graphic_novels {
+  /// `Handmade items`
+  String get attr_handmade_items {
     return Intl.message(
-      'Graphic novels',
-      name: 'attr_graphic_novels',
+      'Handmade items',
+      name: 'attr_handmade_items',
       desc: '',
       args: [],
     );
-  }
-
-  /// `Guitar`
-  String get attr_guitar {
-    return Intl.message('Guitar', name: 'attr_guitar', desc: '', args: []);
-  }
-
-  /// `Handmade`
-  String get attr_handmade {
-    return Intl.message('Handmade', name: 'attr_handmade', desc: '', args: []);
   }
 
   /// `Handyman services`
@@ -3224,16 +3284,6 @@ class S {
     );
   }
 
-  /// `Horseback riding`
-  String get attr_horseback_riding {
-    return Intl.message(
-      'Horseback riding',
-      name: 'attr_horseback_riding',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Interview practice`
   String get attr_interview_practice {
     return Intl.message(
@@ -3249,16 +3299,6 @@ class S {
     return Intl.message(
       'Language exchange',
       name: 'attr_language_exchange',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Lawn mowing`
-  String get attr_lawn_mowing {
-    return Intl.message(
-      'Lawn mowing',
-      name: 'attr_lawn_mowing',
       desc: '',
       args: [],
     );
@@ -3324,16 +3364,6 @@ class S {
     );
   }
 
-  /// `Pair programming`
-  String get attr_pair_programming {
-    return Intl.message(
-      'Pair programming',
-      name: 'attr_pair_programming',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Pet sitting`
   String get attr_pet_sitting {
     return Intl.message(
@@ -3364,16 +3394,6 @@ class S {
     );
   }
 
-  /// `Plant cuttings`
-  String get attr_plant_cuttings {
-    return Intl.message(
-      'Plant cuttings',
-      name: 'attr_plant_cuttings',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Proofreading`
   String get attr_proofreading {
     return Intl.message(
@@ -3384,21 +3404,11 @@ class S {
     );
   }
 
-  /// `Resume writing`
-  String get attr_resume_writing {
+  /// `Multiplayer games`
+  String get attr_multiplayer_games {
     return Intl.message(
-      'Resume writing',
-      name: 'attr_resume_writing',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `RPG games`
-  String get attr_rpg_games {
-    return Intl.message(
-      'RPG games',
-      name: 'attr_rpg_games',
+      'Multiplayer games',
+      name: 'attr_multiplayer_games',
       desc: '',
       args: [],
     );
@@ -3479,16 +3489,6 @@ class S {
     );
   }
 
-  /// `Used books`
-  String get attr_used_books {
-    return Intl.message(
-      'Used books',
-      name: 'attr_used_books',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Used electronics`
   String get attr_used_electronics {
     return Intl.message(
@@ -3499,11 +3499,11 @@ class S {
     );
   }
 
-  /// `Used furniture`
-  String get attr_used_furniture {
+  /// `Homemade goods`
+  String get attr_homemade_goods {
     return Intl.message(
-      'Used furniture',
-      name: 'attr_used_furniture',
+      'Homemade goods',
+      name: 'attr_homemade_goods',
       desc: '',
       args: [],
     );
@@ -3519,21 +3519,11 @@ class S {
     );
   }
 
-  /// `Video game consoles`
-  String get attr_video_game_consoles {
+  /// `Video game hardware`
+  String get attr_video_game_hardware {
     return Intl.message(
-      'Video game consoles',
-      name: 'attr_video_game_consoles',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Vintage clothing`
-  String get attr_vintage_clothing {
-    return Intl.message(
-      'Vintage clothing',
-      name: 'attr_vintage_clothing',
+      'Video game hardware',
+      name: 'attr_video_game_hardware',
       desc: '',
       args: [],
     );
@@ -3559,21 +3549,41 @@ class S {
     );
   }
 
-  /// `Window cleaning`
-  String get attr_window_cleaning {
+  /// `Graphic design`
+  String get attr_graphic_design {
     return Intl.message(
-      'Window cleaning',
-      name: 'attr_window_cleaning',
+      'Graphic design',
+      name: 'attr_graphic_design',
       desc: '',
       args: [],
     );
   }
 
-  /// `Yard work`
-  String get attr_yard_work {
+  /// `Music performance`
+  String get attr_music_performance {
     return Intl.message(
-      'Yard work',
-      name: 'attr_yard_work',
+      'Music performance',
+      name: 'attr_music_performance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Transport service`
+  String get attr_transport_service {
+    return Intl.message(
+      'Transport service',
+      name: 'attr_transport_service',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `AI Consulting`
+  String get attr_ai_consulting {
+    return Intl.message(
+      'AI Consulting',
+      name: 'attr_ai_consulting',
       desc: '',
       args: [],
     );
@@ -3709,24 +3719,9 @@ class S {
     );
   }
 
-  /// `Fresh vegetables`
-  String get attr_fresh_vegetables {
-    return Intl.message(
-      'Fresh vegetables',
-      name: 'attr_fresh_vegetables',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Fresh fruits`
-  String get attr_fresh_fruits {
-    return Intl.message(
-      'Fresh fruits',
-      name: 'attr_fresh_fruits',
-      desc: '',
-      args: [],
-    );
+  /// `Fruits`
+  String get attr_fruits {
+    return Intl.message('Fruits', name: 'attr_fruits', desc: '', args: []);
   }
 
   /// `Fresh herbs`
@@ -3769,9 +3764,14 @@ class S {
     return Intl.message('Poker', name: 'attr_poker', desc: '', args: []);
   }
 
-  /// `Trees`
-  String get attr_trees {
-    return Intl.message('Trees', name: 'attr_trees', desc: '', args: []);
+  /// `Socializing`
+  String get attr_socializing {
+    return Intl.message(
+      'Socializing',
+      name: 'attr_socializing',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Plants`
@@ -3799,19 +3799,24 @@ class S {
     );
   }
 
-  /// `Technician`
-  String get attr_technician {
+  /// `Mechanisms`
+  String get attr_mechanisms {
     return Intl.message(
-      'Technician',
-      name: 'attr_technician',
+      'Mechanisms',
+      name: 'attr_mechanisms',
       desc: '',
       args: [],
     );
   }
 
-  /// `Tractor`
-  String get attr_tractor {
-    return Intl.message('Tractor', name: 'attr_tractor', desc: '', args: []);
+  /// `Farm machinery`
+  String get attr_farm_machinery {
+    return Intl.message(
+      'Farm machinery',
+      name: 'attr_farm_machinery',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Driving`
@@ -3829,21 +3834,6 @@ class S {
     );
   }
 
-  /// `Truck driving`
-  String get attr_truck_driving {
-    return Intl.message(
-      'Truck driving',
-      name: 'attr_truck_driving',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Assembly`
-  String get attr_assembly {
-    return Intl.message('Assembly', name: 'attr_assembly', desc: '', args: []);
-  }
-
   /// `Animal care`
   String get attr_animal_care {
     return Intl.message(
@@ -3857,16 +3847,6 @@ class S {
   /// `Horses`
   String get attr_horses {
     return Intl.message('Horses', name: 'attr_horses', desc: '', args: []);
-  }
-
-  /// `Goats`
-  String get attr_goats {
-    return Intl.message('Goats', name: 'attr_goats', desc: '', args: []);
-  }
-
-  /// `Cows`
-  String get attr_cows {
-    return Intl.message('Cows', name: 'attr_cows', desc: '', args: []);
   }
 
   /// `Self-sufficiency`
@@ -3889,21 +3869,11 @@ class S {
     );
   }
 
-  /// `Fruit harvesting`
-  String get attr_fruit_harvesting {
+  /// `Vegetables`
+  String get attr_vegetables {
     return Intl.message(
-      'Fruit harvesting',
-      name: 'attr_fruit_harvesting',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Vegetable harvesting`
-  String get attr_vegetable_harvesting {
-    return Intl.message(
-      'Vegetable harvesting',
-      name: 'attr_vegetable_harvesting',
+      'Vegetables',
+      name: 'attr_vegetables',
       desc: '',
       args: [],
     );
@@ -3929,16 +3899,6 @@ class S {
     return Intl.message(
       'House maintenance',
       name: 'attr_house_maintenance',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Shepherding`
-  String get attr_shepherding {
-    return Intl.message(
-      'Shepherding',
-      name: 'attr_shepherding',
       desc: '',
       args: [],
     );
@@ -4009,11 +3969,206 @@ class S {
     );
   }
 
-  /// `Socializing`
-  String get attr_socializing {
+  /// `Pet supplies`
+  String get attr_pet_supplies {
     return Intl.message(
-      'Socializing',
-      name: 'attr_socializing',
+      'Pet supplies',
+      name: 'attr_pet_supplies',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Kids toys`
+  String get attr_kids_toys {
+    return Intl.message(
+      'Kids toys',
+      name: 'attr_kids_toys',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Power tools`
+  String get attr_power_tools {
+    return Intl.message(
+      'Power tools',
+      name: 'attr_power_tools',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Camping gear`
+  String get attr_camping_gear {
+    return Intl.message(
+      'Camping gear',
+      name: 'attr_camping_gear',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Kitchen appliances`
+  String get attr_kitchen_appliances {
+    return Intl.message(
+      'Kitchen appliances',
+      name: 'attr_kitchen_appliances',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Device lending`
+  String get attr_device_lending {
+    return Intl.message(
+      'Device lending',
+      name: 'attr_device_lending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Computer accessories`
+  String get attr_computer_accessories {
+    return Intl.message(
+      'Computer accessories',
+      name: 'attr_computer_accessories',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clothing`
+  String get attr_clothing {
+    return Intl.message('Clothing', name: 'attr_clothing', desc: '', args: []);
+  }
+
+  /// `Sports equipment`
+  String get attr_sports_equipment {
+    return Intl.message(
+      'Sports equipment',
+      name: 'attr_sports_equipment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bicycle parts`
+  String get attr_bicycle_parts {
+    return Intl.message(
+      'Bicycle parts',
+      name: 'attr_bicycle_parts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Errand running`
+  String get attr_errand_running {
+    return Intl.message(
+      'Errand running',
+      name: 'attr_errand_running',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Phone repair`
+  String get attr_phone_repair {
+    return Intl.message(
+      'Phone repair',
+      name: 'attr_phone_repair',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Lawn care`
+  String get attr_lawn_care {
+    return Intl.message(
+      'Lawn care',
+      name: 'attr_lawn_care',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Digital products`
+  String get attr_digital_products {
+    return Intl.message(
+      'Digital products',
+      name: 'attr_digital_products',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Software accounts`
+  String get attr_software_accounts {
+    return Intl.message(
+      'Software accounts',
+      name: 'attr_software_accounts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reviewing`
+  String get attr_reviewing {
+    return Intl.message(
+      'Reviewing',
+      name: 'attr_reviewing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Virtual assistance`
+  String get attr_virtual_assistance {
+    return Intl.message(
+      'Virtual assistance',
+      name: 'attr_virtual_assistance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hair styling`
+  String get attr_hair_styling {
+    return Intl.message(
+      'Hair styling',
+      name: 'attr_hair_styling',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Beauty products`
+  String get attr_beauty_products {
+    return Intl.message(
+      'Beauty products',
+      name: 'attr_beauty_products',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Audio equipment`
+  String get attr_audio_equipment {
+    return Intl.message(
+      'Audio equipment',
+      name: 'attr_audio_equipment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Health supplements`
+  String get attr_health_supplements {
+    return Intl.message(
+      'Health supplements',
+      name: 'attr_health_supplements',
       desc: '',
       args: [],
     );
@@ -4364,9 +4519,34 @@ class S {
     return Intl.message('99+', name: 'ninetyNinePlus', desc: '', args: []);
   }
 
-  /// `User`
-  String get userPrefix {
-    return Intl.message('User', name: 'userPrefix', desc: '', args: []);
+  /// `User Details`
+  String get userDetails {
+    return Intl.message(
+      'User Details',
+      name: 'userDetails',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} matching {count, plural, =1{user} other{users}} found`
+  String matchingUsersFound(int count) {
+    return Intl.message(
+      '$count matching ${Intl.plural(count, one: 'user', other: 'users')} found',
+      name: 'matchingUsersFound',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count} matching {count, plural, =1{posting} other{postings}} found`
+  String matchingPostingsFound(int count) {
+    return Intl.message(
+      '$count matching ${Intl.plural(count, one: 'posting', other: 'postings')} found',
+      name: 'matchingPostingsFound',
+      desc: '',
+      args: [count],
+    );
   }
 
   /// `Today`
@@ -4422,6 +4602,11 @@ class S {
       desc: '',
       args: [],
     );
+  }
+
+  /// `User`
+  String get userPrefix {
+    return Intl.message('User', name: 'userPrefix', desc: '', args: []);
   }
 
   /// `Active Postings`
@@ -4534,10 +4719,10 @@ class S {
     );
   }
 
-  /// `Find similar or complementary people, search by keywords`
+  /// `Search by keywords, similarity or trade match, get match notifications`
   String get welcomeStep2Description {
     return Intl.message(
-      'Find similar or complementary people, search by keywords',
+      'Search by keywords, similarity or trade match, get match notifications',
       name: 'welcomeStep2Description',
       desc: '',
       args: [],
@@ -4574,11 +4759,171 @@ class S {
     );
   }
 
-  /// `Trade skills, services, items, or simply connect with your community`
+  /// `Trade knowledge, services, items, or simply connect with your community`
   String get welcomeStep4Description {
     return Intl.message(
-      'Trade skills, services, items, or simply connect with your community',
+      'Trade knowledge, services, items, or simply connect with your community',
       name: 'welcomeStep4Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Privacy & Data Consent`
+  String get gdprConsentTitle {
+    return Intl.message(
+      'Privacy & Data Consent',
+      name: 'gdprConsentTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Before you continue, please review and choose how your data is processed.`
+  String get gdprConsentIntro {
+    return Intl.message(
+      'Before you continue, please review and choose how your data is processed.',
+      name: 'gdprConsentIntro',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Required: Core service processing`
+  String get gdprConsentRequiredLabel {
+    return Intl.message(
+      'Required: Core service processing',
+      name: 'gdprConsentRequiredLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Needed to create your account, match with users, and run secure messaging. This cannot be turned off.`
+  String get gdprConsentRequiredDescription {
+    return Intl.message(
+      'Needed to create your account, match with users, and run secure messaging. This cannot be turned off.',
+      name: 'gdprConsentRequiredDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Optional: Location processing`
+  String get gdprConsentLocationLabel {
+    return Intl.message(
+      'Optional: Location processing',
+      name: 'gdprConsentLocationLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use your location to discover matching users nearby.`
+  String get gdprConsentLocationDescription {
+    return Intl.message(
+      'Use your location to discover matching users nearby.',
+      name: 'gdprConsentLocationDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Optional: AI-assisted matching`
+  String get gdprConsentAiLabel {
+    return Intl.message(
+      'Optional: AI-assisted matching',
+      name: 'gdprConsentAiLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Analyze profile configuration to improve recommendations and relevance.`
+  String get gdprConsentAiDescription {
+    return Intl.message(
+      'Analyze profile configuration to improve recommendations and relevance.',
+      name: 'gdprConsentAiDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cookies (Web)`
+  String get gdprCookiesSectionTitle {
+    return Intl.message(
+      'Cookies (Web)',
+      name: 'gdprCookiesSectionTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Required cookies`
+  String get gdprCookiesRequiredLabel {
+    return Intl.message(
+      'Required cookies',
+      name: 'gdprCookiesRequiredLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Needed for core web functionality: security, session handling, and storing preferences.`
+  String get gdprCookiesRequiredDescription {
+    return Intl.message(
+      'Needed for core web functionality: security, session handling, and storing preferences.',
+      name: 'gdprCookiesRequiredDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Optional analytics cookies`
+  String get gdprCookiesAnalyticsLabel {
+    return Intl.message(
+      'Optional analytics cookies',
+      name: 'gdprCookiesAnalyticsLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Helps us understand usage and improve performance. These are only used if you allow them.`
+  String get gdprCookiesAnalyticsDescription {
+    return Intl.message(
+      'Helps us understand usage and improve performance. These are only used if you allow them.',
+      name: 'gdprCookiesAnalyticsDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can change this later in Settings.`
+  String get gdprConsentManageLater {
+    return Intl.message(
+      'You can change this later in Settings.',
+      name: 'gdprConsentManageLater',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not now`
+  String get gdprConsentDecline {
+    return Intl.message(
+      'Not now',
+      name: 'gdprConsentDecline',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Continue (Accept Terms & Conditions)`
+  String get gdprConsentAccept {
+    return Intl.message(
+      'Continue (Accept Terms & Conditions)',
+      name: 'gdprConsentAccept',
       desc: '',
       args: [],
     );
@@ -5314,6 +5659,11 @@ class S {
     return Intl.message('Match', name: 'match', desc: '', args: []);
   }
 
+  /// `Match:`
+  String get matchLabel {
+    return Intl.message('Match:', name: 'matchLabel', desc: '', args: []);
+  }
+
   /// `Dismiss Match`
   String get dismissMatch {
     return Intl.message(
@@ -5604,6 +5954,36 @@ class S {
     );
   }
 
+  /// `Email Notification Preferences`
+  String get emailNotificationPreferences {
+    return Intl.message(
+      'Email Notification Preferences',
+      name: 'emailNotificationPreferences',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unsubscribe`
+  String get emailUnsubscribe {
+    return Intl.message(
+      'Unsubscribe',
+      name: 'emailUnsubscribe',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unsubscribed successfully`
+  String get emailUnsubscribed {
+    return Intl.message(
+      'Unsubscribed successfully',
+      name: 'emailUnsubscribed',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Please enter a valid email address`
   String get emailInvalid {
     return Intl.message(
@@ -5629,10 +6009,10 @@ class S {
     );
   }
 
-  /// `I agree to receive marketing emails about new features, offers, and updates`
+  /// `I agree to receive emails about new matches, offers, and updates`
   String get marketingConsentLabel {
     return Intl.message(
-      'I agree to receive marketing emails about new features, offers, and updates',
+      'I agree to receive emails about new matches, offers, and updates',
       name: 'marketingConsentLabel',
       desc: '',
       args: [],
@@ -5644,16 +6024,6 @@ class S {
     return Intl.message(
       'We may send you occasional emails about our services. You can unsubscribe at any time.',
       name: 'marketingConsentDescription',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Please consent to receive marketing emails to continue`
-  String get marketingConsentRequired {
-    return Intl.message(
-      'Please consent to receive marketing emails to continue',
-      name: 'marketingConsentRequired',
       desc: '',
       args: [],
     );
@@ -5702,6 +6072,16 @@ class S {
   /// `Review`
   String get review {
     return Intl.message('Review', name: 'review', desc: '', args: []);
+  }
+
+  /// `Rating and Reviews`
+  String get ratingAndReviews {
+    return Intl.message(
+      'Rating and Reviews',
+      name: 'ratingAndReviews',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Report Scam`
@@ -5794,19 +6174,164 @@ class S {
     );
   }
 
-  /// `Your review will be visible after {otherUserName} submits their review, or in 14 days.`
-  String reviewVisibilityNotice(String otherUserName) {
+  /// `Your review will be visible after the other User submits their review, or in 14 days.`
+  String get reviewVisibilityNotice {
     return Intl.message(
-      'Your review will be visible after $otherUserName submits their review, or in 14 days.',
+      'Your review will be visible after the other User submits their review, or in 14 days.',
       name: 'reviewVisibilityNotice',
       desc: '',
-      args: [otherUserName],
+      args: [],
     );
   }
 
   /// `OK`
   String get ok {
     return Intl.message('OK', name: 'ok', desc: '', args: []);
+  }
+
+  /// `Premium User Benefits`
+  String get premiumUserBenefitsTitle {
+    return Intl.message(
+      'Premium User Benefits',
+      name: 'premiumUserBenefitsTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map\n• Have a limit of more than 3 active postings`
+  String get premiumUserBenefitsMessage {
+    return Intl.message(
+      'Unlock Premium to get these benefits:\n• Edit your name\n• Edit your profile description\n• Edit your Avatar icon\n• Add images as work references\n• Stand out on the map\n• Have a limit of more than 3 active postings',
+      name: 'premiumUserBenefitsMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Buy Premium`
+  String get buyPremium {
+    return Intl.message('Buy Premium', name: 'buyPremium', desc: '', args: []);
+  }
+
+  /// `Restore Purchases`
+  String get restorePurchases {
+    return Intl.message(
+      'Restore Purchases',
+      name: 'restorePurchases',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `RevenueCat API key is missing.`
+  String get inAppRevenueCatApiKeyMissing {
+    return Intl.message(
+      'RevenueCat API key is missing.',
+      name: 'inAppRevenueCatApiKeyMissing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to initialize purchases`
+  String get inAppFailedToInitializePurchases {
+    return Intl.message(
+      'Failed to initialize purchases',
+      name: 'inAppFailedToInitializePurchases',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to load offerings`
+  String get inAppFailedToLoadOfferings {
+    return Intl.message(
+      'Failed to load offerings',
+      name: 'inAppFailedToLoadOfferings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No premium packages available right now.`
+  String get inAppNoPremiumPackagesAvailable {
+    return Intl.message(
+      'No premium packages available right now.',
+      name: 'inAppNoPremiumPackagesAvailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Premium activated successfully.`
+  String get inAppPremiumActivatedSuccessfully {
+    return Intl.message(
+      'Premium activated successfully.',
+      name: 'inAppPremiumActivatedSuccessfully',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Purchase completed, but entitlement not active yet.`
+  String get inAppPurchaseCompletedEntitlementNotActiveYet {
+    return Intl.message(
+      'Purchase completed, but entitlement not active yet.',
+      name: 'inAppPurchaseCompletedEntitlementNotActiveYet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Purchase cancelled.`
+  String get inAppPurchaseCancelled {
+    return Intl.message(
+      'Purchase cancelled.',
+      name: 'inAppPurchaseCancelled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Purchase failed`
+  String get inAppPurchaseFailed {
+    return Intl.message(
+      'Purchase failed',
+      name: 'inAppPurchaseFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Premium restored successfully.`
+  String get inAppPremiumRestoredSuccessfully {
+    return Intl.message(
+      'Premium restored successfully.',
+      name: 'inAppPremiumRestoredSuccessfully',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No active Premium purchases found to restore.`
+  String get inAppNoActivePremiumPurchasesToRestore {
+    return Intl.message(
+      'No active Premium purchases found to restore.',
+      name: 'inAppNoActivePremiumPurchasesToRestore',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restore failed`
+  String get inAppRestoreFailed {
+    return Intl.message(
+      'Restore failed',
+      name: 'inAppRestoreFailed',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Skip Review?`
@@ -6044,11 +6569,106 @@ class S {
     return Intl.message('Skip for Now', name: 'skipForNow', desc: '', args: []);
   }
 
+  /// `Bonus / Tip (optional)`
+  String get bonusTipOptional {
+    return Intl.message(
+      'Bonus / Tip (optional)',
+      name: 'bonusTipOptional',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Other`
+  String get other {
+    return Intl.message('Other', name: 'other', desc: '', args: []);
+  }
+
+  /// `Enter bonus amount`
+  String get enterBonusAmount {
+    return Intl.message(
+      'Enter bonus amount',
+      name: 'enterBonusAmount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Loading wallet balance...`
+  String get loadingWalletBalance {
+    return Intl.message(
+      'Loading wallet balance...',
+      name: 'loadingWalletBalance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Current wallet balance: {amount}`
+  String currentWalletBalance(String amount) {
+    return Intl.message(
+      'Current wallet balance: $amount',
+      name: 'currentWalletBalance',
+      desc: '',
+      args: [amount],
+    );
+  }
+
   /// `Failed to submit review`
   String get failedToSubmitReview {
     return Intl.message(
       'Failed to submit review',
       name: 'failedToSubmitReview',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Appeal review`
+  String get appealReviewTitle {
+    return Intl.message(
+      'Appeal review',
+      name: 'appealReviewTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Describe why this review should be reconsidered`
+  String get appealReviewReasonHint {
+    return Intl.message(
+      'Describe why this review should be reconsidered',
+      name: 'appealReviewReasonHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Appeal reason is required`
+  String get appealReasonRequired {
+    return Intl.message(
+      'Appeal reason is required',
+      name: 'appealReasonRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to submit appeal`
+  String get failedToSubmitAppeal {
+    return Intl.message(
+      'Failed to submit appeal',
+      name: 'failedToSubmitAppeal',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to submit appeal right now`
+  String get unableToSubmitAppealNow {
+    return Intl.message(
+      'Unable to submit appeal right now',
+      name: 'unableToSubmitAppealNow',
       desc: '',
       args: [],
     );
@@ -6094,11 +6714,336 @@ class S {
     );
   }
 
+  /// `Barter Coins`
+  String get barterCoinsTitle {
+    return Intl.message(
+      'Barter Coins',
+      name: 'barterCoinsTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on: standing out on the map, boosting postings, custom Avatar icons, tipping other Users`
+  String get barterCoinsInfoMessage {
+    return Intl.message(
+      'Coins can be earned by providing a service, or by actively using the app.\n\nCoins can be spent on: standing out on the map, boosting postings, custom Avatar icons, tipping other Users',
+      name: 'barterCoinsInfoMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Purchase coins`
+  String get purchaseCoins {
+    return Intl.message(
+      'Purchase coins',
+      name: 'purchaseCoins',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select coin package:`
+  String get selectCoinPackage {
+    return Intl.message(
+      'Select coin package:',
+      name: 'selectCoinPackage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Selected coin package: {amount}`
+  String selectedCoinPackage(String amount) {
+    return Intl.message(
+      'Selected coin package: $amount',
+      name: 'selectedCoinPackage',
+      desc: '',
+      args: [amount],
+    );
+  }
+
+  /// `Purchase coins flow coming soon`
+  String get purchaseCoinsFlowComingSoon {
+    return Intl.message(
+      'Purchase coins flow coming soon',
+      name: 'purchaseCoinsFlowComingSoon',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Avatar Shop`
+  String get avatarShopTitle {
+    return Intl.message(
+      'Avatar Shop',
+      name: 'avatarShopTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Buy and apply a custom avatar icon.`
+  String get avatarShopDescription {
+    return Intl.message(
+      'Buy and apply a custom avatar icon.',
+      name: 'avatarShopDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Refresh`
+  String get avatarShopRefresh {
+    return Intl.message(
+      'Refresh',
+      name: 'avatarShopRefresh',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Balance: {amount} ₿`
+  String avatarShopBalance(String amount) {
+    return Intl.message(
+      'Balance: $amount ₿',
+      name: 'avatarShopBalance',
+      desc: '',
+      args: [amount],
+    );
+  }
+
+  /// `Each avatar: {price} ₿`
+  String avatarShopEachAvatarPrice(String price) {
+    return Intl.message(
+      'Each avatar: $price ₿',
+      name: 'avatarShopEachAvatarPrice',
+      desc: '',
+      args: [price],
+    );
+  }
+
+  /// `Failed to load avatar shop: {error}`
+  String avatarShopLoadFailed(String error) {
+    return Intl.message(
+      'Failed to load avatar shop: $error',
+      name: 'avatarShopLoadFailed',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `Unable to process purchase right now.`
+  String get avatarShopUnableToProcessPurchase {
+    return Intl.message(
+      'Unable to process purchase right now.',
+      name: 'avatarShopUnableToProcessPurchase',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This avatar is already selected.`
+  String get avatarShopAvatarAlreadySelected {
+    return Intl.message(
+      'This avatar is already selected.',
+      name: 'avatarShopAvatarAlreadySelected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not enough coins. You need {coins} coins.`
+  String avatarShopNotEnoughCoins(int coins) {
+    return Intl.message(
+      'Not enough coins. You need $coins coins.',
+      name: 'avatarShopNotEnoughCoins',
+      desc: '',
+      args: [coins],
+    );
+  }
+
+  /// `Purchase failed: {error}`
+  String avatarShopPurchaseFailed(String error) {
+    return Intl.message(
+      'Purchase failed: $error',
+      name: 'avatarShopPurchaseFailed',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `Avatar purchased and applied successfully.`
+  String get avatarShopPurchaseSuccess {
+    return Intl.message(
+      'Avatar purchased and applied successfully.',
+      name: 'avatarShopPurchaseSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Selected`
+  String get avatarShopSelected {
+    return Intl.message(
+      'Selected',
+      name: 'avatarShopSelected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Equip`
+  String get avatarShopEquip {
+    return Intl.message('Equip', name: 'avatarShopEquip', desc: '', args: []);
+  }
+
+  /// `Buy {coins} ₿`
+  String avatarShopBuyButton(String coins) {
+    return Intl.message(
+      'Buy $coins ₿',
+      name: 'avatarShopBuyButton',
+      desc: '',
+      args: [coins],
+    );
+  }
+
+  /// `Need {coins} ₿`
+  String avatarShopNeedCoins(String coins) {
+    return Intl.message(
+      'Need $coins ₿',
+      name: 'avatarShopNeedCoins',
+      desc: '',
+      args: [coins],
+    );
+  }
+
+  /// `Boost visibility`
+  String get createPostingBoostTitle {
+    return Intl.message(
+      'Boost visibility',
+      name: 'createPostingBoostTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Spend coins to boost this posting in search results.`
+  String get createPostingBoostDescription {
+    return Intl.message(
+      'Spend coins to boost this posting in search results.',
+      name: 'createPostingBoostDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No boost`
+  String get createPostingBoostNone {
+    return Intl.message(
+      'No boost',
+      name: 'createPostingBoostNone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `3 days (20 coins)`
+  String get createPostingBoost3Days {
+    return Intl.message(
+      '3 days (20 coins)',
+      name: 'createPostingBoost3Days',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `7 days (50 coins)`
+  String get createPostingBoost7Days {
+    return Intl.message(
+      '7 days (50 coins)',
+      name: 'createPostingBoost7Days',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not enough coins for selected boost.`
+  String get createPostingBoostInsufficientCoins {
+    return Intl.message(
+      'Not enough coins for selected boost.',
+      name: 'createPostingBoostInsufficientCoins',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Cannot send file: Recipient public key not available`
   String get cannotSendFileNoRecipientKey {
     return Intl.message(
       'Cannot send file: Recipient public key not available',
       name: 'cannotSendFileNoRecipientKey',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to open this chat right now. Please try again.`
+  String get chatOpenFailed {
+    return Intl.message(
+      'Unable to open this chat right now. Please try again.',
+      name: 'chatOpenFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not read the selected file. Please try another file.`
+  String get fileReadFailed {
+    return Intl.message(
+      'Could not read the selected file. Please try another file.',
+      name: 'fileReadFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to send the file right now. Please try again.`
+  String get fileSendFailed {
+    return Intl.message(
+      'Unable to send the file right now. Please try again.',
+      name: 'fileSendFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to download this file right now. Please try again.`
+  String get fileDownloadFailed {
+    return Intl.message(
+      'Unable to download this file right now. Please try again.',
+      name: 'fileDownloadFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cannot decrypt this file yet. Try again after the chat keys are synchronized.`
+  String get fileDecryptKeyMissing {
+    return Intl.message(
+      'Cannot decrypt this file yet. Try again after the chat keys are synchronized.',
+      name: 'fileDecryptKeyMissing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not open this file. Please try another app or check the file path.`
+  String get couldNotOpenFileGeneric {
+    return Intl.message(
+      'Could not open this file. Please try another app or check the file path.',
+      name: 'couldNotOpenFileGeneric',
       desc: '',
       args: [],
     );
@@ -6139,6 +7084,16 @@ class S {
     return Intl.message(
       'Downloading $filename...',
       name: 'downloadingFile',
+      desc: '',
+      args: [filename],
+    );
+  }
+
+  /// `Decrypting {filename}...`
+  String decryptingFile(String filename) {
+    return Intl.message(
+      'Decrypting $filename...',
+      name: 'decryptingFile',
       desc: '',
       args: [filename],
     );
@@ -6284,17 +7239,17 @@ class S {
     );
   }
 
-  /// `It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!`
+  /// `Your area is currently still growing. Invite people you know and help grow the community — your first referral earns 50 coins!`
   String get noUsersNearbyMessage {
     return Intl.message(
-      'It looks like there are no users in your area yet. Be the first to invite your friends and start bartering!',
+      'Your area is currently still growing. Invite people you know and help grow the community — your first referral earns 50 coins!',
       name: 'noUsersNearbyMessage',
       desc: '',
       args: [],
     );
   }
 
-  /// `Notify me when $count+ users are nearby`
+  /// `Notify me when {count}+ users are nearby`
   String nearbyUsersAlertCheckboxTitle(int count) {
     return Intl.message(
       'Notify me when $count+ users are nearby',
@@ -6364,10 +7319,10 @@ class S {
     );
   }
 
-  /// `Add an email for alerts`
+  /// `E-mail where to receive the notification`
   String get notificationEmailTitle {
     return Intl.message(
-      'Add an email for alerts',
+      'E-mail where to receive the notification',
       name: 'notificationEmailTitle',
       desc: '',
       args: [],
@@ -6444,7 +7399,7 @@ class S {
     );
   }
 
-  /// `Alerts can be sent to $email`
+  /// `Alerts can be sent to {email}`
   String notificationEmailConfigured(String email) {
     return Intl.message(
       'Alerts can be sent to $email',
@@ -6467,6 +7422,251 @@ class S {
   /// `Close`
   String get close {
     return Intl.message('Close', name: 'close', desc: '', args: []);
+  }
+
+  /// `Badges`
+  String get badgesTitle {
+    return Intl.message('Badges', name: 'badgesTitle', desc: '', args: []);
+  }
+
+  /// `No badges earned yet. Keep trading to unlock badges.`
+  String get noBadgesEarnedYet {
+    return Intl.message(
+      'No badges earned yet. Keep trading to unlock badges.',
+      name: 'noBadgesEarnedYet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Earned`
+  String get badgeEarnedStatus {
+    return Intl.message(
+      'Earned',
+      name: 'badgeEarnedStatus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not earned yet`
+  String get badgeNotEarnedStatus {
+    return Intl.message(
+      'Not earned yet',
+      name: 'badgeNotEarnedStatus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Identity Verified`
+  String get badgeIdentityVerifiedTitle {
+    return Intl.message(
+      'Identity Verified',
+      name: 'badgeIdentityVerifiedTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User has completed identity verification.`
+  String get badgeIdentityVerifiedDescription {
+    return Intl.message(
+      'User has completed identity verification.',
+      name: 'badgeIdentityVerifiedDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Veteran Trader`
+  String get badgeVeteranTraderTitle {
+    return Intl.message(
+      'Veteran Trader',
+      name: 'badgeVeteranTraderTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User has completed 100+ successful trades.`
+  String get badgeVeteranTraderDescription {
+    return Intl.message(
+      'User has completed 100+ successful trades.',
+      name: 'badgeVeteranTraderDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Top Rated Seller`
+  String get badgeTopRatedTitle {
+    return Intl.message(
+      'Top Rated Seller',
+      name: 'badgeTopRatedTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Maintains 4.8+ average rating with 50+ reviews.`
+  String get badgeTopRatedDescription {
+    return Intl.message(
+      'Maintains 4.8+ average rating with 50+ reviews.',
+      name: 'badgeTopRatedDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Quick Responder`
+  String get badgeQuickResponderTitle {
+    return Intl.message(
+      'Quick Responder',
+      name: 'badgeQuickResponderTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Usually responds within 24 hours.`
+  String get badgeQuickResponderDescription {
+    return Intl.message(
+      'Usually responds within 24 hours.',
+      name: 'badgeQuickResponderDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Community Connector`
+  String get badgeCommunityConnectorTitle {
+    return Intl.message(
+      'Community Connector',
+      name: 'badgeCommunityConnectorTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Trades with diverse partners (high diversity score).`
+  String get badgeCommunityConnectorDescription {
+    return Intl.message(
+      'Trades with diverse partners (high diversity score).',
+      name: 'badgeCommunityConnectorDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Local Legend`
+  String get badgeVerifiedBusinessTitle {
+    return Intl.message(
+      'Local Legend',
+      name: 'badgeVerifiedBusinessTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Favorited by 30+ Users.`
+  String get badgeVerifiedBusinessDescription {
+    return Intl.message(
+      'Favorited by 30+ Users.',
+      name: 'badgeVerifiedBusinessDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dispute-Free History`
+  String get badgeDisputeFreeTitle {
+    return Intl.message(
+      'Dispute-Free History',
+      name: 'badgeDisputeFreeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Has never had a disputed transaction.`
+  String get badgeDisputeFreeDescription {
+    return Intl.message(
+      'Has never had a disputed transaction.',
+      name: 'badgeDisputeFreeDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fast & Reliable`
+  String get badgeFastTraderTitle {
+    return Intl.message(
+      'Fast & Reliable',
+      name: 'badgeFastTraderTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Completes trades faster than average.`
+  String get badgeFastTraderDescription {
+    return Intl.message(
+      'Completes trades faster than average.',
+      name: 'badgeFastTraderDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Premium User`
+  String get badgePremiumUserTitle {
+    return Intl.message(
+      'Premium User',
+      name: 'badgePremiumUserTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User has an active Premium subscription.`
+  String get badgePremiumUserDescription {
+    return Intl.message(
+      'User has an active Premium subscription.',
+      name: 'badgePremiumUserDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Early Adopter - First 1000 Users`
+  String get badgeTop1000Title {
+    return Intl.message(
+      'Early Adopter - First 1000 Users',
+      name: 'badgeTop1000Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User was among the first 1000 registered users.`
+  String get badgeTop1000Description {
+    return Intl.message(
+      'User was among the first 1000 registered users.',
+      name: 'badgeTop1000Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show more`
+  String get showMore {
+    return Intl.message('Show more', name: 'showMore', desc: '', args: []);
+  }
+
+  /// `Show less`
+  String get showLess {
+    return Intl.message('Show less', name: 'showLess', desc: '', args: []);
   }
 
   /// `Link copied to clipboard!`
@@ -6512,6 +7712,16 @@ class S {
   /// `Report User`
   String get reportUser {
     return Intl.message('Report User', name: 'reportUser', desc: '', args: []);
+  }
+
+  /// `View Profile`
+  String get viewProfile {
+    return Intl.message(
+      'View Profile',
+      name: 'viewProfile',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Block User`
@@ -6784,140 +7994,140 @@ class S {
     );
   }
 
-  /// `Introduction`
+  /// `Controller, Scope and Contact`
   String get privacyPolicyIntroTitle {
     return Intl.message(
-      'Introduction',
+      'Controller, Scope and Contact',
       name: 'privacyPolicyIntroTitle',
       desc: '',
       args: [],
     );
   }
 
-  /// `This Privacy Policy describes how we collect, use, and protect your personal information when you use our bartering application. We are committed to ensuring your privacy and protecting your data.`
+  /// `This policy explains how Barter backend services and connected mobile/web clients process personal data. It covers backend APIs, client apps, admin/compliance tooling, and optional federation features when enabled.`
   String get privacyPolicyIntroContent {
     return Intl.message(
-      'This Privacy Policy describes how we collect, use, and protect your personal information when you use our bartering application. We are committed to ensuring your privacy and protecting your data.',
+      'This policy explains how Barter backend services and connected mobile/web clients process personal data. It covers backend APIs, client apps, admin/compliance tooling, and optional federation features when enabled.',
       name: 'privacyPolicyIntroContent',
       desc: '',
       args: [],
     );
   }
 
-  /// `Information We Collect`
+  /// `Data We Process`
   String get privacyPolicyDataCollectionTitle {
     return Intl.message(
-      'Information We Collect',
+      'Data We Process',
       name: 'privacyPolicyDataCollectionTitle',
       desc: '',
       args: [],
     );
   }
 
-  /// `We collect information you provide directly, including your profile information, interests, offerings, location data, and chat messages. We also collect usage data such as app interactions and device information to improve our service.`
+  /// `We may process account/authentication data (including signature metadata), profile data, postings and chat-related data, notification data (email, push tokens, consent flags), security/compliance records, and technical request metadata.`
   String get privacyPolicyDataCollectionContent {
     return Intl.message(
-      'We collect information you provide directly, including your profile information, interests, offerings, location data, and chat messages. We also collect usage data such as app interactions and device information to improve our service.',
+      'We may process account/authentication data (including signature metadata), profile data, postings and chat-related data, notification data (email, push tokens, consent flags), security/compliance records, and technical request metadata.',
       name: 'privacyPolicyDataCollectionContent',
       desc: '',
       args: [],
     );
   }
 
-  /// `How We Use Your Information`
+  /// `Purposes and GDPR Legal Bases`
   String get privacyPolicyDataUsageTitle {
     return Intl.message(
-      'How We Use Your Information',
+      'Purposes and GDPR Legal Bases',
       name: 'privacyPolicyDataUsageTitle',
       desc: '',
       args: [],
     );
   }
 
-  /// `We use your information to: facilitate bartering connections between users, display your profile to other users in your area, enable chat functionality, improve our services, and send notifications about matches and messages.`
+  /// `Processing supports service delivery (Art. 6(1)(b)), security and abuse prevention (Art. 6(1)(f)), and legal/compliance obligations (Art. 6(1)(c), 6(1)(f)). Where applicable, optional features and consents are processed under Art. 6(1)(a).`
   String get privacyPolicyDataUsageContent {
     return Intl.message(
-      'We use your information to: facilitate bartering connections between users, display your profile to other users in your area, enable chat functionality, improve our services, and send notifications about matches and messages.',
+      'Processing supports service delivery (Art. 6(1)(b)), security and abuse prevention (Art. 6(1)(f)), and legal/compliance obligations (Art. 6(1)(c), 6(1)(f)). Where applicable, optional features and consents are processed under Art. 6(1)(a).',
       name: 'privacyPolicyDataUsageContent',
       desc: '',
       args: [],
     );
   }
 
-  /// `Information Sharing`
+  /// `Processors, Infrastructure and Transfers`
   String get privacyPolicyDataSharingTitle {
     return Intl.message(
-      'Information Sharing',
+      'Processors, Infrastructure and Transfers',
       name: 'privacyPolicyDataSharingTitle',
       desc: '',
       args: [],
     );
   }
 
-  /// `Your profile information, interests, and offerings are visible to other users of the app to facilitate bartering. We do not sell your personal information to third parties. We may share data with service providers who assist in operating our app, and we may disclose information if required by law.`
+  /// `Current integrations include PostgreSQL, Mailjet, Firebase/FCM, Ollama, and Nginx + Docker infrastructure. Optional federation peers are used only when enabled and trusted. If data is processed outside your country/EEA, legally required safeguards (such as SCCs) are applied.`
   String get privacyPolicyDataSharingContent {
     return Intl.message(
-      'Your profile information, interests, and offerings are visible to other users of the app to facilitate bartering. We do not sell your personal information to third parties. We may share data with service providers who assist in operating our app, and we may disclose information if required by law.',
+      'Current integrations include PostgreSQL, Mailjet, Firebase/FCM, Ollama, and Nginx + Docker infrastructure. Optional federation peers are used only when enabled and trusted. If data is processed outside your country/EEA, legally required safeguards (such as SCCs) are applied.',
       name: 'privacyPolicyDataSharingContent',
       desc: '',
       args: [],
     );
   }
 
-  /// `Data Security`
+  /// `Security, Retention and Deletion`
   String get privacyPolicyDataSecurityTitle {
     return Intl.message(
-      'Data Security',
+      'Security, Retention and Deletion',
       name: 'privacyPolicyDataSecurityTitle',
       desc: '',
       args: [],
     );
   }
 
-  /// `We implement appropriate technical and organizational measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.`
+  /// `We apply measures such as authenticated request-signature checks, access controls, transport security, and audit logging. Retention controls and scheduled cleanup are used for operational/compliance records, with legal-hold-aware handling where required.`
   String get privacyPolicyDataSecurityContent {
     return Intl.message(
-      'We implement appropriate technical and organizational measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.',
+      'We apply measures such as authenticated request-signature checks, access controls, transport security, and audit logging. Retention controls and scheduled cleanup are used for operational/compliance records, with legal-hold-aware handling where required.',
       name: 'privacyPolicyDataSecurityContent',
       desc: '',
       args: [],
     );
   }
 
-  /// `Your Rights`
+  /// `Your Rights, Erasure and Portability`
   String get privacyPolicyUserRightsTitle {
     return Intl.message(
-      'Your Rights',
+      'Your Rights, Erasure and Portability',
       name: 'privacyPolicyUserRightsTitle',
       desc: '',
       args: [],
     );
   }
 
-  /// `You have the right to access, update, or delete your personal information at any time through the app settings. You can also request a copy of your data or object to certain types of processing.`
+  /// `Subject to applicable law, you may request access, rectification, erasure, restriction, portability, objection, and consent withdrawal. Authenticated deletion/export workflows include legal-hold checks, DSAR tracking, and compliance event logging.`
   String get privacyPolicyUserRightsContent {
     return Intl.message(
-      'You have the right to access, update, or delete your personal information at any time through the app settings. You can also request a copy of your data or object to certain types of processing.',
+      'Subject to applicable law, you may request access, rectification, erasure, restriction, portability, objection, and consent withdrawal. Authenticated deletion/export workflows include legal-hold checks, DSAR tracking, and compliance event logging.',
       name: 'privacyPolicyUserRightsContent',
       desc: '',
       args: [],
     );
   }
 
-  /// `Third-Party Services`
+  /// `Backend and Client Privacy Notice`
   String get privacyPolicyThirdPartyTitle {
     return Intl.message(
-      'Third-Party Services',
+      'Backend and Client Privacy Notice',
       name: 'privacyPolicyThirdPartyTitle',
       desc: '',
       args: [],
     );
   }
 
-  /// `Our app may use third-party services for analytics, maps, and notifications. These services have their own privacy policies, and we encourage you to review them.`
+  /// `This in-app text summarizes backend-centric processing and should be read together with client-facing app notices (permissions, identifiers, push UX, and local storage/cookies where applicable).`
   String get privacyPolicyThirdPartyContent {
     return Intl.message(
-      'Our app may use third-party services for analytics, maps, and notifications. These services have their own privacy policies, and we encourage you to review them.',
+      'This in-app text summarizes backend-centric processing and should be read together with client-facing app notices (permissions, identifiers, push UX, and local storage/cookies where applicable).',
       name: 'privacyPolicyThirdPartyContent',
       desc: '',
       args: [],
@@ -6934,40 +8144,40 @@ class S {
     );
   }
 
-  /// `We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the app. Continued use of the app after changes constitutes acceptance of the updated policy.`
+  /// `We may update this policy from time to time. Material changes should be communicated in-app or via another appropriate channel, with updated effective dates.`
   String get privacyPolicyChangesContent {
     return Intl.message(
-      'We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the app. Continued use of the app after changes constitutes acceptance of the updated policy.',
+      'We may update this policy from time to time. Material changes should be communicated in-app or via another appropriate channel, with updated effective dates.',
       name: 'privacyPolicyChangesContent',
       desc: '',
       args: [],
     );
   }
 
-  /// `Contact Us`
+  /// `Contact`
   String get privacyPolicyContactTitle {
     return Intl.message(
-      'Contact Us',
+      'Contact',
       name: 'privacyPolicyContactTitle',
       desc: '',
       args: [],
     );
   }
 
-  /// `If you have any questions about this Privacy Policy or our data practices, please contact us at info@bartering.app`
+  /// `For privacy and GDPR requests, contact: info@bartering.app`
   String get privacyPolicyContactContent {
     return Intl.message(
-      'If you have any questions about this Privacy Policy or our data practices, please contact us at info@bartering.app',
+      'For privacy and GDPR requests, contact: info@bartering.app',
       name: 'privacyPolicyContactContent',
       desc: '',
       args: [],
     );
   }
 
-  /// `Last updated: January 2026`
+  /// `Last updated: 2026-04-13`
   String get privacyPolicyLastUpdated {
     return Intl.message(
-      'Last updated: January 2026',
+      'Last updated: 2026-04-13',
       name: 'privacyPolicyLastUpdated',
       desc: '',
       args: [],
@@ -7204,10 +8414,10 @@ class S {
     );
   }
 
-  /// `What do you need? What would you like assistance with?\nYou can change this later.`
+  /// `What services or items do you need?\nYou can change this later.`
   String get selectTheInterestsThatMatchYourPreferences {
     return Intl.message(
-      'What do you need? What would you like assistance with?\nYou can change this later.',
+      'What services or items do you need?\nYou can change this later.',
       name: 'selectTheInterestsThatMatchYourPreferences',
       desc: '',
       args: [],
@@ -7231,6 +8441,966 @@ class S {
       name: 'shareYourInterestsToFindBestMatches',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `Migrate to New Device`
+  String get migrateToNewDevice {
+    return Intl.message(
+      'Migrate to New Device',
+      name: 'migrateToNewDevice',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Migrate Your Account`
+  String get migrateYourAccount {
+    return Intl.message(
+      'Migrate Your Account',
+      name: 'migrateYourAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Generate a migration code to transfer your account data to a new device. The code will be valid for 15 minutes.`
+  String get migrationCodeDescription {
+    return Intl.message(
+      'Generate a migration code to transfer your account data to a new device. The code will be valid for 15 minutes.',
+      name: 'migrationCodeDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Generate Migration Code`
+  String get generateMigrationCode {
+    return Intl.message(
+      'Generate Migration Code',
+      name: 'generateMigrationCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Generating...`
+  String get generating {
+    return Intl.message(
+      'Generating...',
+      name: 'generating',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your Migration Code`
+  String get yourMigrationCode {
+    return Intl.message(
+      'Your Migration Code',
+      name: 'yourMigrationCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Expires in: {time}`
+  String expiresIn(String time) {
+    return Intl.message(
+      'Expires in: $time',
+      name: 'expiresIn',
+      desc: '',
+      args: [time],
+    );
+  }
+
+  /// `Copy Code`
+  String get copyCode {
+    return Intl.message('Copy Code', name: 'copyCode', desc: '', args: []);
+  }
+
+  /// `Migration code copied to clipboard`
+  String get codeCopied {
+    return Intl.message(
+      'Migration code copied to clipboard',
+      name: 'codeCopied',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Generate New Code`
+  String get generateNewCode {
+    return Intl.message(
+      'Generate New Code',
+      name: 'generateNewCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Generate a migration code`
+  String get migrationStep1 {
+    return Intl.message(
+      'Generate a migration code',
+      name: 'migrationStep1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open the app on your new device`
+  String get migrationStep2 {
+    return Intl.message(
+      'Open the app on your new device',
+      name: 'migrationStep2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap "Import Existing Account" on the welcome screen`
+  String get migrationStep3 {
+    return Intl.message(
+      'Tap "Import Existing Account" on the welcome screen',
+      name: 'migrationStep3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter this code on the new device`
+  String get migrationStep4 {
+    return Intl.message(
+      'Enter this code on the new device',
+      name: 'migrationStep4',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New Device Detected`
+  String get newDeviceDetected {
+    return Intl.message(
+      'New Device Detected',
+      name: 'newDeviceDetected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A new device wants to import your account data. Do you want to allow this?`
+  String get newDeviceDetectedMessage {
+    return Intl.message(
+      'A new device wants to import your account data. Do you want to allow this?',
+      name: 'newDeviceDetectedMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Deny`
+  String get deny {
+    return Intl.message('Deny', name: 'deny', desc: '', args: []);
+  }
+
+  /// `Allow`
+  String get allow {
+    return Intl.message('Allow', name: 'allow', desc: '', args: []);
+  }
+
+  /// `Migration denied by user`
+  String get migrationDenied {
+    return Intl.message(
+      'Migration denied by user',
+      name: 'migrationDenied',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Migration completed successfully!`
+  String get migrationCompleted {
+    return Intl.message(
+      'Migration completed successfully!',
+      name: 'migrationCompleted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to send migration data`
+  String get failedToSendMigration {
+    return Intl.message(
+      'Failed to send migration data',
+      name: 'failedToSendMigration',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Migration code has expired. Please generate a new one.`
+  String get migrationCodeExpired {
+    return Intl.message(
+      'Migration code has expired. Please generate a new one.',
+      name: 'migrationCodeExpired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Target device did not join in time`
+  String get targetDeviceTimeout {
+    return Intl.message(
+      'Target device did not join in time',
+      name: 'targetDeviceTimeout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Expired`
+  String get expired {
+    return Intl.message('Expired', name: 'expired', desc: '', args: []);
+  }
+
+  /// `Import Account`
+  String get importAccount {
+    return Intl.message(
+      'Import Account',
+      name: 'importAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter the 10-character migration code from your other device to import your account data.`
+  String get importAccountDescription {
+    return Intl.message(
+      'Enter the 10-character migration code from your other device to import your account data.',
+      name: 'importAccountDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to join migration session`
+  String get failedToJoinMigration {
+    return Intl.message(
+      'Failed to join migration session',
+      name: 'failedToJoinMigration',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to send recovery code`
+  String get failedToSendCode {
+    return Intl.message(
+      'Failed to send recovery code',
+      name: 'failedToSendCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Migration timed out. Please try again with a new code.`
+  String get migrationTimedOut {
+    return Intl.message(
+      'Migration timed out. Please try again with a new code.',
+      name: 'migrationTimedOut',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to process migration data`
+  String get failedToProcessMigration {
+    return Intl.message(
+      'Failed to process migration data',
+      name: 'failedToProcessMigration',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clear`
+  String get clear {
+    return Intl.message('Clear', name: 'clear', desc: '', args: []);
+  }
+
+  /// `Import Existing Account`
+  String get importExistingAccount {
+    return Intl.message(
+      'Import Existing Account',
+      name: 'importExistingAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open the app on your other device`
+  String get targetStep1 {
+    return Intl.message(
+      'Open the app on your other device',
+      name: 'targetStep1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Go to Settings → Account → Migrate Device`
+  String get targetStep2 {
+    return Intl.message(
+      'Go to Settings → Account → Migrate Device',
+      name: 'targetStep2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter the code shown on that device here`
+  String get targetStep3 {
+    return Intl.message(
+      'Enter the code shown on that device here',
+      name: 'targetStep3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recover via Email`
+  String get recoverViaEmail {
+    return Intl.message(
+      'Recover via Email',
+      name: 'recoverViaEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recover Account`
+  String get recoverAccount {
+    return Intl.message(
+      'Recover Account',
+      name: 'recoverAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter your email address to receive a recovery code and restore your account on this device.`
+  String get recoverAccountDescription {
+    return Intl.message(
+      'Enter your email address to receive a recovery code and restore your account on this device.',
+      name: 'recoverAccountDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send Recovery Code`
+  String get sendRecoveryCode {
+    return Intl.message(
+      'Send Recovery Code',
+      name: 'sendRecoveryCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recovery code sent to {email}`
+  String codeSentTo(Object email) {
+    return Intl.message(
+      'Recovery code sent to $email',
+      name: 'codeSentTo',
+      desc: '',
+      args: [email],
+    );
+  }
+
+  /// `Resend Code`
+  String get resendCode {
+    return Intl.message('Resend Code', name: 'resendCode', desc: '', args: []);
+  }
+
+  /// `Resend code in {seconds}s`
+  String resendCodeIn(Object seconds) {
+    return Intl.message(
+      'Resend code in ${seconds}s',
+      name: 'resendCodeIn',
+      desc: '',
+      args: [seconds],
+    );
+  }
+
+  /// `Verify & Recover`
+  String get verifyAndRecover {
+    return Intl.message(
+      'Verify & Recover',
+      name: 'verifyAndRecover',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid recovery code`
+  String get invalidCode {
+    return Intl.message(
+      'Invalid recovery code',
+      name: 'invalidCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Account recovery failed`
+  String get recoveryFailed {
+    return Intl.message(
+      'Account recovery failed',
+      name: 'recoveryFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recovery Successful!`
+  String get recoverySuccess {
+    return Intl.message(
+      'Recovery Successful!',
+      name: 'recoverySuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your account has been successfully recovered on this device.`
+  String get recoverySuccessMessage {
+    return Intl.message(
+      'Your account has been successfully recovered on this device.',
+      name: 'recoverySuccessMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No users found`
+  String get noUsersFound {
+    return Intl.message(
+      'No users found',
+      name: 'noUsersFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No postings found`
+  String get noPostingsFound {
+    return Intl.message(
+      'No postings found',
+      name: 'noPostingsFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enable GPS Location`
+  String get settingsGpsLocationTitle {
+    return Intl.message(
+      'Enable GPS Location',
+      name: 'settingsGpsLocationTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `GPS location tracking is enabled`
+  String get settingsGpsLocationEnabledDescription {
+    return Intl.message(
+      'GPS location tracking is enabled',
+      name: 'settingsGpsLocationEnabledDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `GPS location tracking is disabled`
+  String get settingsGpsLocationDisabledDescription {
+    return Intl.message(
+      'GPS location tracking is disabled',
+      name: 'settingsGpsLocationDisabledDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `When enabled, you can zoom to your current GPS location on the map. The app will request location permissions when needed.`
+  String get settingsGpsLocationDescription {
+    return Intl.message(
+      'When enabled, you can zoom to your current GPS location on the map. The app will request location permissions when needed.',
+      name: 'settingsGpsLocationDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Location permission is required to use GPS location tracking. Please enable location permission in your device settings.`
+  String get locationPermissionRequiredDescription {
+    return Intl.message(
+      'Location permission is required to use GPS location tracking. Please enable location permission in your device settings.',
+      name: 'locationPermissionRequiredDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open Settings`
+  String get openSettings {
+    return Intl.message(
+      'Open Settings',
+      name: 'openSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Profile`
+  String get profilePanelTitle {
+    return Intl.message(
+      'Profile',
+      name: 'profilePanelTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Request collected data export`
+  String get requestCollectedDataExport {
+    return Intl.message(
+      'Request collected data export',
+      name: 'requestCollectedDataExport',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your data export request has been accepted.`
+  String get dataExportRequestAccepted {
+    return Intl.message(
+      'Your data export request has been accepted.',
+      name: 'dataExportRequestAccepted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to request data export.`
+  String get dataExportRequestFailed {
+    return Intl.message(
+      'Failed to request data export.',
+      name: 'dataExportRequestFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please add an email in Notification Preferences before requesting data export.`
+  String get dataExportEmailRequired {
+    return Intl.message(
+      'Please add an email in Notification Preferences before requesting data export.',
+      name: 'dataExportEmailRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} {count, plural, =1{review} other{reviews}}`
+  String reviewsCount(int count) {
+    return Intl.message(
+      '$count ${Intl.plural(count, one: 'review', other: 'reviews')}',
+      name: 'reviewsCount',
+      desc: 'Number of reviews count display',
+      args: [count],
+    );
+  }
+
+  /// `Premium Profile Editor`
+  String get premiumProfileEditorTitle {
+    return Intl.message(
+      'Premium Profile Editor',
+      name: 'premiumProfileEditorTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Customize your premium profile`
+  String get premiumProfileEditorHeader {
+    return Intl.message(
+      'Customize your premium profile',
+      name: 'premiumProfileEditorHeader',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Here you can update your name, description, work references, and avatar SVG.`
+  String get premiumProfileEditorDescription {
+    return Intl.message(
+      'Here you can update your name, description, work references, and avatar SVG.',
+      name: 'premiumProfileEditorDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Saving...`
+  String get premiumProfileEditorSaving {
+    return Intl.message(
+      'Saving...',
+      name: 'premiumProfileEditorSaving',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Display name (optional)`
+  String get premiumProfileEditorDisplayNameOptional {
+    return Intl.message(
+      'Display name (optional)',
+      name: 'premiumProfileEditorDisplayNameOptional',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Description (optional)`
+  String get premiumProfileEditorDescriptionOptional {
+    return Intl.message(
+      'Description (optional)',
+      name: 'premiumProfileEditorDescriptionOptional',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Avatar (.svg)`
+  String get premiumProfileEditorAvatarSvg {
+    return Intl.message(
+      'Avatar (.svg)',
+      name: 'premiumProfileEditorAvatarSvg',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No avatar SVG selected.`
+  String get premiumProfileEditorNoAvatarSvgSelected {
+    return Intl.message(
+      'No avatar SVG selected.',
+      name: 'premiumProfileEditorNoAvatarSvgSelected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Selected: {fileName}`
+  String premiumProfileEditorSelectedFile(String fileName) {
+    return Intl.message(
+      'Selected: $fileName',
+      name: 'premiumProfileEditorSelectedFile',
+      desc: '',
+      args: [fileName],
+    );
+  }
+
+  /// `Upload SVG`
+  String get premiumProfileEditorUploadSvg {
+    return Intl.message(
+      'Upload SVG',
+      name: 'premiumProfileEditorUploadSvg',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove SVG`
+  String get premiumProfileEditorRemoveSvg {
+    return Intl.message(
+      'Remove SVG',
+      name: 'premiumProfileEditorRemoveSvg',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Work reference images`
+  String get premiumProfileEditorWorkReferenceImages {
+    return Intl.message(
+      'Work reference images',
+      name: 'premiumProfileEditorWorkReferenceImages',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add and manage your reference images.`
+  String get premiumProfileEditorWorkReferenceDescription {
+    return Intl.message(
+      'Add and manage your reference images.',
+      name: 'premiumProfileEditorWorkReferenceDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No work reference images yet.`
+  String get premiumProfileEditorNoWorkReferenceImages {
+    return Intl.message(
+      'No work reference images yet.',
+      name: 'premiumProfileEditorNoWorkReferenceImages',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Replace`
+  String get premiumProfileEditorReplace {
+    return Intl.message(
+      'Replace',
+      name: 'premiumProfileEditorReplace',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add image`
+  String get premiumProfileEditorAddImage {
+    return Intl.message(
+      'Add image',
+      name: 'premiumProfileEditorAddImage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete account`
+  String get accountDeletionTitle {
+    return Intl.message(
+      'Delete account',
+      name: 'accountDeletionTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Request account deletion`
+  String get accountDeletionHeader {
+    return Intl.message(
+      'Request account deletion',
+      name: 'accountDeletionHeader',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use this page to request permanent account deletion. Once completed, your profile and related account data will be removed according to our retention policy.`
+  String get accountDeletionInfo {
+    return Intl.message(
+      'Use this page to request permanent account deletion. Once completed, your profile and related account data will be removed according to our retention policy.',
+      name: 'accountDeletionInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Account deletion request confirmed. This action is permanent and cannot be undone.`
+  String get accountDeletionTokenInfo {
+    return Intl.message(
+      'Account deletion request confirmed. This action is permanent and cannot be undone.',
+      name: 'accountDeletionTokenInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Steps:\n1. Enter your account email\n2. Submit to receive a verification code\n3. Enter the code to confirm deletion`
+  String get accountDeletionSteps {
+    return Intl.message(
+      'Steps:\n1. Enter your account email\n2. Submit to receive a verification code\n3. Enter the code to confirm deletion',
+      name: 'accountDeletionSteps',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Account email`
+  String get accountDeletionEmailLabel {
+    return Intl.message(
+      'Account email',
+      name: 'accountDeletionEmailLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Verification code`
+  String get accountDeletionCodeLabel {
+    return Intl.message(
+      'Verification code',
+      name: 'accountDeletionCodeLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter code from email`
+  String get accountDeletionCodeHint {
+    return Intl.message(
+      'Enter code from email',
+      name: 'accountDeletionCodeHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send verification code`
+  String get accountDeletionSendCodeButton {
+    return Intl.message(
+      'Send verification code',
+      name: 'accountDeletionSendCodeButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm account deletion`
+  String get accountDeletionConfirmButton {
+    return Intl.message(
+      'Confirm account deletion',
+      name: 'accountDeletionConfirmButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Verification code sent. Please check your email.`
+  String get accountDeletionCodeSent {
+    return Intl.message(
+      'Verification code sent. Please check your email.',
+      name: 'accountDeletionCodeSent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter a valid verification code.`
+  String get accountDeletionCodeInvalid {
+    return Intl.message(
+      'Please enter a valid verification code.',
+      name: 'accountDeletionCodeInvalid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Deletion request submitted successfully. Our team will process your request and your account will be deleted after verification.`
+  String get accountDeletionSuccessMessage {
+    return Intl.message(
+      'Deletion request submitted successfully. Our team will process your request and your account will be deleted after verification.',
+      name: 'accountDeletionSuccessMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `If confirmed, we will permanently delete:`
+  String get accountDeletionDataDeletedTitle {
+    return Intl.message(
+      'If confirmed, we will permanently delete:',
+      name: 'accountDeletionDataDeletedTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your user profile with the following data has been deleted:`
+  String get accountDeletionDataDeletedTitleAfterConfirmed {
+    return Intl.message(
+      'Your user profile with the following data has been deleted:',
+      name: 'accountDeletionDataDeletedTitleAfterConfirmed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `- Account registration data and profile\n- Device keys and migration/recovery sessions\n- Postings and associated uploaded images\n- Attributes, relationships, reports, and favorites/match history\n- Messages, read receipts, encrypted file metadata, and chat response stats\n- Reviews, reputation, transactions, moderation/appeals, and review audit data\n- Notification contacts and notification preferences\n- Presence/activity cache entries and related analytics/location tracking rows`
+  String get accountDeletionDataDeletedItems {
+    return Intl.message(
+      '- Account registration data and profile\n- Device keys and migration/recovery sessions\n- Postings and associated uploaded images\n- Attributes, relationships, reports, and favorites/match history\n- Messages, read receipts, encrypted file metadata, and chat response stats\n- Reviews, reputation, transactions, moderation/appeals, and review audit data\n- Notification contacts and notification preferences\n- Presence/activity cache entries and related analytics/location tracking rows',
+      name: 'accountDeletionDataDeletedItems',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last online:`
+  String get lastOnlinePrefix {
+    return Intl.message(
+      'Last online:',
+      name: 'lastOnlinePrefix',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unknown`
+  String get lastOnlineUnknown {
+    return Intl.message(
+      'Unknown',
+      name: 'lastOnlineUnknown',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `just now`
+  String get lastOnlineJustNow {
+    return Intl.message(
+      'just now',
+      name: 'lastOnlineJustNow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} min ago`
+  String lastOnlineMinutesAgo(int count) {
+    return Intl.message(
+      '$count min ago',
+      name: 'lastOnlineMinutesAgo',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count} h ago`
+  String lastOnlineHoursAgo(int count) {
+    return Intl.message(
+      '$count h ago',
+      name: 'lastOnlineHoursAgo',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count} d ago`
+  String lastOnlineDaysAgo(int count) {
+    return Intl.message(
+      '$count d ago',
+      name: 'lastOnlineDaysAgo',
+      desc: '',
+      args: [count],
     );
   }
 }

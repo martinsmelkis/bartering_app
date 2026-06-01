@@ -61,17 +61,8 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i651.GlobalChatService>(() => _i651.GlobalChatService());
     gh.singleton<_i627.SettingsService>(() => _i627.SettingsService());
-    gh.factory<_i568.NotificationsCubit>(
-      () => _i568.NotificationsCubit(gh<_i205.ApiClient>()),
-    );
-    gh.singleton<_i935.ChatNotificationService>(
-      () => _i935.ChatNotificationService(gh<_i205.ApiClient>()),
-    );
     gh.lazySingleton<_i33.UserRepository>(
       () => _i33.UserRepository(gh<_i607.SecureStorageService>()),
-    );
-    gh.factory<_i646.InitializeCubit>(
-      () => _i646.InitializeCubit(gh<_i33.UserRepository>()),
     );
     gh.factory<_i838.InterestsCubit>(
       () => _i838.InterestsCubit(
@@ -79,12 +70,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i33.UserRepository>(),
       ),
     );
-    gh.factory<_i12.OnboardingCubit>(
-      () => _i12.OnboardingCubit(
-        gh<_i33.UserRepository>(),
-        gh<_i205.ApiClient>(),
-        gh<_i749.DeviceFingerprintService>(),
-      ),
+    gh.singleton<_i935.ChatNotificationService>(
+      () => _i935.ChatNotificationService(gh<_i205.ApiClient>()),
+    );
+    gh.factory<_i568.NotificationsCubit>(
+      () => _i568.NotificationsCubit(gh<_i205.ApiClient>()),
     );
     gh.factory<_i529.DeviceMigrationService>(
       () => _i529.DeviceMigrationService(
@@ -100,10 +90,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i33.UserRepository>(),
       ),
     );
-    gh.singleton<_i1006.ChatRepository>(
-      () => _i1006.ChatRepository(
-        gh<_i397.AppDatabase>(),
+    gh.factory<_i12.OnboardingCubit>(
+      () => _i12.OnboardingCubit(
         gh<_i33.UserRepository>(),
+        gh<_i205.ApiClient>(),
+        gh<_i749.DeviceFingerprintService>(),
       ),
     );
     gh.factory<_i199.DeviceMigrationCubit>(
@@ -112,6 +103,15 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i607.SecureStorageService>(),
         gh<_i205.ApiClient>(),
         gh<_i749.DeviceFingerprintService>(),
+      ),
+    );
+    gh.factory<_i646.InitializeCubit>(
+      () => _i646.InitializeCubit(gh<_i33.UserRepository>()),
+    );
+    gh.singleton<_i1006.ChatRepository>(
+      () => _i1006.ChatRepository(
+        gh<_i397.AppDatabase>(),
+        gh<_i33.UserRepository>(),
       ),
     );
     return this;

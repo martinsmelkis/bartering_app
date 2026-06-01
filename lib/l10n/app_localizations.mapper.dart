@@ -107,6 +107,10 @@ extension AppLocalizationsExtension on AppLocalizations {
         termsConditionsSectionLiabilityDisputesTitle,
       'termsConditionsSectionLiabilityDisputesContent' =>
         termsConditionsSectionLiabilityDisputesContent,
+      'termsConditionsSectionKidsSafetyTitle' =>
+        termsConditionsSectionKidsSafetyTitle,
+      'termsConditionsSectionKidsSafetyContent' =>
+        termsConditionsSectionKidsSafetyContent,
       'termsConditionsSectionChangesTitle' =>
         termsConditionsSectionChangesTitle,
       'termsConditionsSectionChangesContent' =>
@@ -491,6 +495,10 @@ extension AppLocalizationsExtension on AppLocalizations {
       'attr_software_accounts' => attr_software_accounts,
       'attr_reviewing' => attr_reviewing,
       'attr_virtual_assistance' => attr_virtual_assistance,
+      'attr_hair_styling' => attr_hair_styling,
+      'attr_beauty_products' => attr_beauty_products,
+      'attr_audio_equipment' => attr_audio_equipment,
+      'attr_health_supplements' => attr_health_supplements,
       'userLocation' => userLocation,
       'editLocation' => editLocation,
       'editKeywords' => editKeywords,
@@ -820,7 +828,6 @@ extension AppLocalizationsExtension on AppLocalizations {
       'transactionCompleted' => transactionCompleted,
       'noUsersNearbyTitle' => noUsersNearbyTitle,
       'noUsersNearbyMessage' => noUsersNearbyMessage,
-      'nearbyUsersAlertCheckboxTitle' => nearbyUsersAlertCheckboxTitle,
       'nearbyUsersAlertCheckboxSubtitle' => nearbyUsersAlertCheckboxSubtitle,
       'nearbyUsersAlertLoading' => nearbyUsersAlertLoading,
       'nearbyUsersAlertEnabled' => nearbyUsersAlertEnabled,
@@ -835,7 +842,6 @@ extension AppLocalizationsExtension on AppLocalizations {
       'notificationEmailSaveError' => notificationEmailSaveError,
       'notificationEmailRequired' => notificationEmailRequired,
       'notificationEmailInvalid' => notificationEmailInvalid,
-      'notificationEmailConfigured' => notificationEmailConfigured,
       'shareApp' => shareApp,
       'copyLink' => copyLink,
       'close' => close,
@@ -1179,6 +1185,18 @@ extension AppLocalizationsExtension on AppLocalizations {
         [final String error] => errorUpdatingTransaction(error),
         _ => throw ArgumentError(
           'errorUpdatingTransaction requires 1 arguments',
+        ),
+      },
+      'nearbyUsersAlertCheckboxTitle' => switch (args) {
+        [final int count] => nearbyUsersAlertCheckboxTitle(count),
+        _ => throw ArgumentError(
+          'nearbyUsersAlertCheckboxTitle requires 1 arguments',
+        ),
+      },
+      'notificationEmailConfigured' => switch (args) {
+        [final String email] => notificationEmailConfigured(email),
+        _ => throw ArgumentError(
+          'notificationEmailConfigured requires 1 arguments',
         ),
       },
       'inviteMessageShare' => switch (args) {

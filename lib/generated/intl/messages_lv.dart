@@ -20,58 +20,150 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'lv';
 
-  static String m0(userName) =>
+  static String m0(amount) => "Bilance: ${amount} ₿";
+
+  static String m1(coins) => "Pirkt par ${coins} ₿";
+
+  static String m2(price) => "Katrs avatārs: ${price} ₿";
+
+  static String m3(error) => "Neizdevās ielādēt avatāru veikalu: ${error}";
+
+  static String m4(coins) => "${coins} ₿";
+
+  static String m5(coins) =>
+      "Nepietiek monētu. Nepieciešamas ${coins} monētas.";
+
+  static String m6(error) => "Pirkums neizdevās: ${error}";
+
+  static String m7(userName) =>
       "Bloķējot ${userName}, viņi nevarēs:\n• Sūtīt jums ziņojumus\n• Skatīt jūsu profilu\n• Komentēt jūsu sludinājumus";
 
-  static String m1(error) => "Neizdevās atvērt failu: ${error}";
+  static String m8(email) => "Atjaunošanas kods nosūtīts uz ${email}";
 
-  static String m2(error) => "Lejupielāde neizdevās: ${error}";
+  static String m9(error) => "Neizdevās atvērt failu: ${error}";
 
-  static String m3(filename) => "Notiek ${filename} lejupielāde...";
+  static String m10(amount) => "Pašreizējais maka atlikums: ${amount}";
 
-  static String m4(error) => "Kļūda transakcijas izveidē: ${error}";
+  static String m11(filename) => "Atšifrē ${filename}...";
 
-  static String m5(error) => "Kļūda atrašanās vietas meklēšanā: ${error}";
+  static String m12(error) => "Lejupielāde neizdevās: ${error}";
 
-  static String m6(message) => "Kļūda faila atvēršanā: ${message}";
+  static String m13(filename) => "Notiek ${filename} lejupielāde...";
 
-  static String m7(error) => "Kļūda transakcijas atjaunināšanā: ${error}";
+  static String m14(error) => "Kļūda transakcijas izveidē: ${error}";
 
-  static String m8(exception) => "Kļūda: ${exception}";
+  static String m15(error) => "Kļūda atrašanās vietas meklēšanā: ${error}";
 
-  static String m9(errorMessage) => "Kļūda: ${errorMessage}";
+  static String m16(message) => "Kļūda faila atvēršanā: ${message}";
 
-  static String m10(filePath) => "Fails nav atrasts: ${filePath}";
+  static String m17(error) => "Kļūda transakcijas atjaunināšanā: ${error}";
 
-  static String m11(filePath) => "Fails saglabāts: ${filePath}";
+  static String m18(exception) => "Kļūda: ${exception}";
 
-  static String m12(appLink) =>
+  static String m19(errorMessage) => "Kļūda: ${errorMessage}";
+
+  static String m20(time) => "Derīgs vēl: ${time}";
+
+  static String m21(filePath) => "Fails nav atrasts: ${filePath}";
+
+  static String m22(filePath) => "Fails saglabāts: ${filePath}";
+
+  static String m23(appLink) =>
       "Čau! Pievienojies man BarterApp - lielisks veids, kā mainīt priekšmetus un pakalpojumus ar cilvēkiem tuvumā! 🔄\n\n${appLink}";
 
-  static String m13(id) => "Testa POI ar id ${id} nav atrasts servisā";
+  static String m24(count) => "pirms ${count} d";
 
-  static String m14(id) => "Testa POI ar id ${id} nav atrasts atjaunināšanai";
+  static String m25(count) => "pirms ${count} st";
 
-  static String m15(attempts) => "Nepareizs PIN kods (Mēģinājums ${attempts})";
+  static String m26(count) => "pirms ${count} min";
 
-  static String m16(count) => "${count} atbildēti jautājumi";
+  static String m27(count) =>
+      "${count} ${Intl.plural(count, one: 'atbilstošs', other: 'atbilstoši')} ${Intl.plural(count, one: 'sludinājumi', other: 'sludinājumi')}";
 
-  static String m17(userName) => "Ziņot par ${userName}";
+  static String m28(count) =>
+      "${count} ${Intl.plural(count, one: 'atbilstošs', other: 'atbilstoši')} ${Intl.plural(count, one: 'lietotājs', other: 'lietotāji')}";
 
-  static String m18(userName) => "Atsauksmēt ${userName}";
+  static String m29(id) => "Testa POI ar id ${id} nav atrasts servisā";
 
-  static String m19(otherUserName) =>
-      "Jūsu atsauksme būs redzama pēc tam, kad ${otherUserName} iesniegs savu atsauksmi, vai pēc 14 dienām.";
+  static String m30(id) => "Testa POI ar id ${id} nav atrasts atjaunināšanai";
 
-  static String m20(attempts) => "Nepareiza atbilde (Mēģinājums ${attempts})";
+  static String m31(count) => "Paziņot, kad tuvumā ir ${count}+ lietotāji";
 
-  static String m21(number) => "Stils ${number}";
+  static String m32(email) => "Paziņojumus var nosūtīt uz ${email}";
 
-  static String m22(userName) =>
+  static String m33(attempts) => "Nepareizs PIN kods (Mēģinājums ${attempts})";
+
+  static String m34(fileName) => "Atlasīts: ${fileName}";
+
+  static String m35(count) => "${count} atbildēti jautājumi";
+
+  static String m36(userName) => "Ziņot par ${userName}";
+
+  static String m37(seconds) => "Nosūtīt kodu pēc ${seconds}s";
+
+  static String m38(userName) => "Atsauksmēt ${userName}";
+
+  static String m39(count) =>
+      "${count} ${Intl.plural(count, one: 'atsauksme', other: 'atsauksmes')}";
+
+  static String m40(attempts) => "Nepareiza atbilde (Mēģinājums ${attempts})";
+
+  static String m41(amount) => "Izvēlētā monētu pakotne: ${amount}";
+
+  static String m42(number) => "Stils ${number}";
+
+  static String m43(userName) =>
       "Atbloķējot ${userName}, viņi varēs:\n• Sūtīt jums ziņojumus\n• Skatīt jūsu profilu\n• Komentēt jūsu sludinājumus";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "accountDeletionCodeHint": MessageLookupByLibrary.simpleMessage(
+      "Ievadiet kodu no e-pasta",
+    ),
+    "accountDeletionCodeInvalid": MessageLookupByLibrary.simpleMessage(
+      "Lūdzu, ievadiet derīgu verifikācijas kodu.",
+    ),
+    "accountDeletionCodeLabel": MessageLookupByLibrary.simpleMessage(
+      "Verifikācijas kods",
+    ),
+    "accountDeletionCodeSent": MessageLookupByLibrary.simpleMessage(
+      "Verifikācijas kods nosūtīts. Lūdzu, pārbaudiet savu e-pastu.",
+    ),
+    "accountDeletionConfirmButton": MessageLookupByLibrary.simpleMessage(
+      "Apstiprināt konta dzēšanu",
+    ),
+    "accountDeletionDataDeletedItems": MessageLookupByLibrary.simpleMessage(
+      "- Konta reģistrācijas datus un profilu\n- Ierīču atslēgas un migrācijas/atjaunošanas sesijas\n- Sludinājumus un saistītos augšupielādētos attēlus\n- Atribūtus, saites, ziņojumus un favorītu/atbilstību vēsturi\n- Ziņojumus, izlasīšanas statusus, šifrēto failu metadatus un čata atbilžu statistiku\n- Atsauksmes, reputāciju, darījumus, moderēšanas/apelāciju un atsauksmju audita datus\n- Paziņojumu kontaktus un paziņojumu iestatījumus\n- Klātbūtnes/aktivitātes keša ierakstus un saistītās analītikas/atrašanās vietas izsekošanas rindas",
+    ),
+    "accountDeletionDataDeletedTitle": MessageLookupByLibrary.simpleMessage(
+      "Pēc apstiprinājuma mēs neatgriezeniski dzēsīsim:",
+    ),
+    "accountDeletionDataDeletedTitleAfterConfirmed":
+        MessageLookupByLibrary.simpleMessage(
+          "Jūsu lietotāja profils ir dzēsts, ar šādiem datiem:",
+        ),
+    "accountDeletionEmailLabel": MessageLookupByLibrary.simpleMessage(
+      "Konta e-pasts",
+    ),
+    "accountDeletionHeader": MessageLookupByLibrary.simpleMessage(
+      "Pieprasīt konta dzēšanu",
+    ),
+    "accountDeletionInfo": MessageLookupByLibrary.simpleMessage(
+      "Izmantojiet šo lapu, lai pieprasītu neatgriezenisku konta dzēšanu. Pēc procesa pabeigšanas jūsu profils un saistītie konta dati tiks dzēsti saskaņā ar mūsu datu glabāšanas politiku.",
+    ),
+    "accountDeletionSendCodeButton": MessageLookupByLibrary.simpleMessage(
+      "Nosūtīt verifikācijas kodu",
+    ),
+    "accountDeletionSteps": MessageLookupByLibrary.simpleMessage(
+      "Soļi:\n1. Ievadiet sava konta e-pastu\n2. Iesniedziet pieprasījumu, lai saņemtu verifikācijas kodu\n3. Ievadiet kodu, lai apstiprinātu dzēšanu",
+    ),
+    "accountDeletionSuccessMessage": MessageLookupByLibrary.simpleMessage(
+      "Dzēšanas pieprasījums veiksmīgi iesniegts. Mūsu komanda apstrādās jūsu pieprasījumu, un konts tiks dzēsts pēc verifikācijas.",
+    ),
+    "accountDeletionTitle": MessageLookupByLibrary.simpleMessage("Dzēst kontu"),
+    "accountDeletionTokenInfo": MessageLookupByLibrary.simpleMessage(
+      "Konta dzēšanas pieprasījums apstiprināts. Šī darbība ir neatgriezeniska un to nevar atsaukt.",
+    ),
     "accountSetupSuccess": MessageLookupByLibrary.simpleMessage(
       "Jūsu konts ir iestatīts!",
     ),
@@ -97,11 +189,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Papildu informācija (neobligāti)",
     ),
     "allAttributesHavePreferences": MessageLookupByLibrary.simpleMessage(
-      "Visiem atribūtiem no jūsu profila jau ir paziņojumu preferences",
+      "Visiem atribūtiem no jūsu profila jau ir paziņojumu iestatījumi",
     ),
     "allMatchesDeleted": MessageLookupByLibrary.simpleMessage(
       "Visas atbilstības ir dzēstas",
     ),
+    "allow": MessageLookupByLibrary.simpleMessage("Atļaut"),
     "anUnknownErrorOccurred": MessageLookupByLibrary.simpleMessage(
       "Radās nezināma kļūda.",
     ),
@@ -112,14 +205,49 @@ class MessageLookup extends MessageLookupByLibrary {
     "answerTooShort": MessageLookupByLibrary.simpleMessage(
       "Atbildei jābūt vismaz 2 rakstzīmēm",
     ),
-    "appTitle": MessageLookupByLibrary.simpleMessage("Bartera Lietotne"),
-    "archive": MessageLookupByLibrary.simpleMessage("Arhivēt"),
-    "archiveConversationMessage": MessageLookupByLibrary.simpleMessage(
-      "Vai vēlaties tagad arhivēt šo sarunu?",
+    "apiErrorAuthSessionExpired": MessageLookupByLibrary.simpleMessage(
+      "Sesija beidzās. Lūdzu, autorizējieties vēlreiz.",
     ),
-    "archiveConversationTitle": MessageLookupByLibrary.simpleMessage(
-      "Arhivēt sarunu?",
+    "apiErrorBadRequest": MessageLookupByLibrary.simpleMessage(
+      "Pieprasījumā ir kļūda. Lūdzu, pārbaudiet datus un mēģiniet vēlreiz.",
     ),
+    "apiErrorConflict": MessageLookupByLibrary.simpleMessage(
+      "Konflikts ar esošiem datiem. Lūdzu, atjaunojiet un mēģiniet vēlreiz.",
+    ),
+    "apiErrorFavoriteUsersFallback": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik neizdodas ielādēt iecienītos lietotājus.",
+    ),
+    "apiErrorForbidden": MessageLookupByLibrary.simpleMessage(
+      "Jums nav piekļuves šai darbībai.",
+    ),
+    "apiErrorMatchingUsersFallback": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik neizdodas ielādēt atbilstošus lietotājus.",
+    ),
+    "apiErrorNearbyUsersFallback": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik neizdodas ielādēt tuvumā esošos lietotājus.",
+    ),
+    "apiErrorNoInternet": MessageLookupByLibrary.simpleMessage(
+      "Nav savienojuma ar internetu. Pārbaudiet tīklu un mēģiniet vēlreiz.",
+    ),
+    "apiErrorNotFound": MessageLookupByLibrary.simpleMessage(
+      "Pieprasītais resurss nav atrasts.",
+    ),
+    "apiErrorSearchUsersFallback": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik neizdodas meklēt lietotājus.",
+    ),
+    "apiErrorServer": MessageLookupByLibrary.simpleMessage(
+      "Servera kļūda. Lūdzu, mēģiniet vēlreiz vēlāk.",
+    ),
+    "apiErrorSimilarUsersFallback": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik neizdodas ielādēt līdzīgus lietotājus.",
+    ),
+    "apiErrorTimeout": MessageLookupByLibrary.simpleMessage(
+      "Pieprasījums aizņēma pārāk ilgu laiku. Lūdzu, mēģiniet vēlreiz.",
+    ),
+    "apiErrorValidation": MessageLookupByLibrary.simpleMessage(
+      "Daži ievadītie dati nav derīgi.",
+    ),
+    "appTitle": MessageLookupByLibrary.simpleMessage("Barters.lv"),
     "appealReasonRequired": MessageLookupByLibrary.simpleMessage(
       "Apelācijas iemesls ir obligāts",
     ),
@@ -128,6 +256,13 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appealReviewTitle": MessageLookupByLibrary.simpleMessage(
       "Apstrīdēt atsauksmi",
+    ),
+    "archive": MessageLookupByLibrary.simpleMessage("Arhivēt"),
+    "archiveConversationMessage": MessageLookupByLibrary.simpleMessage(
+      "Vai vēlaties tagad arhivēt šo sarunu?",
+    ),
+    "archiveConversationTitle": MessageLookupByLibrary.simpleMessage(
+      "Arhivēt sarunu?",
     ),
     "archiveWishlist": MessageLookupByLibrary.simpleMessage("Arhivēt"),
     "atLeastOneKeyword": MessageLookupByLibrary.simpleMessage(
@@ -138,14 +273,18 @@ class MessageLookup extends MessageLookupByLibrary {
       "Akadēmiskā mācīšana",
     ),
     "attr_acting": MessageLookupByLibrary.simpleMessage("Aktierspēle"),
-    "attr_aerobics": MessageLookupByLibrary.simpleMessage("Aerobika"),
+    "attr_administrative_work": MessageLookupByLibrary.simpleMessage(
+      "Administratīvais darbs",
+    ),
+    "attr_ai_consulting": MessageLookupByLibrary.simpleMessage(
+      "MI konsultācijas",
+    ),
     "attr_alternative_healing": MessageLookupByLibrary.simpleMessage(
       "Alternatīvā dziedināšana",
     ),
     "attr_alternative_medicine": MessageLookupByLibrary.simpleMessage(
       "Alternatīvā medicīna",
     ),
-    "attr_amateur_radio": MessageLookupByLibrary.simpleMessage("Amatierradio"),
     "attr_android": MessageLookupByLibrary.simpleMessage("Android"),
     "attr_animal_care": MessageLookupByLibrary.simpleMessage(
       "Dzīvnieku aprūpe",
@@ -160,27 +299,31 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_artificial_intelligence": MessageLookupByLibrary.simpleMessage(
       "Mākslīgais intelekts",
     ),
-    "attr_assembly": MessageLookupByLibrary.simpleMessage("Montāža"),
     "attr_astronomy": MessageLookupByLibrary.simpleMessage("Astronomija"),
+    "attr_audio_equipment": MessageLookupByLibrary.simpleMessage(
+      "Audio aprīkojums",
+    ),
     "attr_babysitting": MessageLookupByLibrary.simpleMessage(
       "Bērnu pieskatīšana",
     ),
     "attr_backend_development": MessageLookupByLibrary.simpleMessage(
       "Backend izstrāde",
     ),
-    "attr_backgammon": MessageLookupByLibrary.simpleMessage("Nardi"),
     "attr_backpacking": MessageLookupByLibrary.simpleMessage("Backpacking"),
     "attr_baking": MessageLookupByLibrary.simpleMessage("Cepšana"),
+    "attr_beauty_products": MessageLookupByLibrary.simpleMessage(
+      "Skaistumkopšanas produkti",
+    ),
     "attr_beekeeping": MessageLookupByLibrary.simpleMessage("Biškopība"),
+    "attr_bicycle_parts": MessageLookupByLibrary.simpleMessage(
+      "Velosipēdu detaļas",
+    ),
     "attr_bicycles": MessageLookupByLibrary.simpleMessage("Velosipēdi"),
     "attr_billiards": MessageLookupByLibrary.simpleMessage("Biljards"),
     "attr_biohacking": MessageLookupByLibrary.simpleMessage("Biohakings"),
-    "attr_bird_watching": MessageLookupByLibrary.simpleMessage(
-      "Putnu vērošana",
-    ),
-    "attr_blogging": MessageLookupByLibrary.simpleMessage("Blogošana"),
     "attr_board_games": MessageLookupByLibrary.simpleMessage("Galda spēles"),
     "attr_bodybuilding": MessageLookupByLibrary.simpleMessage("Bodibildings"),
+    "attr_bookkeeping": MessageLookupByLibrary.simpleMessage("Grāmatvedība"),
     "attr_books": MessageLookupByLibrary.simpleMessage("Grāmatas"),
     "attr_bowling": MessageLookupByLibrary.simpleMessage("Boulings"),
     "attr_breadmaking": MessageLookupByLibrary.simpleMessage("Maizes cepšana"),
@@ -191,17 +334,15 @@ class MessageLookup extends MessageLookupByLibrary {
       "Biznesa mentorings",
     ),
     "attr_camping": MessageLookupByLibrary.simpleMessage("Kempings"),
-    "attr_candle_making": MessageLookupByLibrary.simpleMessage(
-      "Sveču darināšana",
+    "attr_camping_gear": MessageLookupByLibrary.simpleMessage(
+      "Kempinga aprīkojums",
     ),
     "attr_canned_goods": MessageLookupByLibrary.simpleMessage(
       "Konservēti produkti",
     ),
     "attr_canyoning": MessageLookupByLibrary.simpleMessage("Kanjonu tūrisms"),
     "attr_car_cleaning": MessageLookupByLibrary.simpleMessage("Auto tīrīšana"),
-    "attr_car_detailing": MessageLookupByLibrary.simpleMessage(
-      "Auto detalizēta tīrīšana",
-    ),
+    "attr_car_detailing": MessageLookupByLibrary.simpleMessage("Auto tjūnings"),
     "attr_car_maintenance": MessageLookupByLibrary.simpleMessage("Auto apkope"),
     "attr_car_restoration": MessageLookupByLibrary.simpleMessage(
       "Auto restaurācija",
@@ -214,26 +355,23 @@ class MessageLookup extends MessageLookupByLibrary {
       "Labdarības darbs",
     ),
     "attr_chess": MessageLookupByLibrary.simpleMessage("Šahs"),
+    "attr_chicken_eggs": MessageLookupByLibrary.simpleMessage("Vistu olas"),
     "attr_cleaning": MessageLookupByLibrary.simpleMessage("Tīrīšana"),
-    "attr_climbing": MessageLookupByLibrary.simpleMessage("Kāpšana"),
     "attr_clothesmaking": MessageLookupByLibrary.simpleMessage(
       "Apģērbu šūšana",
     ),
+    "attr_clothing": MessageLookupByLibrary.simpleMessage("Apģērbs"),
     "attr_co_op_gaming": MessageLookupByLibrary.simpleMessage(
-      "Kooperatīvas spēles",
+      "Multi-player spēles",
     ),
     "attr_code_review": MessageLookupByLibrary.simpleMessage("Koda pārskats"),
     "attr_coding": MessageLookupByLibrary.simpleMessage("Programmēšana"),
-    "attr_coffee": MessageLookupByLibrary.simpleMessage("Kafija"),
-    "attr_cold_plunging": MessageLookupByLibrary.simpleMessage(
-      "Aukstā ūdens vannošana",
-    ),
     "attr_comic_books": MessageLookupByLibrary.simpleMessage("Komiksi"),
     "attr_community_gardening": MessageLookupByLibrary.simpleMessage(
       "Kopienas dārzkopība",
     ),
-    "attr_computer_hardware": MessageLookupByLibrary.simpleMessage(
-      "Datoru aparatūra",
+    "attr_computer_accessories": MessageLookupByLibrary.simpleMessage(
+      "Datoru aksesuāri",
     ),
     "attr_computer_repair": MessageLookupByLibrary.simpleMessage(
       "Datoru remonts",
@@ -246,23 +384,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_couponing": MessageLookupByLibrary.simpleMessage(
       "Kuponu izmantošana",
     ),
-    "attr_cows": MessageLookupByLibrary.simpleMessage("Govis"),
     "attr_crafting": MessageLookupByLibrary.simpleMessage("Amatniecība"),
-    "attr_creative_brainstorming": MessageLookupByLibrary.simpleMessage(
-      "Radoša ideju ģenerēšana",
+    "attr_crocheting": MessageLookupByLibrary.simpleMessage("Tamborēšana"),
+    "attr_cross_stitch": MessageLookupByLibrary.simpleMessage(
+      "Krustdūriena izšūšana",
     ),
-    "attr_creative_writing": MessageLookupByLibrary.simpleMessage(
-      "Radošā rakstīšana",
-    ),
-    "attr_crocheting": MessageLookupByLibrary.simpleMessage("Adīšana ar āķi"),
-    "attr_cross_stitch": MessageLookupByLibrary.simpleMessage("Krustaduriena"),
     "attr_cryptocurrency": MessageLookupByLibrary.simpleMessage("Kriptovalūta"),
     "attr_culinary_arts": MessageLookupByLibrary.simpleMessage(
       "Kulinārijas māksla",
     ),
     "attr_cybersecurity": MessageLookupByLibrary.simpleMessage("Kiberdrošība"),
     "attr_cycling": MessageLookupByLibrary.simpleMessage("Riteņbraukšana"),
-    "attr_dance": MessageLookupByLibrary.simpleMessage("Dejas"),
     "attr_dance_lessons": MessageLookupByLibrary.simpleMessage(
       "Deju nodarbības",
     ),
@@ -273,14 +405,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_deep_cleaning": MessageLookupByLibrary.simpleMessage(
       "Dziļā tīrīšana",
     ),
+    "attr_device_lending": MessageLookupByLibrary.simpleMessage(
+      "Ierīču aizdošana",
+    ),
     "attr_digital_arts": MessageLookupByLibrary.simpleMessage(
       "Digitālā māksla",
     ),
-    "attr_digital_nomadism": MessageLookupByLibrary.simpleMessage(
-      "Digitālais nomādisms",
+    "attr_digital_products": MessageLookupByLibrary.simpleMessage(
+      "Digitālie produkti",
     ),
     "attr_diy": MessageLookupByLibrary.simpleMessage("Dari pats"),
-    "attr_djing": MessageLookupByLibrary.simpleMessage("DJ darbs"),
     "attr_dog_walking": MessageLookupByLibrary.simpleMessage("Suņu pastaigas"),
     "attr_dogs": MessageLookupByLibrary.simpleMessage("Suņi"),
     "attr_drawing": MessageLookupByLibrary.simpleMessage("Zīmēšana"),
@@ -299,6 +433,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_environmentalism": MessageLookupByLibrary.simpleMessage(
       "Vides aizsardzība",
     ),
+    "attr_errand_running": MessageLookupByLibrary.simpleMessage(
+      "Uzdevumu veikšana",
+    ),
     "attr_event_hosting": MessageLookupByLibrary.simpleMessage(
       "Pasākumu organizēšana",
     ),
@@ -311,15 +448,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_farm_animals": MessageLookupByLibrary.simpleMessage(
       "Lauksaimniecības dzīvnieki",
     ),
+    "attr_farm_machinery": MessageLookupByLibrary.simpleMessage(
+      "Lauksaimniecības tehnika",
+    ),
     "attr_farmstay": MessageLookupByLibrary.simpleMessage(
       "Uzturēšanās lauku sētā",
     ),
-    "attr_fashion": MessageLookupByLibrary.simpleMessage("Mode"),
     "attr_fashion_design": MessageLookupByLibrary.simpleMessage(
       "Modes dizains",
     ),
-    "attr_fermentation": MessageLookupByLibrary.simpleMessage("Fermentācija"),
-    "attr_film_making": MessageLookupByLibrary.simpleMessage("Filmu veidošana"),
+    "attr_filmmaking": MessageLookupByLibrary.simpleMessage("Filmu veidošana"),
     "attr_financial_investing": MessageLookupByLibrary.simpleMessage(
       "Finanšu investīcijas",
     ),
@@ -335,61 +473,43 @@ class MessageLookup extends MessageLookupByLibrary {
       "Pārtikas meklēšana dabā",
     ),
     "attr_forestry": MessageLookupByLibrary.simpleMessage("Mežsaimniecība"),
-    "attr_fresh_eggs": MessageLookupByLibrary.simpleMessage("Svaigas olas"),
-    "attr_fresh_fruits": MessageLookupByLibrary.simpleMessage("Svaigas augļi"),
-    "attr_fresh_herbs": MessageLookupByLibrary.simpleMessage(
-      "Svaigas garšaugi",
-    ),
-    "attr_fresh_vegetables": MessageLookupByLibrary.simpleMessage(
-      "Svaigas dārzeņi",
-    ),
-    "attr_fruit_harvesting": MessageLookupByLibrary.simpleMessage(
-      "Augļu novākšana",
-    ),
-    "attr_furniture_building": MessageLookupByLibrary.simpleMessage(
-      "Mēbeļu būvniecība",
-    ),
-    "attr_furniture_repair": MessageLookupByLibrary.simpleMessage(
-      "Mēbeļu remonts",
-    ),
+    "attr_fresh_herbs": MessageLookupByLibrary.simpleMessage("Svaigi garšaugi"),
+    "attr_fruits": MessageLookupByLibrary.simpleMessage("Augļi"),
     "attr_gadgets": MessageLookupByLibrary.simpleMessage("Ierīces"),
     "attr_gaming": MessageLookupByLibrary.simpleMessage("Spēles"),
     "attr_gardening": MessageLookupByLibrary.simpleMessage("Dārzkopība"),
     "attr_gardening_advice": MessageLookupByLibrary.simpleMessage(
       "Dārzkopības padomi",
     ),
-    "attr_genealogy": MessageLookupByLibrary.simpleMessage("Ģenealoģija"),
-    "attr_geocaching": MessageLookupByLibrary.simpleMessage("Ģeoslēpšana"),
-    "attr_goats": MessageLookupByLibrary.simpleMessage("Kazas"),
     "attr_graphic_design": MessageLookupByLibrary.simpleMessage(
       "Grafiskais dizains",
     ),
-    "attr_graphic_novels": MessageLookupByLibrary.simpleMessage(
-      "Grafiskas noveles",
-    ),
-    "attr_guitar": MessageLookupByLibrary.simpleMessage("Ģitāra"),
     "attr_hacking": MessageLookupByLibrary.simpleMessage("Hakings"),
-    "attr_handmade": MessageLookupByLibrary.simpleMessage("Roku darbs"),
+    "attr_hair_styling": MessageLookupByLibrary.simpleMessage("Frizēšana"),
+    "attr_handmade_items": MessageLookupByLibrary.simpleMessage("Rokdarbi"),
     "attr_handyman_services": MessageLookupByLibrary.simpleMessage(
-      "Meistar pakalpojumi",
+      "Santehniķa pakalpojumi",
     ),
     "attr_hauling_services": MessageLookupByLibrary.simpleMessage(
       "Transporta pakalpojumi",
     ),
+    "attr_health_supplements": MessageLookupByLibrary.simpleMessage(
+      "Uztura bagātinātāji",
+    ),
     "attr_herbal_remedies": MessageLookupByLibrary.simpleMessage(
       "Zāļu līdzekļi",
     ),
-    "attr_herp_keeping": MessageLookupByLibrary.simpleMessage(
-      "Rāpuļu audzēšana",
-    ),
     "attr_hiking": MessageLookupByLibrary.simpleMessage("Pārgājieni"),
+    "attr_home_decor": MessageLookupByLibrary.simpleMessage("Mājas dekors"),
     "attr_home_improvement": MessageLookupByLibrary.simpleMessage(
       "Mājas uzlabošana",
     ),
     "attr_homebrewing": MessageLookupByLibrary.simpleMessage(
       "Alus darīšana mājās",
     ),
-    "attr_horseback_riding": MessageLookupByLibrary.simpleMessage("Jāšana"),
+    "attr_homemade_goods": MessageLookupByLibrary.simpleMessage(
+      "Pašdarinātas preces",
+    ),
     "attr_horses": MessageLookupByLibrary.simpleMessage("Zirgi"),
     "attr_house_maintenance": MessageLookupByLibrary.simpleMessage(
       "Mājas apkope",
@@ -397,7 +517,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_houseplant_care": MessageLookupByLibrary.simpleMessage(
       "Istabas augu kopšana",
     ),
-    "attr_hydroponics": MessageLookupByLibrary.simpleMessage("Hidroponika"),
     "attr_interview_practice": MessageLookupByLibrary.simpleMessage(
       "Intervijas prakse",
     ),
@@ -405,39 +524,41 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_jewelry": MessageLookupByLibrary.simpleMessage(
       "Juvelierizstrādājumi",
     ),
-    "attr_kayaking": MessageLookupByLibrary.simpleMessage("Airēšana ar kajaku"),
+    "attr_kids_toys": MessageLookupByLibrary.simpleMessage("Bērnu rotaļlietas"),
+    "attr_kitchen_appliances": MessageLookupByLibrary.simpleMessage(
+      "Virtuves tehnika",
+    ),
     "attr_knitting": MessageLookupByLibrary.simpleMessage("Adīšana"),
     "attr_kombucha": MessageLookupByLibrary.simpleMessage("Kombuča"),
     "attr_landscaping": MessageLookupByLibrary.simpleMessage("Ainavu dizains"),
     "attr_language_exchange": MessageLookupByLibrary.simpleMessage(
       "Valodu apmaiņa",
     ),
-    "attr_lawn_mowing": MessageLookupByLibrary.simpleMessage(
-      "Zāliena pļaušana",
-    ),
+    "attr_lawn_care": MessageLookupByLibrary.simpleMessage("Zāliena kopšana"),
     "attr_leather_crafting": MessageLookupByLibrary.simpleMessage(
       "Ādas apstrāde",
     ),
     "attr_legal_advice": MessageLookupByLibrary.simpleMessage(
-      "Juridiskie padomi",
+      "Juridiskā palīdzība",
     ),
     "attr_linux": MessageLookupByLibrary.simpleMessage("Linux"),
     "attr_local_tours": MessageLookupByLibrary.simpleMessage(
       "Vietējās ekskursijas",
     ),
     "attr_machinery_operation": MessageLookupByLibrary.simpleMessage(
-      "Mašīnu vadīšana",
+      "Smagā tehnika",
     ),
     "attr_machining": MessageLookupByLibrary.simpleMessage("Metālveidošana"),
-    "attr_magic": MessageLookupByLibrary.simpleMessage("Burvība"),
+    "attr_magic": MessageLookupByLibrary.simpleMessage("Maģija"),
     "attr_makeup": MessageLookupByLibrary.simpleMessage("Grims"),
+    "attr_marketing": MessageLookupByLibrary.simpleMessage("Mārketings"),
     "attr_martial_arts": MessageLookupByLibrary.simpleMessage("Cīņas mākslas"),
     "attr_massage": MessageLookupByLibrary.simpleMessage("Masāža"),
     "attr_math_tutoring": MessageLookupByLibrary.simpleMessage(
       "Matemātikas mācīšana",
     ),
+    "attr_mechanisms": MessageLookupByLibrary.simpleMessage("Mehānismi"),
     "attr_meditation": MessageLookupByLibrary.simpleMessage("Meditācija"),
-    "attr_memes": MessageLookupByLibrary.simpleMessage("Mēmi"),
     "attr_mentorship": MessageLookupByLibrary.simpleMessage("Mentorings"),
     "attr_metal_detecting": MessageLookupByLibrary.simpleMessage(
       "Metāla meklēšana",
@@ -446,28 +567,31 @@ class MessageLookup extends MessageLookupByLibrary {
       "Metāla apstrāde",
     ),
     "attr_mindfulness": MessageLookupByLibrary.simpleMessage("Apzinātība"),
-    "attr_minimalism": MessageLookupByLibrary.simpleMessage("Minimālisms"),
     "attr_motorcycles": MessageLookupByLibrary.simpleMessage("Motocikli"),
     "attr_movies": MessageLookupByLibrary.simpleMessage("Filmas"),
     "attr_moving_help": MessageLookupByLibrary.simpleMessage(
       "Pārcelšanās palīdzība",
     ),
-    "attr_mushroom_hunting": MessageLookupByLibrary.simpleMessage("Sēņošana"),
-    "attr_music": MessageLookupByLibrary.simpleMessage("Mūzika"),
+    "attr_music_performance": MessageLookupByLibrary.simpleMessage(
+      "Mūzikas uzstāšanās",
+    ),
+    "attr_music_production": MessageLookupByLibrary.simpleMessage(
+      "Mūzikas producēšana",
+    ),
     "attr_musical_instruments": MessageLookupByLibrary.simpleMessage(
       "Mūzikas instrumenti",
     ),
-    "attr_nail_art": MessageLookupByLibrary.simpleMessage("Nagu dizains"),
     "attr_natural_remedies": MessageLookupByLibrary.simpleMessage(
       "Dabīgie līdzekļi",
+    ),
+    "attr_networking": MessageLookupByLibrary.simpleMessage("Tīklošanās"),
+    "attr_nutrition_advice": MessageLookupByLibrary.simpleMessage(
+      "Uztura konsultācijas",
     ),
     "attr_organic_food": MessageLookupByLibrary.simpleMessage(
       "Bioloģiskā pārtika",
     ),
     "attr_painting": MessageLookupByLibrary.simpleMessage("Gleznošana"),
-    "attr_pair_programming": MessageLookupByLibrary.simpleMessage(
-      "Pāra programmēšana",
-    ),
     "attr_pc_building": MessageLookupByLibrary.simpleMessage("Datoru būvēšana"),
     "attr_permaculture": MessageLookupByLibrary.simpleMessage("Permakultūra"),
     "attr_personal_finance": MessageLookupByLibrary.simpleMessage(
@@ -479,6 +603,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_pet_sitting": MessageLookupByLibrary.simpleMessage(
       "Mājdzīvnieku pieskatīšana",
     ),
+    "attr_pet_supplies": MessageLookupByLibrary.simpleMessage(
+      "Mājdzīvnieku piederumi",
+    ),
+    "attr_phone_repair": MessageLookupByLibrary.simpleMessage(
+      "Tālruņu remonts",
+    ),
     "attr_photo_restoration": MessageLookupByLibrary.simpleMessage(
       "Foto restaurācija",
     ),
@@ -487,31 +617,22 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_piano_lessons": MessageLookupByLibrary.simpleMessage(
       "Klavieru nodarbības",
     ),
-    "attr_plant_cuttings": MessageLookupByLibrary.simpleMessage(
-      "Augu spraudeņi",
-    ),
     "attr_plants": MessageLookupByLibrary.simpleMessage("Augi"),
     "attr_plumbing": MessageLookupByLibrary.simpleMessage("Santehnika"),
-    "attr_podcasting": MessageLookupByLibrary.simpleMessage(
-      "Podkāstu veidošana",
-    ),
-    "attr_podcasts": MessageLookupByLibrary.simpleMessage("Podkāsti"),
     "attr_poker": MessageLookupByLibrary.simpleMessage("Pokers"),
     "attr_pottery": MessageLookupByLibrary.simpleMessage("Podnieku māksla"),
-    "attr_powerlifting": MessageLookupByLibrary.simpleMessage("Spēka sports"),
+    "attr_power_tools": MessageLookupByLibrary.simpleMessage(
+      "Elektroinstrumenti",
+    ),
     "attr_proofreading": MessageLookupByLibrary.simpleMessage("Korektūra"),
-    "attr_puzzles": MessageLookupByLibrary.simpleMessage("Mīklas"),
     "attr_quilting": MessageLookupByLibrary.simpleMessage("Segas šūšana"),
-    "attr_reading": MessageLookupByLibrary.simpleMessage("Lasīšana"),
     "attr_recipes": MessageLookupByLibrary.simpleMessage("Receptes"),
     "attr_record_collecting": MessageLookupByLibrary.simpleMessage(
       "Ierakstu kolekcionēšana",
     ),
     "attr_renovation": MessageLookupByLibrary.simpleMessage("Renovācija"),
-    "attr_resume_writing": MessageLookupByLibrary.simpleMessage(
-      "CV rakstīšana",
-    ),
     "attr_retreats": MessageLookupByLibrary.simpleMessage("Retreats"),
+    "attr_reviewing": MessageLookupByLibrary.simpleMessage("Vērtēšana"),
     "attr_ridesharing": MessageLookupByLibrary.simpleMessage(
       "Braucienu koplietošana",
     ),
@@ -519,102 +640,79 @@ class MessageLookup extends MessageLookupByLibrary {
     "attr_rock_climbing": MessageLookupByLibrary.simpleMessage(
       "Klinšu kāpšana",
     ),
-    "attr_rpg_games": MessageLookupByLibrary.simpleMessage("RPG spēles"),
-    "attr_running": MessageLookupByLibrary.simpleMessage("Skriešana"),
+    "attr_sales": MessageLookupByLibrary.simpleMessage("Pārdošana"),
     "attr_scrap_metal": MessageLookupByLibrary.simpleMessage("Lūžņu metāls"),
     "attr_sculpting": MessageLookupByLibrary.simpleMessage("Tēlniecība"),
     "attr_self_sufficiency": MessageLookupByLibrary.simpleMessage(
       "Pašpietiekamība",
     ),
     "attr_sewing": MessageLookupByLibrary.simpleMessage("Šūšana"),
-    "attr_shepherding": MessageLookupByLibrary.simpleMessage("Ganu darbs"),
     "attr_shoemaking": MessageLookupByLibrary.simpleMessage("Kurpnieku darbs"),
-    "attr_singing": MessageLookupByLibrary.simpleMessage("Dziedāšana"),
-    "attr_skateboarding": MessageLookupByLibrary.simpleMessage("Skrituļošana"),
-    "attr_sketching": MessageLookupByLibrary.simpleMessage("Skicēšana"),
-    "attr_soapmaking": MessageLookupByLibrary.simpleMessage(
-      "Ziepju darināšana",
-    ),
     "attr_social_media": MessageLookupByLibrary.simpleMessage(
       "Sociālie mediji",
     ),
     "attr_socializing": MessageLookupByLibrary.simpleMessage("Socializēšanās"),
+    "attr_software_accounts": MessageLookupByLibrary.simpleMessage(
+      "Programmatūras konti",
+    ),
     "attr_software_development": MessageLookupByLibrary.simpleMessage(
       "Programmatūras izstrāde",
     ),
     "attr_spare_parts": MessageLookupByLibrary.simpleMessage("Rezerves daļas"),
     "attr_spirituality": MessageLookupByLibrary.simpleMessage("Garīgums"),
-    "attr_sports": MessageLookupByLibrary.simpleMessage("Sports"),
     "attr_sports_coaching": MessageLookupByLibrary.simpleMessage(
       "Sporta trenēšana",
+    ),
+    "attr_sports_equipment": MessageLookupByLibrary.simpleMessage(
+      "Sporta aprīkojums",
     ),
     "attr_stand_up_comedy": MessageLookupByLibrary.simpleMessage(
       "Stendup komēdija",
     ),
-    "attr_storytelling": MessageLookupByLibrary.simpleMessage(
-      "Stāstu stāstīšana",
-    ),
     "attr_study_partner": MessageLookupByLibrary.simpleMessage(
       "Studiju partneris",
     ),
-    "attr_sudoku": MessageLookupByLibrary.simpleMessage("Sudoku"),
     "attr_sustainable_living": MessageLookupByLibrary.simpleMessage(
       "Ilgtspējīga dzīvesveida",
     ),
-    "attr_table_tennis": MessageLookupByLibrary.simpleMessage("Galda teniss"),
     "attr_tea": MessageLookupByLibrary.simpleMessage("Tēja"),
     "attr_technical_writing": MessageLookupByLibrary.simpleMessage(
       "Tehniskā rakstīšana",
     ),
-    "attr_technician": MessageLookupByLibrary.simpleMessage("Tehniķis"),
     "attr_tennis": MessageLookupByLibrary.simpleMessage("Teniss"),
-    "attr_thrifting": MessageLookupByLibrary.simpleMessage(
-      "Lietotu lietu iepirkšanās",
-    ),
-    "attr_tiny_homes": MessageLookupByLibrary.simpleMessage("Mazās mājas"),
     "attr_tool_lending": MessageLookupByLibrary.simpleMessage(
       "Instrumentu aizdošana",
     ),
-    "attr_tractor": MessageLookupByLibrary.simpleMessage("Traktors"),
     "attr_translation_services": MessageLookupByLibrary.simpleMessage(
       "Tulkošanas pakalpojumi",
     ),
-    "attr_traveling": MessageLookupByLibrary.simpleMessage("Ceļošana"),
-    "attr_trees": MessageLookupByLibrary.simpleMessage("Koki"),
-    "attr_truck_driving": MessageLookupByLibrary.simpleMessage(
-      "Kravas auto vadīšana",
+    "attr_transport_service": MessageLookupByLibrary.simpleMessage(
+      "Transporta pakalpojums",
     ),
+    "attr_traveling": MessageLookupByLibrary.simpleMessage("Ceļošana"),
     "attr_upcycling": MessageLookupByLibrary.simpleMessage("Pārstrāde"),
     "attr_urban_exploration": MessageLookupByLibrary.simpleMessage(
       "Urbānā pētīšana",
     ),
-    "attr_used_books": MessageLookupByLibrary.simpleMessage(
-      "Lietotas grāmatas",
-    ),
     "attr_used_electronics": MessageLookupByLibrary.simpleMessage(
       "Lietota elektronika",
     ),
-    "attr_used_furniture": MessageLookupByLibrary.simpleMessage(
-      "Lietotas mēbeles",
-    ),
     "attr_ux_design": MessageLookupByLibrary.simpleMessage("UX dizains"),
-    "attr_vegetable_harvesting": MessageLookupByLibrary.simpleMessage(
-      "Dārzeņu novākšana",
-    ),
+    "attr_vegetables": MessageLookupByLibrary.simpleMessage("Dārzeņi"),
     "attr_vehicle_repair": MessageLookupByLibrary.simpleMessage(
       "Transportlīdzekļu remonts",
     ),
     "attr_video_editing": MessageLookupByLibrary.simpleMessage(
       "Video rediģēšana",
     ),
-    "attr_video_game_consoles": MessageLookupByLibrary.simpleMessage(
-      "Videospēļu konsoles",
-    ),
     "attr_video_game_developing": MessageLookupByLibrary.simpleMessage(
       "Videospēļu izstrāde",
     ),
-    "attr_vintage_clothing": MessageLookupByLibrary.simpleMessage(
-      "Vintage apģērbs",
+    "attr_video_game_hardware": MessageLookupByLibrary.simpleMessage(
+      "Videospēļu aparatūra",
+    ),
+    "attr_virtual_assistance": MessageLookupByLibrary.simpleMessage(
+      "Virtuālā asistēšana",
     ),
     "attr_virtual_reality": MessageLookupByLibrary.simpleMessage(
       "Virtuālā realitāte",
@@ -627,15 +725,17 @@ class MessageLookup extends MessageLookupByLibrary {
       "Brīvprātīgais darbs",
     ),
     "attr_weaving": MessageLookupByLibrary.simpleMessage("Aušana"),
+    "attr_web_development": MessageLookupByLibrary.simpleMessage(
+      "Tīmekļa izstrāde",
+    ),
     "attr_weight_training": MessageLookupByLibrary.simpleMessage("Svarcelšana"),
     "attr_welding": MessageLookupByLibrary.simpleMessage("Metināšana"),
-    "attr_window_cleaning": MessageLookupByLibrary.simpleMessage(
-      "Logu tīrīšana",
-    ),
     "attr_wood_carving": MessageLookupByLibrary.simpleMessage("Koka griešana"),
     "attr_woodworking": MessageLookupByLibrary.simpleMessage("Galdniecība"),
+    "attr_workout_planning": MessageLookupByLibrary.simpleMessage(
+      "Treniņu plānošana",
+    ),
     "attr_writing": MessageLookupByLibrary.simpleMessage("Rakstīšana"),
-    "attr_yard_work": MessageLookupByLibrary.simpleMessage("Pagalma darbi"),
     "attr_yoga": MessageLookupByLibrary.simpleMessage("Joga"),
     "attr_zen": MessageLookupByLibrary.simpleMessage("Zen"),
     "attr_zumba": MessageLookupByLibrary.simpleMessage("Zumba"),
@@ -647,6 +747,96 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "attributes": MessageLookupByLibrary.simpleMessage("Atribūti"),
     "attributesSelected": MessageLookupByLibrary.simpleMessage("izvēlēti"),
+    "avatarShopAvatarAlreadySelected": MessageLookupByLibrary.simpleMessage(
+      "Šis avatārs jau ir atlasīts.",
+    ),
+    "avatarShopBalance": m0,
+    "avatarShopBuyButton": m1,
+    "avatarShopDescription": MessageLookupByLibrary.simpleMessage(
+      "Nopērc un uzreiz uzliec pielāgotu avatāra ikonu.",
+    ),
+    "avatarShopEachAvatarPrice": m2,
+    "avatarShopEquip": MessageLookupByLibrary.simpleMessage("Aprīkot"),
+    "avatarShopLoadFailed": m3,
+    "avatarShopNeedCoins": m4,
+    "avatarShopNotEnoughCoins": m5,
+    "avatarShopPurchaseFailed": m6,
+    "avatarShopPurchaseSuccess": MessageLookupByLibrary.simpleMessage(
+      "Avatārs veiksmīgi nopirkts un uzlikts.",
+    ),
+    "avatarShopRefresh": MessageLookupByLibrary.simpleMessage("Atjaunot"),
+    "avatarShopSelected": MessageLookupByLibrary.simpleMessage("Atlasīts"),
+    "avatarShopTitle": MessageLookupByLibrary.simpleMessage("Avatāru veikals"),
+    "avatarShopUnableToProcessPurchase": MessageLookupByLibrary.simpleMessage(
+      "Šobrīd pirkumu nevar apstrādāt.",
+    ),
+    "badgeCommunityConnectorDescription": MessageLookupByLibrary.simpleMessage(
+      "Augsta dažādība sadarbības partneros.",
+    ),
+    "badgeCommunityConnectorTitle": MessageLookupByLibrary.simpleMessage(
+      "Kopienas savienotājs",
+    ),
+    "badgeDisputeFreeDescription": MessageLookupByLibrary.simpleMessage(
+      "Nav bijuši strīdīgi darījumi.",
+    ),
+    "badgeDisputeFreeTitle": MessageLookupByLibrary.simpleMessage(
+      "Bez strīdiem",
+    ),
+    "badgeEarnedStatus": MessageLookupByLibrary.simpleMessage("Nopelnīta"),
+    "badgeFastTraderDescription": MessageLookupByLibrary.simpleMessage(
+      "Pabeidz maiņas ātrāk nekā vidēji.",
+    ),
+    "badgeFastTraderTitle": MessageLookupByLibrary.simpleMessage(
+      "Ātrs un uzticams",
+    ),
+    "badgeIdentityVerifiedDescription": MessageLookupByLibrary.simpleMessage(
+      "Lietotājs ir pabeidzis identitātes verifikāciju.",
+    ),
+    "badgeIdentityVerifiedTitle": MessageLookupByLibrary.simpleMessage(
+      "Identitāte verificēta",
+    ),
+    "badgeNotEarnedStatus": MessageLookupByLibrary.simpleMessage(
+      "Nav nopelnīta",
+    ),
+    "badgePremiumUserDescription": MessageLookupByLibrary.simpleMessage(
+      "Lietotājam ir aktīvs Premium abonements.",
+    ),
+    "badgePremiumUserTitle": MessageLookupByLibrary.simpleMessage(
+      "Premium lietotājs",
+    ),
+    "badgeQuickResponderDescription": MessageLookupByLibrary.simpleMessage(
+      "Parasti atbild 24 stundu laikā.",
+    ),
+    "badgeQuickResponderTitle": MessageLookupByLibrary.simpleMessage(
+      "Ātrs atbildētājs",
+    ),
+    "badgeTop1000Description": MessageLookupByLibrary.simpleMessage(
+      "Lietotājs bija starp pirmajiem 1000 reģistrētajiem lietotājiem.",
+    ),
+    "badgeTop1000Title": MessageLookupByLibrary.simpleMessage(
+      "Agrīnais lietotājs - pirmie 1000",
+    ),
+    "badgeTopRatedDescription": MessageLookupByLibrary.simpleMessage(
+      "Vidējais vērtējums 4.8+ ar vismaz 50 atsauksmēm.",
+    ),
+    "badgeTopRatedTitle": MessageLookupByLibrary.simpleMessage("Top vērtēts"),
+    "badgeVerifiedBusinessDescription": MessageLookupByLibrary.simpleMessage(
+      "Biznesa reģistrācija ir verificēta.",
+    ),
+    "badgeVerifiedBusinessTitle": MessageLookupByLibrary.simpleMessage(
+      "Verificēts bizness",
+    ),
+    "badgeVeteranTraderDescription": MessageLookupByLibrary.simpleMessage(
+      "Lietotājs ir pabeidzis 100+ veiksmīgas maiņas.",
+    ),
+    "badgeVeteranTraderTitle": MessageLookupByLibrary.simpleMessage(
+      "Pieredzējis tirgotājs",
+    ),
+    "badgesTitle": MessageLookupByLibrary.simpleMessage("Nozīmītes"),
+    "barterCoinsInfoMessage": MessageLookupByLibrary.simpleMessage(
+      "Monētas var nopelnīt, sniedzot pakalpojumu vai aktīvi lietojot lietotni.\n\nMonētas var tērēt: izcelšanās kartē, sludinājumu izcelšana, speciālas avatara ikonas",
+    ),
+    "barterCoinsTitle": MessageLookupByLibrary.simpleMessage("Bartera monētas"),
     "beSpecificAndConstructive": MessageLookupByLibrary.simpleMessage(
       "Esiet konkrēts un konstruktīvs",
     ),
@@ -655,7 +845,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "blockUserConfirmation": MessageLookupByLibrary.simpleMessage(
       "Vai tiešām vēlaties bloķēt šo lietotāju? Jūs vairs nevarēsiet ar viņiem sazināties.",
     ),
-    "blockUserConfirmationDetailed": m0,
+    "blockUserConfirmationDetailed": m7,
+    "bonusTipOptional": MessageLookupByLibrary.simpleMessage(
+      "Bonuss / dzeramnauda (neobligāti)",
+    ),
+    "buyPremium": MessageLookupByLibrary.simpleMessage("Pirkt Premium"),
     "camera": MessageLookupByLibrary.simpleMessage("Kamera"),
     "cancel": MessageLookupByLibrary.simpleMessage("Atcelt"),
     "cannotSendFileNoRecipientKey": MessageLookupByLibrary.simpleMessage(
@@ -723,7 +917,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Tehnoloģijas, mācīšanās, izglītība, inovācija, ideju ģenerēšana, zinātne, programmatūra",
     ),
     "category_yellow": MessageLookupByLibrary.simpleMessage(
-      "Saruna, sabiedriskas aktivitātes, ikdienas sarunas, vietējie pasākumi, jauni kontakti, komunikācija",
+      "Sarunas, sabiedriskas aktivitātes, ikdienas sarunas, vietējie pasākumi, jauni kontakti, komunikācija",
     ),
     "changeSecurityQuestion": MessageLookupByLibrary.simpleMessage(
       "Mainīt drošības jautājumu",
@@ -732,10 +926,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "chatError_Offline": MessageLookupByLibrary.simpleMessage(
       "Lietotājs bezsaistē",
     ),
+    "chatOpenFailed": MessageLookupByLibrary.simpleMessage(
+      "Šobrīd nevar atvērt šo čatu. Lūdzu, mēģiniet vēlreiz.",
+    ),
     "chats": MessageLookupByLibrary.simpleMessage("Čati"),
     "chooseFromGallery": MessageLookupByLibrary.simpleMessage(
       "Izvēlēties no iekārtas",
     ),
+    "clear": MessageLookupByLibrary.simpleMessage("Notīrīt"),
     "clearQuietHours": MessageLookupByLibrary.simpleMessage(
       "Notīrīt klusās stundas",
     ),
@@ -743,6 +941,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "closeLocations": MessageLookupByLibrary.simpleMessage(
       "Aizvērt atrašanās vietas",
     ),
+    "codeCopied": MessageLookupByLibrary.simpleMessage(
+      "Pārcelšanas kods nokopēts starpliktuvē",
+    ),
+    "codeSentTo": m8,
     "completeSetup": MessageLookupByLibrary.simpleMessage(
       "Pabeigt iestatīšanu",
     ),
@@ -763,11 +965,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "copiedToClipboard": MessageLookupByLibrary.simpleMessage(
       "Nokopēts starpliktuvē",
     ),
+    "copyCode": MessageLookupByLibrary.simpleMessage("Kopēt kodu"),
     "copyLink": MessageLookupByLibrary.simpleMessage("Kopēt saiti"),
     "couldNotFindChatParticipant": MessageLookupByLibrary.simpleMessage(
       "Neizdevās atrast sarunas dalībnieku",
     ),
-    "couldNotOpenFile": m1,
+    "couldNotOpenFile": m9,
+    "couldNotOpenFileGeneric": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās atvērt šo failu. Lūdzu, mēģiniet citu lietotni vai pārbaudiet faila ceļu.",
+    ),
     "create5DigitPin": MessageLookupByLibrary.simpleMessage(
       "Izveidojiet 5 ciparu PIN kodu",
     ),
@@ -780,13 +986,40 @@ class MessageLookup extends MessageLookupByLibrary {
     "createPosting": MessageLookupByLibrary.simpleMessage(
       "Izveidot sludinājumu",
     ),
+    "createPostingBoost3Days": MessageLookupByLibrary.simpleMessage(
+      "3 dienas (20 monētas)",
+    ),
+    "createPostingBoost7Days": MessageLookupByLibrary.simpleMessage(
+      "7 dienas (50 monētas)",
+    ),
+    "createPostingBoostDescription": MessageLookupByLibrary.simpleMessage(
+      "Tērē monētas, lai izceltu šo sludinājumu meklēšanas rezultātos.",
+    ),
+    "createPostingBoostInsufficientCoins": MessageLookupByLibrary.simpleMessage(
+      "Nepietiek monētu izvēlētajam boost.",
+    ),
+    "createPostingBoostNone": MessageLookupByLibrary.simpleMessage("Bez boost"),
+    "createPostingBoostTitle": MessageLookupByLibrary.simpleMessage(
+      "Redzamības boost",
+    ),
     "createPreferences": MessageLookupByLibrary.simpleMessage(
       "Saglabāt preferences",
     ),
     "createYourFirstWishlistItem": MessageLookupByLibrary.simpleMessage(
       "Izveidojiet savu pirmo vēlmju saraksta vienumu, lai saņemtu paziņojumus, kad parādās atbilstības",
     ),
+    "currentWalletBalance": m10,
     "daily": MessageLookupByLibrary.simpleMessage("Ikdienas"),
+    "dataExportEmailRequired": MessageLookupByLibrary.simpleMessage(
+      "Lūdzu, pievienojiet e-pastu paziņojumu preferencēs pirms datu eksporta pieprasījuma.",
+    ),
+    "dataExportRequestAccepted": MessageLookupByLibrary.simpleMessage(
+      "Jūsu datu eksporta pieprasījums ir pieņemts.",
+    ),
+    "dataExportRequestFailed": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās pieprasīt datu eksportu.",
+    ),
+    "decryptingFile": m11,
     "defaultSettings": MessageLookupByLibrary.simpleMessage(
       "Noklusējuma iestatījumi",
     ),
@@ -819,6 +1052,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteWishlistItemConfirmation": MessageLookupByLibrary.simpleMessage(
       "Vai tiešām vēlaties dzēst šo vēlmju saraksta vienumu?",
     ),
+    "deny": MessageLookupByLibrary.simpleMessage("Aizliegt"),
     "dismiss": MessageLookupByLibrary.simpleMessage("Noraidīt"),
     "dismissMatch": MessageLookupByLibrary.simpleMessage("Noraidīt atbilstību"),
     "dismissMatchConfirmation": MessageLookupByLibrary.simpleMessage(
@@ -826,11 +1060,11 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "dismissed": MessageLookupByLibrary.simpleMessage("Noraidīts"),
     "done": MessageLookupByLibrary.simpleMessage("Gatavs"),
-    "downloadFailed": m2,
+    "downloadFailed": m12,
     "downloadStarted": MessageLookupByLibrary.simpleMessage(
       "Lejupielāde sākta! Pārbaudiet savu lejupielāžu mapi",
     ),
-    "downloadingFile": m3,
+    "downloadingFile": m13,
     "drawer_menu_complementary_users": MessageLookupByLibrary.simpleMessage(
       "Atrast papildinošus lietotājus",
     ),
@@ -859,20 +1093,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "emailInvalid": MessageLookupByLibrary.simpleMessage(
       "Lūdzu, ievadiet derīgu e-pasta adresi",
     ),
+    "emailNotificationPreferences": MessageLookupByLibrary.simpleMessage(
+      "E-pasta iestatījumi",
+    ),
     "emailRequired": MessageLookupByLibrary.simpleMessage(
       "E-pasta adrese ir obligāta",
     ),
     "emailSaved": MessageLookupByLibrary.simpleMessage(
       "E-pasta adrese veiksmīgi saglabāta",
     ),
-    "marketingConsentLabel": MessageLookupByLibrary.simpleMessage(
-      "Piekrītu saņemt mārketinga e-pastus par jaunām funkcijām, piedāvājumiem un atjauninājumiem",
+    "emailUnsubscribe": MessageLookupByLibrary.simpleMessage(
+      "Atteikties no abonēšanas",
     ),
-    "marketingConsentDescription": MessageLookupByLibrary.simpleMessage(
-      "Mēs varam jums nosūtīt reizēm e-pastus par mūsu pakalpojumiem. Jūs jebkurā laikā varat atteikties no abonēšanas.",
-    ),
-    "marketingConsentRequired": MessageLookupByLibrary.simpleMessage(
-      "Lūdzu, piekrītiet saņemt mārketinga e-pastus, lai turpinātu",
+    "emailUnsubscribed": MessageLookupByLibrary.simpleMessage(
+      "Atteikšanās veiksmīga",
     ),
     "emailUpdated": MessageLookupByLibrary.simpleMessage("E-pasts atjaunināts"),
     "enableNotifications": MessageLookupByLibrary.simpleMessage(
@@ -882,6 +1116,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Saņemt paziņojumus par atbilstībām un atjauninājumiem",
     ),
     "endTime": MessageLookupByLibrary.simpleMessage("Beigu laiks"),
+    "enterBonusAmount": MessageLookupByLibrary.simpleMessage(
+      "Ievadiet bonusa summu",
+    ),
     "enterNewPinDescription": MessageLookupByLibrary.simpleMessage(
       "Ievadiet jaunu 5 ciparu PIN kodu",
     ),
@@ -896,7 +1133,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Ievadiet savu PIN kodu",
     ),
     "error": MessageLookupByLibrary.simpleMessage("Kļūda"),
-    "errorCreatingTransaction": m4,
+    "errorCreatingTransaction": m14,
     "errorCreatingWishlistItem": MessageLookupByLibrary.simpleMessage(
       "Kļūda vēlmju saraksta vienuma izveidē",
     ),
@@ -912,7 +1149,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "errorDuringInitialization": MessageLookupByLibrary.simpleMessage(
       "Kļūda inicializācijas laikā.",
     ),
-    "errorFindingLocation": m5,
+    "errorFindingLocation": m15,
     "errorLoadingAttributes": MessageLookupByLibrary.simpleMessage(
       "Kļūda atribūtu ielādē",
     ),
@@ -925,25 +1162,42 @@ class MessageLookup extends MessageLookupByLibrary {
     "errorLoadingWishlist": MessageLookupByLibrary.simpleMessage(
       "Kļūda vēlmju saraksta ielādē",
     ),
-    "errorOpeningFile": m6,
+    "errorOpeningFile": m16,
     "errorUpdatingFavorite": MessageLookupByLibrary.simpleMessage(
-      "Kļūda iecienītā atjaunināšanā",
+      "Kļūda iecienītā lietotāja atjaunināšanā",
     ),
-    "errorUpdatingTransaction": m7,
+    "errorUpdatingTransaction": m17,
     "errorUpdatingWishlistItem": MessageLookupByLibrary.simpleMessage(
       "Kļūda vēlmju saraksta vienuma atjaunināšanā",
     ),
     "errorVerifyingPin": MessageLookupByLibrary.simpleMessage(
       "Kļūda, pārbaudot PIN",
     ),
-    "errorWithException": m8,
-    "errorWithMessage": m9,
+    "errorWithException": m18,
+    "errorWithMessage": m19,
     "expirationDate": MessageLookupByLibrary.simpleMessage("Derīguma termiņš"),
+    "expired": MessageLookupByLibrary.simpleMessage("Beidzies"),
     "expires": MessageLookupByLibrary.simpleMessage("Derīgs līdz"),
+    "expiresIn": m20,
     "expiresPrefix": MessageLookupByLibrary.simpleMessage("Derīgs līdz"),
     "eyes": MessageLookupByLibrary.simpleMessage("Acis"),
     "failedToBlockUser": MessageLookupByLibrary.simpleMessage(
       "Neizdevās bloķēt lietotāju",
+    ),
+    "failedToJoinMigration": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās pievienoties pārcelšanas sesijai",
+    ),
+    "failedToProcessMigration": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās apstrādāt pārcelšanas datus",
+    ),
+    "failedToSendCode": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās nosūtīt atjaunošanas kodu",
+    ),
+    "failedToSendMigration": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās nosūtīt pārcelšanas datus",
+    ),
+    "failedToSubmitAppeal": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās iesniegt apelāciju",
     ),
     "failedToSubmitReport": MessageLookupByLibrary.simpleMessage(
       "Neizdevās iesniegt ziņojumu. Lūdzu, mēģiniet vēlreiz.",
@@ -951,17 +1205,26 @@ class MessageLookup extends MessageLookupByLibrary {
     "failedToSubmitReview": MessageLookupByLibrary.simpleMessage(
       "Neizdevās iesniegt atsauksmi",
     ),
-    "failedToSubmitAppeal": MessageLookupByLibrary.simpleMessage(
-      "Neizdevās iesniegt apelāciju",
-    ),
     "failedToUnblockUser": MessageLookupByLibrary.simpleMessage(
       "Neizdevās atbloķēt lietotāju",
     ),
     "falseReportsWarning": MessageLookupByLibrary.simpleMessage(
       "Viltus ziņojumi var izraisīt soda sankcijas jūsu kontam.",
     ),
-    "fileNotFound": m10,
-    "fileSavedAt": m11,
+    "fileDecryptKeyMissing": MessageLookupByLibrary.simpleMessage(
+      "Šo failu vēl nevar atšifrēt. Mēģiniet vēlreiz, kad čata atslēgas būs sinhronizētas.",
+    ),
+    "fileDownloadFailed": MessageLookupByLibrary.simpleMessage(
+      "Šobrīd failu lejupielādēt neizdevās. Lūdzu, mēģiniet vēlreiz.",
+    ),
+    "fileNotFound": m21,
+    "fileReadFailed": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās nolasīt izvēlēto failu. Lūdzu, izvēlieties citu failu.",
+    ),
+    "fileSavedAt": m22,
+    "fileSendFailed": MessageLookupByLibrary.simpleMessage(
+      "Šobrīd failu nosūtīt neizdevās. Lūdzu, mēģiniet vēlreiz.",
+    ),
     "fileSentSuccessfully": MessageLookupByLibrary.simpleMessage(
       "Fails veiksmīgi nosūtīts!",
     ),
@@ -978,11 +1241,64 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "frequency": MessageLookupByLibrary.simpleMessage("Biežums"),
     "gallery": MessageLookupByLibrary.simpleMessage("Iekārta"),
+    "gdprConsentAccept": MessageLookupByLibrary.simpleMessage(
+      "Turpināt (Piekrītot lietošanas noteikumiem)",
+    ),
+    "gdprConsentAiDescription": MessageLookupByLibrary.simpleMessage(
+      "Analizē profilu un iestatījumus, lai uzlabotu ieteikumus un atbilstību.",
+    ),
+    "gdprConsentAiLabel": MessageLookupByLibrary.simpleMessage(
+      "Neobligāti: MI palīdzēta atbilstība",
+    ),
+    "gdprConsentDecline": MessageLookupByLibrary.simpleMessage("Ne tagad"),
+    "gdprConsentIntro": MessageLookupByLibrary.simpleMessage(
+      "Pirms turpināt, lūdzu, pārskatiet un izvēlieties, kā tiek apstrādāti jūsu dati.",
+    ),
+    "gdprConsentLocationDescription": MessageLookupByLibrary.simpleMessage(
+      "Izmantojiet atrašanās vietu, lai atrastu atbilstošākos lietotājus tuvumā",
+    ),
+    "gdprConsentLocationLabel": MessageLookupByLibrary.simpleMessage(
+      "Neobligāti: atrašanās vietas apstrāde",
+    ),
+    "gdprConsentManageLater": MessageLookupByLibrary.simpleMessage(
+      "Šīs izvēles varēsiet mainīt vēlāk iestatījumos.",
+    ),
+    "gdprConsentRequiredDescription": MessageLookupByLibrary.simpleMessage(
+      "Nepieciešams konta izveidei, lietotāju atbilstībām un drošai saziņai.",
+    ),
+    "gdprConsentRequiredLabel": MessageLookupByLibrary.simpleMessage(
+      "Obligāti: pamatpakalpojuma apstrāde",
+    ),
+    "gdprConsentTitle": MessageLookupByLibrary.simpleMessage(
+      "Privātuma un datu piekrišana",
+    ),
+    "gdprCookiesAnalyticsDescription": MessageLookupByLibrary.simpleMessage(
+      "Palīdz saprast lietojumu un uzlabot veiktspēju. Tās tiek izmantotas tikai ar jūsu piekrišanu.",
+    ),
+    "gdprCookiesAnalyticsLabel": MessageLookupByLibrary.simpleMessage(
+      "Neobligātās analītikas sīkdatnes",
+    ),
+    "gdprCookiesRequiredDescription": MessageLookupByLibrary.simpleMessage(
+      "Nepieciešamas pamatfunkcijām: drošībai, sesiju uzturēšanai un būtisko iestatījumu saglabāšanai.",
+    ),
+    "gdprCookiesRequiredLabel": MessageLookupByLibrary.simpleMessage(
+      "Obligātās sīkdatnes",
+    ),
+    "gdprCookiesSectionTitle": MessageLookupByLibrary.simpleMessage(
+      "Sīkdatnes (Web)",
+    ),
     "generateAvatar": MessageLookupByLibrary.simpleMessage("Ģenerēt avatāru"),
     "generateCryptoWallet": MessageLookupByLibrary.simpleMessage(
       "Ģenerēt kriptomaciņu",
     ),
+    "generateMigrationCode": MessageLookupByLibrary.simpleMessage(
+      "Ģenerēt pārcelšanas kodu",
+    ),
+    "generateNewCode": MessageLookupByLibrary.simpleMessage(
+      "Ģenerēt jaunu kodu",
+    ),
     "generateWallet": MessageLookupByLibrary.simpleMessage("Ģenerēt maciņu"),
+    "generating": MessageLookupByLibrary.simpleMessage("Ģenerē..."),
     "getStarted": MessageLookupByLibrary.simpleMessage("Sākt"),
     "goBack": MessageLookupByLibrary.simpleMessage("Atpakaļ"),
     "googleSignInNotImplemented": MessageLookupByLibrary.simpleMessage(
@@ -1010,9 +1326,54 @@ class MessageLookup extends MessageLookupByLibrary {
     "hairStyle": MessageLookupByLibrary.simpleMessage("Matu stils"),
     "howDidItGo": MessageLookupByLibrary.simpleMessage("Kā gāja? *"),
     "howItWorks": MessageLookupByLibrary.simpleMessage("Kā tas darbojas"),
+    "importAccount": MessageLookupByLibrary.simpleMessage("Ievietot kontu"),
+    "importAccountDescription": MessageLookupByLibrary.simpleMessage(
+      "Ievadiet 10 rakstzīmju pārcelšanas kodu no savas citas ierīces, lai importētu konta datus.",
+    ),
+    "importExistingAccount": MessageLookupByLibrary.simpleMessage(
+      "Importēt eksistējošu kontu",
+    ),
+    "inAppFailedToInitializePurchases": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās inicializēt pirkumus",
+    ),
+    "inAppFailedToLoadOfferings": MessageLookupByLibrary.simpleMessage(
+      "Neizdevās ielādēt piedāvājumus",
+    ),
+    "inAppNoActivePremiumPurchasesToRestore":
+        MessageLookupByLibrary.simpleMessage(
+          "Nav atrasti aktīvi Premium pirkumi atjaunošanai.",
+        ),
+    "inAppNoPremiumPackagesAvailable": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik nav pieejamu Premium paku.",
+    ),
+    "inAppPremiumActivatedSuccessfully": MessageLookupByLibrary.simpleMessage(
+      "Premium veiksmīgi aktivizēts.",
+    ),
+    "inAppPremiumRestoredSuccessfully": MessageLookupByLibrary.simpleMessage(
+      "Premium veiksmīgi atjaunots.",
+    ),
+    "inAppPurchaseCancelled": MessageLookupByLibrary.simpleMessage(
+      "Pirkums atcelts.",
+    ),
+    "inAppPurchaseCompletedEntitlementNotActiveYet":
+        MessageLookupByLibrary.simpleMessage(
+          "Pirkums pabeigts, bet piekļuve vēl nav aktivizēta.",
+        ),
+    "inAppPurchaseFailed": MessageLookupByLibrary.simpleMessage(
+      "Pirkums neizdevās",
+    ),
+    "inAppRestoreFailed": MessageLookupByLibrary.simpleMessage(
+      "Atjaunošana neizdevās",
+    ),
+    "inAppRevenueCatApiKeyMissing": MessageLookupByLibrary.simpleMessage(
+      "Trūkst RevenueCat API atslēgas.",
+    ),
     "instant": MessageLookupByLibrary.simpleMessage("Tūlītējs"),
     "interest": MessageLookupByLibrary.simpleMessage("Interese"),
-    "inviteMessageShare": m12,
+    "invalidCode": MessageLookupByLibrary.simpleMessage(
+      "Nederīgs atjaunošanas kods",
+    ),
+    "inviteMessageShare": m23,
     "inviteMessageSubject": MessageLookupByLibrary.simpleMessage(
       "Pievienojies man BarterApp!",
     ),
@@ -1022,15 +1383,32 @@ class MessageLookup extends MessageLookupByLibrary {
     "languageGerman": MessageLookupByLibrary.simpleMessage("Deutsch"),
     "languageLatvian": MessageLookupByLibrary.simpleMessage("Latviešu"),
     "languageSpanish": MessageLookupByLibrary.simpleMessage("Español"),
+    "lastOnlineDaysAgo": m24,
+    "lastOnlineHoursAgo": m25,
+    "lastOnlineJustNow": MessageLookupByLibrary.simpleMessage("tikko"),
+    "lastOnlineMinutesAgo": m26,
+    "lastOnlinePrefix": MessageLookupByLibrary.simpleMessage(
+      "Pēdējoreiz tiešsaistē:",
+    ),
+    "lastOnlineUnknown": MessageLookupByLibrary.simpleMessage("Nezināms"),
     "linkCopiedToClipboard": MessageLookupByLibrary.simpleMessage(
       "Saite nokopēta starpliktuvē!",
     ),
     "loading": MessageLookupByLibrary.simpleMessage("Notiek ielāde..."),
+    "loadingWalletBalance": MessageLookupByLibrary.simpleMessage(
+      "Ielādē maka atlikumu...",
+    ),
     "locationNotFound": MessageLookupByLibrary.simpleMessage(
       "Atrašanās vieta nav atrasta.",
     ),
+    "locationPermissionRequiredDescription": MessageLookupByLibrary.simpleMessage(
+      "Atrašanās vietas atļauja ir nepieciešama, lai izmantotu GPS atrašanās vietas izsekošanu. Lūdzu, iespējojiet atrašanās vietas atļauju ierīces iestatījumos.",
+    ),
     "locationSaved": MessageLookupByLibrary.simpleMessage(
       "Atrašanās vieta saglabāta!",
+    ),
+    "locationSetAtMarkerInfo": MessageLookupByLibrary.simpleMessage(
+      "Jūsu atrašanās vieta tiks iestatīta marķiera atrašanās vietā",
     ),
     "locations": MessageLookupByLibrary.simpleMessage("Atrašanās vietas"),
     "lookingFor": MessageLookupByLibrary.simpleMessage("Meklē"),
@@ -1047,25 +1425,92 @@ class MessageLookup extends MessageLookupByLibrary {
     "markAsViewed": MessageLookupByLibrary.simpleMessage(
       "Atzīmēt kā apskatītu",
     ),
+    "marketingConsentDescription": MessageLookupByLibrary.simpleMessage(
+      "Mēs reizēm varam jums nosūtīt e-pastus par mūsu pakalpojumiem. Jūs jebkurā laikā varat atteikties no abonēšanas.",
+    ),
+    "marketingConsentLabel": MessageLookupByLibrary.simpleMessage(
+      "Piekrītu saņemt e-pastus par jauniem piedāvājumiem, iespējām un atjauninājumiem",
+    ),
     "match": MessageLookupByLibrary.simpleMessage("Atbilstība"),
     "matchDismissed": MessageLookupByLibrary.simpleMessage(
       "Atbilstība noraidīta",
     ),
     "matchHistory": MessageLookupByLibrary.simpleMessage("Atbilstību vēsture"),
+    "matchLabel": MessageLookupByLibrary.simpleMessage("Atbilstība:"),
     "matchScore": MessageLookupByLibrary.simpleMessage("Atbilstības rādītājs"),
     "matches": MessageLookupByLibrary.simpleMessage("Atbilstības"),
+    "matchingPostingsFound": m27,
+    "matchingUsersFound": m28,
     "maxImagesReached": MessageLookupByLibrary.simpleMessage(
       "Maksimums 3 attēli atļauti",
+    ),
+    "migrateToNewDevice": MessageLookupByLibrary.simpleMessage(
+      "Pārcelt uz jaunu ierīci",
+    ),
+    "migrateYourAccount": MessageLookupByLibrary.simpleMessage(
+      "Pārcelt savu kontu",
+    ),
+    "migrationCodeDescription": MessageLookupByLibrary.simpleMessage(
+      "Ģenerējiet pārcelšanas kodu, lai pārsūtītu konta datus uz jaunu ierīci. Kods būs derīgs 15 minūtes.",
+    ),
+    "migrationCodeExpired": MessageLookupByLibrary.simpleMessage(
+      "Pārcelšanas kods ir beidzies. Lūdzu, ģenerējiet jaunu.",
+    ),
+    "migrationCompleted": MessageLookupByLibrary.simpleMessage(
+      "Pārcelšana pabeigta veiksmīgi!",
+    ),
+    "migrationDenied": MessageLookupByLibrary.simpleMessage(
+      "Pārcelšana aizliegta lietotāja",
+    ),
+    "migrationStep1": MessageLookupByLibrary.simpleMessage(
+      "Ģenerējiet pārcelšanas kodu",
+    ),
+    "migrationStep2": MessageLookupByLibrary.simpleMessage(
+      "Atveriet lietotni jaunajā ierīcē",
+    ),
+    "migrationStep3": MessageLookupByLibrary.simpleMessage(
+      "Sākumekrānā pieskarieties \"Ievietot esošo kontu\"",
+    ),
+    "migrationStep4": MessageLookupByLibrary.simpleMessage(
+      "Ievadiet šo kodu jaunajā ierīcē",
+    ),
+    "migrationTimedOut": MessageLookupByLibrary.simpleMessage(
+      "Pārcelšanas laiks beidzies. Lūdzu, mēģiniet vēlreiz ar jaunu kodu.",
     ),
     "minMatchScore": MessageLookupByLibrary.simpleMessage(
       "Min. atbilstības rādītājs",
     ),
-    "mockPoiNotFound": m13,
-    "mockPoiNotFoundForUpdate": m14,
+    "mockPoiNotFound": m29,
+    "mockPoiNotFoundForUpdate": m30,
     "mouth": MessageLookupByLibrary.simpleMessage("Mute"),
     "myWishlist": MessageLookupByLibrary.simpleMessage("Mans vēlmju saraksts"),
+    "nearbyUsersAlertCheckboxSubtitle": MessageLookupByLibrary.simpleMessage(
+      "Nosūtīsim paziņojumu, kad jūsu apkārtnē parādīsies pietiekami daudz lietotāju.",
+    ),
+    "nearbyUsersAlertCheckboxTitle": m31,
+    "nearbyUsersAlertDisabled": MessageLookupByLibrary.simpleMessage(
+      "Tuvumā esošo lietotāju paziņojums izslēgts.",
+    ),
+    "nearbyUsersAlertEnabled": MessageLookupByLibrary.simpleMessage(
+      "Tuvumā esošo lietotāju paziņojums ieslēgts.",
+    ),
+    "nearbyUsersAlertLoading": MessageLookupByLibrary.simpleMessage(
+      "Pārbaudām paziņojuma iestatījumu...",
+    ),
+    "nearbyUsersAlertManageDelivery": MessageLookupByLibrary.simpleMessage(
+      "Pārvaldiet, kur tiek nosūtīti tuvumā esošo lietotāju paziņojumi.",
+    ),
+    "nearbyUsersAlertSaveError": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik neizdevās atjaunināt tuvumā esošo lietotāju paziņojumu.",
+    ),
     "need": MessageLookupByLibrary.simpleMessage("Vajadzība"),
     "newBadge": MessageLookupByLibrary.simpleMessage("JAUNS"),
+    "newDeviceDetected": MessageLookupByLibrary.simpleMessage(
+      "Jauna ierīce konstatēta",
+    ),
+    "newDeviceDetectedMessage": MessageLookupByLibrary.simpleMessage(
+      "Jauna ierīce vēlas importēt jūsu konta datus. Vai vēlaties to atļaut?",
+    ),
     "newPostings": MessageLookupByLibrary.simpleMessage("Jauni sludinājumi"),
     "newUsers": MessageLookupByLibrary.simpleMessage("Jauni lietotāji"),
     "ninetyNinePlus": MessageLookupByLibrary.simpleMessage("99+"),
@@ -1084,12 +1529,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "noAttributesToDisplay": MessageLookupByLibrary.simpleMessage(
       "Nav atribūtu, ko parādīt.",
     ),
+    "noBadgesEarnedYet": MessageLookupByLibrary.simpleMessage(
+      "Vēl nav nopelnītu nozīmīšu. Turpiniet veikt maiņas, lai tās iegūtu.",
+    ),
     "noChatsYet": MessageLookupByLibrary.simpleMessage("Vēl nav sarunu"),
     "noContactsFound": MessageLookupByLibrary.simpleMessage(
       "Nav atrasti kontakti",
     ),
     "noMatchesYet": MessageLookupByLibrary.simpleMessage("Vēl nav atbilstību"),
     "noMessagesYet": MessageLookupByLibrary.simpleMessage("Vēl nav ziņojumu"),
+    "noPostingsFound": MessageLookupByLibrary.simpleMessage(
+      "Nav atrasti sludinājumi",
+    ),
     "noPushTokens": MessageLookupByLibrary.simpleMessage(
       "Nav reģistrētu push paziņojumu marķieru",
     ),
@@ -1102,8 +1553,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "noUnviewedMatches": MessageLookupByLibrary.simpleMessage(
       "Nav neapskatītu atbilstību",
     ),
+    "noUsersFound": MessageLookupByLibrary.simpleMessage(
+      "Nav atrasti lietotāji",
+    ),
     "noUsersNearbyMessage": MessageLookupByLibrary.simpleMessage(
-      "Šķiet, ka jūsu apkārtnē vēl nav lietotāju. Esiet pirmais, kas uzaicina draugus un sāk barterēšanos!",
+      "Jūsu apkārtne vēl attīstās. Uzaicini paziņas un veido kopienu — nopelni 50 monētas par pirmo ieteikumu!",
     ),
     "noUsersNearbyTitle": MessageLookupByLibrary.simpleMessage(
       "Nav lietotāju tuvumā",
@@ -1114,6 +1568,31 @@ class MessageLookup extends MessageLookupByLibrary {
     "nose": MessageLookupByLibrary.simpleMessage("Deguns"),
     "notSet": MessageLookupByLibrary.simpleMessage("Nav iestatīts"),
     "notVerified": MessageLookupByLibrary.simpleMessage("Nav verificēts"),
+    "notificationEmailConfigured": m32,
+    "notificationEmailInvalid": MessageLookupByLibrary.simpleMessage(
+      "Ievadiet derīgu e-pasta adresi.",
+    ),
+    "notificationEmailLabel": MessageLookupByLibrary.simpleMessage(
+      "E-pasta adrese",
+    ),
+    "notificationEmailRequired": MessageLookupByLibrary.simpleMessage(
+      "Ievadiet e-pasta adresi.",
+    ),
+    "notificationEmailSave": MessageLookupByLibrary.simpleMessage(
+      "Saglabāt e-pastu",
+    ),
+    "notificationEmailSaveError": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik neizdevās saglabāt paziņojumu e-pastu.",
+    ),
+    "notificationEmailSaved": MessageLookupByLibrary.simpleMessage(
+      "Paziņojumu e-pasts saglabāts.",
+    ),
+    "notificationEmailSubtitle": MessageLookupByLibrary.simpleMessage(
+      "Pievienojiet e-pasta adresi, lai mēs varētu paziņot arī tad, ja push paziņojumi nav pieejami.",
+    ),
+    "notificationEmailTitle": MessageLookupByLibrary.simpleMessage(
+      "Pievienojiet e-pastu paziņojumiem",
+    ),
     "notificationPreferences": MessageLookupByLibrary.simpleMessage(
       "Paziņojumu preferences",
     ),
@@ -1136,8 +1615,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "onboardingScreenTitle": MessageLookupByLibrary.simpleMessage(
       "Ievadapmācība",
     ),
+    "openSettings": MessageLookupByLibrary.simpleMessage("Atvērt iestatījumus"),
     "optionalField": MessageLookupByLibrary.simpleMessage("Neobligāti"),
     "or": MessageLookupByLibrary.simpleMessage("VAI"),
+    "other": MessageLookupByLibrary.simpleMessage("Cits"),
     "pauseWishlist": MessageLookupByLibrary.simpleMessage("Apturēt"),
     "permissionDeniedOpenFile": MessageLookupByLibrary.simpleMessage(
       "Atļauja liegta faila atvēršanai",
@@ -1152,7 +1633,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pinErrorEmpty": MessageLookupByLibrary.simpleMessage(
       "Lūdzu, ievadiet PIN kodu",
     ),
-    "pinErrorIncorrect": m15,
+    "pinErrorIncorrect": m33,
     "pinErrorMismatch": MessageLookupByLibrary.simpleMessage(
       "PIN kodi nesakrīt",
     ),
@@ -1256,84 +1737,142 @@ class MessageLookup extends MessageLookupByLibrary {
       "Preference atjaunināta",
     ),
     "preferencesCreated": MessageLookupByLibrary.simpleMessage(
-      "Paziņojumu preferences saglabātas",
+      "Paziņojumu iestatījumi saglabātas",
+    ),
+    "premiumProfileEditorAddImage": MessageLookupByLibrary.simpleMessage(
+      "Pievienot attēlu",
+    ),
+    "premiumProfileEditorAvatarSvg": MessageLookupByLibrary.simpleMessage(
+      "Avatars (.svg)",
+    ),
+    "premiumProfileEditorDescription": MessageLookupByLibrary.simpleMessage(
+      "Šeit varat atjaunināt savu vārdu, aprakstu, darba atsauces un avatara SVG.",
+    ),
+    "premiumProfileEditorDescriptionOptional":
+        MessageLookupByLibrary.simpleMessage("Apraksts (neobligāti)"),
+    "premiumProfileEditorDisplayNameOptional":
+        MessageLookupByLibrary.simpleMessage("Parādāmais vārds (neobligāti)"),
+    "premiumProfileEditorHeader": MessageLookupByLibrary.simpleMessage(
+      "Pielāgojiet savu Premium profilu",
+    ),
+    "premiumProfileEditorNoAvatarSvgSelected":
+        MessageLookupByLibrary.simpleMessage("Nav atlasīts avatara SVG."),
+    "premiumProfileEditorNoWorkReferenceImages":
+        MessageLookupByLibrary.simpleMessage("Vēl nav darbu atsauču attēlu."),
+    "premiumProfileEditorRemoveSvg": MessageLookupByLibrary.simpleMessage(
+      "Noņemt SVG",
+    ),
+    "premiumProfileEditorReplace": MessageLookupByLibrary.simpleMessage(
+      "Aizvietot",
+    ),
+    "premiumProfileEditorSaving": MessageLookupByLibrary.simpleMessage(
+      "Saglabā...",
+    ),
+    "premiumProfileEditorSelectedFile": m34,
+    "premiumProfileEditorTitle": MessageLookupByLibrary.simpleMessage(
+      "Premium profila redaktors",
+    ),
+    "premiumProfileEditorUploadSvg": MessageLookupByLibrary.simpleMessage(
+      "Augšupielādēt SVG",
+    ),
+    "premiumProfileEditorWorkReferenceDescription":
+        MessageLookupByLibrary.simpleMessage(
+          "Pievienojiet un pārvaldiet savus atsauču attēlus.",
+        ),
+    "premiumProfileEditorWorkReferenceImages":
+        MessageLookupByLibrary.simpleMessage("Darbu atsauču attēli"),
+    "premiumUserBenefitsMessage": MessageLookupByLibrary.simpleMessage(
+      "Atbloķējiet Premium, lai iegūtu šīs priekšrocības:\n• Rediģēt savu vārdu\n• Rediģēt profila aprakstu\n• Rediģēt savu profila ikonu\n• Pievienot darba atsauču attēlus\n• Izcelties kartē\n• Atļauti vairāk nekā 3 aktīvi sludinājumi",
+    ),
+    "premiumUserBenefitsTitle": MessageLookupByLibrary.simpleMessage(
+      "Premium lietotāja priekšrocības",
     ),
     "privacyPolicy": MessageLookupByLibrary.simpleMessage("Privātuma politika"),
     "privacyPolicyChangesContent": MessageLookupByLibrary.simpleMessage(
-      "Mēs varam laiku pa laikam atjaunināt šo Privātuma politiku. Mēs paziņosim jums par jebkādām izmaiņām, publicējot jauno politiku lietotnē. Turpinot lietot lietotni pēc izmaiņām, tas nozīmē atjauninātās politikas pieņemšanu.",
+      "Mēs laiku pa laikam varam atjaunināt šo politiku. Būtiskas izmaiņas jākomunicē lietotnē vai citā atbilstošā kanālā, norādot atjauninātus spēkā stāšanās datumus.",
     ),
     "privacyPolicyChangesTitle": MessageLookupByLibrary.simpleMessage(
       "Izmaiņas šajā politikā",
     ),
     "privacyPolicyContactContent": MessageLookupByLibrary.simpleMessage(
-      "Ja jums ir kādi jautājumi par šo Privātuma politiku vai mūsu datu praksi, lūdzu, sazinieties ar mums uz info@bartering.app",
+      "Privātuma un GDPR pieprasījumiem: info@bartering.app",
     ),
     "privacyPolicyContactTitle": MessageLookupByLibrary.simpleMessage(
-      "Sazinieties ar mums",
+      "Kontakti",
     ),
     "privacyPolicyDataCollectionContent": MessageLookupByLibrary.simpleMessage(
-      "Mēs apkopojam informāciju, ko jūs sniedzat tieši, tostarp jūsu profila informāciju, intereses, piedāvājumus, atrašanās vietas datus un tērzēšanas ziņojumus. Mēs arī apkopojam lietošanas datus, piemēram, lietotnes mijiedarbību un ierīces informāciju, lai uzlabotu mūsu pakalpojumu.",
+      "Mēs varam apstrādāt konta/autentifikācijas datus (t.sk. paraksta metadatus), profila datus, sludinājumu un čata datus, paziņojumu datus (e-pasts, push tokeni, piekrišanu karogi), drošības/compliance ierakstus un tehniskos pieprasījumu metadatus.",
     ),
     "privacyPolicyDataCollectionTitle": MessageLookupByLibrary.simpleMessage(
-      "Informācija, ko mēs apkopojam",
+      "Kādus datus mēs apstrādājam",
     ),
     "privacyPolicyDataSecurityContent": MessageLookupByLibrary.simpleMessage(
-      "Mēs īstenojam atbilstošus tehniskos un organizatoriskos pasākumus, lai aizsargātu jūsu personisko informāciju no nesankcionētas piekļuves, izmaiņām, izpaušanas vai iznīcināšanas. Tomēr neviens pārraides veids internetā nav 100% drošs.",
+      "Mēs izmantojam pasākumus, piemēram, autentificētu pieprasījumu parakstu pārbaudes, piekļuves kontroli, transporta drošību un audita žurnālus. Tiek izmantotas glabāšanas kontroles un plānota tīrīšana operacionālajiem/compliance ierakstiem, ar legal hold saderīgu apstrādi, kur nepieciešams.",
     ),
     "privacyPolicyDataSecurityTitle": MessageLookupByLibrary.simpleMessage(
-      "Datu drošība",
+      "Drošība, glabāšana un dzēšana",
     ),
     "privacyPolicyDataSharingContent": MessageLookupByLibrary.simpleMessage(
-      "Jūsu profila informācija, intereses un piedāvājumi ir redzami citiem lietotnes lietotājiem, lai veicinātu maiņu. Mēs nepārdodam jūsu personisko informāciju trešajām personām. Mēs varam kopīgot datus ar pakalpojumu sniedzējiem, kuri palīdz darbināt mūsu lietotni, un mēs varam atklāt informāciju, ja to prasa likums.",
+      "Pašreizējās integrācijas var ietvert PostgreSQL, Mailjet, Firebase/FCM, Ollama, kā arī Nginx + Docker infrastruktūru. Izvēles federācijas mezgli tiek izmantoti tikai tad, ja tie ir ieslēgti un uzticami. Ja dati tiek apstrādāti ārpus jūsu valsts/EEZ, tiek piemērotas juridiski prasītās garantijas (piemēram, SCC).",
     ),
     "privacyPolicyDataSharingTitle": MessageLookupByLibrary.simpleMessage(
-      "Informācijas kopīgošana",
+      "Apstrādātāji, infrastruktūra un pārsūtīšana",
     ),
     "privacyPolicyDataUsageContent": MessageLookupByLibrary.simpleMessage(
-      "Mēs izmantojam jūsu informāciju, lai: veicinātu maiņas savienojumus starp lietotājiem, parādītu jūsu profilu citiem lietotājiem jūsu apkārtnē, nodrošinātu tērzēšanas funkcionalitāti, uzlabotu mūsu pakalpojumus un nosūtītu paziņojumus par atbilstībām un ziņojumiem.",
+      "Apstrāde nodrošina pakalpojuma sniegšanu (GDPR 6(1)(b)), drošību un ļaunprātīgas izmantošanas novēršanu (GDPR 6(1)(f)), kā arī juridiskos/compliance pienākumus (GDPR 6(1)(c), 6(1)(f)). Ja piemērojams, izvēles funkcijas un piekrišanas tiek apstrādātas saskaņā ar GDPR 6(1)(a).",
     ),
     "privacyPolicyDataUsageTitle": MessageLookupByLibrary.simpleMessage(
-      "Kā mēs izmantojam jūsu informāciju",
+      "Mērķi un GDPR juridiskie pamati",
     ),
     "privacyPolicyIntroContent": MessageLookupByLibrary.simpleMessage(
-      "Šī Privātuma politika apraksta, kā mēs apkopojam, izmantojam un aizsargājam jūsu personisko informāciju, lietojot mūsu maiņas lietotni. Mēs apņemamies nodrošināt jūsu privātumu un aizsargāt jūsu datus.",
+      "Šī politika skaidro, kā Barter backend pakalpojumi un saistītie mobilie/tīmekļa klienti apstrādā personas datus. Tā aptver backend API, klienta lietotnes, admin/compliance rīkus un izvēles federācijas funkcijas, ja tās ir ieslēgtas.",
     ),
-    "privacyPolicyIntroTitle": MessageLookupByLibrary.simpleMessage("Ievads"),
+    "privacyPolicyIntroTitle": MessageLookupByLibrary.simpleMessage(
+      "Pārzinis, tvērums un kontakti",
+    ),
     "privacyPolicyLastUpdated": MessageLookupByLibrary.simpleMessage(
-      "Pēdējoreiz atjaunots: 2025. gada janvāris",
+      "Pēdējoreiz atjaunots: 2026-04-13",
     ),
     "privacyPolicyThirdPartyContent": MessageLookupByLibrary.simpleMessage(
-      "Mūsu lietotnē var tikt izmantoti trešo pušu pakalpojumi analītikai, kartēm un paziņojumiem. Šiem pakalpojumiem ir savas privātuma politikas, un mēs iesakām tās pārskatīt.",
+      "Šis lietotnē redzamais teksts apkopo backend-centrisku apstrādi un jālasa kopā ar klienta lietotnes paziņojumiem (atļaujas, identifikatori, push UX un lokālā glabātuve/sīkdatnes, kur piemērojams).",
     ),
     "privacyPolicyThirdPartyTitle": MessageLookupByLibrary.simpleMessage(
-      "Trešo pušu pakalpojumi",
+      "Backend un klienta privātuma paziņojums",
     ),
     "privacyPolicyUserRightsContent": MessageLookupByLibrary.simpleMessage(
-      "Jums ir tiesības jebkurā laikā piekļūt, atjaunināt vai dzēst savu personisko informāciju, izmantojot lietotnes iestatījumus. Jūs varat arī pieprasīt savu datu kopiju vai iebilst pret noteiktiem apstrādes veidiem.",
+      "Ievērojot piemērojamos tiesību aktus, varat pieprasīt piekļuvi, labošanu, dzēšanu, ierobežošanu, pārnesamību, iebildumus un piekrišanas atsaukšanu. Autentificētas dzēšanas/eksporta plūsmas ietver legal hold pārbaudes, DSAR uzskaiti un compliance notikumu žurnalēšanu.",
     ),
     "privacyPolicyUserRightsTitle": MessageLookupByLibrary.simpleMessage(
-      "Jūsu tiesības",
+      "Jūsu tiesības, dzēšana un pārnesamība",
     ),
     "privateKey": MessageLookupByLibrary.simpleMessage("Privātā atslēga"),
     "profileDeleted": MessageLookupByLibrary.simpleMessage(
       "Profils veiksmīgi dzēsts",
     ),
+    "profilePanelTitle": MessageLookupByLibrary.simpleMessage("Profils"),
     "provideMoreContext": MessageLookupByLibrary.simpleMessage(
       "Sniedziet vairāk konteksta...",
     ),
     "publicKey": MessageLookupByLibrary.simpleMessage("Publiskā atslēga"),
+    "purchaseCoins": MessageLookupByLibrary.simpleMessage("Pirkt monētas"),
+    "purchaseCoinsFlowComingSoon": MessageLookupByLibrary.simpleMessage(
+      "Monētu pirkšanas plūsma drīzumā",
+    ),
     "pushNotifications": MessageLookupByLibrary.simpleMessage(
       "Push paziņojumi",
     ),
     "pushTokenRemoved": MessageLookupByLibrary.simpleMessage(
       "Push marķieris noņemts",
     ),
-    "questionsAnswered": m16,
+    "questionsAnswered": m35,
     "quietHours": MessageLookupByLibrary.simpleMessage("Klusās stundas"),
     "quietHoursDescription": MessageLookupByLibrary.simpleMessage(
       "Nesūtīt paziņojumus šajā laikā",
     ),
     "randomize": MessageLookupByLibrary.simpleMessage("Nejauši"),
+    "ratingAndReviews": MessageLookupByLibrary.simpleMessage(
+      "Reputācija un Atsauksmes",
+    ),
     "ratingExcellent": MessageLookupByLibrary.simpleMessage("Izcils"),
     "ratingGood": MessageLookupByLibrary.simpleMessage("Labs"),
     "ratingOkay": MessageLookupByLibrary.simpleMessage("Labi"),
@@ -1341,6 +1880,22 @@ class MessageLookup extends MessageLookupByLibrary {
     "ratingRequired": MessageLookupByLibrary.simpleMessage("Vērtējums *"),
     "ratingVeryBad": MessageLookupByLibrary.simpleMessage("Ļoti slikti"),
     "recommendations": MessageLookupByLibrary.simpleMessage("Ieteikumi:"),
+    "recoverAccount": MessageLookupByLibrary.simpleMessage("Atjaunot kontu"),
+    "recoverAccountDescription": MessageLookupByLibrary.simpleMessage(
+      "Ievadiet savu e-pasta adresi, lai saņemtu atjaunošanas kodu un atjaunotu savu kontu šajā ierīcē.",
+    ),
+    "recoverViaEmail": MessageLookupByLibrary.simpleMessage(
+      "Atjaunot pa e-pastu",
+    ),
+    "recoveryFailed": MessageLookupByLibrary.simpleMessage(
+      "Konta atjaunošana neizdevās",
+    ),
+    "recoverySuccess": MessageLookupByLibrary.simpleMessage(
+      "Atjaunošana veiksmīga!",
+    ),
+    "recoverySuccessMessage": MessageLookupByLibrary.simpleMessage(
+      "Jūsu konts ir veiksmīgi atjaunots šajā ierīcē.",
+    ),
     "relevancy": MessageLookupByLibrary.simpleMessage("Atbilstība"),
     "remove": MessageLookupByLibrary.simpleMessage("Noņemt"),
     "removePushToken": MessageLookupByLibrary.simpleMessage(
@@ -1394,11 +1949,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "reportUserConfirmation": MessageLookupByLibrary.simpleMessage(
       "Lūdzu, norādiet iemeslu ziņošanai par šo lietotāju.",
     ),
-    "reportUserTitle": m17,
+    "reportUserTitle": m36,
+    "requestCollectedDataExport": MessageLookupByLibrary.simpleMessage(
+      "Pieprasīt savākto datu eksportu",
+    ),
+    "resendCode": MessageLookupByLibrary.simpleMessage("Nosūtīt kodu vēlreiz"),
+    "resendCodeIn": m37,
     "resetLinkSentMessage": MessageLookupByLibrary.simpleMessage(
       "Ja konts eksistē, atiestatīšanas saite ir nosūtīta.",
     ),
     "resetYourPin": MessageLookupByLibrary.simpleMessage("Atiestatīt PIN kodu"),
+    "restorePurchases": MessageLookupByLibrary.simpleMessage(
+      "Atjaunot pirkumus",
+    ),
     "retry": MessageLookupByLibrary.simpleMessage("Mēģināt vēlreiz"),
     "review": MessageLookupByLibrary.simpleMessage("Atsauksme"),
     "reviewGuidelines": MessageLookupByLibrary.simpleMessage(
@@ -1407,8 +1970,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "reviewSubmitted": MessageLookupByLibrary.simpleMessage(
       "Atsauksme iesniegta!",
     ),
-    "reviewUser": m18,
-    "reviewVisibilityNotice": m19,
+    "reviewUser": m38,
+    "reviewVisibilityNotice": MessageLookupByLibrary.simpleMessage(
+      "Jūsu atsauksme būs redzama pēc tam, kad otrs lietotājs iesniegs savu atsauksmi, vai pēc 14 dienām.",
+    ),
+    "reviewsCount": m39,
     "save": MessageLookupByLibrary.simpleMessage("Saglabāt"),
     "saveAndContinue": MessageLookupByLibrary.simpleMessage(
       "Saglabāt un turpināt",
@@ -1426,7 +1992,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "searchForALocation": MessageLookupByLibrary.simpleMessage(
       "Meklēt atrašanās vietu",
     ),
-    "securityAnswerIncorrect": m20,
+    "securityAnswerIncorrect": m40,
     "securityAnswerNote": MessageLookupByLibrary.simpleMessage(
       "Piezīme: Atbildes nav reģistrjutīgas",
     ),
@@ -1473,6 +2039,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "selectAttributes": MessageLookupByLibrary.simpleMessage(
       "Izvēlēties atribūtus",
     ),
+    "selectCoinPackage": MessageLookupByLibrary.simpleMessage(
+      "Izvēlieties monētu pakotni:",
+    ),
     "selectLocation": MessageLookupByLibrary.simpleMessage(
       "Izvēlēties atrašanās vietu",
     ),
@@ -1487,10 +2056,14 @@ class MessageLookup extends MessageLookupByLibrary {
       "Izvēlieties piedāvājumus/lietas, ko varat sniegt",
     ),
     "selectYourInterests": MessageLookupByLibrary.simpleMessage(
-      "Ko jūs meklējat/vajadzīgs?",
+      "Ko Jūs meklējat?",
     ),
     "selectYourOffers": MessageLookupByLibrary.simpleMessage(
-      "Ko jums ir/piedāvājat?",
+      "Ko Jūs piedāvājat?",
+    ),
+    "selectedCoinPackage": m41,
+    "sendRecoveryCode": MessageLookupByLibrary.simpleMessage(
+      "Nosūtīt atjaunošanas kodu",
     ),
     "sendResetLink": MessageLookupByLibrary.simpleMessage(
       "Nosūtīt atiestatīšanas saiti",
@@ -1506,6 +2079,20 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "settingsChangePinDescription": MessageLookupByLibrary.simpleMessage(
       "Atjaunināt drošības PIN kodu",
+    ),
+    "settingsGpsLocationDescription": MessageLookupByLibrary.simpleMessage(
+      "Kad iespējots, varat pietuvināt karti līdz pašreizējai GPS atrašanās vietai. Lietotne pieprasīs atrašanās vietas atļaujas, kad nepieciešams.",
+    ),
+    "settingsGpsLocationDisabledDescription":
+        MessageLookupByLibrary.simpleMessage(
+          "GPS atrašanās vietas izsekošana ir atspējota",
+        ),
+    "settingsGpsLocationEnabledDescription":
+        MessageLookupByLibrary.simpleMessage(
+          "GPS atrašanās vietas izsekošana ir iespējota",
+        ),
+    "settingsGpsLocationTitle": MessageLookupByLibrary.simpleMessage(
+      "Iespējot GPS atrašanās vietu",
     ),
     "settingsKeywordSearchRadiusDescription":
         MessageLookupByLibrary.simpleMessage(
@@ -1610,6 +2197,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "shareYourInterestsToFindBestMatches": MessageLookupByLibrary.simpleMessage(
       "Dalieties ar savām interesēm, lai atrastu labākās atbilstības ar citiem!",
     ),
+    "showLess": MessageLookupByLibrary.simpleMessage("Rādīt mazāk"),
+    "showMore": MessageLookupByLibrary.simpleMessage("Rādīt vairāk"),
     "showPath": MessageLookupByLibrary.simpleMessage("Rādīt ceļu"),
     "similar": MessageLookupByLibrary.simpleMessage("Līdzīgs"),
     "skin": MessageLookupByLibrary.simpleMessage("Āda"),
@@ -1626,7 +2215,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Sāciet sarunu no kartes",
     ),
     "startTime": MessageLookupByLibrary.simpleMessage("Sākuma laiks"),
-    "styleNumber": m21,
+    "styleNumber": m42,
     "submitReport": MessageLookupByLibrary.simpleMessage("Iesniegt ziņojumu"),
     "submitReview": MessageLookupByLibrary.simpleMessage("Iesniegt atsauksmi"),
     "submitting": MessageLookupByLibrary.simpleMessage("Notiek iesniegšana..."),
@@ -1649,16 +2238,80 @@ class MessageLookup extends MessageLookupByLibrary {
     "tapToSelectDate": MessageLookupByLibrary.simpleMessage(
       "Pieskarieties, lai izvēlētos derīguma termiņu (neobligāti)",
     ),
+    "targetDeviceTimeout": MessageLookupByLibrary.simpleMessage(
+      "Mērķa ierīce nepievienojās laikā",
+    ),
+    "targetStep1": MessageLookupByLibrary.simpleMessage(
+      "Atveriet lietotni savā citā ierīcē",
+    ),
+    "targetStep2": MessageLookupByLibrary.simpleMessage(
+      "Dodieties uz Iestatījumi → Konts → Pārcelt ierīci",
+    ),
+    "targetStep3": MessageLookupByLibrary.simpleMessage(
+      "Ievadiet kodu, kas redzams uz šīs ierīces",
+    ),
     "tellUsMore": MessageLookupByLibrary.simpleMessage(
       "Pastāstiet vairāk (neobligāti)",
+    ),
+    "termsConditionsSectionAccountRestrictionContent":
+        MessageLookupByLibrary.simpleMessage(
+          "Mēs varam ierobežot vai dzēst kontus par noteikumu pārkāpumiem vai drošības riskiem.",
+        ),
+    "termsConditionsSectionAccountRestrictionTitle":
+        MessageLookupByLibrary.simpleMessage(
+          "5. Konta ierobežošana vai dzēšana",
+        ),
+    "termsConditionsSectionAccountUseContent": MessageLookupByLibrary.simpleMessage(
+      "Jūs esat atbildīgs par sava konta drošību un par aktivitātēm, kas notiek, izmantojot jūsu kontu. Jums jāieveda jūsu e-pasta adrese Profila sadaļā - Paziņojumu iestatījumos lai varētu atjaunot profilu, vai pieprasīt tā dzēšanu, ja zaudējat piekļuvi ierīcei.",
+    ),
+    "termsConditionsSectionAccountUseTitle":
+        MessageLookupByLibrary.simpleMessage(
+          "3. Konta lietošana, atjaunošana un dzēšana",
+        ),
+    "termsConditionsSectionChangesContent": MessageLookupByLibrary.simpleMessage(
+      "Mēs varam periodiski atjaunināt šos noteikumus. Turpinot lietot lietotni pēc izmaiņām, jūs piekrītat atjauninātajiem noteikumiem.",
+    ),
+    "termsConditionsSectionChangesTitle": MessageLookupByLibrary.simpleMessage(
+      "8. Izmaiņas noteikumos",
+    ),
+    "termsConditionsSectionKidsSafetyContent": MessageLookupByLibrary.simpleMessage(
+      "Mums ir nulles tolerance pret bērnu seksuālu izmantošanu un vardarbību (CSAE), tostarp bērnu seksuālas izmantošanas materiāliem (CSAM), pavedināšanu, cilvēku tirdzniecību un jebkādu nepilngadīgo seksuālu ekspluatāciju.\n\nŠajā platformā ir stingri aizliegts:\n- publicēt, pieprasīt, izplatīt vai glabāt CSAM\n- seksualizēta saziņa ar nepilngadīgajiem\n- pavedināšana, piespiešana, cilvēku tirdzniecība vai nepilngadīgo ekspluatācija\n- jebkāds mēģinājums izmantot šo pakalpojumu, lai apdraudētu bērnu\n\nMēs varam dzēst saturu, ierobežot vai dzēst kontus, un likumā noteiktajos gadījumos ziņot kompetentajām iestādēm. Lietotāji var ziņot par pārkāpumiem lietotnē vai rakstot uz info@bartering.app.\n\nMēs drošības ziņojumus izskatām pēc iespējas ātri un sadarbojamies ar iestādēm to likumīgo pieprasījumu ietvaros, kas saistīti ar CSAE pārkāpumiem.",
+    ),
+    "termsConditionsSectionKidsSafetyTitle":
+        MessageLookupByLibrary.simpleMessage(
+          "7. Bērnu drošības un CSAE standarti",
+        ),
+    "termsConditionsSectionLiabilityDisputesContent":
+        MessageLookupByLibrary.simpleMessage(
+          "Lietotāji ir atbildīgi par savām vienošanām un mijiedarbību. Platforma sniedz starpniecības vidi, cik to atļauj tiesību akti.",
+        ),
+    "termsConditionsSectionLiabilityDisputesTitle":
+        MessageLookupByLibrary.simpleMessage("6. Atbildība un strīdi"),
+    "termsConditionsSectionMinimumAgeContent": MessageLookupByLibrary.simpleMessage(
+      "Lietotne paredzēta personām no 16 gadu vecuma. Reģistrējoties, jūs apliecināt, ka jums ir vismaz 16 gadi.",
+    ),
+    "termsConditionsSectionMinimumAgeTitle":
+        MessageLookupByLibrary.simpleMessage("Minimālais vecums"),
+    "termsConditionsSectionProhibitedConductContent":
+        MessageLookupByLibrary.simpleMessage(
+          "Aizliegta krāpniecība, uzmākšanās, nelikumīgs saturs, citu lietotāju datu ļaunprātīga izmantošana un jebkāda pretlikumīga darbība.",
+        ),
+    "termsConditionsSectionProhibitedConductTitle":
+        MessageLookupByLibrary.simpleMessage("4. Aizliegtā rīcība"),
+    "termsConditionsSectionScopeContent": MessageLookupByLibrary.simpleMessage(
+      "Šie noteikumi attiecas uz Bartering App lietošanu un nosaka lietotāja tiesības un pienākumus.",
+    ),
+    "termsConditionsSectionScopeTitle": MessageLookupByLibrary.simpleMessage(
+      "1. Piemērošana",
+    ),
+    "termsConditionsTitle": MessageLookupByLibrary.simpleMessage(
+      "Lietošanas noteikumi",
     ),
     "thankYouForFeedback": MessageLookupByLibrary.simpleMessage(
       "Paldies par atsauksmēm!",
     ),
     "today": MessageLookupByLibrary.simpleMessage("Šodien"),
-    "tradeMatch": MessageLookupByLibrary.simpleMessage(
-      "Tirdzniecības atbilstība",
-    ),
+    "tradeMatch": MessageLookupByLibrary.simpleMessage("Atbilstība"),
     "transactionBlocked": MessageLookupByLibrary.simpleMessage(
       "Transakcija bloķēta",
     ),
@@ -1692,18 +2345,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "unableToReviewUser": MessageLookupByLibrary.simpleMessage(
       "Šobrīd nav iespējams atsauksmēt šo lietotāju",
     ),
-    "unableToSubmitAppealNow": MessageLookupByLibrary.simpleMessage(
-      "Pašlaik nevar iesniegt apelāciju",
-    ),
     "unableToShareAtThisTime": MessageLookupByLibrary.simpleMessage(
       "Šobrīd nevar dalīties",
+    ),
+    "unableToSubmitAppealNow": MessageLookupByLibrary.simpleMessage(
+      "Pašlaik nevar iesniegt apelāciju",
     ),
     "unblock": MessageLookupByLibrary.simpleMessage("Atbloķēt"),
     "unblockUser": MessageLookupByLibrary.simpleMessage("Atbloķēt lietotāju"),
     "unblockUserConfirmation": MessageLookupByLibrary.simpleMessage(
       "Vai tiešām vēlaties atbloķēt šo lietotāju? Viņi varēs atkal ar jums sazināties.",
     ),
-    "unblockUserConfirmationDetailed": m22,
+    "unblockUserConfirmationDetailed": m43,
     "unknownUser": MessageLookupByLibrary.simpleMessage("Nezināms lietotājs"),
     "unlockButton": MessageLookupByLibrary.simpleMessage("Atbloķēt"),
     "unviewed": MessageLookupByLibrary.simpleMessage("Neapskatīts"),
@@ -1718,6 +2371,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "userBlocked": MessageLookupByLibrary.simpleMessage(
       "Lietotājs veiksmīgi bloķēts",
+    ),
+    "userDetails": MessageLookupByLibrary.simpleMessage(
+      "Lietotāja informācija",
     ),
     "userId": MessageLookupByLibrary.simpleMessage("Lietotāja ID"),
     "userInterestedIn": MessageLookupByLibrary.simpleMessage("Interesē:"),
@@ -1735,10 +2391,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "users": MessageLookupByLibrary.simpleMessage("Lietotāji"),
     "valuePrefix": MessageLookupByLibrary.simpleMessage("Vērtība"),
     "verified": MessageLookupByLibrary.simpleMessage("Verificēts"),
+    "verifyAndRecover": MessageLookupByLibrary.simpleMessage(
+      "Verificēt un atjaunot",
+    ),
     "verifyAndResetPin": MessageLookupByLibrary.simpleMessage(
       "Verificēt un atiestatīt PIN",
     ),
     "viewMatches": MessageLookupByLibrary.simpleMessage("Skatīt atbilstības"),
+    "viewProfile": MessageLookupByLibrary.simpleMessage("Skatīt profilu"),
     "weekly": MessageLookupByLibrary.simpleMessage("Iknedēļas"),
     "welcomeStep1Description": MessageLookupByLibrary.simpleMessage(
       "Izveidojiet anonīmu profilu ar savām interesēm un to, ko piedāvājat",
@@ -1757,7 +2417,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "welcomeStep3Title": MessageLookupByLibrary.simpleMessage("Sāciet tērzēt"),
     "welcomeStep4Description": MessageLookupByLibrary.simpleMessage(
-      "Mainiet prasmes, pakalpojumus, priekšmetus vai vienkārši savienojieties ar savu kopienu",
+      "Mainiet zināšanas, pakalpojumus, priekšmetus vai vienkārši savienojieties ar savu kopienu",
     ),
     "welcomeStep4Title": MessageLookupByLibrary.simpleMessage(
       "Veiciet apmaiņas",
@@ -1806,5 +2466,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "wishlistStatusPaused": MessageLookupByLibrary.simpleMessage("Apturēts"),
     "yesterday": MessageLookupByLibrary.simpleMessage("Vakar"),
     "yourAnswer": MessageLookupByLibrary.simpleMessage("Jūsu atbilde"),
+    "yourMigrationCode": MessageLookupByLibrary.simpleMessage(
+      "Jūsu pārcelšanas kods",
+    ),
   };
 }

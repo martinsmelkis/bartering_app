@@ -79,7 +79,10 @@ class _InviteFriendsDialogState extends State<InviteFriendsDialog> {
   Future<void> _loadNearbyUsersAlertState() async {
     try {
       final response = await getIt<ApiClient>().getNearbyUsersAlert();
-      final enabled = _extractEnabledState(response);
+      final data = response.data;
+      final enabled = _extractEnabledState(
+        data is Map<String, dynamic> ? data : const <String, dynamic>{},
+      );
 
       if (!mounted) return;
       setState(() {

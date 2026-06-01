@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'application.dart';
 import 'flavor_config.dart';
 import 'screens/initialize_screen/initialize_screen.dart';
-import 'services/messaging/firebase_service.dart';
+import 'services/messaging/firebase_service.dart' as local;
 import 'utils/debug_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +79,7 @@ void main() async {
   if (!kIsWeb && deviceValidationResult?.isValid == true) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       logDebug('⏳ Initializing FirebaseService after first frame...');
-      unawaited(FirebaseService().initialize());
+      unawaited(local.FirebaseService().initialize());
     });
   }
 }
