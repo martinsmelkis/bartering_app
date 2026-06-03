@@ -31,7 +31,9 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   static const String _gdprConsentVersion = 'v1';
-  static final Uri _appStoreUrl = Uri.parse('https://apps.apple.com/app/6763872867');
+  static final Uri _appStoreUrl = Uri.parse(
+    'https://apps.apple.com/app/6763872867',
+  );
   static final Uri _playStoreUrl = Uri.parse(
     'https://play.google.com/store/apps/details?id=app.bartering.bartering_app',
   );
@@ -43,7 +45,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   static const int _svgAssetCount = 29;
 
   // Generate SVG asset path by index (1-based)
-  static String _getSvgAsset(int index) => 'assets/icons/avatars/path$index.svg';
+  static String _getSvgAsset(int index) =>
+      'assets/icons/avatars/path$index.svg';
 
   // Same palette as onboarding category card colors
   static final List<Color> _onboardingCategoryColors = [
@@ -94,8 +97,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 20),
-    )
-      ..repeat();
+    )..repeat();
   }
 
   @override
@@ -108,9 +110,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   List<_FloatingIcon> _generateFloatingIcons() {
     final random = Random();
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     final deviceSize = ResponsiveBreakpoints.getDeviceSize(context);
     final isLargeNonWeb = !kIsWeb && context.canShowSideBySide;
     final iconSizeScale = isLargeNonWeb ? 1.5 : 1.0;
@@ -145,32 +145,40 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     // Generate avatar icons
     for (int i = 0; i < avatarIconCount; i++) {
       final size = (random.nextDouble() * 40 + 26) / iconSizeScale; // 30-70
-      icons.add(_FloatingIcon(
-        svgAsset: _getSvgAsset(random.nextInt(_svgAssetCount) + 1),
-        // 1-based index
-        left: random.nextDouble() * (screenSize.width - size),
-        top: random.nextDouble() * screenSize.height,
-        size: size,
-        duration: Duration(seconds: random.nextInt(10) + 15),
-        // 15-25 seconds
-        delay: Duration(milliseconds: random.nextInt(3000)),
-      ));
+      icons.add(
+        _FloatingIcon(
+          svgAsset: _getSvgAsset(random.nextInt(_svgAssetCount) + 1),
+          // 1-based index
+          left: random.nextDouble() * (screenSize.width - size),
+          top: random.nextDouble() * screenSize.height,
+          size: size,
+          duration: Duration(seconds: random.nextInt(10) + 15),
+          // 15-25 seconds
+          delay: Duration(milliseconds: random.nextInt(3000)),
+        ),
+      );
     }
 
     // Generate onboarding category icons
     for (int i = 0; i < onboardingIconCount; i++) {
-      final size = (random.nextDouble() * 30 + 10) / iconSizeScale; // 25-55 (slightly smaller)
-      icons.add(_FloatingIcon(
-        iconData: _onboardingIcons[random.nextInt(_onboardingIcons.length)],
-        iconColor:
-            _onboardingCategoryColors[random.nextInt(_onboardingCategoryColors.length)]
-                .withValues(alpha: 0.60),
-        left: random.nextDouble() * (screenSize.width - size),
-        top: random.nextDouble() * screenSize.height,
-        size: size,
-        duration: Duration(seconds: random.nextInt(10) + 15),
-        delay: Duration(milliseconds: random.nextInt(3000)),
-      ));
+      final size =
+          (random.nextDouble() * 30 + 10) /
+          iconSizeScale; // 25-55 (slightly smaller)
+      icons.add(
+        _FloatingIcon(
+          iconData: _onboardingIcons[random.nextInt(_onboardingIcons.length)],
+          iconColor:
+              _onboardingCategoryColors[random.nextInt(
+                    _onboardingCategoryColors.length,
+                  )]
+                  .withValues(alpha: 0.60),
+          left: random.nextDouble() * (screenSize.width - size),
+          top: random.nextDouble() * screenSize.height,
+          size: size,
+          duration: Duration(seconds: random.nextInt(10) + 15),
+          delay: Duration(milliseconds: random.nextInt(3000)),
+        ),
+      );
     }
 
     return icons;
@@ -220,11 +228,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 cryptoErrorString.contains('badpaddingexception') ||
                 cryptoErrorString.contains('bad_decrypt') ||
                 cryptoErrorString.contains('cipher functions') ||
-                (cryptoError.code.toLowerCase().contains('read') && cryptoError.message == null) ||
+                (cryptoError.code.toLowerCase().contains('read') &&
+                    cryptoError.message == null) ||
                 (cryptoError.message?.toLowerCase().contains('read') == true) ||
                 cryptoErrorString.contains('keystore') ||
                 cryptoErrorString.contains('fluttersecurestorage')) {
-              logDebug('🔄 Keystore error during deferred crypto init. Resetting secure storage and retrying bootstrap.');
+              logDebug(
+                '🔄 Keystore error during deferred crypto init. Resetting secure storage and retrying bootstrap.',
+              );
 
               await userRepository.clearStorage();
               await userRepository.resetUserId();
@@ -233,9 +244,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               if (userId != null && userId.isNotEmpty) {
                 CryptoService.disposeSingletonStatic();
                 final recoveredCryptoService = await CryptoService.create();
-                final recoveredPublicKey = recoveredCryptoService.ecPublicKeyToString(
-                  recoveredCryptoService.getPublicKey(),
-                );
+                final recoveredPublicKey = recoveredCryptoService
+                    .ecPublicKeyToString(recoveredCryptoService.getPublicKey());
 
                 await apiClient.createProfile(
                   UserRegistrationData(
@@ -280,8 +290,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Future<GdprConsentChoice?> _ensureConsentBeforeProceed() async {
     final settingsService = getIt<SettingsService>();
 
-    final alreadyConsented =
-        await settingsService.hasAcceptedGdprConsentVersion(_gdprConsentVersion);
+    final alreadyConsented = await settingsService
+        .hasAcceptedGdprConsentVersion(_gdprConsentVersion);
 
     if (!mounted) return null;
 
@@ -346,11 +356,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     }
   }
 
-  Future<GdprConsentChoice?> _showGdprConsentDialog(BuildContext context) async {
+  Future<GdprConsentChoice?> _showGdprConsentDialog(
+    BuildContext context,
+  ) async {
     final settingsService = getIt<SettingsService>();
-    final initialLocationConsent = await settingsService.getStoredLocationConsent();
-    final initialAiConsent = await settingsService.getStoredAiProcessingConsent();
-    final initialAnalyticsConsent = await settingsService.getStoredAnalyticsCookiesConsent();
+    final initialLocationConsent = await settingsService
+        .getStoredLocationConsent();
+    final initialAiConsent = await settingsService
+        .getStoredAiProcessingConsent();
+    final initialAnalyticsConsent = await settingsService
+        .getStoredAnalyticsCookiesConsent();
 
     if (!context.mounted) return null;
 
@@ -391,11 +406,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         child: Stack(
           children: [
             // Floating icons background
-            ..._floatingIcons.map((icon) =>
-                _AnimatedFloatingIcon(
-                  floatingIcon: icon,
-                  controller: _animationController,
-                )),
+            ..._floatingIcons.map(
+              (icon) => _AnimatedFloatingIcon(
+                floatingIcon: icon,
+                controller: _animationController,
+              ),
+            ),
             // Main content
             SafeArea(
               child: Center(
@@ -466,7 +482,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             fontSize: context.buttonFontSize / fontScale,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.2,
-                            color: Colors.black87
+                            color: Colors.black87,
                           ),
                         ),
                       ),
@@ -475,7 +491,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       Container(
                         constraints: BoxConstraints(
                           maxWidth: ResponsiveBreakpoints.getMaxContentWidth(
-                              context),
+                            context,
+                          ),
                         ),
                         padding: EdgeInsets.all(24),
                         decoration: BoxDecoration(
@@ -551,7 +568,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   ),
                                   label: Text(storeLink.label),
                                   style: OutlinedButton.styleFrom(
-                                    backgroundColor: AppColors.background.withValues(alpha: 0.9),
+                                    backgroundColor: AppColors.background
+                                        .withValues(alpha: 0.9),
                                     foregroundColor: Colors.black87,
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 20.w,
@@ -561,7 +579,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                       borderRadius: BorderRadius.circular(14.r),
                                     ),
                                     side: BorderSide(
-                                      color: Colors.white.withValues(alpha: 0.7),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.7,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -584,7 +604,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -596,10 +615,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  Widget _buildHowItWorksStep(BuildContext context,
-      IconData icon,
-      String title,
-      String description,) {
+  Widget _buildHowItWorksStep(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String description,
+  ) {
     final bool isLargeNonWeb = !kIsWeb && context.canShowSideBySide;
     // Keep existing web tuning, but apply 2x downscale on large non-web screens.
     final double fontScale = isLargeNonWeb ? 1.5 : (kIsWeb ? 1.2 : 1.0);
@@ -614,11 +635,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             color: AppColors.background.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(12.r / iconScale),
           ),
-          child: Icon(
-            icon,
-            color: AppColors.primary,
-            size: 18.sp / iconScale,
-          ),
+          child: Icon(icon, color: AppColors.primary, size: 18.sp / iconScale),
         ),
         SizedBox(width: 12.w / iconScale),
         Expanded(
@@ -663,20 +680,20 @@ class _StoreLink {
   });
 
   const _StoreLink.appStore(Uri url)
-      : this(
-          label: 'App Store',
-          icon: Icons.apple,
-          iconColor: Colors.blue,
-          url: url,
-        );
+    : this(
+        label: 'App Store',
+        icon: Icons.apple,
+        iconColor: Colors.blue,
+        url: url,
+      );
 
   const _StoreLink.playStore(Uri url)
-      : this(
-          label: 'Google Play',
-          icon: Icons.shop,
-          iconColor: Colors.green,
-          url: url,
-        );
+    : this(
+        label: 'Google Play',
+        icon: Icons.shop,
+        iconColor: Colors.green,
+        url: url,
+      );
 }
 
 // Helper class to store floating icon data
@@ -699,8 +716,10 @@ class _FloatingIcon {
     required this.size,
     required this.duration,
     required this.delay,
-  }) : assert(svgAsset != null || iconData != null,
-  'Either svgAsset or iconData must be provided');
+  }) : assert(
+         svgAsset != null || iconData != null,
+         'Either svgAsset or iconData must be provided',
+       );
 }
 
 // Animated floating icon widget
@@ -730,13 +749,9 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
     _startOffset = _random.nextDouble() * 100 - 50; // -50 to 50
     _endOffset = _random.nextDouble() * 100 - 50; // -50 to 50
 
-    _animation = Tween<double>(
-      begin: _startOffset,
-      end: _endOffset,
-    ).animate(CurvedAnimation(
-      parent: widget.controller,
-      curve: Curves.easeInOut,
-    ));
+    _animation = Tween<double>(begin: _startOffset, end: _endOffset).animate(
+      CurvedAnimation(parent: widget.controller, curve: Curves.easeInOut),
+    );
 
     _opacityAnimation = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.5), weight: 1),
@@ -753,10 +768,7 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
         return Positioned(
           left: widget.floatingIcon.left + _animation.value,
           top: widget.floatingIcon.top,
-          child: Opacity(
-            opacity: _opacityAnimation.value,
-            child: child!,
-          ),
+          child: Opacity(opacity: _opacityAnimation.value, child: child!),
         );
       },
       child: widget.floatingIcon.svgAsset != null
@@ -779,7 +791,9 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
           : Icon(
               widget.floatingIcon.iconData!,
               size: widget.floatingIcon.size,
-              color: widget.floatingIcon.iconColor ?? Colors.white.withValues(alpha: 0.5),
+              color:
+                  widget.floatingIcon.iconColor ??
+                  Colors.white.withValues(alpha: 0.5),
             ),
     );
   }
@@ -804,6 +818,6 @@ class _AnimatedFloatingIconState extends State<_AnimatedFloatingIcon> {
     //    '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
 
     // Replace the default color with the random color
-    return svgString;//.replaceAll('#ffd4a3', colorHex);
+    return svgString; //.replaceAll('#ffd4a3', colorHex);
   }
 }

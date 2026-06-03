@@ -29,7 +29,6 @@ class DeviceValidationResult {
 }
 
 class DeviceValidationService {
-
   /// Comprehensive device validation
   static Future<DeviceValidationResult> validateDevice() async {
     final deviceInfo = DeviceInfoPlugin();
@@ -55,7 +54,7 @@ class DeviceValidationService {
 
         // === 1. User Agent Analysis ===
         final ua = webInfo.userAgent ?? '';
-        
+
         // Check for headless/automation tools
         if (ua.contains('HeadlessChrome')) {
           suspicionScore += 50;
@@ -108,7 +107,10 @@ class DeviceValidationService {
         // === 5. Touch Points Check ===
         // Check for inconsistent touch capabilities
         final touchPoints = webInfo.maxTouchPoints ?? 0;
-        final isMobile = ua.contains('Mobile') || ua.contains('Android') || ua.contains('iPhone');
+        final isMobile =
+            ua.contains('Mobile') ||
+            ua.contains('Android') ||
+            ua.contains('iPhone');
         if (isMobile && touchPoints == 0) {
           // Mobile device claiming no touch support is suspicious
           suspicionScore += 15;
@@ -117,9 +119,10 @@ class DeviceValidationService {
 
         // === 6. Platform Consistency Check ===
         final platformStr = webInfo.platform ?? '';
-        
+
         // Check for platform/UA mismatches
-        if (ua.contains('Windows') && !platformStr.toLowerCase().contains('win')) {
+        if (ua.contains('Windows') &&
+            !platformStr.toLowerCase().contains('win')) {
           suspicionScore += 20;
           suspiciousIndicators.add('Platform/UA mismatch (Windows)');
         }
@@ -127,7 +130,8 @@ class DeviceValidationService {
           suspicionScore += 20;
           suspiciousIndicators.add('Platform/UA mismatch (Mac)');
         }
-        if (ua.contains('Linux') && !platformStr.toLowerCase().contains('linux')) {
+        if (ua.contains('Linux') &&
+            !platformStr.toLowerCase().contains('linux')) {
           suspicionScore += 20;
           suspiciousIndicators.add('Platform/UA mismatch (Linux)');
         }
@@ -138,9 +142,11 @@ class DeviceValidationService {
           suspicionScore += 30;
           suspiciousIndicators.add('Suspiciously short user agent');
         }
-        
+
         // Missing common UA components
-        if (!ua.contains('Mozilla') && !ua.contains('Chrome') && !ua.contains('Safari')) {
+        if (!ua.contains('Mozilla') &&
+            !ua.contains('Chrome') &&
+            !ua.contains('Safari')) {
           suspicionScore += 25;
           suspiciousIndicators.add('Missing standard browser identifiers');
         }
@@ -164,23 +170,25 @@ class DeviceValidationService {
         // This is a basic check - for more comprehensive checks,
         // you would need platform channels to JavaScript
         // Here we note the limitation in details
-        details['screenCheckNote'] = 'Enhanced screen validation available via JS interop';
+        details['screenCheckNote'] =
+            'Enhanced screen validation available via JS interop';
 
         // === 10. Suspicious Browser Combinations ===
         final browserName = webInfo.browserName.toString().toLowerCase();
-        
+
         // Chrome claiming to be on unusual platforms
-        if (browserName.contains('chrome') && platformStr.toLowerCase().contains('blackberry')) {
+        if (browserName.contains('chrome') &&
+            platformStr.toLowerCase().contains('blackberry')) {
           suspicionScore += 25;
           suspiciousIndicators.add('Chrome on suspicious platform');
         }
 
         // Update reason based on findings
         if (suspicionScore > 50) {
-          reason = suspiciousIndicators.isNotEmpty 
-              ? suspiciousIndicators.first 
+          reason = suspiciousIndicators.isNotEmpty
+              ? suspiciousIndicators.first
               : 'Likely automated browser detected';
-          
+
           return DeviceValidationResult(
             isValid: false,
             isPhysicalDevice: true, // N/A for web
@@ -192,8 +200,8 @@ class DeviceValidationService {
         }
 
         // Add note about web validation
-        details['validationNote'] = 'Web platform validated with ${suspiciousIndicators.length} checks';
-
+        details['validationNote'] =
+            'Web platform validated with ${suspiciousIndicators.length} checks';
       } else if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
 
@@ -219,7 +227,7 @@ class DeviceValidationService {
           suspicionScore += 15;
           suspiciousIndicators.add('Generic brand');
         }
-        
+
         if (androidInfo.model.toLowerCase().contains('sdk')) {
           suspicionScore += 15;
           suspiciousIndicators.add('SDK model name');
@@ -241,7 +249,7 @@ class DeviceValidationService {
         }
 
         // === 4. Suspicious Build Fingerprints ===
-        final fingerprint = androidInfo.fingerprint?.toLowerCase() ?? '';
+        final fingerprint = androidInfo.fingerprint.toLowerCase();
         if (fingerprint.contains('generic')) {
           suspicionScore += 10;
           suspiciousIndicators.add('Generic fingerprint');
@@ -267,7 +275,6 @@ class DeviceValidationService {
           suspicionScore += 25;
           suspiciousIndicators.add('Simulator in model name');
         }
-
       } else if (Platform.isIOS) {
         final iosInfo = await deviceInfo.iosInfo;
 
@@ -300,7 +307,8 @@ class DeviceValidationService {
 
         // === 3. Identifier Check ===
         // Physical devices should have a vendor identifier
-        if (iosInfo.identifierForVendor == null || iosInfo.identifierForVendor!.isEmpty) {
+        if (iosInfo.identifierForVendor == null ||
+            iosInfo.identifierForVendor!.isEmpty) {
           suspicionScore += 15;
           suspiciousIndicators.add('Missing vendor identifier');
         }
@@ -319,7 +327,6 @@ class DeviceValidationService {
           suspicionScore += 5;
           suspiciousIndicators.add('Invalid iOS version format');
         }
-
       } else {
         // Desktop or other platform
         suspicionScore = 100;
@@ -330,13 +337,15 @@ class DeviceValidationService {
 
       // Determine validity
       final isValid = suspicionScore < 50;
-      final isPhysicalDevice = kIsWeb ? true : (details['isPhysicalDevice'] ?? false);
+      final isPhysicalDevice = kIsWeb
+          ? true
+          : (details['isPhysicalDevice'] ?? false);
 
       // Add overall assessment to details
       details['suspicionScore'] = suspicionScore;
       details['totalIndicators'] = suspiciousIndicators.length;
 
-      print('@@@@@@@@@@@@@ Validate device end');
+      debugPrint('@@@@@@@@@@@@@ Validate device end');
 
       return DeviceValidationResult(
         isValid: isValid,
@@ -346,15 +355,17 @@ class DeviceValidationService {
         details: details,
         suspiciousIndicators: suspiciousIndicators,
       );
-
     } catch (e) {
+      // Device-info plugins can temporarily fail on newly released iOS/Android
+      // versions or App Review hardware. Treat validation errors as non-blocking
+      // so users never see a blank/blocked launch because a local heuristic failed.
       return DeviceValidationResult(
-        isValid: false,
-        isPhysicalDevice: false,
-        suspicionScore: 100,
-        reason: 'Error checking device: $e',
-        details: {'error': e.toString()},
-        suspiciousIndicators: ['Exception during validation'],
+        isValid: true,
+        isPhysicalDevice: true,
+        suspicionScore: 0,
+        reason: 'Device validation skipped after error: $e',
+        details: {'error': e.toString(), 'validationSkipped': true},
+        suspiciousIndicators: const [],
       );
     }
   }
@@ -362,21 +373,23 @@ class DeviceValidationService {
   /// Get a human-readable summary of the device validation
   static Future<String> getDeviceSummary() async {
     final result = await validateDevice();
-    
+
     final buffer = StringBuffer();
     buffer.writeln('Device Validation Summary:');
     buffer.writeln('- Valid: ${result.isValid ? "✓" : "✗"}');
     buffer.writeln('- Physical Device: ${result.isPhysicalDevice ? "✓" : "✗"}');
     buffer.writeln('- Suspicion Score: ${result.suspicionScore}/100');
     buffer.writeln('- Reason: ${result.reason}');
-    
+
     if (result.suspiciousIndicators.isNotEmpty) {
-      buffer.writeln('- Suspicious Indicators (${result.suspiciousIndicators.length}):');
+      buffer.writeln(
+        '- Suspicious Indicators (${result.suspiciousIndicators.length}):',
+      );
       for (final indicator in result.suspiciousIndicators) {
         buffer.writeln('  • $indicator');
       }
     }
-    
+
     return buffer.toString();
   }
 
