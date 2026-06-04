@@ -62,8 +62,10 @@ class UserProfileScreen extends StatefulWidget {
   final List<ParsedAttributeData>? interests;
   final List<ParsedAttributeData>? offerings;
   final bool showAppBar; // Whether to show the app bar (false for panel mode)
-  final Function(bool)? onNestedPanelChanged; // Callback when nested panel opens/closes
-  final bool skipNestedPanelLayout; // When true, external layout handles nested panel (prevents double rendering)
+  final Function(bool)?
+  onNestedPanelChanged; // Callback when nested panel opens/closes
+  final bool
+  skipNestedPanelLayout; // When true, external layout handles nested panel (prevents double rendering)
 
   const UserProfileScreen({
     super.key,
@@ -84,7 +86,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     with WidgetsBindingObserver {
   String? _userLocation;
   Map<String, double>? _profileKeywordDataMap;
-  
+
   // Reputation data with caching
   ReputationResponse? _reputationData;
   List<BadgeDetail>? _userBadges;
@@ -95,7 +97,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   bool _isLoadingReputation = false;
   bool _isLoadingBadges = false;
   bool _isLoadingWallet = false;
-  
+
   // Cache instance
   final ReputationCache _reputationCache = ReputationCache();
 
@@ -121,20 +123,16 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           dotenv.env['REVENUECAT_WEB_COINS_200_LINK_BASE_URL'] ?? '',
       premiumAndroidProductId:
           dotenv.env['REVENUECAT_ANDROID_PREMIUM_PRODUCT_ID'],
-      premiumIosProductId:
-          dotenv.env['REVENUECAT_IOS_PREMIUM_PRODUCT_ID'],
+      premiumIosProductId: dotenv.env['REVENUECAT_IOS_PREMIUM_PRODUCT_ID'],
       coins20AndroidProductId:
           dotenv.env['REVENUECAT_ANDROID_COINS_20_PRODUCT_ID'],
-      coins20IosProductId:
-          dotenv.env['REVENUECAT_IOS_COINS_20_PRODUCT_ID'],
+      coins20IosProductId: dotenv.env['REVENUECAT_IOS_COINS_20_PRODUCT_ID'],
       coins50AndroidProductId:
           dotenv.env['REVENUECAT_ANDROID_COINS_50_PRODUCT_ID'],
-      coins50IosProductId:
-          dotenv.env['REVENUECAT_IOS_COINS_50_PRODUCT_ID'],
+      coins50IosProductId: dotenv.env['REVENUECAT_IOS_COINS_50_PRODUCT_ID'],
       coins200AndroidProductId:
           dotenv.env['REVENUECAT_ANDROID_COINS_200_PRODUCT_ID'],
-      coins200IosProductId:
-          dotenv.env['REVENUECAT_IOS_COINS_200_PRODUCT_ID'],
+      coins200IosProductId: dotenv.env['REVENUECAT_IOS_COINS_200_PRODUCT_ID'],
       texts: () {
         final l10n = AppLocalizations.of(context)!;
         return InAppPurchasesTexts(
@@ -218,8 +216,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       _isLoadingReputation = true;
     });
     try {
-      final reputation = await _userProfileScreenCubit.fetchReputation(widget.userId);
-      final reviewsResponse = await _userProfileScreenCubit.fetchUserReviews(widget.userId);
+      final reputation = await _userProfileScreenCubit.fetchReputation(
+        widget.userId,
+      );
+      final reviewsResponse = await _userProfileScreenCubit.fetchUserReviews(
+        widget.userId,
+      );
       // Cache the result
       _reputationCache.setReputation(widget.userId, reputation);
       setState(() {
@@ -236,7 +238,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 reviewerId: review.reviewerId,
                 text: review.reviewText?.trim(),
                 rating: review.rating > 0 ? review.rating.toDouble() : null,
-                submittedAt: DateTime.fromMillisecondsSinceEpoch(review.submittedAt),
+                submittedAt: DateTime.fromMillisecondsSinceEpoch(
+                  review.submittedAt,
+                ),
               ),
             )
             .toList();
@@ -267,7 +271,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       _isLoadingBadges = true;
     });
     try {
-      final badges = await _userProfileScreenCubit.fetchUserBadges(widget.userId);
+      final badges = await _userProfileScreenCubit.fetchUserBadges(
+        widget.userId,
+      );
       // Cache the result
       _reputationCache.setBadges(widget.userId, badges);
       setState(() {
@@ -389,7 +395,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     final l10n = AppLocalizations.of(context)!;
 
     // Check if we're in web panel mode
-    final bool isWebPanel = kIsWeb && !widget.showAppBar && context.canShowSideBySide;
+    final bool isWebPanel =
+        kIsWeb && !widget.showAppBar && context.canShowSideBySide;
 
     return BackButtonHandler(
       onBackPressed: () async {
@@ -401,32 +408,36 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         return false;
       },
       child: BlocListener<NestedPanelCubit, NestedPanelState>(
-          listener: (context, nestedPanelState) {
-            // Notify parent when nested panel state changes (for panel expansion)
-            widget.onNestedPanelChanged?.call(nestedPanelState.isOpen);
+        listener: (context, nestedPanelState) {
+          // Notify parent when nested panel state changes (for panel expansion)
+          widget.onNestedPanelChanged?.call(nestedPanelState.isOpen);
+        },
+        child: BlocBuilder<NestedPanelCubit, NestedPanelState>(
+          builder: (context, nestedPanelState) {
+            // When skipNestedPanelLayout is true, render just the profile content
+            // When false, wrap with AdaptiveNestedPanelLayout for side-by-side nested panels
+            if (widget.skipNestedPanelLayout) {
+              return _buildProfileContent(context, l10n, isWebPanel);
+            }
+
+            return AdaptiveNestedPanelLayout(
+              panelType: nestedPanelState.panelType,
+              userId: nestedPanelState.userId,
+              onClose: () => context.read<NestedPanelCubit>().closePanel(),
+              mainContent: _buildProfileContent(context, l10n, isWebPanel),
+            );
           },
-          child: BlocBuilder<NestedPanelCubit, NestedPanelState>(
-            builder: (context, nestedPanelState) {
-              // When skipNestedPanelLayout is true, render just the profile content
-              // When false, wrap with AdaptiveNestedPanelLayout for side-by-side nested panels
-              if (widget.skipNestedPanelLayout) {
-                return _buildProfileContent(context, l10n, isWebPanel);
-              }
-              
-              return AdaptiveNestedPanelLayout(
-                panelType: nestedPanelState.panelType,
-                userId: nestedPanelState.userId,
-                onClose: () => context.read<NestedPanelCubit>().closePanel(),
-                mainContent: _buildProfileContent(context, l10n, isWebPanel),
-              );
-            },
-          ),
         ),
-      );
+      ),
+    );
   }
 
   /// Builds the main profile content widget
-  Widget _buildProfileContent(BuildContext context, AppLocalizations l10n, bool isWebPanel) {
+  Widget _buildProfileContent(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool isWebPanel,
+  ) {
     return Scaffold(
       appBar: widget.showAppBar
           ? AppBar(
@@ -477,7 +488,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
                           _buildRatingDisplay(l10n),
                           SizedBox(height: 8),
-                          Divider(height: 1, color: Colors.grey.withValues(alpha: 0.25)),
+                          Divider(
+                            height: 1,
+                            color: Colors.grey.withValues(alpha: 0.25),
+                          ),
                           SizedBox(height: 4),
                           Row(
                             children: [
@@ -510,7 +524,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                                       context.push('/location-picker');
                                     } else {
                                       // Panel mode: use push and reload on return
-                                      context.pushReplacement('/location-picker');
+                                      context.pushReplacement(
+                                        '/location-picker',
+                                      );
                                     }
                                   },
                                   icon: Icon(
@@ -518,7 +534,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                                     size: AppDimensions.editIconSize,
                                     color: AppColors.primary,
                                   ),
-                                  padding: EdgeInsets.fromLTRB(4, 4, (kIsWeb ? 8 : 0), 4),
+                                  padding: EdgeInsets.fromLTRB(
+                                    4,
+                                    4,
+                                    (kIsWeb ? 8 : 0),
+                                    4,
+                                  ),
                                   constraints: const BoxConstraints(),
                                   tooltip: l10n.editLocation,
                                 ),
@@ -569,7 +590,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   onTap: () async {
                     final locale = Localizations.localeOf(context);
                     await getIt<OnboardingCubit>().completeOnboarding(
-                        locale.languageCode);
+                      locale.languageCode,
+                    );
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) =>
@@ -597,7 +619,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       await Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) =>
-                          const CreatePostingScreen(isOffer: false),
+                              const CreatePostingScreen(isOffer: false),
                         ),
                       );
                     } catch (e) {
@@ -606,7 +628,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8.0),
+                      horizontal: 12,
+                      vertical: 8.0,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(8.r),
@@ -614,11 +638,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.add,
-                          size: 18,
-                          color: Colors.white,
-                        ),
+                        Icon(Icons.add, size: 18, color: Colors.white),
                         SizedBox(width: 4.w),
                         Text(
                           l10n.addNewPosting,
@@ -647,22 +667,23 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       widget.interests == null || widget.interests!.isEmpty
                           ? const SizedBox()
                           : Wrap(
-                        spacing: 7.2,
-                        runSpacing: 7.2,
-                        children: widget.interests!
-                            .map((interest) {
-                          try {
-                            return AttributeBubble(
-                              attribute: interest,
-                              matchType: AttributeMatchType.none,
-                              scaleFactor: 1.2,
-                            );
-                          } catch (e) {
-                            logDebug('Error rendering interest bubble: $e');
-                            return const SizedBox.shrink();
-                          }
-                        }).toList(),
-                      ),
+                              spacing: 7.2,
+                              runSpacing: 7.2,
+                              children: widget.interests!.map((interest) {
+                                try {
+                                  return AttributeBubble(
+                                    attribute: interest,
+                                    matchType: AttributeMatchType.none,
+                                    scaleFactor: 1.2,
+                                  );
+                                } catch (e) {
+                                  logDebug(
+                                    'Error rendering interest bubble: $e',
+                                  );
+                                  return const SizedBox.shrink();
+                                }
+                              }).toList(),
+                            ),
                     ],
                   ),
                 ),
@@ -687,7 +708,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   onTap: () async {
                     final locale = Localizations.localeOf(context);
                     (await getIt<InterestsCubit>().submitInterests(
-                        locale.languageCode, false));
+                      locale.languageCode,
+                      false,
+                    ));
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) =>
@@ -716,7 +739,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       await Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) =>
-                          const CreatePostingScreen(isOffer: true),
+                              const CreatePostingScreen(isOffer: true),
                         ),
                       );
                     } catch (e) {
@@ -725,7 +748,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8.0),
+                      horizontal: 12,
+                      vertical: 8.0,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(8.r),
@@ -733,11 +758,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.add,
-                          size: 18,
-                          color: Colors.white,
-                        ),
+                        Icon(Icons.add, size: 18, color: Colors.white),
                         SizedBox(width: 4.w),
                         Text(
                           l10n.addNewPosting,
@@ -766,22 +787,23 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       widget.offerings == null || widget.offerings!.isEmpty
                           ? const SizedBox()
                           : Wrap(
-                        spacing: 7.2,
-                        runSpacing: 7.2,
-                        children: widget.offerings!
-                            .map((offering) {
-                          try {
-                            return AttributeBubble(
-                              attribute: offering,
-                              matchType: AttributeMatchType.none,
-                              scaleFactor: 1.2,
-                            );
-                          } catch (e) {
-                            logDebug('Error rendering offering bubble: $e');
-                            return const SizedBox.shrink();
-                          }
-                        }).toList(),
-                      ),
+                              spacing: 7.2,
+                              runSpacing: 7.2,
+                              children: widget.offerings!.map((offering) {
+                                try {
+                                  return AttributeBubble(
+                                    attribute: offering,
+                                    matchType: AttributeMatchType.none,
+                                    scaleFactor: 1.2,
+                                  );
+                                } catch (e) {
+                                  logDebug(
+                                    'Error rendering offering bubble: $e',
+                                  );
+                                  return const SizedBox.shrink();
+                                }
+                              }).toList(),
+                            ),
                     ],
                   ),
                 ),
@@ -817,7 +839,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       // In panel mode, just stay on the current screen
                       if (mounted && widget.showAppBar) {
                         // Include pinVerified flag for web to prevent router double-creation
-                        context.pushReplacement('/map', extra: {'pinVerified': true});
+                        context.pushReplacement(
+                          '/map',
+                          extra: {'pinVerified': true},
+                        );
                       }
                     }
                   },
@@ -835,10 +860,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             if (_profileKeywordDataMap != null)
               CategoryStatsUtils.buildCategoryStatsBar(
                 keywordMap: _profileKeywordDataMap,
-                attributes: [
-                  ...?widget.interests,
-                  ...?widget.offerings,
-                ],
+                attributes: [...?widget.interests, ...?widget.offerings],
               ),
             SizedBox(height: 20.h),
             // Notification Preferences Button
@@ -873,7 +895,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             // Match history will be loaded when user actually opens the match history screen
             BlocBuilder<NotificationsCubit, NotificationsState>(
               builder: (context, notificationState) {
-                final unreadCount = notificationState.matchHistory?.unviewedCount ?? 0;
+                final unreadCount =
+                    notificationState.matchHistory?.unviewedCount ?? 0;
 
                 return Align(
                   alignment: Alignment.centerRight,
@@ -890,7 +913,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                             // Use adaptive behavior: panel within profile on web, full-screen on mobile
                             if (isWebPanel) {
                               // Open as nested panel within profile on web
-                              context.read<NestedPanelCubit>().openMatchHistory();
+                              context
+                                  .read<NestedPanelCubit>()
+                                  .openMatchHistory();
                             } else {
                               // Navigate to full-screen on mobile
                               await Navigator.of(context).push(
@@ -934,12 +959,15 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     // Use adaptive behavior: panel within profile on web, full-screen on mobile
                     if (isWebPanel) {
                       // Open as nested panel within profile on web
-                      context.read<NestedPanelCubit>().openManagePostings(widget.userId);
+                      context.read<NestedPanelCubit>().openManagePostings(
+                        widget.userId,
+                      );
                     } else {
                       // Navigate to full-screen on mobile
                       await Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => ManagePostingsScreen(userId: widget.userId),
+                          builder: (_) =>
+                              ManagePostingsScreen(userId: widget.userId),
                         ),
                       );
                     }
@@ -984,9 +1012,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             child: const SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-              ),
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
           )
         else
@@ -1032,9 +1058,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           const SizedBox(
             width: 16,
             height: 16,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
+            child: CircularProgressIndicator(strokeWidth: 2),
           )
         else
           PointerInterceptor(
@@ -1073,7 +1097,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                         color: (_userBadges != null && _userBadges!.isNotEmpty)
                             ? Colors.grey[700]
                             : Colors.grey[500],
-                        fontWeight: (_userBadges != null && _userBadges!.isNotEmpty)
+                        fontWeight:
+                            (_userBadges != null && _userBadges!.isNotEmpty)
                             ? FontWeight.w600
                             : FontWeight.w500,
                       ),
@@ -1218,7 +1243,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 child: Text(l10n.cancel),
               ),
               FilledButton(
-                onPressed: () => Navigator.of(dialogContext).pop(reasonText.trim()),
+                onPressed: () =>
+                    Navigator.of(dialogContext).pop(reasonText.trim()),
                 child: Text(l10n.submitReview),
               ),
             ],
@@ -1259,10 +1285,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       final message = _extractApiErrorMessage(e) ?? l10n.failedToSubmitAppeal;
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     } catch (_) {
       if (!mounted) return;
@@ -1382,13 +1405,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
       final message = state.statusMessage?.isNotEmpty == true
           ? state.statusMessage!
-          : AppLocalizations.of(context)!
-              .selectedCoinPackage(selectedAmount.toString());
+          : AppLocalizations.of(
+              context,
+            )!.selectedCoinPackage(selectedAmount.toString());
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.green,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.green),
       );
       _loadWalletData();
     });
@@ -1445,8 +1466,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           value: _inAppPurchasesCubit,
           child: BlocConsumer<InAppPurchasesCubit, InAppPurchasesState>(
             listener: (context, state) {
-              if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
-                ScaffoldMessenger.of(this.context).showSnackBar(
+              if (state.errorMessage != null &&
+                  state.errorMessage!.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.errorMessage!),
                     backgroundColor: Colors.red,
@@ -1454,8 +1476,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 );
               }
 
-              if (state.statusMessage != null && state.statusMessage!.isNotEmpty) {
-                ScaffoldMessenger.of(this.context).showSnackBar(
+              if (state.statusMessage != null &&
+                  state.statusMessage!.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.statusMessage!),
                     backgroundColor: Colors.green,
@@ -1471,7 +1494,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             },
             builder: (context, state) {
               return PremiumUserBenefitsDialog(
-                isLoading: state.isPurchasing || state.isRestoring || state.isInitializing,
+                isLoading:
+                    state.isPurchasing ||
+                    state.isRestoring ||
+                    state.isInitializing,
                 onPurchasePremium: () async {
                   await context.read<InAppPurchasesCubit>().purchasePremium();
                 },
@@ -1515,8 +1541,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             message.isNotEmpty
                 ? message
                 : success
-                    ? l10n.dataExportRequestAccepted
-                    : l10n.dataExportRequestFailed,
+                ? l10n.dataExportRequestAccepted
+                : l10n.dataExportRequestFailed,
           ),
           backgroundColor: success ? Colors.green : Colors.red,
         ),
@@ -1551,33 +1577,42 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   }
 
   Future<void> _deleteProfile() async {
-    final l10n = AppLocalizations.of(this.context)!;
+    final l10n = AppLocalizations.of(context)!;
 
     BuildContext? loadingDialogContext;
+    void dismissLoadingDialog() {
+      final dialogContext = loadingDialogContext;
+      if (dialogContext != null && dialogContext.mounted) {
+        Navigator.of(dialogContext, rootNavigator: kIsWeb).pop();
+        return;
+      }
+      if (mounted && Navigator.of(context, rootNavigator: kIsWeb).canPop()) {
+        Navigator.of(context, rootNavigator: kIsWeb).pop();
+      }
+    }
+
     try {
       showDialog(
-        context: this.context,
+        context: context,
         barrierDismissible: false,
         useRootNavigator: kIsWeb,
         builder: (dialogContext) {
           loadingDialogContext = dialogContext;
           return PointerInterceptor(
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
+            child: const Center(child: CircularProgressIndicator()),
           );
         },
       );
 
-      await _userProfileScreenCubit.deleteProfile(widget.userId);
+      await _userProfileScreenCubit
+          .deleteProfile(widget.userId)
+          .timeout(const Duration(seconds: 35));
 
       if (!mounted) return;
 
-      if (loadingDialogContext != null && loadingDialogContext!.mounted) {
-        Navigator.of(loadingDialogContext!, rootNavigator: kIsWeb).pop();
-      }
+      dismissLoadingDialog();
 
-      ScaffoldMessenger.of(this.context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.profileDeleted),
           backgroundColor: Colors.green,
@@ -1587,22 +1622,18 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       if (kIsWeb) {
         SystemNavigator.pop();
       } else {
-        Navigator.of(this.context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => const InitializeScreen(),
-          ),
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const InitializeScreen()),
           (route) => false,
         );
       }
     } catch (e) {
       logDebugError('Error deleting profile', e);
 
-      if (loadingDialogContext != null && loadingDialogContext!.mounted) {
-        Navigator.of(loadingDialogContext!, rootNavigator: kIsWeb).pop();
-      }
+      dismissLoadingDialog();
 
       if (!mounted) return;
-      ScaffoldMessenger.of(this.context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.errorDeletingProfile),
           backgroundColor: Colors.red,
@@ -1610,5 +1641,4 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       );
     }
   }
-
 }

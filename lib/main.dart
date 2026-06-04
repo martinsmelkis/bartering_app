@@ -82,6 +82,7 @@ void main() async {
         context: ErrorDescription('while configuring dependencies'),
       ),
     );
+    logDebug('Startup stack: $stackTrace');
     runApp(_StartupErrorApp(errorMessage: e.toString()));
     return;
   }

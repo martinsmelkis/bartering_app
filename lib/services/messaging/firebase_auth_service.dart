@@ -35,7 +35,11 @@ class FCMTokenService {
     // Send to backend
     final platform = Platform.isAndroid ? 'ANDROID' : 'IOS';
     final success = await _notificationApi.addPushToken(
-      AddPushTokenRequest(token: token, platform: platform, deviceId: userId + "_" + platform)
+      AddPushTokenRequest(
+        token: token,
+        platform: platform,
+        deviceId: '${userId}_$platform',
+      ),
     );
 
     if (success.success != false) {
@@ -54,12 +58,26 @@ class FCMTokenService {
 
     final token = _firebase?.fcmToken;
     if (token != null) {
-      await _notificationApi.removePushToken(
-        token,
-      );
+      try {
+        await _notificationApi
+            .removePushToken(token)
+            .timeout(const Duration(seconds: 5));
+      } catch (e) {
+        logDebug('⚠️ Failed to remove push token during session cleanup: $e');
+      }
     }
 
-    // Unsubscribe from topics
-    await _firebase?.unsubscribeFromTopic('user_$userId');
+    // Unsubscribe from topics as best effort only. Firebase can return
+    // AUTHENTICATION_FAILED after account/app-token state changes; that must
+    // not block account deletion completion.
+    try {
+      await _firebase
+          ?.unsubscribeFromTopic('user_$userId')
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      logDebug(
+        '⚠️ Failed to unsubscribe from FCM topic during session cleanup: $e',
+      );
+    }
   }
 }

@@ -66,22 +66,21 @@ class UserProfileScreenState {
 class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
   final ApiClient _apiClient;
 
-  UserProfileScreenCubit(this._apiClient) : super(const UserProfileScreenState());
+  UserProfileScreenCubit(this._apiClient)
+    : super(const UserProfileScreenState());
 
   Future<ReputationResponse> fetchReputation(String userId) async {
     emit(state.copyWith(isLoadingReputation: true, clearError: true));
     try {
       final reputation = await _apiClient.getReputation(userId);
-      emit(state.copyWith(
-        reputationData: reputation,
-        isLoadingReputation: false,
-      ));
+      emit(
+        state.copyWith(reputationData: reputation, isLoadingReputation: false),
+      );
       return reputation;
     } catch (e) {
-      emit(state.copyWith(
-        isLoadingReputation: false,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(isLoadingReputation: false, errorMessage: e.toString()),
+      );
       rethrow;
     }
   }
@@ -90,16 +89,15 @@ class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
     emit(state.copyWith(isLoadingBadges: true, clearError: true));
     try {
       final badgesResponse = await _apiClient.getUserBadges(userId);
-      emit(state.copyWith(
-        userBadges: badgesResponse.badges,
-        isLoadingBadges: false,
-      ));
+      emit(
+        state.copyWith(
+          userBadges: badgesResponse.badges,
+          isLoadingBadges: false,
+        ),
+      );
       return badgesResponse.badges;
     } catch (e) {
-      emit(state.copyWith(
-        isLoadingBadges: false,
-        errorMessage: e.toString(),
-      ));
+      emit(state.copyWith(isLoadingBadges: false, errorMessage: e.toString()));
       rethrow;
     }
   }
@@ -108,16 +106,10 @@ class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
     emit(state.copyWith(isLoadingWallet: true, clearError: true));
     try {
       final wallet = await _apiClient.getWallet();
-      emit(state.copyWith(
-        walletData: wallet,
-        isLoadingWallet: false,
-      ));
+      emit(state.copyWith(walletData: wallet, isLoadingWallet: false));
       return wallet;
     } catch (e) {
-      emit(state.copyWith(
-        isLoadingWallet: false,
-        errorMessage: e.toString(),
-      ));
+      emit(state.copyWith(isLoadingWallet: false, errorMessage: e.toString()));
       rethrow;
     }
   }
@@ -154,29 +146,39 @@ class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
     try {
       final authService = FCMTokenService();
       try {
-        await authService.onSessionEnded(userId);
+        await authService
+            .onSessionEnded(userId)
+            .timeout(const Duration(seconds: 8));
       } catch (sessionEndError) {
-        logDebug('⚠️ Session cleanup failed during profile deletion: $sessionEndError');
+        logDebug(
+          '⚠️ Session cleanup failed during profile deletion: $sessionEndError',
+        );
       }
 
-      await _apiClient.deleteUser(userId);
+      await _apiClient.deleteUser(userId).timeout(const Duration(seconds: 20));
 
       try {
         await getIt<ChatRepository>().clearAllChats();
       } catch (chatClearError) {
-        logDebug('⚠️ Failed to clear local chats during profile deletion: $chatClearError');
+        logDebug(
+          '⚠️ Failed to clear local chats during profile deletion: $chatClearError',
+        );
       }
 
       try {
         await SecureStorageService().clearStorage();
       } catch (secureStorageError) {
-        logDebug('⚠️ Failed to clear secure storage during profile deletion: $secureStorageError');
+        logDebug(
+          '⚠️ Failed to clear secure storage during profile deletion: $secureStorageError',
+        );
       }
 
       try {
         await getIt<SettingsService>().clearAll();
       } catch (settingsClearError) {
-        logDebug('⚠️ Failed to clear settings during profile deletion: $settingsClearError');
+        logDebug(
+          '⚠️ Failed to clear settings during profile deletion: $settingsClearError',
+        );
       }
 
       try {
@@ -193,7 +195,9 @@ class UserProfileScreenCubit extends Cubit<UserProfileScreenState> {
         try {
           await Platform.clearAllBrowserStorage();
         } catch (browserStorageError) {
-          logDebug('⚠️ Failed to clear browser storage during profile deletion: $browserStorageError');
+          logDebug(
+            '⚠️ Failed to clear browser storage during profile deletion: $browserStorageError',
+          );
         }
       }
     } catch (e) {
