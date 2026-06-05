@@ -202,15 +202,20 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                     ),
                     const SizedBox(height: 16),
                     // Submit button
-                    Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        final locale = Localizations.localeOf(context);
-                        _offersCubit.submitOffers(locale.languageCode);
-                      },
-                      child: Text(l10n.continueButton),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewPadding.bottom,
+                      ),
+                      child: Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final locale = Localizations.localeOf(context);
+                            _offersCubit.submitOffers(locale.languageCode);
+                          },
+                          child: Text(l10n.continueButton),
+                        ),
+                      ),
                     ),
-                  ),
                 ],
               ),
             );

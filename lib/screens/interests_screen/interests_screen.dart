@@ -219,17 +219,22 @@ class _InterestsViewState extends State<InterestsView> {
                     ),
                     const SizedBox(height: 16),
                     // Submit button
-                    Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        final locale = Localizations.localeOf(context);
-                        context
-                            .read<InterestsCubit>()
-                            .submitInterests(locale.languageCode, true);
-                      },
-                      child: Text(l10n.continueButton),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewPadding.bottom,
+                      ),
+                      child: Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final locale = Localizations.localeOf(context);
+                            context
+                                .read<InterestsCubit>()
+                                .submitInterests(locale.languageCode, true);
+                          },
+                          child: Text(l10n.continueButton),
+                        ),
+                      ),
                     ),
-                  ),
                 ],
               ),
             );
