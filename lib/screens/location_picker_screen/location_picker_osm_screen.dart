@@ -8,7 +8,7 @@ import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repositories/user_repository.dart';
 import '../../services/api_client.dart';
-import '../../services/secure_storage_service.dart';
+import '../../services/location_check_in_service.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/dialogs/error_dialog.dart';
 import '../../widgets/dialogs/progress_dialog.dart';
@@ -81,14 +81,15 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
   Future<void> _saveLocation(GeoPoint point) async {
     _selectedPoint = point;
     if (_selectedPoint != null) {
-      final prefs = await SecureStorageService();
-      await prefs.saveOwnLocation(
-          "${_selectedPoint!.latitude.toString()}"
-              ", ${_selectedPoint!.longitude.toString()}");
+      final publishToMap = await _confirmLocationCheckIn();
+      if (publishToMap == null) return;
+
+      LocationCheckInService().setCheckedIn(publishToMap);
+
       if (mounted) {
         _locationPickerCubit.state.selectedLocation = _selectedPoint;
         // update profile trough Cubit, navigate to MapScreen on submit success
-        _locationPickerCubit.saveLocation(_selectedPoint);
+        _locationPickerCubit.saveLocation(_selectedPoint, publishToMap: publishToMap);
       }
     } else {
       if (mounted) {
@@ -99,6 +100,33 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
         );
       }
     }
+  }
+
+  Future<bool?> _confirmLocationCheckIn() async {
+    if (!mounted) return null;
+
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => PointerInterceptor(
+        child: AlertDialog(
+          title: const Text('Display your location on the map?'),
+          content: const Text(
+            'If you check in, this location can be shown to other users on the map for this app session. You can decline and keep it saved only on this device.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Check in'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   /*@override

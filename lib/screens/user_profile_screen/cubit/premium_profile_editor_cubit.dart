@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
+import 'package:barter_app/services/location_check_in_service.dart';
 import 'package:barter_app/utils/dio_error_handler.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -458,14 +459,15 @@ class PremiumProfileEditorCubit extends Cubit<PremiumProfileEditorState> {
         ...existingWorkReferenceImageUrls,
         ...newWorkReferenceImageUrls,
       ];
+      final isCheckedIn = LocationCheckInService().isCheckedIn;
 
       final updatedProfile = UserProfileData(
         userId: userId,
         name: (state.name ?? '').trim().isNotEmpty
             ? (state.name ?? '').trim()
             : (_userRepository.userName ?? ''),
-        latitude: _userRepository.latitude,
-        longitude: _userRepository.longitude,
+        latitude: isCheckedIn ? _userRepository.latitude : null,
+        longitude: isCheckedIn ? _userRepository.longitude : null,
         profileKeywordDataMap: keywordMap,
         selfDescription: (state.description ?? '').trim().isNotEmpty
             ? (state.description ?? '').trim()

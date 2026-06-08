@@ -1,4 +1,5 @@
 import 'package:barter_app/configure_dependencies.dart';
+import 'package:barter_app/services/location_check_in_service.dart';
 import 'package:barter_app/services/settings_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +50,17 @@ class DrawerMain extends StatelessWidget {
                     final settingsService = getIt<SettingsService>();
                     final useMapCenter = await settingsService.getUseMapCenterForSearch();
                     final radiusKm = await settingsService.getNearbyUsersRadius();
+                    final isCheckedIn = LocationCheckInService().isCheckedIn;
+
+                    if (!useMapCenter && !isCheckedIn) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please manually check in before searching from your location.'),
+                        ),
+                      );
+                      return;
+                    }
                     
                     if (useMapCenter) {
                       final mapCenter = await mapController.centerMap;
@@ -77,6 +89,17 @@ class DrawerMain extends StatelessWidget {
                       final settingsService = getIt<SettingsService>();
                       final useMapCenter = await settingsService.getUseMapCenterForSearch();
                       final radiusKm = await settingsService.getNearbyUsersRadius();
+                      final isCheckedIn = LocationCheckInService().isCheckedIn;
+
+                      if (!useMapCenter && !isCheckedIn) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please manually check in before searching from your location.'),
+                          ),
+                        );
+                        return;
+                      }
                       
                       if (useMapCenter) {
                         final mapCenter = await mapController.centerMap;

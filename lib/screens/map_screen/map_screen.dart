@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/screens/chats_list_screen/cubit/chats_badge_cubit.dart';
@@ -34,6 +35,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../configure_dependencies.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/map/point_of_interest.dart';
+import '../../services/api_client.dart';
+import '../../services/location_check_in_service.dart';
 import '../../services/messaging/firebase_auth_service.dart';
 import '../../services/messaging/firebase_service.dart';
 import '../../utils/geo_utils.dart';
@@ -89,6 +92,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   String? _currentUserName;
   List<ParsedAttributeData>? _userInterests;
   List<ParsedAttributeData>? _userOfferings;
+  bool _hasClearedLocationForThisSession = false;
 
   // GlobalKey to preserve Scaffold state and prevent map rebuilds
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -135,7 +139,6 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     mapOperationsCubit = context.read<MapOperationsCubit>();
     _mapController.addObserver(this);
 
-    // Load GPS location setting
     final settingsService = getIt<SettingsService>();
     _isGpsLocationEnabled = settingsService.isGpsLocationEnabledSync();
 
@@ -192,6 +195,8 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   Future<void> _loadUserProfile() async {
     final userRepository = getIt<UserRepository>();
 
+    await _clearPublishedLocationUnlessCheckedIn(userRepository);
+
     _currentUserId = await userRepository.getUserId();
     _currentUserName = await userRepository.getUserName();
     _userInterests = await userRepository.getInterests(loadFromStorage: true);
@@ -203,6 +208,35 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     if (mounted) {
       setState(() {});
       _autoOpenProfileOnWebLargeScreen();
+    }
+  }
+
+  Future<void> _clearPublishedLocationUnlessCheckedIn(UserRepository userRepository) async {
+    if (_hasClearedLocationForThisSession) return;
+
+    final isCheckedIn = LocationCheckInService().isCheckedIn;
+    if (isCheckedIn) return;
+
+    _hasClearedLocationForThisSession = true;
+
+    final userId = await userRepository.getUserId();
+    if (userId == null || userId.isEmpty) return;
+
+    try {
+      final profileData = UserProfileData(
+        userId: userId,
+        name: await userRepository.getUserName() ?? "",
+        latitude: null,
+        longitude: null,
+        attributes: List.empty(growable: false),
+        profileKeywordDataMap: await userRepository.getProfileKeywordDataMap(),
+        activePostingIds: List.empty(growable: false),
+      );
+      await getIt<ApiClient>().updateProfileInfo(profileData);
+      userRepository.invalidateCachedProfileInfo();
+      logDebug('✅ Cleared published location until the user manually checks in');
+    } catch (e) {
+      logDebugError('Error clearing published location', e);
     }
   }
 
@@ -329,8 +363,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       );
       _processPois(widget.initialPois!);
     } else {
-      // Default behavior: zoom to saved location and perform default search
-      await _zoomToSavedLocation();
+      // Default behavior: zoom to saved location only after a manual check-in.
+      final isCheckedIn = LocationCheckInService().isCheckedIn;
+      if (isCheckedIn) {
+        await _zoomToSavedLocation();
+      }
 
       // Check if user has a saved location before performing search
       final locationString = await SecureStorageService().getOwnLocation();
@@ -1111,6 +1148,17 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
                             final settingsService = getIt<SettingsService>();
                             final useMapCenter = await settingsService.getUseMapCenterForSearch();
                             final radiusKm = await settingsService.getNearbyUsersRadius();
+                            final isCheckedIn = LocationCheckInService().isCheckedIn;
+
+                            if (!useMapCenter && !isCheckedIn) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Please manually check in before searching from your location.'),
+                                ),
+                              );
+                              return;
+                            }
 
                             final radiusMeters = radiusKm * 1000;
                             _lastNearbySearchRadiusMeters = radiusMeters;

@@ -8,6 +8,7 @@ import '../../models/profile/user_consent_update_request.dart';
 import '../../models/profile/user_profile_data.dart';
 import '../../repositories/user_repository.dart';
 import '../../services/api_client.dart';
+import '../../services/location_check_in_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/secure_storage_service.dart';
 import '../../theme/app_colors.dart';
@@ -796,12 +797,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return;
       }
 
+      final isCheckedIn = LocationCheckInService().isCheckedIn;
+
       // Create updated profile with new language
       final updatedProfile = UserProfileData(
         userId: userId,
         name: userName,
-        latitude: _userRepository.latitude,
-        longitude: _userRepository.longitude,
+        latitude: isCheckedIn ? _userRepository.latitude : null,
+        longitude: isCheckedIn ? _userRepository.longitude : null,
         attributes: List.empty(growable: false),
         profileKeywordDataMap: await _userRepository.getProfileKeywordDataMap(),
         activePostingIds: [],

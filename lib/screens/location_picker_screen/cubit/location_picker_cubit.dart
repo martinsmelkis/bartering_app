@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:barter_app/models/profile/user_profile_data.dart';
 import 'package:barter_app/repositories/user_repository.dart';
 import 'package:barter_app/services/api_client.dart';
@@ -22,7 +20,7 @@ class LocationPickerCubit extends Cubit<LocationPickerState> {
     emit(state.copyWith(status: LocationPickerStatus.initial));
   }
 
-  Future<void> saveLocation(GeoPoint? position) async {
+  Future<void> saveLocation(GeoPoint? position, {bool publishToMap = false}) async {
     if (position == null) {
       emit(state.copyWith(status: LocationPickerStatus.error, errorMessage: "Please select a location first."));
       return;
@@ -31,6 +29,10 @@ class LocationPickerCubit extends Cubit<LocationPickerState> {
     emit(state.copyWith(status: LocationPickerStatus.loading));
 
     try {
+      await _userRepository.saveOwnLocation(
+          "${position.latitude.toString()}"
+              ", ${position.longitude.toString()}");
+
       final profileData = UserProfileData(
         userId: _userRepository.userId!,
         name: "",
