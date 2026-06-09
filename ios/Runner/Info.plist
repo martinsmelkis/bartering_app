@@ -32,6 +32,10 @@
 	<string>Barter App can use your location to show nearby users and improve match relevance. Location access is optional and can be enabled in settings.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Barter App can use your location to show nearby users and improve match relevance. Location access is optional and can be enabled in settings.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Barter App uses your camera only when you choose to take a photo for a posting, profile, or chat message.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Barter App uses your photo library only when you choose an image for a posting, profile, or chat message.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

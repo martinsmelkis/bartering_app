@@ -72,10 +72,30 @@ class AppRouter {
     return null;
   }
 
+  static const Set<String> _publicRoutes = {
+    '/privacy-policy',
+    '/terms',
+    '/delete-account',
+    '/account-deletion',
+  };
+
+  static String _initialLocation() {
+    if (!kIsWeb) return '/initialize';
+
+    final fragment = Uri.base.fragment.trim();
+    if (fragment.isEmpty) return '/initialize';
+
+    final normalized = fragment.startsWith('/') ? fragment : '/$fragment';
+    final path = Uri.tryParse(normalized)?.path;
+    if (path != null && _publicRoutes.contains(path)) return normalized;
+
+    return '/initialize';
+  }
+
   static final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: true,
-    initialLocation: '/initialize',
+    initialLocation: _initialLocation(),
     redirect: (context, state) {
       final token = _extractUnsubscribeToken(state);
       final hasToken = token != null && token.isNotEmpty;
