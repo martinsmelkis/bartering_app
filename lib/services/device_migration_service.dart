@@ -1,6 +1,7 @@
 // Secure Device Migration Framework for Barter App
 // Handles cross-device user data synchronization with end-to-end encryption
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -183,6 +184,7 @@ class DeviceMigrationService {
   static const String _migrationNonceKey = 'migration_nonce_';
   static const Duration _sessionExpiry = Duration(minutes: 15);
   static const Duration _confirmationTimeout = Duration(minutes: 5);
+  static const Duration _joinSessionTimeout = Duration(seconds: 15);
 
   final SecureStorageService _secureStorage;
   final ApiClient _apiClient;
@@ -403,11 +405,11 @@ class DeviceMigrationService {
         'sessionCode': sessionCode,
         'targetDeviceId': deviceFingerprint,
         'targetPublicKey': ephemeralPublicKey,
-      });
+      }).timeout(_joinSessionTimeout);
 
       if (!response.success || response.sessionId == null) {
         return MigrationJoinResult.error(
-          response.errorMessage ?? 'Failed to join session - no sessionId received',
+          response.errorMessage ?? 'Invalid migration code. Please check the code and try again.',
         );
       }
 
@@ -435,9 +437,19 @@ class DeviceMigrationService {
         userId: response.userId!,
         requiresConfirmation: true,
       );
+    } on TimeoutException {
+      logDebugError('Timed out joining migration session');
+      return MigrationJoinResult.error(
+        'Migration code check timed out. Please check your connection and try again.',
+      );
+    } on DioException catch (e) {
+      logDebugError('Failed to join migration session: $e');
+      return MigrationJoinResult.error(_getMigrationJoinErrorMessage(e));
     } catch (e) {
       logDebugError('Failed to join migration session: $e');
-      return MigrationJoinResult.error('Join failed: $e');
+      return MigrationJoinResult.error(
+        'Unable to check this migration code. Please try again.',
+      );
     }
   }
 
@@ -581,6 +593,32 @@ class DeviceMigrationService {
     }
   }
 
+  /// Converts migration join failures to user-friendly error messages.
+  String _getMigrationJoinErrorMessage(DioException e) {
+    final statusCode = e.response?.statusCode;
+    final data = e.response?.data;
+
+    if (data is Map<String, dynamic>) {
+      final serverMessage = data['errorMessage'] ?? data['message'];
+      if (serverMessage is String && serverMessage.trim().isNotEmpty) {
+        return serverMessage;
+      }
+    }
+
+    switch (statusCode) {
+      case 400:
+      case 404:
+        return 'Invalid migration code. Please check the code and try again.';
+      case 408:
+      case 504:
+        return 'Migration code check timed out. Please check your connection and try again.';
+      case 429:
+        return 'Too many attempts. Please wait a few minutes and try again.';
+      default:
+        return 'Unable to check this migration code. Please try again.';
+    }
+  }
+
   /// Converts DioException to user-friendly error message
   String _getUserFriendlyErrorMessage(DioException e) {
     final response = e.response;
@@ -694,7 +732,7 @@ class DeviceMigrationService {
         }
 
         // Parse and save attributes (interests and offerings)
-        final attributes = profileData.attributes ?? [];
+        final attributes = profileData.attributes;
         final interests = attributes
             .where((a) => a.type == 0) // 0 = interest type
             .map((a) => ParsedAttributeData(
@@ -818,7 +856,7 @@ class DeviceMigrationService {
     combinedPayload.setAll(salt.length + iv.length, encryptedBytes);
 
     // 7. Sign the combined payload
-    final payloadToSign = '${session.sessionId}.${targetDeviceId}.${base64Encode(combinedPayload)}';
+    final payloadToSign = '${session.sessionId}.$targetDeviceId.${base64Encode(combinedPayload)}';
     logDebug('📝 Signing payload: ${payloadToSign.substring(0, min(50, payloadToSign.length))}...');
     final signature = _cryptoService!.signMessage(payloadToSign);
     if (signature == null) {

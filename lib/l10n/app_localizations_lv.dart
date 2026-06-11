@@ -252,7 +252,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get termsConditionsSectionMinimumAgeContent =>
-      'Lietotne paredzēta personām no 16 gadu vecuma. Reģistrējoties, jūs apliecināt, ka jums ir vismaz 16 gadi.';
+      'Lietotne paredzēta personām no 18 gadu vecuma. Reģistrējoties, jūs apliecināt, ka jums ir vismaz 18 gadi.';
 
   @override
   String get termsConditionsSectionAccountUseTitle =>
@@ -3188,11 +3188,19 @@ class AppLocalizationsLv extends AppLocalizations {
       'Neizdevās pievienoties pārcelšanas sesijai';
 
   @override
+  String get invalidMigrationCode =>
+      'Nederīgs pārcelšanas kods. Lūdzu, pārbaudiet kodu un mēģiniet vēlreiz.';
+
+  @override
   String get failedToSendCode => 'Neizdevās nosūtīt atjaunošanas kodu';
 
   @override
   String get migrationTimedOut =>
       'Pārcelšanas laiks beidzies. Lūdzu, mēģiniet vēlreiz ar jaunu kodu.';
+
+  @override
+  String get migrationPayloadTimedOut =>
+      'Pārcelšanas laiks beidzies, gaidot apstiprinājumu no otras ierīces. Lūdzu, mēģiniet vēlreiz ar jaunu kodu.';
 
   @override
   String get failedToProcessMigration =>

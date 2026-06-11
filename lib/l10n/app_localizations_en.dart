@@ -248,7 +248,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get termsConditionsSectionMinimumAgeContent =>
-      'The app is intended for users aged 16 or older. By registering, you confirm you are at least 16 years old.';
+      'The app is intended for users aged 18 or older. By registering, you confirm you are at least 18 years old.';
 
   @override
   String get termsConditionsSectionAccountUseTitle =>
@@ -3154,11 +3154,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToJoinMigration => 'Failed to join migration session';
 
   @override
+  String get invalidMigrationCode =>
+      'Invalid migration code. Please check the code and try again.';
+
+  @override
   String get failedToSendCode => 'Failed to send recovery code';
 
   @override
   String get migrationTimedOut =>
       'Migration timed out. Please try again with a new code.';
+
+  @override
+  String get migrationPayloadTimedOut =>
+      'Migration timed out waiting for approval from the other device. Please try again with a new code.';
 
   @override
   String get failedToProcessMigration => 'Failed to process migration data';

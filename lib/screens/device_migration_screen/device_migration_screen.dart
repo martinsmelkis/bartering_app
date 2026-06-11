@@ -95,10 +95,15 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
     // Step 1: Join the migration session
     final joinResult = await cubit.joinMigrationSession(sessionCode);
 
+    if (!mounted) return;
+
     if (!joinResult.success || joinResult.sessionId == null) {
       setState(() {
         _isSubmitting = false;
-        _errorMessage = joinResult.errorMessage ?? l10n.failedToJoinMigration;
+        _errorMessage = _localizedJoinError(
+          joinResult.errorMessage,
+          l10n,
+        );
       });
       return;
     }
@@ -110,8 +115,9 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
     // Step 2: Poll for payload to be available (wait for "transferring" status)
     // Use sessionId (UUID) for payload retrieval, not sessionCode
     EncryptedMigrationPayloadResponse? payload;
+    String? pollingErrorMessage;
     int pollAttempts = 0;
-    const maxPollAttempts = 60; // Poll for up to 10 minutes (10 seconds * 60)
+    const maxPollAttempts = 12; // Poll for up to 2 minutes (10 seconds * 12)
 
     while (payload == null && pollAttempts < maxPollAttempts) {
       await Future.delayed(const Duration(seconds: 10));
@@ -135,13 +141,30 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
           }
           
           // Check if session ended without payload
-          if (statusResponse.status == 'completed' || 
-              statusResponse.status == 'expired' || 
-              statusResponse.status == 'cancelled' ||
-              statusResponse.status == 'failed') {
-            logDebugError('❌ Session ended with status: ${statusResponse.status}');
+          if (statusResponse.status == 'expired') {
+            logDebugError('❌ Session expired while waiting for migration payload');
+            pollingErrorMessage = l10n.migrationTimedOut;
             break;
           }
+
+          if (statusResponse.status == 'cancelled' ||
+              statusResponse.status == 'failed') {
+            logDebugError('❌ Session ended with status: ${statusResponse.status}');
+            pollingErrorMessage = statusResponse.errorMessage ?? l10n.failedToJoinMigration;
+            break;
+          }
+
+          if (statusResponse.status == 'completed') {
+            logDebugError('❌ Session completed without migration payload');
+            pollingErrorMessage = l10n.failedToProcessMigration;
+            break;
+          }
+        } else {
+          pollingErrorMessage = _localizedJoinError(
+            statusResponse.errorMessage,
+            l10n,
+          );
+          break;
         }
       } catch (e) {
         // Payload not ready yet, continue polling
@@ -154,7 +177,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
     if (payload == null) {
       setState(() {
         _isSubmitting = false;
-        _errorMessage = l10n.migrationTimedOut;
+        _errorMessage = pollingErrorMessage ?? l10n.migrationPayloadTimedOut;
       });
       return;
     }
@@ -185,10 +208,29 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
       logDebugError('⚠️ No userId in migration result - chat may not work');
     }
 
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     // Navigate to map screen after successful migration
     context.go('/map');
+  }
+
+  String _localizedJoinError(String? errorMessage, AppLocalizations l10n) {
+    final normalized = errorMessage?.toLowerCase() ?? '';
+
+    if (normalized.contains('invalid') ||
+        normalized.contains('not found') ||
+        normalized.contains('404')) {
+      return l10n.invalidMigrationCode;
+    }
+
+    if (normalized.contains('timed out') ||
+        normalized.contains('timeout') ||
+        normalized.contains('408') ||
+        normalized.contains('504')) {
+      return l10n.migrationTimedOut;
+    }
+
+    return errorMessage ?? l10n.failedToJoinMigration;
   }
 
   void _clearAll() {

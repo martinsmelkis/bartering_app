@@ -521,7 +521,7 @@ abstract class AppLocalizations {
   /// No description provided for @termsConditionsSectionMinimumAgeContent.
   ///
   /// In en, this message translates to:
-  /// **'The app is intended for users aged 16 or older. By registering, you confirm you are at least 16 years old.'**
+  /// **'The app is intended for users aged 18 or older. By registering, you confirm you are at least 18 years old.'**
   String get termsConditionsSectionMinimumAgeContent;
 
   /// No description provided for @termsConditionsSectionAccountUseTitle.
@@ -5894,6 +5894,12 @@ abstract class AppLocalizations {
   /// **'Failed to join migration session'**
   String get failedToJoinMigration;
 
+  /// No description provided for @invalidMigrationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid migration code. Please check the code and try again.'**
+  String get invalidMigrationCode;
+
   /// No description provided for @failedToSendCode.
   ///
   /// In en, this message translates to:
@@ -5905,6 +5911,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Migration timed out. Please try again with a new code.'**
   String get migrationTimedOut;
+
+  /// No description provided for @migrationPayloadTimedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration timed out waiting for approval from the other device. Please try again with a new code.'**
+  String get migrationPayloadTimedOut;
 
   /// No description provided for @failedToProcessMigration.
   ///
