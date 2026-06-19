@@ -3175,7 +3175,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clear => 'Clear';
 
   @override
-  String get importExistingAccount => 'Import Existing Account';
+  String get importExistingAccount => 'Import or delete Account';
 
   @override
   String get targetStep1 => 'Open the app on your other device';

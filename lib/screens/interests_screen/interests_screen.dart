@@ -177,7 +177,7 @@ class _InterestsViewState extends State<InterestsView> {
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
                     // Custom keyword input
                     TextField(
                       controller: _customKeywordController,
@@ -201,7 +201,7 @@ class _InterestsViewState extends State<InterestsView> {
                         _customKeywordController.clear();
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     // Custom keywords list
                     Wrap(
                       spacing: 8.0,
@@ -217,7 +217,7 @@ class _InterestsViewState extends State<InterestsView> {
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     // Submit button
                     Padding(
                       padding: EdgeInsets.only(

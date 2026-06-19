@@ -5933,7 +5933,7 @@ abstract class AppLocalizations {
   /// No description provided for @importExistingAccount.
   ///
   /// In en, this message translates to:
-  /// **'Import Existing Account'**
+  /// **'Import or delete Account'**
   String get importExistingAccount;
 
   /// No description provided for @targetStep1.

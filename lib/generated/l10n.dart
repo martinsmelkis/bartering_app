@@ -8729,10 +8729,10 @@ class S {
     return Intl.message('Clear', name: 'clear', desc: '', args: []);
   }
 
-  /// `Import Existing Account`
+  /// `Import or delete Account`
   String get importExistingAccount {
     return Intl.message(
-      'Import Existing Account',
+      'Import or delete Account',
       name: 'importExistingAccount',
       desc: '',
       args: [],

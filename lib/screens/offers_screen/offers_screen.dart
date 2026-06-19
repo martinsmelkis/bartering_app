@@ -160,7 +160,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     // Custom keyword input
                     TextField(
                       controller: _customKeywordController,
@@ -184,7 +184,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                         _customKeywordController.clear();
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     // Custom keywords list
                     Wrap(
                       spacing: spacing,
@@ -200,7 +200,7 @@ class _OffersScreenState extends State<OffersScreenWidget> {
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     // Submit button
                     Padding(
                       padding: EdgeInsets.only(

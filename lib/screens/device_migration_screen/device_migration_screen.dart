@@ -274,7 +274,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 16),
                   // Icon
                   Container(
                     padding: EdgeInsets.all(24.r),
@@ -288,7 +288,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                       color: AppColors.primary,
                     ),
                   ),
-                  SizedBox(height: 32),
+                  SizedBox(height: 24),
                   // Title
                   Text(
                     l10n.importAccount,
@@ -299,7 +299,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 16.h),
+                  SizedBox(height: 16),
                   // Description
                   Text(
                     l10n.importAccountDescription,
@@ -310,10 +310,10 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 40.h),
+                  SizedBox(height: 32),
                   // Code input boxes
                   _buildCodeInput(fontScale),
-                  SizedBox(height: 32.h),
+                  SizedBox(height: 32),
                   // Error message
                   if (_errorMessage != null)
                     Container(
@@ -381,7 +381,7 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                             ),
                     ),
                   ),
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 8),
                   // Clear button
                   TextButton(
                     onPressed: _clearAll,
@@ -393,7 +393,40 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16.h),
+                  SizedBox(height: 8),
+                  // Instructions
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildInstructionStep(
+                          '1',
+                          l10n.targetStep1,
+                          fontScale,
+                        ),
+                        SizedBox(height: 8),
+                        _buildInstructionStep(
+                          '2',
+                          l10n.targetStep2,
+                          fontScale,
+                        ),
+                        SizedBox(height: 8),
+                        _buildInstructionStep(
+                          '3',
+                          l10n.targetStep3,
+                          fontScale,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 16),
                   // Email recovery option
                   TextButton.icon(
                     onPressed: () {
@@ -417,37 +450,22 @@ class _DeviceMigrationScreenState extends State<DeviceMigrationScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 40),
-                  // Instructions
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                      ),
+                  SizedBox(height: 8),
+                  // Account deletion option
+                  TextButton.icon(
+                    onPressed: () => context.push('/delete-account'),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      color: Colors.red.shade700,
+                      size: 20,
                     ),
-                    child: Column(
-                      children: [
-                        _buildInstructionStep(
-                          '1',
-                          l10n.targetStep1,
-                          fontScale,
-                        ),
-                        SizedBox(height: 12.h),
-                        _buildInstructionStep(
-                          '2',
-                          l10n.targetStep2,
-                          fontScale,
-                        ),
-                        SizedBox(height: 12.h),
-                        _buildInstructionStep(
-                          '3',
-                          l10n.targetStep3,
-                          fontScale,
-                        ),
-                      ],
+                    label: Text(
+                      l10n.accountDeletionTitle,
+                      style: TextStyle(
+                        color: Colors.red.shade700,
+                        fontSize: context.bodyFontSize / fontScale,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],

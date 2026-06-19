@@ -1232,7 +1232,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Enter the 10-character migration code from your other device to import your account data.",
     ),
     "importExistingAccount": MessageLookupByLibrary.simpleMessage(
-      "Import Existing Account",
+      "Import or delete Account",
     ),
     "inAppFailedToInitializePurchases": MessageLookupByLibrary.simpleMessage(
       "Failed to initialize purchases",
