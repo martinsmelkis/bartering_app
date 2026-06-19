@@ -8,9 +8,7 @@ share knowledge, or trade items.
 
 Use together with [bartering_app_backend](https://github.com/martinsmelkis/bartering_app_backend).
 
-<img width="1791" height="620" alt="app_screens_play_store" src="https://github.com/user-attachments/assets/a9f9857b-436b-4503-b713-1699d1ba6458" />
-
-
+<img width="1788" height="621" alt="app_screens_play_store_1" src="https://github.com/user-attachments/assets/729b0cf5-647c-4db0-944f-9612a425559b" />
 
 ### Key Features
 
