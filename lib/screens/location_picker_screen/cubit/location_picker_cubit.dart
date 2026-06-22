@@ -22,7 +22,7 @@ class LocationPickerCubit extends Cubit<LocationPickerState> {
     emit(state.copyWith(status: LocationPickerStatus.initial));
   }
 
-  Future<void> saveLocation(GeoPoint? position) async {
+  Future<void> saveLocation(GeoPoint? position, {bool publishToMap = false}) async {
     if (position == null) {
       emit(state.copyWith(status: LocationPickerStatus.error, errorMessage: "Please select a location first."));
       return;
@@ -31,11 +31,15 @@ class LocationPickerCubit extends Cubit<LocationPickerState> {
     emit(state.copyWith(status: LocationPickerStatus.loading));
 
     try {
+      await _userRepository.saveOwnLocation(
+          "${position.latitude.toString()}"
+              ", ${position.longitude.toString()}");
+
       final profileData = UserProfileData(
         userId: _userRepository.userId!,
         name: "",
-        latitude: position.latitude,
-        longitude: position.longitude,
+        latitude: publishToMap ? position.latitude : null,
+        longitude: publishToMap ? position.longitude : null,
         attributes: List.empty(growable: false),
         profileKeywordDataMap: await _userRepository.getProfileKeywordDataMap(),
         activePostingIds: List.empty(growable: false),

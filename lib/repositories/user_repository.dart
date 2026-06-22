@@ -117,6 +117,17 @@ class UserRepository {
   double get longitude => userLocation?.isNotEmpty == true ?
     double.tryParse(userLocation?.split(',')[1] ?? "") ?? 0.0 : 0.0;
 
+  Future<String?> getOwnLocation({bool loadFromStorage = false}) async {
+    userLocation = loadFromStorage ? await _secureStorageService.getOwnLocation()
+        : userLocation ?? await _secureStorageService.getOwnLocation();
+    return userLocation;
+  }
+
+  Future<void> saveOwnLocation(String location) async {
+    userLocation = location;
+    await _secureStorageService.saveOwnLocation(location);
+  }
+
   Future<String?> getUserId() async {
     if (userId == null) {
       logDebug('🔄 UserRepository: Loading userId from storage');

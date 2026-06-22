@@ -36,17 +36,62 @@ class PoiCubit extends Cubit<PoiState> {
       final distanceA = a.distanceKm ?? double.maxFinite;
       final distanceB = b.distanceKm ?? double.maxFinite;
       final distanceComparison = distanceA.compareTo(distanceB);
-      
+
       if (distanceComparison != 0) {
         return distanceComparison;
       }
-      
+
       // If distances are equal, sort by relevancy score (descending - highest first)
       final relevancyA = a.matchRelevancyScore ?? 0.0;
       final relevancyB = b.matchRelevancyScore ?? 0.0;
       return relevancyB.compareTo(relevancyA);
     });
     return sorted;
+  }
+
+  bool _hasUsableCoordinates(PointOfInterest poi) {
+    final latitude = poi.profile.latitude;
+    final longitude = poi.profile.longitude;
+    return latitude != null &&
+        longitude != null &&
+        !(latitude == 0.0 && longitude == 0.0);
+  }
+
+  List<PointOfInterest> _withFallbackCoordinates(
+      List<PointOfInterest> pois,
+      double? fallbackLatitude,
+      double? fallbackLongitude,
+      ) {
+    if (fallbackLatitude == null ||
+        fallbackLongitude == null ||
+        (fallbackLatitude == 0.0 && fallbackLongitude == 0.0)) {
+      return pois;
+    }
+
+    return pois
+        .map(
+          (poi) => _hasUsableCoordinates(poi)
+          ? poi
+          : poi.copyWith(
+        userProfileData: poi.profile.copyWith(
+          latitude: fallbackLatitude,
+          longitude: fallbackLongitude,
+        ),
+      ),
+    )
+        .toList();
+  }
+
+  Future<(double?, double?)> _getSavedLocationCoordinates() async {
+    final location = await userRepository.getOwnLocation();
+    if (location?.isNotEmpty != true) return (null, null);
+
+    final parts = location!.split(',');
+    if (parts.length < 2) return (null, null);
+
+    final latitude = double.tryParse(parts[0].trim());
+    final longitude = double.tryParse(parts[1].trim());
+    return (latitude, longitude);
   }
 
   /// Fetches all points of interest.
@@ -63,10 +108,10 @@ class PoiCubit extends Cubit<PoiState> {
       final hasLocationConsent = await settingsService.hasLocationConsent();
 
       List<PointOfInterest> pois;
+      double? latitude;
+      double? longitude;
 
       if (hasLocationConsent) {
-        double latitude;
-        double longitude;
 
         // Check if explicit coordinates are provided (e.g., from map center)
         if (lat != null && lon != null) {
@@ -74,11 +119,10 @@ class PoiCubit extends Cubit<PoiState> {
           longitude = lon;
         } else {
           // Use user's saved location
-          final location = await userRepository.getOwnLocation();
-          latitude = location?.isNotEmpty == true ?
-            double.tryParse(location?.split(',')[0] ?? "") ?? 0.0 : 0.0;
-          longitude = location?.isNotEmpty == true ?
-            double.tryParse(location?.split(',')[1] ?? "") ?? 0.0 : 0.0;
+          final (savedLatitude, savedLongitude) =
+          await _getSavedLocationCoordinates();
+          latitude = savedLatitude ?? 0.0;
+          longitude = savedLongitude ?? 0.0;
 
           // Check if location is not set (0.0, 0.0)
           if (latitude == 0.0 && longitude == 0.0) {
@@ -95,7 +139,8 @@ class PoiCubit extends Cubit<PoiState> {
         // Omit geo parameters when user has not consented.
         pois = await _apiClient.getPointsOfInterestNoGeo(userId);
       }
-      final sortedPois = _sortPois(pois);
+      final visiblePois = _withFallbackCoordinates(pois, latitude, longitude);
+      final sortedPois = _sortPois(visiblePois);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
@@ -126,17 +171,17 @@ class PoiCubit extends Cubit<PoiState> {
     int? weight, String? seeking, String? offering, double? lat, double? lon}) async {
     try {
       emit(PoiLoading());
-      
+
       userId ??= await userRepository.getOwnUserId();
-      
+
       final settingsService = getIt<SettingsService>();
       final hasLocationConsent = await settingsService.hasLocationConsent();
 
       List<PointOfInterest> poi;
+      double? parsedLatitude;
+      double? parsedLongitude;
 
       if (hasLocationConsent) {
-        double parsedLatitude;
-        double parsedLongitude;
 
         // Check if explicit coordinates are provided (e.g., from map center)
         if (lat != null && lon != null) {
@@ -144,13 +189,10 @@ class PoiCubit extends Cubit<PoiState> {
           parsedLongitude = lon;
         } else {
           // Use user's saved location
-          final location = await userRepository.getOwnLocation();
-          parsedLatitude = location?.isNotEmpty == true
-              ? double.tryParse(location?.split(',')[0] ?? "") ?? 0.0
-              : 0.0;
-          parsedLongitude = location?.isNotEmpty == true
-              ? double.tryParse(location?.split(',')[1] ?? "") ?? 0.0
-              : 0.0;
+          final (savedLatitude, savedLongitude) =
+          await _getSavedLocationCoordinates();
+          parsedLatitude = savedLatitude ?? 0.0;
+          parsedLongitude = savedLongitude ?? 0.0;
 
           // Check if location is not set (0.0, 0.0)
           if (parsedLatitude == 0.0 && parsedLongitude == 0.0) {
@@ -184,7 +226,12 @@ class PoiCubit extends Cubit<PoiState> {
       poi.forEach((poi) {
         debugPrint('@@@@@@@@@@@ POI loaded: ${poi.profile.userId} ${poi.matchRelevancyScore}');
       });
-      final sortedPois = _sortPois(poi);
+      final visiblePois = _withFallbackCoordinates(
+        poi,
+        hasLocationConsent ? parsedLatitude : null,
+        hasLocationConsent ? parsedLongitude : null,
+      );
+      final sortedPois = _sortPois(visiblePois);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
@@ -212,17 +259,17 @@ class PoiCubit extends Cubit<PoiState> {
   Future<void> getSimilarProfiles(String keyword, {double? lat, double? lon, double? radiusMeters}) async {
     try {
       emit(PoiLoading());
-      
+
       userId ??= await userRepository.getOwnUserId();
-      
+
       final settingsService = getIt<SettingsService>();
       final hasLocationConsent = await settingsService.hasLocationConsent();
 
       List<PointOfInterest> poi;
+      double? latitude;
+      double? longitude;
 
       if (hasLocationConsent) {
-        double? latitude;
-        double? longitude;
 
         // Check if explicit coordinates are provided (e.g., from map center)
         if (lat != null && lon != null) {
@@ -230,11 +277,10 @@ class PoiCubit extends Cubit<PoiState> {
           longitude = lon;
         } else {
           // Use user's saved location
-          final location = await userRepository.getOwnLocation();
-          latitude = location?.isNotEmpty == true ?
-              double.tryParse(location?.split(',')[0] ?? "") : null;
-          longitude = location?.isNotEmpty == true ?
-              double.tryParse(location?.split(',')[1] ?? "") : null;
+          final (savedLatitude, savedLongitude) =
+          await _getSavedLocationCoordinates();
+          latitude = savedLatitude;
+          longitude = savedLongitude;
         }
 
         // Check if location is not set (0.0, 0.0) or null
@@ -260,7 +306,12 @@ class PoiCubit extends Cubit<PoiState> {
           null,
         );
       }
-      final sortedPois = _sortPois(poi);
+      final visiblePois = _withFallbackCoordinates(
+        poi,
+        hasLocationConsent ? latitude : null,
+        hasLocationConsent ? longitude : null,
+      );
+      final sortedPois = _sortPois(visiblePois);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
@@ -289,9 +340,9 @@ class PoiCubit extends Cubit<PoiState> {
   Future<void> getComplementaryProfiles(String keyword, {double? lat, double? lon, double? radiusMeters, bool fallbackToNearby = true}) async {
     try {
       emit(PoiLoading());
-      
+
       userId ??= await userRepository.getOwnUserId();
-      
+
       final settingsService = getIt<SettingsService>();
       final hasLocationConsent = await settingsService.hasLocationConsent();
 
@@ -306,11 +357,10 @@ class PoiCubit extends Cubit<PoiState> {
           longitude = lon;
         } else {
           // Use user's saved location
-          final location = await userRepository.getOwnLocation();
-          latitude = location?.isNotEmpty == true ?
-              double.tryParse(location?.split(',')[0] ?? "") : null;
-          longitude = location?.isNotEmpty == true ?
-              double.tryParse(location?.split(',')[1] ?? "") : null;
+          final (savedLatitude, savedLongitude) =
+          await _getSavedLocationCoordinates();
+          latitude = savedLatitude;
+          longitude = savedLongitude;
         }
 
         // Check if location is not set (0.0, 0.0) or null
@@ -347,8 +397,13 @@ class PoiCubit extends Cubit<PoiState> {
         );
         return;
       }
-      
-      final sortedPois = _sortPois(poi);
+
+      final visiblePois = _withFallbackCoordinates(
+        poi,
+        hasLocationConsent ? latitude : null,
+        hasLocationConsent ? longitude : null,
+      );
+      final sortedPois = _sortPois(visiblePois);
       emit(PoiLoaded(sortedPois));
     } on DioException catch (e) {
       final errorMessage = DioErrorHandler.getLocalizedApiErrorMessage(
