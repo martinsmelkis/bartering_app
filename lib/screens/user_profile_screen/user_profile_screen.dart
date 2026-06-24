@@ -48,7 +48,6 @@ import '../../services/settings_service.dart';
 import '../../theme/app_colors.dart';
 import 'widgets/badges_info_dialog.dart';
 import 'widgets/delete_profile_confirmation_dialog.dart';
-import 'widgets/premium_lock_icon.dart';
 import 'widgets/premium_user_benefits_dialog.dart';
 import 'widgets/profile_action_button.dart';
 import 'widgets/profile_coins_info_dialog.dart';
@@ -476,17 +475,15 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              SizedBox(width: 8.w),
-                              PremiumLockIcon(
-                                isPremiumActive: _isPremiumActive,
-                                onTap: _handlePremiumLockTap,
-                              ),
+                              SizedBox(width: 6.w),
+                              _buildReputationDisplay(),
+                              SizedBox(width: 4.w),
+                              _buildCoinsBalanceDisplay(),
                               const Spacer(),
                             ],
                           ),
                           SizedBox(height: 8.h),
-
-                          _buildRatingDisplay(l10n),
+                          _buildPurchaseQuickActions(l10n),
                           SizedBox(height: 8),
                           Divider(
                             height: 1,
@@ -989,19 +986,117 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     );
   }
 
-  /// Build rating display widget for profile header with badges and balance
-  Widget _buildRatingDisplay(AppLocalizations l10n) {
-    // Use reputation data if available, otherwise default to 0.0 and 0
+  Widget _buildPurchaseQuickActions(AppLocalizations l10n) {
+    return Wrap(
+      spacing: 8.w,
+      runSpacing: 8.h,
+      children: [
+        _buildCompactPurchaseAction(
+          icon: _isPremiumActive ? Icons.stars_sharp : Icons.workspace_premium,
+          label: _isPremiumActive ? 'Edit profile' : l10n.buyPremium,
+          backgroundColor: _isPremiumActive
+              ? Colors.green.withValues(alpha: 0.1)
+              : AppColors.primary.withValues(alpha: 0.1),
+          foregroundColor: _isPremiumActive ? Colors.green : AppColors.primary,
+          borderColor: _isPremiumActive
+              ? Colors.green.withValues(alpha: 0.35)
+              : AppColors.primary.withValues(alpha: 0.35),
+          iconBuilder: _isPremiumActive
+              ? (color) => _buildPremiumEditButtonIcon(color)
+              : null,
+          onTap: _isPremiumActive
+              ? _openPremiumProfileEditor
+              : _handlePremiumLockTap,
+        ),
+        _buildCompactPurchaseAction(
+          icon: Icons.monetization_on_outlined,
+          label: 'Coins and Avatars Shop',
+          backgroundColor: AppColors.secondary.withValues(alpha: 0.12),
+          foregroundColor: AppColors.secondary,
+          borderColor: AppColors.secondary.withValues(alpha: 0.38),
+          onTap: _showCoinsInfoDialog,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompactPurchaseAction({
+    required IconData icon,
+    required String label,
+    required Color backgroundColor,
+    required Color foregroundColor,
+    required Color borderColor,
+    required VoidCallback onTap,
+    Widget Function(Color color)? iconBuilder,
+  }) {
+    return PointerInterceptor(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18.r),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(18.r),
+            border: Border.all(color: borderColor),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              iconBuilder?.call(foregroundColor) ??
+                  Icon(icon, size: 16, color: foregroundColor),
+              SizedBox(width: 5.w),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: foregroundColor,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPremiumEditButtonIcon(Color color) {
+    return SizedBox(
+      width: 20,
+      height: 20,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Center(child: Icon(Icons.stars_sharp, size: 17, color: color)),
+          Positioned(
+            right: -1,
+            bottom: -1,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.35),
+                ),
+              ),
+              child: const Icon(Icons.edit, size: 10, color: AppColors.primary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReputationDisplay() {
     final rating = _reputationData?.averageRating ?? 0.0;
     final ratingColor = AvatarColorUtils.getRatingColor(rating);
-    final balanceText = _isLoadingWallet
-        ? '...'
-        : (_walletData?.availableBalance.toDouble() ?? 0.0).toStringAsFixed(2);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Rating badge
         if (_isLoadingReputation)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1052,8 +1147,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               ),
             ),
           ),
-        const SizedBox(width: 12),
-        // Badges display
+        const SizedBox(width: 8),
         if (_isLoadingBadges)
           const SizedBox(
             width: 16,
@@ -1108,77 +1202,60 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               ),
             ),
           ),
-        const SizedBox(width: 16),
-        // Account Balance placeholder
-        InkWell(
-          onTap: _showCoinsInfoDialog,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 21,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    '₿',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  balanceText,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 6),
-        InkWell(
-          onTap: _showCoinsInfoDialog,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.35),
-              ),
-            ),
-            alignment: Alignment.center,
-            child: const Icon(
-              Icons.question_mark,
-              size: 14,
-              color: AppColors.primary,
-            ),
-          ),
-        ),
       ],
+    );
+  }
+
+  Widget _buildCoinsBalanceDisplay() {
+    final balanceText = _isLoadingWallet
+        ? '...'
+        : (_walletData?.availableBalance.toDouble() ?? 0.0).toStringAsFixed(2);
+
+    return InkWell(
+      onTap: _showCoinsInfoDialog,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 21,
+              height: 20,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                '₿',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              balanceText,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
