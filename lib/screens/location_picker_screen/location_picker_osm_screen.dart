@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
@@ -83,7 +84,7 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
   Future<void> _saveLocation(GeoPoint point) async {
     _selectedPoint = point;
     if (_selectedPoint != null) {
-      if (Platform.isIOS) {
+      if (!kIsWeb && Platform.isIOS) {
         final publishToMap = await _confirmLocationCheckIn();
         if (publishToMap == null || publishToMap == false) {
           LocationCheckInService().setCheckedIn(false);

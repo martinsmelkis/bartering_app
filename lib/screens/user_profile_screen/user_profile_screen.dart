@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:barter_app/models/reviews/reputation_response.dart';
 import 'package:barter_app/models/reviews/review_submission.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
@@ -102,6 +104,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
   late final InAppPurchasesCubit _inAppPurchasesCubit;
   late final UserProfileScreenCubit _userProfileScreenCubit;
+  StreamSubscription<InAppPurchasesState>? _inAppPurchasesSubscription;
 
   @override
   void initState() {
@@ -153,6 +156,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       premiumEntitlementId: 'Bartering App Premium',
     );
 
+    _inAppPurchasesSubscription = _inAppPurchasesCubit.stream.listen(
+      _handleInAppPurchasesStateChanged,
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _inAppPurchasesCubit.initialize();
@@ -187,6 +194,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _inAppPurchasesSubscription?.cancel();
     _inAppPurchasesCubit.close();
     _userProfileScreenCubit.close();
     super.dispose();
@@ -196,7 +204,16 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _maybeSyncPendingPurchase();
+      _inAppPurchasesCubit.refreshPremiumStatus();
     }
+  }
+
+  void _handleInAppPurchasesStateChanged(InAppPurchasesState state) {
+    if (!mounted || _isPremiumActive == state.isPremium) return;
+
+    setState(() {
+      _isPremiumActive = state.isPremium;
+    });
   }
 
   /// Load reputation data with 10-minute caching
@@ -319,10 +336,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       });
     } catch (e) {
       logDebug('Error loading premium status: $e');
-      if (!mounted) return;
-      setState(() {
-        _isPremiumActive = false;
-      });
+      // Keep the current/cubit-derived premium state when the refresh fails.
     }
   }
 
@@ -335,6 +349,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
     try {
       await getIt<ApiClient>().syncPremiumNow();
+      await _loadPremiumStatus();
+      await _inAppPurchasesCubit.refreshPremiumStatus();
       await _loadWalletData();
       await settingsService.clearPendingPurchase();
 

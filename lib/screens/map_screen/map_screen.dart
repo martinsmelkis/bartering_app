@@ -235,7 +235,7 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
   }
 
   /// Perform default search based on settings
-  Future<void> _performDefaultSearch() async {
+  Future<void> _performDefaultSearch({GeoPoint? initialCenter}) async {
     if (!mounted) return;
 
     // Ensure user profile is loaded before searching
@@ -249,11 +249,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     final useMapCenter = await settingsService.getUseMapCenterForSearch();
     final radiusKm = await settingsService.getNearbyUsersRadius();
 
-    double? lat;
-    double? lon;
+    double? lat = initialCenter?.latitude;
+    double? lon = initialCenter?.longitude;
 
     // Get coordinates based on settings
-    if (useMapCenter && _isMapReady) {
+    if (lat == null && lon == null && useMapCenter && _isMapReady) {
       try {
         final mapCenter = await _mapController.centerMap;
         lat = mapCenter.latitude;
@@ -262,6 +262,12 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
         // If getting map center fails, continue without it (will use user location)
         debugPrint('Error getting map center: $e');
       }
+    }
+
+    if ((lat == null || lon == null) || (lat == 0.0 && lon == 0.0)) {
+      final savedPoint = await _getSavedLocationPoint();
+      lat = savedPoint?.latitude;
+      lon = savedPoint?.longitude;
     }
 
     final radiusMeters = radiusKm * 1000;
@@ -286,26 +292,51 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
     _loadUserProfile();
   }
 
-  Future<void> _zoomToSavedLocation() async {
+  Future<GeoPoint?> _getSavedLocationPoint() async {
     final locationString = await SecureStorageService().getOwnLocation();
-    if (locationString != null && locationString.isNotEmpty) {
-      final parts = locationString.split(',').map((part) => part.trim()).toList();
-      if (parts.length == 2) {
-        final lat = double.tryParse(parts[0]);
-        final lon = double.tryParse(parts[1]);
-        if (lat != null && lon != null) {
-          final savedPoint = GeoPoint(latitude: lat, longitude: lon);
-          await _safeMoveTo(savedPoint);
-          await _showSavedUserLocationMarker(savedPoint);
-          if (ResponsiveBreakpoints.isPhone(context)) {
-            await _safeSetZoom(12.0);
-          }
-        }
-      }
+    if (locationString == null || locationString.isEmpty) {
+      return null;
     }
+
+    final parts = locationString.split(',').map((part) => part.trim()).toList();
+    if (parts.length != 2) {
+      logDebug('⚠️ Invalid saved location format: $locationString');
+      return null;
+    }
+
+    final lat = double.tryParse(parts[0]);
+    final lon = double.tryParse(parts[1]);
+    if (lat == null || lon == null || (lat == 0.0 && lon == 0.0)) {
+      logDebug('⚠️ Invalid saved location coordinates: $locationString');
+      return null;
+    }
+
+    return GeoPoint(latitude: lat, longitude: lon);
+  }
+
+  Future<GeoPoint?> _zoomToSavedLocation() async {
+    final shouldUsePhoneZoom = ResponsiveBreakpoints.isPhone(context);
+    final savedPoint = await _getSavedLocationPoint();
+    if (savedPoint == null) {
+      return null;
+    }
+
+    logDebug('@@@@@@@@@ Centering map on saved location: '
+        '${savedPoint.latitude}, ${savedPoint.longitude}');
+    await _safeMoveTo(savedPoint);
+    await _showSavedUserLocationMarker(savedPoint);
+    if (shouldUsePhoneZoom) {
+      await _safeSetZoom(12.0);
+    }
+    return savedPoint;
   }
 
   void _onMapReady(bool isReady) async {
+    if (!isReady) {
+      logDebug('@@@@@@@@@ _onMapReady called with isReady=false, waiting');
+      return;
+    }
+
     // Guard to prevent multiple executions
     if (_isMapReady) {
       logDebug('@@@@@@@@@ _onMapReady called but already ready, ignoring');
@@ -330,13 +361,11 @@ class _MapScreenV2State extends State<MapScreenV2> with OSMMixinObserver {
       _processPois(widget.initialPois!);
     } else {
       // Default behavior: zoom to saved location and perform default search
-      await _zoomToSavedLocation();
+      final savedPoint = await _zoomToSavedLocation();
 
-      // Check if user has a saved location before performing search
-      final locationString = await SecureStorageService().getOwnLocation();
-      if (locationString != null && locationString.isNotEmpty) {
+      if (savedPoint != null) {
         // User has a location set, trigger default search now that map is ready
-        await _performDefaultSearch();
+        await _performDefaultSearch(initialCenter: savedPoint);
       } else {
         debugPrint('⚠️ No user location set yet - skipping initial search');
         // Optionally show a message to the user that they need to set their location

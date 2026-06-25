@@ -155,6 +155,7 @@ class InAppPurchasesCubit extends Cubit<InAppPurchasesState> {
     try {
       if (kIsWeb) {
         await refreshPremiumStatus();
+        emit(state.copyWith(isInitializing: false));
         return;
       }
 

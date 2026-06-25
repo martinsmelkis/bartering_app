@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:barter_app/configure_dependencies.dart';
 import 'package:barter_app/data/local/app_database.dart';
+import 'package:barter_app/flavor_config.dart';
 import 'package:barter_app/models/user/parsed_attribute_data.dart';
 import 'package:barter_app/models/user/user_onboarding_data.dart';
 import 'package:barter_app/services/api_client.dart';
@@ -21,6 +22,9 @@ part 'onboarding_state.dart';
 
 @injectable
 class OnboardingCubit extends Cubit<OnboardingState> {
+  static const String _parseOnboardingEndpoint =
+      '/api/v1/ai/parse-onboarding';
+
   final UserRepository _userRepository;
   final ApiClient _apiClient;
   final DeviceFingerprintService _fingerprintService;
@@ -105,8 +109,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       await _userRepository.saveProfileKeywordDataMap(profileData);
 
       // --- Check if this is initial onboarding (no prior profile exists) ---
-      final AppDatabase _appDatabase = getIt<AppDatabase>();
-      final existingProfileCount = await _appDatabase.profiles.count().getSingle();
+      final AppDatabase appDatabase = getIt<AppDatabase>();
+      final existingProfileCount = await appDatabase.profiles.count().getSingle();
       final isInitialOnboarding = existingProfileCount == 0;
 
       // --- Save data to local Drift database ---
@@ -119,14 +123,21 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       );
       logDebug("@@@@@@@@@ User data saved to local database 0.");
       logDebug("@@@@@@@@@ User data saved to local database 1.");
-      await _appDatabase.profiles.insertOne(
+      await appDatabase.profiles.insertOne(
           userCompanion, mode: drift.InsertMode.insertOrReplace);
       logDebug("@@@@@@@@@ User data saved to local database.");
 
-      final usersData = await _appDatabase.profiles.select().get();
-      logDebug('@@@@@@@@@@ usersData in DB: ${ usersData}');
+      final usersData = await appDatabase.profiles.select().get();
+      logDebug('@@@@@@@@@@ usersData in DB: $usersData');
 
-      logDebug('@@@@@@@@@@@ Submit onboarding data: $profileData');
+      final onboardingUrl = _buildApiUrl(_parseOnboardingEndpoint);
+      _logOnboardingDiagnostic(
+        'Preparing onboarding submission',
+        url: onboardingUrl,
+        userId: userId,
+        languageCode: languageCode,
+        profileData: profileData,
+      );
       // --- Call API ---
       UserOnboardingData user = UserOnboardingData(
           userId: userId, onboardingKeyNamesToWeights: profileData);
@@ -134,11 +145,18 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       final interestsList = await _apiClient.getInterestsFromOnboardingData(
           user, languageCode);
 
+      _logOnboardingDiagnostic(
+        'Onboarding submission succeeded',
+        url: onboardingUrl,
+        userId: userId,
+        languageCode: languageCode,
+        profileData: profileData,
+      );
       logDebug('@@@@@@@@@@@ API Result: $interestsList');
       logDebug('API Result: $interestsList');
 
       // Save server-suggested offerings for quick search suggestions
-      if (interestsList != null && interestsList.isNotEmpty) {
+      if (interestsList.isNotEmpty) {
         await _userRepository.saveSuggestedInterests(interestsList);
       }
 
@@ -160,15 +178,72 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       } else {
         logDebug('@@@@@@@@@@@ Cubit was closed, cannot emit success state');
       }
-    } catch (e) {
-      logDebugError('Error completing onboarding', e);
+    } catch (e, stackTrace) {
+      final onboardingUrl = _buildApiUrl(_parseOnboardingEndpoint);
+      _logOnboardingDiagnostic(
+        'Onboarding submission failed',
+        url: onboardingUrl,
+        languageCode: languageCode,
+        error: e,
+        stackTrace: stackTrace,
+      );
+      logDebugError('Error completing onboarding', e, stackTrace);
       if (!isClosed) {
         emit(state.copyWith(
           status: OnboardingStatus.error,
-          errorMessage: e.toString(),
+          errorMessage: 'Onboarding request failed. URL: $onboardingUrl\n$e',
         ));
       }
     }
+  }
+
+  String _buildApiUrl(String endpoint) {
+    final baseUrl = ApiClient.serviceBaseUrl;
+    final normalizedBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final normalizedEndpoint = endpoint.startsWith('/') ? endpoint : '/$endpoint';
+    return '$normalizedBaseUrl$normalizedEndpoint';
+  }
+
+  void _logOnboardingDiagnostic(
+    String message, {
+    required String url,
+    String? userId,
+    String? languageCode,
+    Map<String, double>? profileData,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    final buffer = StringBuffer()
+      ..writeln('@@@@@@@@@@@ $message')
+      ..writeln('@@@@@@@@@@@ Flavor: ${FlavorConfig.flavor.name}')
+      ..writeln('@@@@@@@@@@@ Environment file: ${FlavorConfig.envFileName}')
+      ..writeln('@@@@@@@@@@@ kReleaseMode: $kReleaseMode')
+      ..writeln('@@@@@@@@@@@ kDebugMode: $kDebugMode')
+      ..writeln('@@@@@@@@@@@ Platform: ${kIsWeb ? 'web' : Platform.operatingSystem}')
+      ..writeln('@@@@@@@@@@@ API base URL: ${ApiClient.serviceBaseUrl}')
+      ..writeln('@@@@@@@@@@@ API endpoint: $_parseOnboardingEndpoint')
+      ..writeln('@@@@@@@@@@@ Attempted URL: $url');
+
+    if (languageCode != null) {
+      buffer.writeln('@@@@@@@@@@@ Accept-Language: $languageCode');
+    }
+    if (userId != null) {
+      buffer.writeln('@@@@@@@@@@@ User ID: $userId');
+    }
+    if (profileData != null) {
+      buffer.writeln('@@@@@@@@@@@ Profile data keys: ${profileData.keys.toList()}');
+      buffer.writeln('@@@@@@@@@@@ Profile data values: $profileData');
+    }
+    if (error != null) {
+      buffer.writeln('@@@@@@@@@@@ Error: $error');
+    }
+    if (stackTrace != null) {
+      buffer.writeln('@@@@@@@@@@@ Stack trace: $stackTrace');
+    }
+
+    debugPrint(buffer.toString());
   }
 
   void updateInterestsList(List<ParsedAttributeData> parsedInterests) {
