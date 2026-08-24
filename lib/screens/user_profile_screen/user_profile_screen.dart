@@ -495,7 +495,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                               _buildReputationDisplay(),
                               SizedBox(width: 4.w),
                               _buildCoinsBalanceDisplay(),
-                              const Spacer(),
+                              kIsWeb ? const SizedBox() : const Spacer(),
                             ],
                           ),
                           SizedBox(height: 8.h),
@@ -1050,7 +1050,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         onTap: onTap,
         borderRadius: BorderRadius.circular(18.r),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(18.r),
@@ -1061,7 +1061,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             children: [
               iconBuilder?.call(foregroundColor) ??
                   Icon(icon, size: 16, color: foregroundColor),
-              SizedBox(width: 5.w),
+              SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(

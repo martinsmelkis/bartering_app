@@ -38,6 +38,36 @@ class LocationPickerScreenWidget extends StatefulWidget {
   State<LocationPickerScreenWidget> createState() => _LocationPickerOsmScreenState();
 }
 
+class _LocationPickerTitle extends StatelessWidget {
+  const _LocationPickerTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    final bodySmall = Theme.of(context).textTheme.bodySmall;
+
+    return IgnorePointer(
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            'Set your Location',
+            textAlign: TextAlign.center,
+            style: bodySmall?.copyWith(
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+              fontSize: (bodySmall.fontSize ?? 12) * 1.2,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
 
   ValueNotifier<bool> trackingNotifier = ValueNotifier(false);
@@ -246,9 +276,11 @@ class _LocationPickerOsmScreenState extends State<LocationPickerScreenWidget> {
         onMapReady: _onMapReady,
         showDefaultMarkerPickWidget: true,
         topWidgetPicker: Padding(
-          padding: const EdgeInsets.only(top: 56, left: 8, right: 8),
+          padding: const EdgeInsets.only(top: 46, left: 8, right: 8),
           child: Column(
             children: [
+              const _LocationPickerTitle(),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   PointerInterceptor(

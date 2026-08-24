@@ -205,6 +205,7 @@
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+				4F7A4DCC2F3B4E71963A4A10 /* Embed sqlite3mc Native Asset */,
 				2C6051BE7CCBB61388BBD91C /* [CP] Embed Pods Frameworks */,
 				E811C3C1D1A0507BCBF1986B /* [CP] Copy Pods Resources */,
 			);
@@ -337,6 +338,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
+		};
+		4F7A4DCC2F3B4E71963A4A10 /* Embed sqlite3mc Native Asset */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed sqlite3mc Native Asset";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nNATIVE_ASSETS_ROOT=\"${FLUTTER_APPLICATION_PATH:-${SRCROOT}/..}/${FLUTTER_BUILD_DIR}/native_assets/ios\"\nAPP_FRAMEWORKS_DIR=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nmkdir -p \"$APP_FRAMEWORKS_DIR\"\nfor FRAMEWORK_NAME in sqlite3mc libsqlite3mc; do\n  SQLITE_FRAMEWORK=\"${NATIVE_ASSETS_ROOT}/${FRAMEWORK_NAME}.framework\"\n  if [ -d \"$SQLITE_FRAMEWORK\" ]; then\n    rsync -av --delete \"$SQLITE_FRAMEWORK\" \"$APP_FRAMEWORKS_DIR/\"\n    if [ -n \"${EXPANDED_CODE_SIGN_IDENTITY:-}\" ]; then\n      /usr/bin/codesign --force --sign \"${EXPANDED_CODE_SIGN_IDENTITY}\" --preserve-metadata=identifier,entitlements \"${APP_FRAMEWORKS_DIR}/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}\"\n    fi\n  else\n    echo \"${FRAMEWORK_NAME}.framework not found at $SQLITE_FRAMEWORK.\"\n  fi\ndone\n";
 		};
 		4AA790213B5CAFF8C2334383 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

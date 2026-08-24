@@ -96,6 +96,14 @@ class AppRouter {
     navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: true,
     initialLocation: _initialLocation(),
+    // On web, the browser's own "platform default location" (derived from
+    // window.location by the Flutter engine) can be unreliable for hash
+    // fragments on a cold load/refresh (e.g. https://bartering.app/#/delete-account
+    // resolving to "/" instead of "/delete-account"). Force our own
+    // Uri.base-derived `_initialLocation()` to always win on web so public
+    // deep-linked pages (delete-account, privacy-policy, terms) never get
+    // silently dropped in favor of the default /initialize -> /map flow.
+    overridePlatformDefaultLocation: kIsWeb,
     redirect: (context, state) {
       final token = _extractUnsubscribeToken(state);
       final hasToken = token != null && token.isNotEmpty;

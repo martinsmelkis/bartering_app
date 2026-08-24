@@ -57,6 +57,14 @@ class PlatformInterface {
     }
 
     if (!kReleaseMode) {
+      if (Platform.isIOS) {
+        logDebug(
+          '⚠️ Using an unencrypted iOS debug/profile database to avoid '
+          'sqlite3mc simulator native-asset loading issues.',
+        );
+        return _createUnencryptedDevelopmentDatabase(path.path, databaseName);
+      }
+
       try {
         return NativeDatabase.createInBackground(
           dbFile,
